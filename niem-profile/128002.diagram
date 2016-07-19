@@ -1,0 +1,119 @@
+format 209
+
+classcanvas 128002 class_ref 143874 // Charge
+  classdiagramsettings hide_attributes yes member_max_width 0 show_infonote yes end
+  xyz 502 483 2000
+  constraint 131202
+    hidden
+    end
+    "See CriminalCase
+"
+      xyzwh 334 468 2000 119 59
+end
+classcanvas 128130 class_ref 146178 // CaseTypeSpecificInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 440 51 2000
+end
+classcanvas 128258 class_ref 183682 // AppellateCaseInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 431 119 2000
+end
+classcanvas 128386 class_ref 183810 // CourtRuleAppellateCaseInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 26 20 2000
+end
+classcanvas 128514 class_ref 183938 // CivilAppellateCaseInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 39 266 2005
+end
+classcanvas 128642 class_ref 184066 // AddedParty
+  classdiagramsettings member_max_width 0 end
+  xyz 833 113 2000
+end
+classcanvas 128770 class_ref 184194 // RemovedParty
+  classdiagramsettings member_max_width 0 end
+  xyz 823 227 2000
+end
+classcanvas 128898 class_ref 184322 // CriminalAppellateCaseInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 400 359 2000
+end
+classcanvas 129026 class_ref 184450 // Sentence
+  classdiagramsettings member_max_width 0 end
+  xyz 864 408 2000
+end
+classcanvas 129154 class_ref 184578 // SentenceComponent
+  classdiagramsettings member_max_width 0 end
+  xyz 792 510 2000
+end
+classcanvas 129282 class_ref 184706 // ChargeDisposition
+  classdiagramsettings member_max_width 0 end
+  xyz 401 583 2000
+end
+relationcanvas 129410 relation_ref 177794 // <generalisation>
+  from ref 128258 z 2001 stereotype "<<ECF>>" xyz 522 117 3000 to ref 128130
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 129538 relation_ref 177922 // <directional aggregation>
+  from ref 128258 z 2001 stereotype "<<ECF>>" xyz 327 150 3000 to ref 128386
+  role_a_pos 307 102 3000 no_role_b
+  multiplicity_a_pos 307 135 3000 no_multiplicity_b
+end
+relationcanvas 129666 relation_ref 178050 // <directional aggregation>
+  from ref 128258 z 2006 stereotype "<<ECF>>" xyz 321 268 3000 to ref 128514
+  role_a_pos 295 256 3000 no_role_b
+  multiplicity_a_pos 295 289 3000 no_multiplicity_b
+end
+relationcanvas 129794 relation_ref 178178 // <directional aggregation>
+  from ref 128258 z 2001 stereotype "<<ECF>>" xyz 724 195 3000 to ref 128642
+  role_a_pos 740 158 3000 no_role_b
+  multiplicity_a_pos 816 191 3000 no_multiplicity_b
+end
+relationcanvas 129922 relation_ref 178306 // <directional aggregation>
+  from ref 128258 z 2001 stereotype "<<ECF>>" xyz 487.5 242 3000 to ref 128770
+  role_a_pos 723 239 3000 no_role_b
+  multiplicity_a_pos 806 272 3000 no_multiplicity_b
+end
+relationcanvas 130050 relation_ref 178434 // <directional aggregation>
+  from ref 128258 z 2001 stereotype "<<ECF>>" xyz 505 352 3000 to ref 128898
+  role_a_pos 552 334 3000 no_role_b
+  multiplicity_a_pos 506 334 3000 no_multiplicity_b
+end
+relationcanvas 130178 relation_ref 178562 // <directional aggregation>
+  from ref 128898 z 2001 stereotype "<<ECF>>" xyz 504 453 3000 to ref 128002
+  role_a_pos 551 458 3000 no_role_b
+  multiplicity_a_pos 525 458 3000 no_multiplicity_b
+end
+relationcanvas 130306 relation_ref 178690 // <directional aggregation>
+  from ref 128898 z 2001 stereotype "<<ECF>>" xyz 671.5 429 3000 to ref 129026
+  role_a_pos 790 412 3000 no_role_b
+  multiplicity_a_pos 847 445 3000 no_multiplicity_b
+end
+relationcanvas 130434 relation_ref 178818 // <directional aggregation>
+  from ref 129026 z 2001 stereotype "<<ECF>>" xyz 688 484 3000 to ref 128002
+  role_a_pos 596 483 3000 no_role_b
+  multiplicity_a_pos 596 516 3000 no_multiplicity_b
+end
+relationcanvas 130562 relation_ref 178946 // <directional aggregation>
+  from ref 129026 z 2001 stereotype "<<ECF>>" xyz 895 498 3000 to ref 129154
+  role_a_pos 941 485 3000 no_role_b
+  multiplicity_a_pos 898 485 3000 no_multiplicity_b
+end
+relationcanvas 130690 relation_ref 179074 // <directional aggregation>
+  decenter_begin 652
+  from ref 128002 z 2001 stereotype "<<ECF>>" xyz 518 565 3000 to ref 129282
+  role_a_pos 563 558 3000 no_role_b
+  multiplicity_a_pos 517 558 3000 no_multiplicity_b
+end
+relationcanvas 130818 relation_ref 179202 // <directional aggregation>
+  from ref 129026 z 2001 stereotype "<<ECF>>" xyz 913 380 3000 to point 952 351
+  line 130946 z 2001 to point 887 346
+  line 131458 z 2001 to point 859 362
+  line 131074 z 2001 to ref 129026
+  role_a_pos 903 383 3000 no_role_b
+  multiplicity_a_pos 877 383 3000 no_multiplicity_b
+end
+line 131330 -_-_
+  from ref 128002 z 2001 to ref 131202
+end

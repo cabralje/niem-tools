@@ -1,0 +1,8 @@
+window_sizes 2872 1526 338 2528 1469 0
+cleanlooks_style
+selected class_ref 219138 // niemProperty
+open
+  class_ref 206082 // niem
+  class_ref 219138 // niemProperty
+end
+end
