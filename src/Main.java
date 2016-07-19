@@ -20,12 +20,12 @@ class Main {
           int argc = argv.length-1;
           switch (argv[0]) {
             case "importSchema":
- 
+
               // Import NIEM schema
               UmlCom.trace("Importing NIEM schema");
               NiemTools.importSchemaDir();
               break;
-   
+
             case "reset":
 
               // Globally reset NIEM Stereotype
@@ -44,6 +44,10 @@ class Main {
 
             default:
 
+            // Import NIEM schema
+            UmlCom.trace("Importing NIEM schema");
+            NiemTools.importSchemaDir();
+            
 	      // Generate UML Model HTML documentation
 //	      target.set_dir(argv.length - 1, argv);
 	      target.set_dir(0,null);
@@ -57,18 +61,18 @@ class Main {
 	      UmlItem.end_file();
 	      UmlClass.generate();
 
-              // Generate NIEM Mapping HTML
+        // Generate NIEM Mapping HTML
 	      UmlCom.trace("Generating NIEM Mapping");
-              NiemTools.exportHtml();
+        NiemTools.exportHtml();
 
-              // Generate NIEM Mapping CSV
+        // Generate NIEM Mapping CSV
 	      UmlCom.trace("Generating NIEM Mapping CSV");
-              NiemTools.exportCsv();
+        NiemTools.exportCsv();
 
-              // Generate NIEM Wantlist instance
+        // Generate NIEM Wantlist instance
 	      UmlCom.trace("Generating NIEM Wantlist");
-              NiemTools.exportWantlist();
-              break;
+        NiemTools.exportWantlist();
+        break;
 	  }
 	  UmlCom.trace("Done");
 	  UmlCom.message("");
