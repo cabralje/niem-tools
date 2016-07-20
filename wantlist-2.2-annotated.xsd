@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    attributeFormDefault="qualified"
+    elementFormDefault="qualified"
+    targetNamespace="http://niem.gov/niem/wantlist/2.2"
+    version="1"
+    xmlns:w="http://niem.gov/niem/wantlist/2.2"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+<xsd:element name="WantList" type="w:WantListType">
+  <xsd:annotation> 
+    <xsd:documentation>
+      A list or record of XML Schema types, elements, and attributes and their
+      associated metadata selected from a release of a product.  A WantList is 
+      a compact representation for a subset that contains enough information 
+      to regenerate the original complete schema subset.  In all definitions 
+      within this WantList schema, "a product release" means "a release of a 
+      product."  References to types, elements, and attributes refer to data 
+      components in an XML schema of a product release.
+    </xsd:documentation>
+  </xsd:annotation>
+</xsd:element>
+
+<xsd:complexType name="WantListType">
+  <xsd:annotation> 
+    <xsd:documentation>
+      A data structure for a list or record of types and properties 
+      and their associated metadata selected from a product release.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:sequence>
+
+     <xsd:element name="Attribute" type="w:AttributeType" minOccurs="0" maxOccurs="unbounded">
+       <xsd:annotation>
+         <xsd:documentation>
+           An XML Schema attribute in a product release.
+         </xsd:documentation>
+       </xsd:annotation>
+     </xsd:element>
+
+     <xsd:element name="Element" type="w:ElementType" minOccurs="0" maxOccurs="unbounded">
+       <xsd:annotation> 
+         <xsd:documentation>
+           An XML Schema element in a product release.
+         </xsd:documentation>
+       </xsd:annotation>
+     </xsd:element>
+
+     <xsd:element name="Type" type="w:TypeType" minOccurs="0" maxOccurs="unbounded">
+       <xsd:annotation> 
+         <xsd:documentation>
+           An XML Schema type in a product release.
+         </xsd:documentation>
+       </xsd:annotation>
+     </xsd:element>
+
+  </xsd:sequence>
+
+  <xsd:attribute name="product" use="required" type="xsd:string">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A product used by this WantList: NIEM or GJXDM. 
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+  <xsd:attribute name="release" use="required" type="w:VersionType">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A version number for the release of the product used by this WantList.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+  <xsd:attribute name="nillableDefault" use="required" type="xsd:boolean">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A version number for the release of the product used by this WantList.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+</xsd:complexType>
+
+<xsd:simpleType name="VersionType">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A data structure for a version number for the product release.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:restriction base="xsd:token">
+        <xsd:pattern value="[0-9]+(\.[0-9]+)*((alpha|beta|rc)[0-9]+)?(-[A-z]+)*"/>
+      </xsd:restriction>
+</xsd:simpleType>
+
+<xsd:complexType name="AttributeType">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A data structure for describing an attribute in a product release.
+        </xsd:documentation>
+      </xsd:annotation>
+
+      <xsd:attribute name="name" use="required" type="xsd:QName">
+        <xsd:annotation> 
+          <xsd:documentation>
+            A qualified name for an attribute.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+
+      <xsd:attribute name="qualifier" use="optional" type="xsd:NCName">
+        <xsd:annotation> 
+          <xsd:documentation>
+            A label that identifies the type of a GJXDM 
+            attribute when multiple types are available.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+</xsd:complexType>
+
+<xsd:complexType name="ElementType">
+          <xsd:annotation> 
+    <xsd:documentation>
+      A data structure for describing an element in a product release.
+    </xsd:documentation>
+  </xsd:annotation>
+
+	<xsd:attribute name="name" use="required" type="xsd:QName">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A qualified name for an element.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+	<xsd:attribute name="qualifier" use="optional" type="xsd:NCName">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A label that identifies the type of a GJXDM 
+        element when multiple types are available.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+	<xsd:attribute name="isReference" use="required" type="xsd:boolean">
+    <xsd:annotation> 
+      <xsd:documentation>
+        True, if this element can be used as a reference;
+        and therefore, an associated reference element will exist.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+	<xsd:attribute name="nillable" use="required" type="xsd:boolean">
+    <xsd:annotation> 
+      <xsd:documentation>
+        True, if this element is nillable.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+</xsd:complexType>
+
+<xsd:complexType name="TypeType">
+  <xsd:annotation> 
+    <xsd:documentation>
+      A data structure for describing a type in a product release.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:sequence>
+    <xsd:element name="AttributeInType" type="w:AttributeInTypeType" minOccurs="0" maxOccurs="unbounded">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A description of the usage of an attribute 
+          included in a type in a product release.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="ElementInType" type="w:ElementInTypeType" minOccurs="0" maxOccurs="unbounded">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A description of the usage of an element 
+          included in a type in a product release.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="Facet" type="w:FacetType" minOccurs="0" maxOccurs="unbounded">
+      <xsd:annotation>
+        <xsd:documentation>
+          A kind of XML Schema restriction on a type.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+
+    <xsd:element name="UnionMember" type="w:UnionMemberType" minOccurs="0" maxOccurs="unbounded">
+      <xsd:annotation>
+        <xsd:documentation>
+          A type that is a member of a named 
+          union of types in a product release.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:element>
+  </xsd:sequence>
+        
+  <xsd:attribute name="name" use="required" type="xsd:QName">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A qualified name for a type.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+  <xsd:attribute name="isRequested" use="required" type="xsd:boolean">
+    <xsd:annotation> 
+      <xsd:documentation>
+        True, if the type was explicitly selected for a subset; 
+        false, if it was automatically added as a dependency.
+        Not all requirements must be conveyed in the wantlist, 
+        only the ones that are needed to convey the requested 
+        information.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+</xsd:complexType>
+
+<xsd:complexType name="AttributeInTypeType">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A data structure for describing usage of an attribute 
+        included in a type in a product release.
+      </xsd:documentation>
+    </xsd:annotation>
+
+  <xsd:attribute name="name" use="required" type="xsd:QName">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A qualified name for an attribute.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+  <xsd:attribute name="qualifier" use="optional" type="xsd:NCName">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A label that identifies the type of a GJXDM 
+        attribute when multiple types are available.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+  <xsd:attribute name="minOccurs" use="optional" type="xsd:nonNegativeInteger">
+    <xsd:annotation> 
+      <xsd:documentation>
+	Least cardinality allowed for an attribute; values = "0" or "1".
+	IF minOccurs=  AND maxOccurs=	THEN	cardinality=
+	 	"1"		"1"		"required"
+		"0"		"1"		"optional"
+		"0"		"0"		"not allowed"
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+  <xsd:attribute name="maxOccurs" use="optional" type="xsd:nonNegativeInteger">
+    <xsd:annotation> 
+      <xsd:documentation>
+	Greatest cardinality allowed for an attribute; values = "0" or "1".
+	IF minOccurs=  AND maxOccurs=	THEN	cardinality=
+	 	"1"		"1"		"required"
+		"0"		"1"		"optional"
+		"0"		"0"		"not allowed"
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+</xsd:complexType>
+
+<xsd:complexType name="ElementInTypeType">
+  <xsd:annotation> 
+    <xsd:documentation>
+      A data structure for describing usage of an 
+      element included in a type in a product release.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:attribute name="name" use="required" type="xsd:QName">
+    <xsd:annotation> 
+      <xsd:documentation>
+          A qualified name for an element.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+  <xsd:attribute name="qualifier" use="optional" type="xsd:NCName">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A label that identifies the type of a GJXDM 
+        element when multiple types are available.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+  <xsd:attribute name="isReference" use="required" type="xsd:boolean">
+    <xsd:annotation> 
+      <xsd:documentation>
+        True, if this element can be used as a reference; 
+        and therefore, an associated reference element will exist.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+  <xsd:attribute name="minOccurs" use="optional" type="xsd:nonNegativeInteger">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A least cardinality constraint.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+  <xsd:attribute name="maxOccurs" use="optional" type="w:allNNI">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A greatest cardinality constraint.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+        
+  <xsd:attribute name="choice" use="optional" type="w:PositiveIntegerListType">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A list of indices corresponding to choices in xsd:choice.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+</xsd:complexType>
+
+<xsd:complexType name="FacetType">
+  <xsd:annotation> 
+    <xsd:documentation>
+      A data structure for describing usage of an XML Schema 
+      restriction (i.e., facet) on a type in a product release.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:attribute name="facet" use="required" type="w:FacetFacetType">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A kind of XML Schema restriction on a type.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+
+  <xsd:attribute name="value" use="required">
+    <xsd:annotation> 
+      <xsd:documentation>
+        A numeric value for a facet that defines a bound or constraint.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+</xsd:complexType>
+
+<xsd:simpleType name="FacetFacetType">
+  <xsd:annotation> 
+    <xsd:documentation>
+      A data structure for describing a kind 
+      of a XML Schema restriction on a type.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:restriction base="xsd:token">
+    <xsd:enumeration value="minExclusive">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A minimum range constraint that excludes this bounding value.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:enumeration>
+    <xsd:enumeration value="minInclusive">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A minimum range constraint that includes this bounding value.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:enumeration>
+    <xsd:enumeration value="maxExclusive">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A maximum range constraint that excludes this bounding value.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:enumeration>
+    <xsd:enumeration value="maxInclusive">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A maximum range constraint that includes this bounding value.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:enumeration>
+    <xsd:enumeration value="totalDigits">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A constraint that specifies the quantity of digital characters 
+          (including a decimal point) that a decimal number may contain.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:enumeration>
+    <xsd:enumeration value="fractionDigits">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A constraint that specifies the quantity of digital characters
+          a decimal number may contain to the right of its decimal point.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:enumeration>
+    <xsd:enumeration value="length">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A constraint that specifies the exact character length of a string.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:enumeration>
+    <xsd:enumeration value="minLength">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A constraint that specifies the minimum character length of a string.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:enumeration>
+    <xsd:enumeration value="maxLength">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A constraint that specifies the maximum character length of a string.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:enumeration>
+    <xsd:enumeration value="enumeration">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A constraint that specifies an exact set of values.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:enumeration>
+    <xsd:enumeration value="whiteSpace">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A constraint that specifices how whitespace (non-printable) characters 
+          will be treated within a character string (Per W3C XML Schema, 
+          possible values are: preserve, replace, or collapse).
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:enumeration>
+    <xsd:enumeration value="pattern">
+      <xsd:annotation> 
+        <xsd:documentation>
+          A constraint that specifies an explicit character string format.
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:enumeration>
+  </xsd:restriction>
+</xsd:simpleType>
+  
+<xsd:complexType name="UnionMemberType">
+  <xsd:annotation> 
+    <xsd:documentation>
+      A data structure that describes a type that is a member 
+      of a named union of types in a product release.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:attribute name="type" use="required" type="xsd:QName">
+    <xsd:annotation>
+      <xsd:documentation>
+        A qualified name for a type.
+      </xsd:documentation>
+    </xsd:annotation>
+  </xsd:attribute>
+</xsd:complexType>
+
+<xsd:simpleType name="allNNI">
+  <xsd:annotation>
+    <xsd:documentation>
+      A data structure that describes a maximum occurence (maxOccurs)
+      constraint value on a declaration of element use within a type 
+      (i.e., ref).  Value set is the union of nonNegativeInteger and 
+      the string "unbounded".
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:union memberTypes="xsd:nonNegativeInteger">
+    <xsd:simpleType>
+      <xsd:restriction base="xsd:NMTOKEN">
+        <xsd:enumeration value="unbounded">
+          <xsd:annotation>
+            <xsd:documentation>
+              A maximum occurrence (maxOccurs) cardinality 
+              constraint without bound.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:enumeration>
+      </xsd:restriction>
+    </xsd:simpleType>
+  </xsd:union>
+</xsd:simpleType>
+
+<xsd:simpleType name="PositiveIntegerListType">
+  <xsd:annotation> 
+    <xsd:documentation>
+      A data structure for a list of integers used 
+      as indices to choices in xsd:choice.
+    </xsd:documentation>
+  </xsd:annotation>
+  <xsd:list itemType="xsd:positiveInteger"/>
+</xsd:simpleType>
+
+</xsd:schema>
+

@@ -19,7 +19,7 @@ import javax.xml.parsers.*;         // DOM
 import org.w3c.dom.*;               // DOM
 import org.xml.sax.*;               // SAX
 import com.opencsv.*;                 // OpenCSV library
-import gov.niem.niem.wantlist._2.*;   // NIEM Wantlist JAXB bindings
+// import gov.niem.niem.wantlist._2.*;   // NIEM Wantlist JAXB bindings
 
 class NiemTools extends UmlClass {
 
