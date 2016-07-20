@@ -25,25 +25,28 @@ class NiemTools extends UmlClass {
 
   private static HashMap<String,String> NiemElements = new HashMap<String,String>();
   private static HashMap<String,String> NiemTypes = new HashMap<String,String>();
+  private static HashMap<String,List<String>> NiemElementsInType = new HashMap<String,List<String>>();
   private static HashMap<String,String> NiemNamespaces = new HashMap<String,String>();
+
 
   // protected static final String[] niemSchema = {"nc","j"};
 
   protected static final String niemStereotype = "niem-profile:niem";
 
-  // NIEM mapping spreadsheet column headings, NIEM profile profile steroetype, NIEM profile legacy stereotype
-  public static final String[][] map = {{"Model Class","",""},
- {"Model Attribute","",""},
- {"Model Multiplicity","",""},
- {"Model Definition","",""},
- {"NIEM XPath","XPath","OldXPath"},
- {"NIEM Type","Type",""},
- {"NIEM Property","Property",""},
- {"NIEM Base Type","BaseType",""},
- {"NIEM Multiplicity","Multiplicity","OldMultiplicity"},
- {"Old XPath","OldXPath",""},
- {"Old Multiplcity","OldMultiplicity",""},
- {"NIEM Mapping Notes","Notes",""}};
+  // NIEM mapping spreadsheet column headings, NIEM profile profile steroetype, NIEM profile legacy stereotype, NIEM profile container stereotype
+  public static final String[][] map = {
+ {"Model Class","","",""},
+ {"Model Attribute","","",""},
+ {"Model Multiplicity","","",""},
+ {"Model Definition","","",""},
+ {"NIEM XPath","XPath","OldXPath",""},
+ {"NIEM Type","Type","",""},
+ {"NIEM Property","Property","","Type"},
+ {"NIEM Base Type","BaseType","",""},
+ {"NIEM Multiplicity","Multiplicity","OldMultiplicity",""},
+ {"Old XPath","OldXPath","",""},
+ {"Old Multiplcity","OldMultiplicity","",""},
+ {"NIEM Mapping Notes","Notes","",""}};
 
   // initializer
   public NiemTools(long id, String n) {
@@ -355,10 +358,11 @@ class NiemTools extends UmlClass {
       Document doc = docBuilder.parse (new File(filename));
       // UmlCom.trace("File parsed");
       Node root, attr;
-      NodeList list, anlist, cclist, exlist, slist;
+      NodeList list, anlist, cclist, exlist, slist, ellist;
       org.w3c.dom.Element s, e, an, cc, ex;
       String en, et, ed, bt;
       String prefix;
+      List<String> enlist;
 
       // get namespaces
       root = doc.getDocumentElement();
@@ -409,14 +413,29 @@ class NiemTools extends UmlClass {
             en = e.getAttribute("name");
             ed = "";
             bt = "";
+            et  = "";
             anlist = e.getElementsByTagName("xs:annotation");
             if (anlist.getLength()>0)
               ed = ((org.w3c.dom.Element)anlist.item(0)).getElementsByTagName("xs:documentation").item(0).getTextContent();
             cclist = e.getElementsByTagName("xs:complexContent");
             if (cclist.getLength()>0) {
               exlist = ((org.w3c.dom.Element)cclist.item(0)).getElementsByTagName("xs:extension");
-              if (exlist.getLength()>0)
+              if (exlist.getLength()>0) {
                 bt = ((org.w3c.dom.Element)exlist.item(0)).getAttribute("base");
+                ellist = ((org.w3c.dom.Element)exlist.item(0)).getElementsByTagName("xs:element");
+                for (int j=0; j < ellist.getLength(); j++) {
+                  et = ((org.w3c.dom.Element)ellist.item(j)).getAttribute("ref");
+                  UmlCom.trace("Element " + et + " in type " + prefix + en);
+                  enlist = (List)(NiemElementsInType.get(prefix + en));
+                  if (enlist == null) {
+                    enlist = new ArrayList<String>();
+                    enlist.add(et);
+                    NiemElementsInType.put(prefix + en, enlist);
+                  } else {
+                    enlist.add(et);
+                  }
+                }
+              }
             } else {
               cclist = e.getElementsByTagName("xs:simpleContent");
               if (cclist.getLength()>0) {
@@ -520,6 +539,7 @@ class NiemTools extends UmlClass {
   // output a line of the NIEM mapping spreadhseet in HTML format
   public static void writeLineHtml(UmlItem item) throws IOException
   {
+
     // Export Class, Property and Multiplicity
     switch (item.kind().value()) {
       case anItemKind._aClass:
@@ -567,39 +587,67 @@ class NiemTools extends UmlClass {
 
     // Export NIEM Mapping
     int p;
+    String oldValue, container;
+
     if (item.stereotype().equals(niemStereotype)) {
       String schema = getSchema((String)(item.propertyValue(niemStereotype+":Type")));
       for (p=4;p<map.length;p++) {
-        if (map[p][2].equals(""))
-          fw.write(columnHtml((String)(item.propertyValue(niemProperty(p))),null,schema));
-        else
-          fw.write(columnHtml((String)(item.propertyValue(niemProperty(p))),(String)(item.propertyValue(niemStereotype+":"+map[p][2])),schema));
+        if (map[p][2].equals("")) {
+          oldValue = null;
+        } else {
+          oldValue = (String)(item.propertyValue(niemStereotype+":"+map[p][2]));
+        }
+        if (map[p][3].equals("")) {
+          container = null;
+        } else {
+          container = (String)(item.propertyValue(niemStereotype+":"+map[p][3]));
+        }
+        fw.write(columnHtml((String)(item.propertyValue(niemProperty(p))),oldValue,container,schema));
       }
     } else {
       for (p=3;p<(map.length);p++)
         fw.write("<td></td>");
     }
     fw.write("</tr>");
-
   }
 
   // output one column of the NIEM mapping spreadhsset in HTML format
-  protected static String columnHtml(String newValue, String oldValue, String schema) throws IOException
+  protected static String columnHtml(String newValue, String oldValue, String container, String schema) throws IOException
   {
+    String extensionColor = "#ffd700";
+    String invalidNIEMColor = "#ff8888";
+    String validNIEMColor = "#ffffff";
+    String changedColor = "#0000ff";
+    String unchangedColor = "#000000";
+    String defaultColor = "#ffffff";
+
     if (newValue != null)
       newValue = newValue.trim();
     if (oldValue != null)
       oldValue = oldValue.trim();
     if (schema !=null)
       schema = schema.trim();
-    String bgcolor = "#ffffff";
-    if ((schema != null) && (!schema.equals("")) && (!isNiemSchema(schema))) bgcolor = "#ffd700";
+    if (container != null)
+      container = container.trim();
+    String bgcolor = defaultColor;
+    if ((schema != null) && (!schema.equals("")) && (!isNiemSchema(schema)))
+      bgcolor = extensionColor;
     if (isNiemSchema(schema)) {
-      bgcolor = "#00ffff";
-      if (NiemTypes.containsKey(newValue)) bgcolor = "#00ff00";
-      if (NiemElements.containsKey(newValue)) bgcolor = "#00ff00";
+      bgcolor = validNIEMColor;
+      if (container != null) {
+        if (!NiemElements.containsKey(newValue))
+          bgcolor = invalidNIEMColor;
+        List<String> list = (List)(NiemElementsInType.get(container));
+        if (list == null)
+          bgcolor = invalidNIEMColor;
+        else if (!list.contains(newValue))
+            bgcolor = invalidNIEMColor;
+      }
+      // else if (!NiemTypes.containsKey(newValue))
+      //      bgcolor = invalidNIEMColor;
     }
-    String fgcolor = ((oldValue != null) && (!oldValue.equals(newValue))) ? "#ff0000" : "#000000";
+
+    String fgcolor = ((oldValue != null) && (!oldValue.equals(newValue))) ? changedColor : unchangedColor;
 
     return "<td bgcolor=\"" + bgcolor +"\"><font color = \"" + fgcolor +"\">" + newValue + "</font></td>";
   }
