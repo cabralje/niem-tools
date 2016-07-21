@@ -1,9 +1,33 @@
 import java.io.*;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 // the program is called with the socket port number in argument
 
 class Main {
   public static void main(String argv[]) {
+
+    try {
+            // Set System L&F
+        UIManager.setLookAndFeel(
+            UIManager.getSystemLookAndFeelClassName());
+//            UIManager.getCrossPlatformLookAndFeelClassName());
+
+    }
+    catch (UnsupportedLookAndFeelException e) {
+       // handle exception
+    }
+    catch (ClassNotFoundException e) {
+       // handle exception
+    }
+    catch (InstantiationException e) {
+       // handle exception
+    }
+    catch (IllegalAccessException e) {
+       // handle exception
+    }
+
+    // new SwingApplication(); //Create and show the GUI.
 
     if (argv.length >= 1) {
       UmlCom.connect(Integer.valueOf(argv[argv.length - 1]).intValue());
@@ -47,7 +71,7 @@ class Main {
             // Import NIEM schema
             UmlCom.trace("Importing NIEM schema");
             NiemTools.importSchemaDir();
-            
+
 	      // Generate UML Model HTML documentation
 //	      target.set_dir(argv.length - 1, argv);
 	      target.set_dir(0,null);
