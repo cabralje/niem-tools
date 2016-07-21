@@ -15,12 +15,11 @@ import javax.swing.*;
 import javax.swing.filechooser.*;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
-import javax.xml.bind.*;              // JAXB
+//import javax.xml.bind.*;            // JAXB
 import javax.xml.parsers.*;         // DOM
 import org.w3c.dom.*;               // DOM
 import org.xml.sax.*;               // SAX
-import com.opencsv.*;                 // OpenCSV library
-// import gov.niem.niem.wantlist._2.*;   // NIEM Wantlist JAXB bindings
+import com.opencsv.*;               // OpenCSV library
 
 class NiemTools extends UmlClass {
 
@@ -28,9 +27,6 @@ class NiemTools extends UmlClass {
   private static HashMap<String,String> NiemTypes = new HashMap<String,String>();
   private static HashMap<String,List<String>> NiemElementsInType = new HashMap<String,List<String>>();
   private static HashMap<String,String> NiemNamespaces = new HashMap<String,String>();
-
-
-  // protected static final String[] niemSchema = {"nc","j"};
 
   protected static final String niemStereotype = "niem-profile:niem";
 
@@ -132,23 +128,6 @@ class NiemTools extends UmlClass {
   // generate NIEM wantlist for import into Subset Schema Generator Tool (SSGT)
   public static void exportWantlist() throws IOException
   {
-
-    // String wantlistSchema = UmlBasePackage.getProject().propertyValue("wantlist schema");
-
-    // JFrame frame = new JFrame();
-    // JFileChooser fc = new JFileChooser(wantlistSchema);
-
-    // fc.setFileFilter(new FileNameExtensionFilter("XSD file","xsd"));
-    // fc.setDialogTitle("Wantlist schema");
-
-    // if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
-    //  throw new RuntimeException("abort");
-
-    // wantlistSchema = fc.getSelectedFile().getAbsolutePath();
-    // UmlBasePackage.getProject().set_PropertyValue("wantlist schema",wantlistSchema);
-
-    // WantList wantlist = new WantList();
-
     // Export schema
     fw = new FileWriter(directory + "/wantlist.xml");
     fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -269,49 +248,6 @@ class NiemTools extends UmlClass {
     fw.write("</w:WantList>");
     fw.close();
 
-  /*
-    // Create Java content
-    //Country spain = new Country();
-    //spain.setName( "Spain" );
-    //spain.setCapital( "Madrid" );
-    //spain.setFoundation( LocalDate.of( 1469, 10, 19 ) );
-    //spain.setImportance( 1 );
-
-    // Create schema
-    SchemaFactory sf = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
-    Schema schema = sf.newSchema( new File( wantlistSchema ) );
-
-    // Initialize validator
-    Validator validator = schema.newValidator();
-    validator.setErrorHandler( new MyErrorHandler() );
-
-    // Validate instance
-    try {
-      validator.validate( wantlist );
-    }
-    catch (ParserConfigurationException e) {
-      UmlCom.trace("ParserConfigurationException");
-    }
-    catch (SAXException e) {
-  //    e.printStackTrace();
-      UmlCom.trace("SAXException");
-    }
-    catch (IOException ed) {
-      UmlCom.trace("IOException");
-    }
-
-    // Create JAXB instance
-    JAXBContext jaxbContext = JAXBContext.newInstance( Wantlist.class );
-    JAXBSource sourceWantlist = new JAXBSource( jaxbContext, wantlist );
-
-    // Create JAXB marshaller
-    Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-    jaxbMarshaller.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, true );
-
-    // Marshall Java ojects in XML
-    jaxbMarshaller.marshal( wantlist, new File(directory + "wantlist.xml") );
-    jaxbMarshaller.marshal( wantlist, System.out );
-  */
   }
 
   // extract namespace prefix from XML tag
