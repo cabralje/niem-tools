@@ -10,6 +10,7 @@
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 import java.util.Map.Entry;
 import javax.swing.*;
 import javax.swing.filechooser.*;
@@ -21,7 +22,8 @@ import org.w3c.dom.*;               // DOM
 import org.xml.sax.*;               // SAX
 import com.opencsv.*;               // OpenCSV library
 
-class NiemTools extends UmlClass {
+class NiemTools extends UmlClass
+{
 
   private static HashMap<String,String> NiemElements = new HashMap<String,String>();
   private static HashMap<String,String> NiemTypes = new HashMap<String,String>();
@@ -38,7 +40,7 @@ class NiemTools extends UmlClass {
  {"Model Definition","",},
  {"NIEM XPath","XPath"},
  {"NIEM Type","Type"},
- {"NIEM Property","Property"},
+ {"NIEM Property (Representation)","Property"},
  {"NIEM Base Type","BaseType"},
  {"NIEM Multiplicity","Multiplicity"},
  {"Old XPath","OldXPath"},
@@ -46,7 +48,8 @@ class NiemTools extends UmlClass {
  {"NIEM Mapping Notes","Notes"}};
 
   // initializer
-  public NiemTools(long id, String n) {
+  public NiemTools(long id, String n)
+  {
     super(id, n); inherited_opers = null;
 
     // initialize NIEM core and justice namespace mappings
@@ -60,7 +63,8 @@ class NiemTools extends UmlClass {
   public static void exportCsv() throws IOException
   {
     fw = new FileWriter(directory + "/niem-mapping.csv");
-    try {
+    try
+    {
       CSVWriter writer = new CSVWriter(fw);
 
       // Write header
@@ -70,27 +74,31 @@ class NiemTools extends UmlClass {
       writer.writeNext(nextLine);
 
       // Export NIEM Mappings for Classes
-      for (int i=0; i<classes.size(); i++) {
+      for (int i=0; i<classes.size(); i++)
+      {
         UmlItem c = (UmlItem) classes.elementAt(i);
-        if (c.stereotype().equals(niemStereotype)) {
+
+        if (c.stereotype().equals(niemStereotype))
+        {
           writer.writeNext(itemCsv(c));
 
           // Export NIEM Mapping for Attributes and Relations
-          UmlItem[] ch = c.children();
-          for (int j=0; j<ch.length; j++) {
-            if (ch[j].stereotype().equals(niemStereotype)) {
-              nextLine = itemCsv(ch[j]);
+          for (UmlItem ch : c.children())
+            if (ch.stereotype().equals(niemStereotype))
+            {
+              nextLine = itemCsv(ch);
               if (nextLine != null)
                 writer.writeNext(nextLine);
             }
-          }
         }
       }
       writer.close();
 
-    } catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e)
+    {
       UmlCom.trace("File not found");
-    } catch (IOException e) {
+    } catch (IOException e)
+    {
       UmlCom.trace("IO exception");
     }
   }
@@ -109,14 +117,15 @@ class NiemTools extends UmlClass {
     // Show NIEM Mappings for Classes
     for (int i=0; i<classes.size(); i++) {
       UmlItem c = (UmlItem) classes.elementAt(i);
-      if (c.stereotype().equals(niemStereotype)) {
+      if (c.stereotype().equals(niemStereotype))
+      {
         writeLineHtml(c);
 
         // Show NIEM Mapping for Attributes and Relations
-        UmlItem[] ch = c.children();
-        for (int j=0; j<ch.length; j++) {
-          if (ch[j].stereotype().equals(niemStereotype))
-            writeLineHtml(ch[j]);
+        for (UmlItem ch : c.children())
+        {
+          if (ch.stereotype().equals(niemStereotype))
+            writeLineHtml(ch);
         }
       }
     }
@@ -148,51 +157,75 @@ class NiemTools extends UmlClass {
     // Iterate over all items with NIEM stereotype to export elements
     for (int i=0; i < all.size() ; i++) {
       UmlItem c = (UmlItem) all.elementAt(i);
-      if (c.stereotype().equals(niemStereotype)) {
+      if (c.stereotype().equals(niemStereotype))
+      {
         p = c.propertyValue(pn);
-        if (!p.equals(""))
-          if (isNiemSchema(getSchema(p)))
-              if (NiemElements.containsKey(p))
-                fw.write("<w:Element w:name=\"" + p + "\" w:isReference=\"false\" w:nillable=\"false\"/>\n");
-              else
-                fw.write("<!--w:Element w:name=\"" + p + "\" w:isReference=\"false\" w:nillable=\"false\"/-->\n");
+        if (!p.equals("")) {
+          String[] pp = p.split(",");
+          for (String ppp : pp)
+          {
+            ppp = ppp.trim();
+            Matcher mat = Pattern.compile("\\((.*?)\\)").matcher(ppp);
+            if (mat.find())
+              ppp = mat.group(1);
+            if (isNiemSchema(getSchema(ppp)))
+                if (NiemElements.containsKey(ppp))
+                  fw.write("<w:Element w:name=\"" + ppp + "\" w:isReference=\"false\" w:nillable=\"false\"/>\n");
+                else
+                  fw.write("<!--w:Element w:name=\"" + ppp + "\" w:isReference=\"false\" w:nillable=\"false\"/-->\n");
+          }
+        }
       }
     }
 
     // Iterate over all items with NIEM stereotype to export types
-    for (int i=0; i < all.size() ; i++) {
+    for (int i=0; i < all.size() ; i++)
+    {
       invalid = false;
       UmlItem c = (UmlItem) all.elementAt(i);
-      if (c.stereotype().equals(niemStereotype)) {
+      if (c.stereotype().equals(niemStereotype))
+      {
         t = c.propertyValue(tn);
         p = c.propertyValue(pn);
         b = c.propertyValue(bn);
         m = c.propertyValue(mn);
-        if (p.equals("")) {
+        if (p.equals(""))
+        {
+          String[] tt = t.split(",");
+          for (String ttt : tt)
+          {
+            ttt = ttt.trim();
+            // NIEM Type Mapping
+            if (isNiemSchema(getSchema(ttt)))
+            {
 
-          // NIEM Type Mapping
-          if (isNiemSchema(getSchema(t))) {
-
-            // Export NIEM Types
-            if (NiemTypes.containsKey(t))
-              fw.write("<w:Type w:name=\"" + t + "\" w:isRequested=\"true\"/>\n");
-            else
-              fw.write("<!--w:Type w:name=\"" + t + "\" w:isRequested=\"true\"/-->\n");
-          } else {
-
-            if (isNiemSchema(getSchema(b))) {
-
-              if (NiemTypes.containsKey(b))
-                // Export NIEM Base Types for Non-NIEM Types
-                fw.write("<w:Type w:name=\"" + b + "\" w:isRequested=\"true\"/>\n");
+              // Export NIEM Types
+              if (NiemTypes.containsKey(ttt))
+                fw.write("<w:Type w:name=\"" + ttt + "\" w:isRequested=\"true\"/>\n");
               else
-                fw.write("<!--w:Type w:name=\"" + b + "\" w:isRequested=\"true\"/-->\n");
+                fw.write("<!--w:Type w:name=\"" + ttt + "\" w:isRequested=\"true\"/-->\n");
+            } else {
+
+              String[] bb = b.split(",");
+              for (String bbb : bb)
+              {
+                bbb = bbb.trim();
+                if (isNiemSchema(getSchema(bbb)))
+                {
+                  if (NiemTypes.containsKey(bbb))
+                    // Export NIEM Base Types for Non-NIEM Types
+                    fw.write("<w:Type w:name=\"" + bbb + "\" w:isRequested=\"true\"/>\n");
+                    else
+                    fw.write("<!--w:Type w:name=\"" + bbb + "\" w:isRequested=\"true\"/-->\n");
+                }
+              }
             }
           }
         } else {
 
           // NIEM Element in Type Mapping
-          if (isNiemSchema(getSchema(t))) {
+          if (isNiemSchema(getSchema(t)))
+          {
 
             // Export NIEM Types
             if (NiemTypes.containsKey(t))
@@ -201,7 +234,8 @@ class NiemTools extends UmlClass {
               fw.write("<!--w:Type w:name=\"" + t + "\" w:isRequested=\"true\"-->\n");
               invalid = true;
             }
-            if (isNiemSchema(getSchema(p))) {
+            if (isNiemSchema(getSchema(p)))
+            {
 
               // Export Element in Type
               if ((m.equals("")))
@@ -213,12 +247,21 @@ class NiemTools extends UmlClass {
               } else
                 minoccurs = maxoccurs = m;
 
-              if (isNiemSchema(getSchema(t))) {
-                List<String> list = (List)(NiemElementsInType.get(t));
-                if ((!invalid) && ((list != null) && (list.contains(p))))
-                  fw.write("\t<w:ElementInType w:name=\"" + p + "\" w:isReference=\"false\" w:minOccurs=\"" + minoccurs + "\" w:maxOccurs=\"" + maxoccurs + "\"/>\n");
-                else
-                  fw.write("\t<!--w:ElementInType w:name=\"" + p + "\" w:isReference=\"false\" w:minOccurs=\"" + minoccurs + "\" w:maxOccurs=\"" + maxoccurs + "\"/-->\n");
+              if (isNiemSchema(getSchema(t)))
+              {
+                String[] pp = p.split(",");
+                for (String ppp : pp)
+                {
+                  ppp = ppp.trim();
+                  Matcher mat = Pattern.compile("\\((.*?)\\)").matcher(ppp);
+                  if (mat.find())
+                    continue;
+                  List<String> list = (List)(NiemElementsInType.get(t));
+                  if ((!invalid) && ((list != null) && (list.contains(ppp))))
+                    fw.write("\t<w:ElementInType w:name=\"" + ppp + "\" w:isReference=\"false\" w:minOccurs=\"" + minoccurs + "\" w:maxOccurs=\"" + maxoccurs + "\"/>\n");
+                  else
+                    fw.write("\t<!--w:ElementInType w:name=\"" + ppp + "\" w:isReference=\"false\" w:minOccurs=\"" + minoccurs + "\" w:maxOccurs=\"" + maxoccurs + "\"/-->\n");
+                }
               }
               if (!invalid)
                 fw.write("</w:Type>");
@@ -230,17 +273,25 @@ class NiemTools extends UmlClass {
                 fw.write("</w:Type>");
               else
                 fw.write("<!--/w:Type-->");
-              if (isNiemSchema(getSchema(b))) {
-
+              if (isNiemSchema(getSchema(b)))
+              {
                 // Export NIEM Base Types for Non-NIEM Properties
-                if (NiemTypes.containsKey(b))
-                  // Export NIEM Base Types for Non-NIEM Types
-                  fw.write("<w:Type w:name=\"" + b + "\" w:isRequested=\"true\"/>\n");
-                else
-                  fw.write("<!--w:Type w:name=\"" + b + "\" w:isRequested=\"true\"/-->\n");
+                String[] bb = b.split(",");
+                for (String bbb : bb)
+                {
+                  bbb = bbb.trim();
+                  if (isNiemSchema(getSchema(bbb)))
+                  {
+                    if (NiemTypes.containsKey(bbb))
+                      // Export NIEM Base Types for Non-NIEM Types
+                      fw.write("<w:Type w:name=\"" + bbb + "\" w:isRequested=\"true\"/>\n");
+                      else
+                      fw.write("<!--w:Type w:name=\"" + bbb + "\" w:isRequested=\"true\"/-->\n");
+                  }
+                }
               }
             }
-           }
+          }
         }
       }
     }
@@ -278,7 +329,8 @@ class NiemTools extends UmlClass {
       reader.readNext();
 
       // NIEM Read Mappings
-      while ((nextLine = reader.readNext()) != null) {
+      while ((nextLine = reader.readNext()) != null)
+      {
 
         String className = nextLine[0].trim();
         String attributeName = nextLine[1].trim();
@@ -286,7 +338,8 @@ class NiemTools extends UmlClass {
           UmlItem c = (UmlItem) classes.elementAt(i);
           if (c.stereotype().equals(niemStereotype) && (c.pretty_name().equals(className))) {
 
-            if (attributeName.equals("")) {
+            if (attributeName.equals(""))
+            {
 
               // Import NIEM Mapping to Class
               UmlCom.trace("Importing NIEM mapping for " + className);
@@ -295,13 +348,16 @@ class NiemTools extends UmlClass {
               }
               break;
 
-            } else {
+            } else
+            {
 
               UmlItem[] ch = c.children();
-              for (UmlItem item: ch) {
+              for (UmlItem item: ch)
+              {
                 if (item.stereotype().equals(niemStereotype) && (item.pretty_name().equals(attributeName))) {
                   // Import NIEM Mapping to Attribute
-                  for (int p=4; p<map.length && p<nextLine.length; p++) {
+                  for (int p=4; p<map.length && p<nextLine.length; p++)
+                  {
                     item.set_PropertyValue(niemProperty(p),nextLine[p]);
                   }
                   break;
@@ -313,9 +369,11 @@ class NiemTools extends UmlClass {
       }
       reader.close();
 
-    } catch (FileNotFoundException e) {
+    } catch (FileNotFoundException e)
+    {
       UmlCom.trace("File not found");
-    } catch (IOException e) {
+    } catch (IOException e)
+    {
       UmlCom.trace("IO exception");
     }
   }
@@ -324,7 +382,8 @@ class NiemTools extends UmlClass {
   public static void importSchema(String filename) throws IOException
   {
     //DOM parser
-    try {
+    try
+    {
       // parse the schema
       DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
@@ -340,15 +399,18 @@ class NiemTools extends UmlClass {
       // get namespaces
       root = doc.getDocumentElement();
       NamedNodeMap nslist = root.getAttributes();
-      for(int i = 0 ; i < nslist.getLength(); i++) {
+      for(int i = 0 ; i < nslist.getLength(); i++)
+      {
         attr = nslist.item(i);
         String aname = attr.getNodeName();
         String avalue = attr.getNodeValue();
         Integer index = aname.indexOf(":");
 
-        if (index>0) {
+        if (index>0)
+        {
           prefix = aname.substring(index+1);
-          if ((!NiemNamespaces.containsKey(avalue)) && (!NiemNamespaces.containsValue(prefix)) && (!prefix.equals("schemaLocation"))) {
+          if ((!NiemNamespaces.containsKey(avalue)) && (!NiemNamespaces.containsValue(prefix)) && (!prefix.equals("schemaLocation")))
+          {
             NiemNamespaces.put(avalue,prefix);
             // UmlCom.trace("Namespace: " + avalue + "(" + prefix + ")");
           }
@@ -361,12 +423,15 @@ class NiemTools extends UmlClass {
 
       // parse the elements
       list = root.getChildNodes();
-      for(int i = 0 ; i < list.getLength(); i++) {
+      for(int i = 0 ; i < list.getLength(); i++)
+      {
 
         // parse elements
-        if (((Node)list.item(i)).getNodeName() == "xs:element") {
+        if (((Node)list.item(i)).getNodeName() == "xs:element")
+        {
           e = (org.w3c.dom.Element)list.item(i);
-          if (e.hasAttributes()) {
+          if (e.hasAttributes())
+          {
             // prefix = e.getPrefix();
             en = e.getAttribute("name");
             et = e.getAttribute("type");
@@ -375,12 +440,14 @@ class NiemTools extends UmlClass {
             if (anlist.getLength()>0)
               ed = ((org.w3c.dom.Element)anlist.item(0)).getElementsByTagName("xs:documentation").item(0).getTextContent();
 
-            if (!NiemElements.containsKey(prefix + en)) {
+            if (!NiemElements.containsKey(prefix + en))
+            {
               NiemElements.put(prefix + en,ed);
              // UmlCom.trace("Element " + en + " (" + et + ") - " + ed );
             }
 
-            if (!NiemTypes.containsKey(et)) {
+            if (!NiemTypes.containsKey(et))
+            {
               NiemTypes.put(et,ed);
              // UmlCom.trace("Element [" + prefix + en + "]");
            }
@@ -388,9 +455,11 @@ class NiemTools extends UmlClass {
         }
 
         // parse the types
-        if (((Node)list.item(i)).getNodeName() == "xs:complexType") {
+        if (((Node)list.item(i)).getNodeName() == "xs:complexType")
+        {
           e = (org.w3c.dom.Element)list.item(i);
-          if (e.hasAttributes()) {
+          if (e.hasAttributes())
+          {
             // prefix = e.getPrefix();
             en = e.getAttribute("name");
             ed = "";
@@ -400,25 +469,31 @@ class NiemTools extends UmlClass {
             if (anlist.getLength()>0)
               ed = ((org.w3c.dom.Element)anlist.item(0)).getElementsByTagName("xs:documentation").item(0).getTextContent();
             cclist = e.getElementsByTagName("xs:complexContent");
-            if (cclist.getLength()>0) {
+            if (cclist.getLength()>0)
+            {
               exlist = ((org.w3c.dom.Element)cclist.item(0)).getElementsByTagName("xs:extension");
-              if (exlist.getLength()>0) {
+              if (exlist.getLength()>0)
+              {
                 bt = ((org.w3c.dom.Element)exlist.item(0)).getAttribute("base");
                 ellist = ((org.w3c.dom.Element)exlist.item(0)).getElementsByTagName("xs:element");
-                for (int j=0; j < ellist.getLength(); j++) {
+                for (int j=0; j < ellist.getLength(); j++)
+                {
                   et = ((org.w3c.dom.Element)ellist.item(j)).getAttribute("ref");
                   // UmlCom.trace("Element " + et + " in type " + prefix + en);
                   enlist = (List)(NiemElementsInType.get(prefix + en));
-                  if (enlist == null) {
+                  if (enlist == null)
+                  {
                     enlist = new ArrayList<String>();
                     enlist.add(et);
                     NiemElementsInType.put(prefix + en, enlist);
-                  } else {
+                  } else
+                  {
                     enlist.add(et);
                   }
                 }
               }
-            } else {
+            } else
+            {
               cclist = e.getElementsByTagName("xs:simpleContent");
               if (cclist.getLength()>0) {
                 exlist = ((org.w3c.dom.Element)cclist.item(0)).getElementsByTagName("xs:extension");
@@ -434,19 +509,24 @@ class NiemTools extends UmlClass {
         }
       }
     }
-    catch (ParserConfigurationException e) {
+    catch (ParserConfigurationException e)
+    {
       UmlCom.trace("ParserConfigurationException");
     }
-    catch (SAXException e) {
+    catch (SAXException e)
+    {
       UmlCom.trace("SAXException");
     }
-    catch (DOMException e) {
+    catch (DOMException e)
+    {
       UmlCom.trace("DOMException");
     }
-    catch (IOException e) {
+    catch (IOException e)
+    {
       UmlCom.trace("IOException");
     }
-    catch (IllegalArgumentException e) {
+    catch (IllegalArgumentException e)
+    {
       UmlCom.trace("IllegalArgumentException");
     }
 
@@ -475,10 +555,12 @@ class NiemTools extends UmlClass {
     // Walk directory
     Files.walkFileTree(
 
-     FileSystems.getDefault().getPath(directory), new SimpleFileVisitor<Path>() {
+     FileSystems.getDefault().getPath(directory), new SimpleFileVisitor<Path>()
+     {
 
       @Override
-      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException
+      {
         String filename = file.toString();
         if (filename.endsWith(".xsd")) {
           // UmlCom.trace(filename);
@@ -489,10 +571,13 @@ class NiemTools extends UmlClass {
       }
 
       @Override
-      public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
-        if (e == null) {
+      public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException
+      {
+        if (e == null)
+        {
           return FileVisitResult.CONTINUE;
-        } else {
+        } else
+        {
           // directory iteration failed
           throw e;
         }
@@ -523,7 +608,8 @@ class NiemTools extends UmlClass {
   {
 
     // Export Class, Property and Multiplicity
-    switch (item.kind().value()) {
+    switch (item.kind().value())
+    {
       case anItemKind._aClass:
         {
           fw.write("<tr bgcolor=\"#f0f0f0\"><td>");
@@ -532,7 +618,8 @@ class NiemTools extends UmlClass {
           fw.write("</td><td>");
         }
         break;
-      case anItemKind._anAttribute: {
+      case anItemKind._anAttribute:
+      {
           fw.write("<tr><td>");
           item.parent().write();
           fw.write("</td><td>");
@@ -578,9 +665,11 @@ class NiemTools extends UmlClass {
     String defaultFGColor = "#000000";
     String fgcolor, bgcolor;
 
-    if (item.stereotype().equals(niemStereotype)) {
+    if (item.stereotype().equals(niemStereotype))
+    {
 
-      for (p=4;p<map.length;p++) {
+      for (p=4;p<map.length;p++)
+      {
         column[p]= (String)(item.propertyValue(niemProperty(p)));
         if (column[p] != null)
           column[p]=column[p].trim();
@@ -596,26 +685,50 @@ class NiemTools extends UmlClass {
       // export Type
       fgcolor = defaultFGColor;
       if (!extension)
-        if (!NiemTypes.containsKey(column[5]))
-          fgcolor = invalidFGColor;
+      {
+        String[] tt = column[5].split(",");
+        for (String ttt : tt)
+        {
+          ttt = ttt.trim();
+          if (!NiemTypes.containsKey(ttt))
+            fgcolor = invalidFGColor;
+        }
+      }
       fw.write(columnHtml(column[5], bgcolor, fgcolor));
 
       // export Property
       fgcolor = defaultFGColor;
-      if (!extension) {
-        List<String> list = (List)(NiemElementsInType.get(column[5]));
-        if (list == null)
-          fgcolor = invalidFGColor;
-        else if (!list.contains(column[6]))
-            fgcolor = invalidFGColor;
+      if (!extension)
+      {
+        String[] pp = column[6].split(",");
+        for (String ppp : pp)
+        {
+          ppp = ppp.trim();
+          Matcher mat = Pattern.compile("\\((.*?)\\)").matcher(ppp);
+          if (!mat.find())
+          {
+            List<String> list = (List)(NiemElementsInType.get(column[5]));
+            if (list == null)
+              fgcolor = invalidFGColor;
+            else if (!list.contains(ppp))
+              fgcolor = invalidFGColor;
+          }
+        }
       }
       fw.write(columnHtml(column[6], bgcolor, fgcolor));
 
       // export BaseType
       fgcolor = defaultFGColor;
       if (!extension)
-        if (!NiemTypes.containsKey(column[7]))
-          fgcolor = invalidFGColor;
+      {
+        String[] bb = column[7].split(",");
+        for (String bbb : bb)
+        {
+          bbb = bbb.trim();
+          if (!NiemTypes.containsKey(bbb))
+            fgcolor = invalidFGColor;
+        }
+      }
       fw.write(columnHtml(column[7], bgcolor, fgcolor));
 
       // export Multiplicity
@@ -648,7 +761,8 @@ class NiemTools extends UmlClass {
   public static void deleteMapping()
   {
     Iterator<UmlItem> it = all.iterator();
-    while (it.hasNext()) {
+    while (it.hasNext())
+    {
       UmlItem item = it.next();
       if (item.stereotype().equals(niemStereotype))
         for (int p=4;p<map.length;p++)
@@ -662,7 +776,8 @@ class NiemTools extends UmlClass {
    String[] nextLine = new String[map.length];
 
     // Export Class and Property
-    switch (item.kind().value()) {
+    switch (item.kind().value())
+    {
       case anItemKind._aClass:
         nextLine[0]=item.pretty_name();
 	nextLine[1]="";
@@ -674,7 +789,8 @@ class NiemTools extends UmlClass {
     }
 
     // Export Multiplicity
-    switch (item.kind().value()) {
+    switch (item.kind().value())
+    {
       case anItemKind._aClass:
         nextLine[2]="";
         break;
@@ -697,7 +813,8 @@ class NiemTools extends UmlClass {
     nextLine[3]=item.description();
 
     // Export NIEM Mapping
-    if (item.stereotype().equals(niemStereotype)) {
+    if (item.stereotype().equals(niemStereotype))
+    {
       String schema = getSchema((String)(item.propertyValue(niemStereotype+":Type")));
       for (int p=4;p<map.length;p++)
         nextLine[p]=item.propertyValue(niemProperty(p));
@@ -709,9 +826,11 @@ class NiemTools extends UmlClass {
   public static void resetStereotype()
   {
    Iterator it=all.iterator();
-   while (it.hasNext()) {
+   while (it.hasNext())
+   {
      UmlItem item = (UmlItem)it.next();
-     if (item.stereotype().equals("niem:niem")) {
+     if (item.stereotype().equals("niem:niem"))
+     {
        item.set_Stereotype(niemStereotype);
        item.applyStereotype();
      }

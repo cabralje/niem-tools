@@ -33,7 +33,7 @@ class Main {
       UmlCom.connect(Integer.valueOf(argv[argv.length - 1]).intValue());
 
       try {
-        UmlCom.trace("<b>BOUML2NIEM</b> release 0.1<br />");
+        UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
 
         UmlItem target = UmlCom.targetItem();
 	try {
