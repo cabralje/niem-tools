@@ -698,7 +698,7 @@ class NiemTools extends UmlClass
 
       // export Property
       fgcolor = defaultFGColor;
-      if (!extension)
+      if ((!column[5].equals("") && (!extension)))
       {
         String[] pp = column[6].split(",");
         for (String ppp : pp)
