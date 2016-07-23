@@ -2,10 +2,11 @@
 import java.util.*;
 import java.io.*;
 import javax.swing.*;
+
 /**
  *  This class is a mother class for all the other Uml* classes, this
  *  allows to generalize their management, declare virtual operations etc ...
- * 
+ *
  *  You can modify it as you want (except the constructor)
  */
 abstract class UmlItem extends UmlBaseItem {
@@ -21,7 +22,7 @@ abstract class UmlItem extends UmlBaseItem {
   /**
    *   Set the directory where the files will be generated
    *   initializing 'directory'.
-   * 
+   *
    *   May be remove already existing html files and css
    */
   public void set_dir(int argc, String[] argv) {
@@ -29,7 +30,7 @@ abstract class UmlItem extends UmlBaseItem {
     boolean rem;
     boolean replace_css;
     int index0;
-    
+
     if ((argc != 0) && argv[0].equals("-flat")) {
       flat = true;
       index0 = 1;
@@ -39,7 +40,7 @@ abstract class UmlItem extends UmlBaseItem {
       flat = false;
       index0 = 0;
     }
-  
+
     if ((argc != 0) && argv[index0].equals("-svg")) {
       svg = true;
       index0 += 1;
@@ -47,7 +48,7 @@ abstract class UmlItem extends UmlBaseItem {
     }
     else
       svg = false;
-  
+
     if ((argc != 0) && argv[index0].equals("-tag")) {
       tag = true;
       index0 += 1;
@@ -55,7 +56,7 @@ abstract class UmlItem extends UmlBaseItem {
     }
     else
       tag = false;
-  
+
     if ((argc != 0) && argv[index0].equals("-tag_all")) {
       tag_all = true;
       index0 += 1;
@@ -63,26 +64,26 @@ abstract class UmlItem extends UmlBaseItem {
     }
     else
       tag_all = false;
-  
+
     if (argc == 0) {
       directory = UmlBasePackage.getProject().propertyValue("html dir");
       if (directory == null)
         directory = new String("/tmp/") + name() + "_html";
-      
+
       // in java it is very complicated to select
       // a directory through a dialog, and the dialog
       // is very slow and ugly
       JFrame frame = new JFrame();
       JFileChooser fc = new JFileChooser(directory);
-      
+
       fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
       fc.setDialogTitle("Directory where the files will be produced");
-      
+
       if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
         throw new RuntimeException("abort");
-      
+
       directory = fc.getSelectedFile().getAbsolutePath();	// !
-      
+
       ask = true;
       rem = false;
       replace_css = true;
@@ -90,7 +91,7 @@ abstract class UmlItem extends UmlBaseItem {
     else {
       directory = argv[index0];
       ask = false;
-      
+
       if ((argc >= 2) && (argv[index0 + 1].equals("-del_html"))) {
         rem = true;
         replace_css = ((argc == 3) && argv[index0 + 2].equals("-del_css"));
@@ -100,37 +101,36 @@ abstract class UmlItem extends UmlBaseItem {
         replace_css = ((argc == 2) && argv[index0 + 1].equals("-del_css"));
       }
     }
-    
+
     File dir = new File(directory);
     int i;
-    
+
     if (dir.exists()) {
       if (dir.isDirectory()) {
         File[] files = dir.listFiles();
-  	
+
         if (ask) {
   	// remove html old files ?
   	for (i = 0; i != files.length; i += 1) {
   	  if (files[i].isFile() &&
   	      (files[i].getName().toLowerCase().endsWith(".html"))) {
-  	    if (!rem) {
-  	      ConfirmBox msg = new ConfirmBox("Delete already existing html files ?");
-  	      
-  	      if (!msg.ok())
-  		break;
+            if (!rem) {
+              if (JOptionPane.showConfirmDialog(null, "Delete already existing html files?", "Delete already existing html files?", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION)
+    		        break;
   	      rem = true;
   	    }
   	    files[i].delete();
   	  }
   	}
-  
+
   	// remove old css file ?
   	for (i = 0; i != files.length; i += 1) {
   	  if (files[i].isFile() &&
   	      (files[i].getName().equals("style.css"))) {
-  	    ConfirmBox msg = new ConfirmBox("Delete already existing style.css ?");
-  	    
-  	    replace_css = msg.ok();
+            if (JOptionPane.showConfirmDialog(null, "Delete already existing style.css?", "Delete already existing style.css?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+      	      replace_css = true;
+            else
+              replace_css = false;
   	    break;
   	  }
   	}
@@ -144,10 +144,10 @@ abstract class UmlItem extends UmlBaseItem {
   	    }
   	  }
   	}
-  	
+
   	if (!replace_css) {
   	  replace_css = true;	// to create it
-  	  
+
   	  for (i = 0; i != files.length; i += 1) {
   	    if (files[i].isFile() &&
   		(files[i].getName().equals("style.css"))) {
@@ -164,7 +164,7 @@ abstract class UmlItem extends UmlBaseItem {
       dir.mkdir();
       replace_css = true;	// to create it
     }
-  
+
     if (ask) {
       try {
         UmlBasePackage.getProject().set_PropertyValue("html dir", directory);
@@ -172,12 +172,12 @@ abstract class UmlItem extends UmlBaseItem {
       catch (RuntimeException e) {
       }
     }
-  
+
     if (replace_css) {
       try {
         // write css file
         FileWriter fw = new FileWriter(directory + "/style.css");
-        
+
         fw.write("div.title { font-size: 150%; background: #87ceff; text-align: center; font-weight: bold; }\n");
         fw.write("\n");
         fw.write("div.sub { margin-left : 20px; }\n");
@@ -225,9 +225,9 @@ abstract class UmlItem extends UmlBaseItem {
   public void memo_ref() {
     all.addElement(this);
     known = true;
-    
+
     UmlItem[] ch = children();
-    
+
     for (int i = 0; i != ch.length; i += 1)
       ch[i].memo_ref();
   }
@@ -244,9 +244,9 @@ abstract class UmlItem extends UmlBaseItem {
   {
     String filename = directory + "/" + f;
     boolean is_frame = (f == "index-withframe");
-    
+
     fw = new FileWriter(filename + ".html");
-    
+
     fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     fw.write("<!-- Documentation produced by the Html generator of Bouml (http://www.bouml.fr) -->\n");
     fw.write((is_frame)
@@ -256,7 +256,7 @@ abstract class UmlItem extends UmlBaseItem {
   		 : "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n");
     fw.write("\n");
     fw.write("<head>\n");
-    
+
     if (s == null) {
       fw.write("<title>" + filename + "</title>\n");
       fw.write("<link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" />\n");
@@ -281,22 +281,22 @@ abstract class UmlItem extends UmlBaseItem {
       fw.write("<!-- ============================================================= -->\n");
       fw.write("\n");
     }
-  
+
   }
 
   public static void end_file() throws IOException
   {
     fw.write("</body>\n");
     fw.write("</html>\n");
-      
+
     fw.close();
-  
+
   }
 
   public static void ref_indexes() throws IOException
   {
     fw.write("<hr />\n<p><a href=\"index.html\" target = \"projectFrame\"><b> -Top- </b></a>");
-    
+
     UmlClass.ref_index();
     UmlOperation.ref_index();
     UmlAttribute.ref_index();
@@ -314,7 +314,7 @@ abstract class UmlItem extends UmlBaseItem {
     UmlComponentDiagram.ref_index();
     UmlDeploymentDiagram.ref_index();
     fw.write("</p>\n<p>\n</p>\n<p>");
-    
+
     for (int i = 0; i != letters.length(); i += 1) {
       fw.write("<a href=\"index_");
       fw.write(new Integer(letters.charAt(i) & 255).toString());
@@ -322,7 +322,7 @@ abstract class UmlItem extends UmlBaseItem {
       writeq(letters.charAt(i));
       fw.write(" </b></a>");
     }
-  
+
     fw.write("</p>\n");
   }
 
@@ -344,57 +344,57 @@ abstract class UmlItem extends UmlBaseItem {
     UmlCollaborationDiagram.generate_index();
     UmlComponentDiagram.generate_index();
     UmlDeploymentDiagram.generate_index();
-  
+
     int n = all.size();
     char previous;
-    
+
     sort(all);
-    
+
     previous = 0;
     for (int i = 0; i != n; i += 1) {
       UmlItem x = (UmlItem) all.elementAt(i);
       String s = x.pretty_name();
-      
+
       if (s.length() != 0) {
         char c = x.pretty_name().charAt(0);
-        
+
         if ((c >= 'a') && (c <= 'z'))
   	c += 'A' - 'a';
-        
+
         if (c != previous) {
   	previous = c;
   	letters += c;
         }
       }
     }
-  
+
     previous = 0;
     for (int i = 0; i != n; i += 1) {
       UmlItem x = (UmlItem) all.elementAt(i);
       String s = x.pretty_name();
-      
+
       if (s.length() != 0) {
         char c = x.pretty_name().charAt(0);
-        
+
         if ((c >= 'a') && (c <= 'z'))
   	c += 'A' - 'a';
-        
+
         if (c != previous) {
   	if (previous != 0) {
   	  fw.write("</table>\n");
   	  end_file();
   	}
-  	
+
   	previous = c;
-  	
+
   	String sn = new Integer(c & 255).toString();
-  	
+
   	start_file(new String("index_") + sn, new String("") + c, true);
-  	
+
   	fw.write("<table>\n");
   	fw.write("<tr bgcolor=\"#f0f0f0\"><td align=\"center\"><b>Name</b></td><td align=\"center\"><b>Kind</b></td><td align=\"center\"><b>Description</b></td></tr>\n");
         }
-        
+
         fw.write("<tr bgcolor=\"#f0f0f0\"><td>");
         x.write("projectFrame");
         fw.write("</td><td>");
@@ -404,18 +404,18 @@ abstract class UmlItem extends UmlBaseItem {
         fw.write("</td></tr>\n");
       }
     }
-  
+
     if (previous != 0) {
       fw.write("</table>\n");
       end_file();
     }
-  
+
   }
 
   public static void frame() throws IOException
   {
     start_file("index-withframe", null, false);
-  
+
     fw.write("<frameset cols=\"20%,80%\">\n");
     fw.write("  <noframes>\n");
     fw.write("    <body>\n");
@@ -430,13 +430,13 @@ abstract class UmlItem extends UmlBaseItem {
     fw.write("    <frame src=\"index.html\" name=\"projectFrame\" />\n");
     fw.write("  </frameset>\n");
     fw.write("</frameset>\n");
-   
+
     fw.write("</html>");
     fw.close();
-  
+
     UmlCom.trace("document with frame produced in <i>"
   	       + directory + "/index-withframe.html");
-  
+
     UmlCom.trace("document without frame produced in <i>"
   	       + directory + "/index.html");
   }
@@ -453,9 +453,9 @@ abstract class UmlItem extends UmlBaseItem {
 
   public void html(String pfix, int rank, String what, int level, String kind) throws IOException {
     define();
-   
+
     chapter(what, pfix, rank, kind, level);
-  
+
     if (description().length() != 0) {
       fw.write("<p>");
       if (tag)
@@ -464,19 +464,19 @@ abstract class UmlItem extends UmlBaseItem {
         writeq(description());
       fw.write("<br /></p>\n");
     }
-  
+
     write_properties();
-    
+
     UmlItem[] ch = children();
-    
+
     if (ch.length != 0) {
       String spfix = (rank == 0)
         ? ""
         : (pfix + String.valueOf(rank) + ".");
-      
+
       level += 1;
       rank = 1;
-      fw.write("<div class=\"sub\">\n");    
+      fw.write("<div class=\"sub\">\n");
       for (int i = 0; i != ch.length; i += 1) {
         ch[i].html(spfix, rank, level);
         if (ch[i].chapterp())
@@ -488,15 +488,15 @@ abstract class UmlItem extends UmlBaseItem {
 
   public void html(String what, UmlDiagram diagram) throws IOException {
     define();
-  
+
     fw.write("<table><tr><td><div class=\"element\">");
     fw.write(what);
     fw.write(" <b>");
     writeq(name());
     fw.write("</b></div></td></tr></table>\n");
-    
+
     String d = description();
-    
+
     if (d.length() != 0) {
       fw.write("<p>");
       if (tag)
@@ -505,40 +505,40 @@ abstract class UmlItem extends UmlBaseItem {
         writeq(d);
       fw.write("<br /></p>\n");
     }
-    
+
     write_dependencies();
-  
+
     if (diagram != null) {
       fw.write("<p>Diagram : ");
       diagram.write();
       fw.write("</p>\n");
     }
-  
+
     write_properties();
   }
 
   public void write_children(String pfix, int rank, int level) throws IOException {
     UmlItem[] ch = children();
-      
+
     if (ch.length != 0) {
       String spfix;
       int srank = 1;
-      
+
       if (rank == 0)
         spfix = "";
       else {
         spfix = pfix + String.valueOf(rank) + ".";
         fw.write("<div class=\"sub\">\n");
       }
-      
-      level += 1; 
-      
+
+      level += 1;
+
       for (int i = 0; i != ch.length; i += 1) {
         ch[i].html(spfix, srank, level);
         if (ch[i].chapterp())
   	srank += 1;
       }
-      
+
       if (rank != 0)
         fw.write("</div>\n");
     }
@@ -546,7 +546,7 @@ abstract class UmlItem extends UmlBaseItem {
 
   public void write_dependencies() throws IOException {
     UmlItem[] ch = children();
-    
+
     for (int i = 0; i != ch.length; i += 1) {
       if ((ch[i].kind() == anItemKind.aNcRelation) &&
   	(((UmlNcRelation) ch[i]).relationKind() == aRelationKind.aDependency)) {
@@ -563,25 +563,25 @@ abstract class UmlItem extends UmlBaseItem {
       writeq(stereotype());
       fw.write("</p>\n");
     }
-      
+
     Hashtable d = properties();
-    
+
     if (! d.isEmpty()) {
       fw.write("<p>Properties:</p><ul>\n");
-      
+
       Set set = d.entrySet();
       Iterator i = set.iterator();
-      
+
       while(i.hasNext()){
         Map.Entry e = (Map.Entry) i.next();
-  
+
         fw.write("<li>");
         writeq((String) e.getKey());
         fw.write(":<br /><div class=\"sub\">");
         writeq((String) e.getValue());
         fw.write("</div></li>\n");
       }
-      
+
       fw.write("</ul>\n");
     }
   }
@@ -590,7 +590,7 @@ abstract class UmlItem extends UmlBaseItem {
     if (rank != 0) {
       if (level > 4)
         level = 4;
-      
+
       fw.write("<h");
       fw.write(String.valueOf(level));
       if (!kind.equals("")) {
@@ -600,7 +600,7 @@ abstract class UmlItem extends UmlBaseItem {
       }
       else
         fw.write(">");
-  
+
       fw.write(pfix);
       fw.write(String.valueOf(rank));
       fw.write(' ');
@@ -619,20 +619,20 @@ abstract class UmlItem extends UmlBaseItem {
   public int bypass_comment(String s) {
     int index = 0;
     int n = s.length();
-    
+
     while (index != n) {
       if (Character.isWhitespace(s.charAt(index)))
         index += 1;
       else if ((s.charAt(index) == '/') && ((index + 1) != n)) {
         if (s.charAt(index + 1) == '/') {
-  	do 
+  	do
   	  index += 1;
   	while ((index != n) &&
   	       (s.charAt(index) != '\n') && (s.charAt(index) != '\r'));
         }
         else if (s.charAt(index + 1) == '*') {
   	int index2 = s.indexOf("*/", index + 2);
-  	
+
   	if (index2 != -1)
   	  index = index2 + 2;
   	else
@@ -651,26 +651,26 @@ abstract class UmlItem extends UmlBaseItem {
       else
         return index;
     }
-  
+
     return index;
-  
+
   }
 
   public int manage_alias(String s, int index) throws IOException {
     // s[index] is '@'
     int index2;
-    
+
     if ((s.charAt(index + 1) == '{') && ((index2 = s.indexOf('}', index + 2)) != -1)) {
       String key = s.substring(index + 2, index2);
       String value;
       UmlItem node = this;
-  
+
       do {
         if ((value = node.propertyValue(key)) != null)
   	break;
         node = node.parent();
       } while (node != null);
-      
+
       if (node != null)
         // find, insert the value
         writeq(value);
@@ -680,7 +680,7 @@ abstract class UmlItem extends UmlBaseItem {
         writeq(key);
         fw.write("}");
       }
-  
+
       // bypass the key
       return index2 + 1;
     }
@@ -732,7 +732,7 @@ abstract class UmlItem extends UmlBaseItem {
       fw.write(s);
     else {
       int n = s.length();
-      
+
       for (int index = 0; index != n; index += 1) {
         if ((s.charAt(index) == '<') &&
   	  ((index + 6) < n) &&
@@ -742,7 +742,7 @@ abstract class UmlItem extends UmlBaseItem {
   	  (s.charAt(index+4) == 'l') &&
   	  (s.charAt(index+5) == '>')) {
   	index += 6;
-  	
+
   	while (index != n) {
   	  if ((s.charAt(index) == '<') &&
   	      ((index + 7) < n) &&
@@ -801,7 +801,7 @@ abstract class UmlItem extends UmlBaseItem {
       writeq(JavaSettings.type(t.toString()));
     else
       writeq(t.toString());
-  
+
   }
 
   public static void write(UmlTypeSpec t) throws IOException
@@ -919,17 +919,17 @@ abstract class UmlItem extends UmlBaseItem {
   public static void generate_index(Vector v, String k, String r) throws IOException
   {
     int n = v.size();
-    
+
     if (n != 0) {
       sort(v);
-      
+
       start_file(r, k + " Index", true);
-      
+
       fw.write("<table>\n");
-      
+
       for (int i = 0; i != n; i += 1) {
         UmlItem x = (UmlItem) v.elementAt(i);
-        
+
         fw.write("<tr bgcolor=\"#f0f0f0\"><td>");
         x.write("projectFrame");
         fw.write("</td><td>");
@@ -939,7 +939,7 @@ abstract class UmlItem extends UmlBaseItem {
         fw.write("</td></tr>\n");
       }
       fw.write("</table>\n");
-      
+
       end_file();
     }
   }
@@ -955,28 +955,28 @@ abstract class UmlItem extends UmlBaseItem {
       int lo = low;
       int hi = high + 1;
       UmlItem e = (UmlItem) v.elementAt(low);
-      
+
       for (;;) {
         while ((++lo < hi) && !((UmlItem) v.elementAt(lo)).gt(e))
   	;
         while (((UmlItem) v.elementAt(--hi)).gt(e));
   	;
-        
+
         if (lo < hi) {
   	Object x = v.elementAt(lo);
-  	
+
   	v.setElementAt(v.elementAt(hi), lo);
   	v.setElementAt(x, hi);
         }
         else
   	break;
       }
-      
+
       Object x = v.elementAt(low);
-  	
+
       v.setElementAt(v.elementAt(hi), low);
       v.setElementAt(x, hi);
-      
+
       sort(v, low, hi - 1);
       sort(v, hi + 1, high);
     }
@@ -986,7 +986,7 @@ abstract class UmlItem extends UmlBaseItem {
    String s1 = pretty_name();
    String s2 = other.pretty_name();
    int i = s1.compareToIgnoreCase(s2);
-   
+
    return ((((i == 0) && (parent() != null) && (other.parent() != null))
   	  ? parent().pretty_name().compareToIgnoreCase(other.parent().pretty_name())
   	  : i)
