@@ -33,4 +33,4 @@ rem javac -cp opencsv-3.5.jar;wantlist-2.2.jar -d bin src\*.java
 javac -cp opencsv-3.5.jar -d bin src\*.java
 
 echo Creating NIEM tools jar
-jar -cf niem-tools.jar -C bin .
+jar -cf niemtools.jar -C bin .
