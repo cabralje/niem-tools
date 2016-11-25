@@ -41,7 +41,7 @@ class Main
 
 			try
 			{
-				UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
+				//UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
 
 				UmlItem target = UmlCom.targetItem();
 
@@ -55,27 +55,32 @@ class Main
 				{
 				case "exportSchema":
 					// Import extension and exchange schema
-					UmlCom.trace("Exporting extension and exchange schema");
+					UmlCom.message("Exporting extension and exchange schema ...");
+					//UmlCom.trace("Exporting extension and exchange schema");
 					NiemTools.exportSchema();
 					break;
 
 				case "importSchema":
 					// Import NIEM schema
-					UmlCom.trace("Importing NIEM schema");
+					UmlCom.message("Importing NIEM schema ...");
+					//UmlCom.trace("Importing NIEM schema");
 					NiemTools.importSchemaDir(root, false);
 					break;
 
 				case "reset":
 					// Globally reset NIEM Stereotype
-					UmlCom.trace("Resetting NIEM stereotype");
+					UmlCom.message("Resetting NIEM stereotype ...");
+					//UmlCom.trace("Resetting NIEM stereotype");
 					NiemTools.resetStereotype();
 					break;
 
 				case "import":
 					// Import NIEM Mapping CSV file
-					UmlCom.trace("Deleting NIEM Mapping");
+					UmlCom.message("Deleting NIEM Mapping ...");
+					//UmlCom.trace("Deleting NIEM Mapping");
 					NiemTools.deleteMapping();
-					UmlCom.trace("Importing NIEM Mapping");
+					UmlCom.message("Importing NIEM Mapping ...");
+					//UmlCom.trace("Importing NIEM Mapping");
 					NiemTools.importCsv();
 					break;
 
@@ -84,9 +89,10 @@ class Main
 					// Create PIM
 					NiemTools.createPIM(root);
 
-					// Import NIEM schema
-					UmlCom.trace("Importing NIEM schema");
-					NiemTools.importSchemaDir(root, false);
+				// Import NIEM schema
+					UmlCom.message("Importing NIEM schema ...");
+					//UmlCom.trace("Importing NIEM schema");
+					NiemTools.importSchemaDir(root, false); 
 
 					// Generate UML Model HTML documentation
 					//	target.set_dir(argv.length - 1, argv);
@@ -102,23 +108,27 @@ class Main
 					UmlClass.generate();
 
 					// Generate NIEM Mapping HTML
-					UmlCom.trace("Generating NIEM Mapping");
+					UmlCom.message ("Generating NIEM Mapping ...");
+					//UmlCom.trace("Generating NIEM Mapping");
 					NiemTools.exportHtml();
 
 					// Generate NIEM Mapping CSV
-					UmlCom.trace("Generating NIEM Mapping CSV");
+					UmlCom.message("Generating NIEM Mapping CSV ...");
+					//UmlCom.trace("Generating NIEM Mapping CSV");
 					NiemTools.exportCsv();
 
 					// Generate NIEM Wantlist instance
-					UmlCom.trace("Generating NIEM Wantlist");
+					UmlCom.message("Generating NIEM Wantlist ...");
+					//UmlCom.trace("Generating NIEM Wantlist");
 					NiemTools.exportWantlist();
 
-					// Generate extension schema
-					UmlCom.trace("Generating extension schema");
-					NiemTools.exportSchema();
+/*					// Generate extension schema
+					UmlCom.message("Generating extension schema ...");
+					//UmlCom.trace("Generating extension schema");
+					NiemTools.exportSchema();*/
 
 					// output UML objects
-					NiemTools.outputUML();
+					//NiemTools.outputUML();
 
 					break;
 				}

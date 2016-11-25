@@ -13,7 +13,7 @@ import java.util.Vector;
  *
  */
 @SuppressWarnings("rawtypes")
-public class UmlItem {
+public class UmlItem implements Comparable {
 
 	public UmlItem() {
 		super();
@@ -332,6 +332,169 @@ public class UmlItem {
 		    } */
 	}
 
+	public static void sort(Vector v)
+	  {
+	    sort(v, 0, v.size() - 1);
+	  }
+
+	  public static void generate_indexes() throws IOException
+	  {
+	/*    UmlClass.generate_index();
+	    UmlOperation.generate_index();
+	    UmlAttribute.generate_index();
+	    UmlPackage.generate_index();
+	    UmlUseCase.generate_index();
+	    UmlActivity.generate_index();
+	    UmlState.generate_index();
+	    UmlClassDiagram.generate_index();
+	    UmlObjectDiagram.generate_index();
+	    UmlActivityDiagram.generate_index();
+	    UmlStateDiagram.generate_index();
+	    UmlUseCaseDiagram.generate_index();
+	    UmlSequenceDiagram.generate_index();
+	    UmlCollaborationDiagram.generate_index();
+	    UmlComponentDiagram.generate_index();
+	    UmlDeploymentDiagram.generate_index();*/
+	  
+	    int n = all.size();
+	    char previous;
+	    
+	    sort(all);
+	    
+	    previous = 0;
+	    for (int i = 0; i != n; i += 1) {
+	      UmlItem x = (UmlItem) all.elementAt(i);
+	      String s = x.pretty_name();
+	      
+	      if (s.length() != 0) {
+	        char c = x.pretty_name().charAt(0);
+	        
+	        if ((c >= 'a') && (c <= 'z'))
+	  	c += 'A' - 'a';
+	        
+	        if (c != previous) {
+	  	previous = c;
+	  	letters += c;
+	        }
+	      }
+	    }
+	  
+	    previous = 0;
+	    for (int i = 0; i != n; i += 1) {
+	      UmlItem x = (UmlItem) all.elementAt(i);
+	      String s = x.pretty_name();
+	      
+	      if (s.length() != 0) {
+	        char c = x.pretty_name().charAt(0);
+	        
+	        if ((c >= 'a') && (c <= 'z'))
+	  	c += 'A' - 'a';
+	        
+	        if (c != previous) {
+	  	if (previous != 0) {
+	  	  fw.write("</table>\n");
+	  	  end_file();
+	  	}
+	  	
+	  	previous = c;
+	  	
+	  	String sn = new Integer(c & 255).toString();
+	  	
+	  	start_file(new String("index_") + sn, new String("") + c, true);
+	  	
+	  	fw.write("<table>\n");
+	  	fw.write("<tr bgcolor=\"#f0f0f0\"><td align=\"center\"><b>Name</b></td><td align=\"center\"><b>Kind</b></td><td align=\"center\"><b>Description</b></td></tr>\n");
+	        }
+	        
+	        fw.write("<tr bgcolor=\"#f0f0f0\"><td>");
+	        x.write("projectFrame");
+	        fw.write("</td><td>");
+	        fw.write(x.sKind());
+	        fw.write("</td><td>");
+	        writeq(x.description());
+	        fw.write("</td></tr>\n");
+	      }
+	    }
+	  
+	    if (previous != 0) {
+	      fw.write("</table>\n");
+	      end_file();
+	    }
+	  
+	  }
+	  
+	  private boolean gt(UmlItem other) {
+		   String s1 = pretty_name();
+		   String s2 = other.pretty_name();
+		   int i = s1.compareToIgnoreCase(s2);
+		   
+		   return ((((i == 0) && (parent() != null) && (other.parent() != null))
+		  	  ? parent().pretty_name().compareToIgnoreCase(other.parent().pretty_name())
+		  	  : i)
+		  	 > 0);
+		  }
+
+	@SuppressWarnings("unchecked")
+	private static void sort(Vector v, int low, int high)
+	  {
+	    if (low < high) {
+	      int lo = low;
+	      int hi = high + 1;
+	      UmlItem e = (UmlItem) v.elementAt(low);
+	      
+	      for (;;) {
+	        while ((++lo < hi) && !((UmlItem) v.elementAt(lo)).gt(e))
+	  	;
+	        while (((UmlItem) v.elementAt(--hi)).gt(e));
+	  	;
+	        
+	        if (lo < hi) {
+	  	Object x = v.elementAt(lo);
+	  	
+	  	v.setElementAt(v.elementAt(hi), lo);
+	  	v.setElementAt(x, hi);
+	        }
+	        else
+	  	break;
+	      }
+	      
+	      Object x = v.elementAt(low);
+	  	
+	      v.setElementAt(v.elementAt(hi), low);
+	      v.setElementAt(x, hi);
+	      
+	      sort(v, low, hi - 1);
+	      sort(v, hi + 1, high);
+	    }
+	  }
+
+	public void write(String target) throws IOException {
+	    if (known) {
+	      fw.write("<a href=\"index.html#ref");
+	      fw.write(String.valueOf(kind().value()));
+	      fw.write('_');
+	      fw.write(String.valueOf(getIdentifier()));
+	      fw.write("\" target = \"");
+	      fw.write(target);
+	      fw.write("\"><b>");
+	      writeq(pretty_name());
+	      fw.write("</b></a>");
+	    }
+	    else
+	      writeq(name());
+	  }
+	
+	  @SuppressWarnings("unchecked")
+	  public void memo_ref() {
+	      all.addElement(this);
+	      known = true;
+	      
+	      UmlItem[] ch = children();
+	      
+	      for (int i = 0; i != ch.length; i += 1)
+	        ch[i].memo_ref();
+	    }
+	  
 	ArrayList<UmlItem> children = new ArrayList<UmlItem>();
 	UmlItem _parent;
 	String name;
@@ -380,5 +543,52 @@ public class UmlItem {
 	private int _modeler_id;
 
 	private String _name;
+
+	  public void moveAfter(UmlItem x) throws RuntimeException {
+		//    UmlCom.send_cmd(identifier_(), OnInstanceCmd.moveAfterCmd, 
+		//                    (x != null) ? x.identifier_() : 0);
+		//    UmlCom.check();
+		//    parent().reread_children_if_needed_();
+		  }
+	  
+	//  added operations to support sorting
+
+	public void sort() {
+		UmlCom.trace("target not allowed, must be a <i>package</i>, any <i>view</i> or a <i>use case</i>");
+	}
+
+	public int orderWeight() {
+		return 0;
+	}
+
+	public int compareTo(Object o) {
+		UmlItem e1 = (UmlItem) this;
+		UmlItem e2 = (UmlItem) o;
+		int w1 = e1.orderWeight();
+		int w2 = e2.orderWeight();
+
+		return (w1 != w2)
+				? w1 - w2
+						: e1.name().compareTo(e2.name());
+	}
+
+	public void sortChildren() {
+		UmlItem[] v = children();
+		int sz = v.length;
+
+		if (sz != 0) {
+			// sort in memory
+			java.util.Arrays.sort((Object[]) v);
+
+			// update browser
+			int u;
+			UmlItem previous = null;
+
+			for (u = 0; u != sz; u += 1) {
+				v[u].moveAfter(previous);
+				previous = v[u];
+			}
+		}
+	}
 
 }

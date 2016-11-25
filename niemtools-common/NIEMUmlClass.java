@@ -20,6 +20,9 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -1196,6 +1199,10 @@ class NiemTools
 		);
 		}
 
+		// Sorting
+		UmlCom.trace("Sorting namespaces");
+        referencePackage.sort();
+		
 		UmlCom.trace("Namespaces: " + NiemNamespaces.size());
 		UmlCom.trace("Types: " + NiemTypes.size());
 		UmlCom.trace("Elements: " + NiemElements.size());

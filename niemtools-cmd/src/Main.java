@@ -30,17 +30,22 @@ public class Main
 			UmlCom.trace("Importing NIEM schema");
 			NiemTools.importSchemaDir(root,false);
 
+			// Generate indexes
+			UmlCom.trace("Memorizing references");
+			root.memo_ref();
+			UmlItem.generate_indexes();
+
 			// Generate NIEM Mapping HTML
-	//		UmlCom.trace("Generating NIEM Mapping");
-	//		NiemTools.exportHtml();
+			UmlCom.trace("Generating NIEM Mapping");
+			NiemTools.exportHtml();
 
 			// Generate NIEM Mapping CSV
-	//		UmlCom.trace("Generating NIEM Mapping CSV");
-	//		NiemTools.exportCsv();
+			UmlCom.trace("Generating NIEM Mapping CSV");
+			NiemTools.exportCsv();
 
 			// Generate NIEM Wantlist instance
-	//		UmlCom.trace("Generating NIEM Wantlist");
-	//		NiemTools.exportWantlist();
+			UmlCom.trace("Generating NIEM Wantlist");
+			NiemTools.exportWantlist();
 
 			// Generate extension schema
 	//		UmlCom.trace("Generating extension schema");
