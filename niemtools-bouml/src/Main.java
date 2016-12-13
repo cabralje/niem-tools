@@ -1,6 +1,10 @@
-import java.io.*;
+import java.io.IOException;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 // the program is called with the socket port number in argument
 
@@ -9,6 +13,8 @@ class Main
 	public static void main(String argv[])
 	{
 
+		JFrame frame = new JFrame();
+		
 		try
 		{
 			// Set System L&F
@@ -49,7 +55,8 @@ class Main
 				target.memo_ref();
 
 				UmlPackage root = UmlBasePackage.getProject();
-
+				NiemTools.createPIM(root);
+				
 				// int argc = argv.length-1;
 				switch (argv[0])
 				{
@@ -57,14 +64,27 @@ class Main
 					// Import extension and exchange schema
 					UmlCom.message("Exporting extension and exchange schema ...");
 					//UmlCom.trace("Exporting extension and exchange schema");
-					NiemTools.exportSchema();
+					NiemTools.exportSchema(root.propertyValue("html dir"));
 					break;
 
 				case "importSchema":
-					// Import NIEM schema
-					UmlCom.message("Importing NIEM schema ...");
-					//UmlCom.trace("Importing NIEM schema");
-					NiemTools.importSchemaDir(root, false);
+					// Create PIM
+					//NiemTools.createPIM(root);
+					
+					// Imort schema
+					UmlCom.message("Importing NIEM schema");
+					// in java it is very complicated to select
+					// a directory through a dialog, and the dialog
+					// is very slow and ugly
+					JFileChooser fc = new JFileChooser(root.propertyValue("niem dir"));
+					fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+					fc.setDialogTitle("Directory of the schema to be imported");
+					if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
+						return;
+					String directory = fc.getSelectedFile().getAbsolutePath();
+					root.set_PropertyValue("niem dir",directory);
+					NiemTools.importSchemaDir(directory,false);
+					UmlCom.message("Done");
 					break;
 
 				case "reset":
@@ -75,28 +95,29 @@ class Main
 					break;
 
 				case "import":
-					// Import NIEM Mapping CSV file
-					UmlCom.message("Deleting NIEM Mapping ...");
-					//UmlCom.trace("Deleting NIEM Mapping");
+					UmlCom.trace("Deleting NIEM Mapping");
 					NiemTools.deleteMapping();
-					UmlCom.message("Importing NIEM Mapping ...");
-					//UmlCom.trace("Importing NIEM Mapping");
-					NiemTools.importCsv();
+					UmlCom.trace("Importing NIEM Mapping");
+					JFileChooser fc2 = new JFileChooser(root.propertyValue("html dir"));
+					fc2.setFileFilter(new FileNameExtensionFilter("CSV file","csv"));
+					fc2.setDialogTitle("NIEM Mapping CSV file");
+					if (fc2.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
+						return;
+					String filename = fc2.getSelectedFile().getAbsolutePath();
+					NiemTools.importCsv(filename);
 					break;
 
+				case "sort":
+			        UmlCom.trace("<b>Sort</b> release 5.0<br>");
+			        UmlCom.targetItem().sort();
+			        UmlCom.trace("Done<br>");
+					break;
+					
 				default:
-
-					// Create PIM
-					NiemTools.createPIM(root);
-
-				// Import NIEM schema
-					UmlCom.message("Importing NIEM schema ...");
-					//UmlCom.trace("Importing NIEM schema");
-					NiemTools.importSchemaDir(root, false); 
 
 					// Generate UML Model HTML documentation
 					//	target.set_dir(argv.length - 1, argv);
-					target.set_dir(0,null);
+/*					target.set_dir(0,null);
 					UmlItem.frame();
 					UmlCom.message("Indexes ...");
 					UmlItem.generate_indexes();
@@ -105,27 +126,27 @@ class Main
 					UmlItem.end_file();
 					UmlItem.start_file("navig", null, true);
 					UmlItem.end_file();
-					UmlClass.generate();
-
+					UmlClass.generate();  */
+					
 					// Generate NIEM Mapping HTML
 					UmlCom.message ("Generating NIEM Mapping ...");
-					//UmlCom.trace("Generating NIEM Mapping");
-					NiemTools.exportHtml();
+					UmlCom.trace("Generating NIEM Mapping");
+					NiemTools.exportHtml(root.propertyValue("html dir"), "niem-mapping");
 
 					// Generate NIEM Mapping CSV
 					UmlCom.message("Generating NIEM Mapping CSV ...");
-					//UmlCom.trace("Generating NIEM Mapping CSV");
-					NiemTools.exportCsv();
+					UmlCom.trace("Generating NIEM Mapping CSV");
+					NiemTools.exportCsv(root.propertyValue("html dir"), "niem-mapping.csv");
 
 					// Generate NIEM Wantlist instance
 					UmlCom.message("Generating NIEM Wantlist ...");
-					//UmlCom.trace("Generating NIEM Wantlist");
-					NiemTools.exportWantlist();
+					UmlCom.trace("Generating NIEM Wantlist");
+					NiemTools.exportWantlist(root.propertyValue("html dir"), "wantlist");
 
-/*					// Generate extension schema
-					UmlCom.message("Generating extension schema ...");
-					//UmlCom.trace("Generating extension schema");
-					NiemTools.exportSchema();*/
+					// Generate extension schema
+				//	UmlCom.message("Generating extension schema ...");
+				//	UmlCom.trace("Generating extension schema");
+				//	NiemTools.exportSchema(root.propertyValue("html dir"));
 
 					// output UML objects
 					//NiemTools.outputUML();

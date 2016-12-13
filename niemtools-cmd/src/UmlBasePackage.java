@@ -2,7 +2,6 @@
 abstract class UmlBasePackage {
 	
 	public UmlBasePackage() {
-		// TODO Auto-generated constructor stub
 	}
 
 	  public static UmlPackage getProject()

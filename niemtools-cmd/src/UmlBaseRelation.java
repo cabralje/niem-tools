@@ -12,16 +12,24 @@ abstract class UmlBaseRelation extends UmlItem {
 
 		UmlRelation r = (UmlRelation)start.create_(anItemKind.aRelation, "Generalisation");
 		if (r != null)
-			r.baseType = end;
+			r._role_type = end;
+
 		return r;
 	}
-	
-	  protected UmlBaseRelation(long id, String n) { super(id, n); }
-	  
-	  protected UmlBaseRelation()
-	  {
-		  super();
-	  }
-	  
-	  protected UmlClass baseType;
+
+	public UmlClass roleType() {
+
+		return _role_type;
+	}
+
+	protected UmlBaseRelation(long id, String n) { super(id, n); }
+
+	protected UmlBaseRelation()
+	{
+		super();
+	}
+
+	protected UmlClass _role_type;
+
+	// protected UmlClass baseType;
 }

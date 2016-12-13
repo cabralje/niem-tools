@@ -12,7 +12,6 @@ public class UmlClassInstance extends UmlItem {
 	 *
 	 */
 	public UmlClassInstance() {
-		// TODO Auto-generated constructor stub
 		super();
 	}
 

@@ -17,7 +17,6 @@ public class UmlItem implements Comparable {
 
 	public UmlItem() {
 		super();
-		// TODO Auto-generated constructor stub
 		set_Stereotype(NiemTools.niemStereotype);
 	}
 

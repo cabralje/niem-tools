@@ -12,7 +12,7 @@ public class UmlAttribute extends UmlItem {
 	 *
 	 */
 	public UmlAttribute() {
-		// TODO Auto-generated constructor stub
+		
 		super();
 	}
 
@@ -45,6 +45,12 @@ public class UmlAttribute extends UmlItem {
 	  
 	    _type = t;
 	  }
+	  public void set_Multiplicity(String s) throws RuntimeException {
+		   // UmlCom.send_cmd(identifier_(), OnInstanceCmd.setMultiplicityCmd, s);
+		    //UmlCom.check();
+		  
+		    _multiplicity = s;
+		  }
 	  
 	  public String multiplicity() {
 		   // read_if_needed_();
@@ -52,7 +58,7 @@ public class UmlAttribute extends UmlItem {
 		    return _multiplicity;
 		  }
 	  
-	  private String _multiplicity;
+	  private String _multiplicity = "";
 	  
 	  private UmlTypeSpec _type;
 }

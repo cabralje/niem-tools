@@ -11,7 +11,6 @@ public class UmlPackage extends UmlItem {
 
 	public UmlPackage() {
 		super();
-		// TODO Auto-generated constructor stub
 		kind = anItemKind.aPackage;
 	}
 

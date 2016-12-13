@@ -2,7 +2,6 @@
 public class UmlRelation extends UmlBaseRelation {
 
 	public UmlRelation() {
-		// TODO Auto-generated constructor stub
 		super();
 		kind = anItemKind.aRelation;
 		_role_name = "Generalisation";
@@ -44,8 +43,8 @@ public class UmlRelation extends UmlBaseRelation {
 		    
 		    return _role_name;
 		  }
-	  
+	  	  
 	  private aRelationKind _rel_kind = aRelationKind.aGeneralisation;
-	  private String _multiplicity;
-	  
+	  private String _multiplicity = "";
+
 }

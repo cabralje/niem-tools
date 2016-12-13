@@ -23,7 +23,6 @@ public class UmlClass extends UmlItem {
 
 /*	@SuppressWarnings("unchecked")
 	public UmlClass() {
-		// TODO Auto-generated constructor stub
 		super();
 		kind = anItemKind.aClass;
 	    _base_type = new UmlTypeSpec();

@@ -11,7 +11,6 @@ public class UmlClassView extends UmlItem {
 
 	public UmlClassView() {
 		super();
-		// TODO Auto-generated constructor stub
 		kind = anItemKind.aClassView;
 	}
 
