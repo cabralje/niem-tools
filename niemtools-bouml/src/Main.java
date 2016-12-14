@@ -63,7 +63,7 @@ class Main
 				case "exportSchema":
 					// Import extension and exchange schema
 					UmlCom.message("Exporting extension and exchange schema ...");
-					//UmlCom.trace("Exporting extension and exchange schema");
+					UmlCom.trace("Exporting extension and exchange schema");
 					NiemTools.exportSchema(root.propertyValue("html dir"));
 					break;
 
@@ -144,9 +144,9 @@ class Main
 					NiemTools.exportWantlist(root.propertyValue("html dir"), "wantlist");
 
 					// Generate extension schema
-				//	UmlCom.message("Generating extension schema ...");
-				//	UmlCom.trace("Generating extension schema");
-				//	NiemTools.exportSchema(root.propertyValue("html dir"));
+					UmlCom.message("Generating extension schema ...");
+					UmlCom.trace("Generating extension schema");
+					NiemTools.exportSchema(root.propertyValue("html dir"));
 
 					// output UML objects
 					//NiemTools.outputUML();
