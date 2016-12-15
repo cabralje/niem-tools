@@ -847,7 +847,23 @@ class NiemTools {
 				}
 			}
 		}
-
+		for (int i = 0; i < UmlClassInstance.all.size(); i++) {
+			UmlItem c = (UmlItem) UmlClassInstance.all.elementAt(i);
+			if (c.stereotype().equals(niemStereotype)) {
+				String baseTypeName = c.propertyValue(niemProperty(7));
+				if (!baseTypeName.equals("") && !baseTypeName.equals("??") && !isExternal(baseTypeName)) 
+				{
+					if (isNiemType(baseTypeName)) 
+					{
+						// UmlCom.trace("Adding type " + baseTypeName + " to subset");
+						UmlClass type = copyType(baseTypeName);
+						if (type != null)
+							SubsetTypes.put(type.propertyValue(uriProperty), type);
+					}
+				}
+			}
+		}
+		
 		// Copy subset types and create extension types
 		//UmlCom.trace("createSubset: Copy subset types and create extension types");
 		for (int i = 0; i < UmlClass.all.size(); i++) {
@@ -884,9 +900,104 @@ class NiemTools {
 				}
 			}
 		}
+		for (int i = 0; i < UmlClassInstance.all.size(); i++) {
+			UmlItem c = (UmlItem) UmlClassInstance.all.elementAt(i);
+			if (c.stereotype().equals(niemStereotype)) {
+				String typeName = c.propertyValue(niemProperty(5));
+				String notes = c.propertyValue(niemProperty(11));
+				String description = c.description();
 
+				if (!typeName.equals("") && !typeName.equals("??") && !isExternal(typeName)) {
+					if (isNiemType(typeName)) {
+						//UmlCom.trace("Adding type " + typeName + " to subset");
+						UmlClass type = copyType(typeName);
+						if (type != null)
+							SubsetTypes.put(type.propertyValue(uriProperty), type);
+					} else {
+						// UmlCom.trace("Adding type " + typeName + " to extension");
+						String prefix = getPrefix(typeName);
+						String schemaURI = Prefixes.get(prefix);
+						Namespace ns = findNamespace(schemaURI);
+						if (ns != null && ns.referenceClassView != null)
+						{
+							UmlCom.trace("createSubset: type " + typeName + " not found in reference model");
+							continue;
+						}
+						UmlClass type = addType(typeName, description, notes);
+						if (type != null)
+						{
+							String uri = type.propertyValue(uriProperty);
+							// UmlCom.trace("Added " + uri + " to extension");
+							ExtensionTypes.put(uri, type);
+						}
+					}
+				}
+			}
+		}
+		
 		// Copy subset elements and create extension elements
 		//UmlCom.trace("createSubset: Copy subset elements and create extension elements");
+		for (int i = 0; i < UmlClass.all.size(); i++) {
+			UmlItem c = (UmlItem) UmlClass.all.elementAt(i);
+			if (c.stereotype().equals(niemStereotype)) {
+				String typeName = c.propertyValue(niemProperty(5));
+				String elementName = c.propertyValue(niemProperty(6));
+				String baseTypeName = c.propertyValue(niemProperty(7));
+				String multiplicity = c.propertyValue(niemProperty(8));
+				String description = c.description();
+				String mappingNotes = c.propertyValue(niemProperty(11));
+
+				if (!elementName.equals("") && !elementName.equals("??") && !isExternal(elementName)) {
+					//	String elementName2 = elementName.replace(" ", "").replace("(", "").replace(")", "");
+					String[] elements = elementName.split(",");
+					for (String e : elements) 
+					{
+						String e1 = e.trim();
+						String e2 = e1;
+						boolean inType = true;
+						if (e2.startsWith("(") && e2.endsWith(")"))
+						{
+							inType = false;
+							e2 = e2.substring(1,e2.length()-1);
+						}
+						if (isNiemElement(e2)) {
+							//UmlCom.trace("Adding element " + e2 + " in subset");
+							UmlClassInstance element = copyElement(e2);
+							if (element != null)
+								SubsetElements.put(element.propertyValue(uriProperty), element);
+							if (inType && !typeName.equals("") && isNiemElementInType(typeName, e2)) {
+								//UmlCom.trace("Adding element " + e2 + " in type " + typeName + " in subset");
+								String cn = element.parent().propertyValue(uriProperty);
+								List<UmlClassInstance> enlist = (List<UmlClassInstance>) (SubsetElementsInType.get(cn));
+								if (enlist == null) {
+									enlist = new ArrayList<UmlClassInstance>();
+									SubsetElementsInType.put(cn, enlist);
+								}
+								copyElementInType(typeName, element, multiplicity);
+							}
+						} else {
+							//UmlCom.trace("Adding element " + e + " in extension");
+							String prefix = getPrefix(e2);
+							String schemaURI = Prefixes.get(prefix);
+							Namespace ns = findNamespace(schemaURI);
+							if (ns != null && ns.referenceClassView != null)
+							{
+								UmlCom.trace("createSubset: element " + e2 + " not found in reference model");
+								continue;
+							}
+							if (baseTypeName.trim().equals(""))
+							{
+								UmlCom.trace("createSubset: base type not found for element " +  e2);
+								continue;
+							}
+							UmlClassInstance ci = addElement(e2, baseTypeName, description, mappingNotes);
+							if (ci != null)
+								ExtensionElements.put(ci.propertyValue(uriProperty), ci);
+						}
+					}
+				}
+			}
+		}
 		for (int i = 0; i < UmlClass.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlClass.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
@@ -992,6 +1103,47 @@ class NiemTools {
 				}
 			}
 		}
+		for (int i = 0; i < UmlClassInstance.all.size(); i++) {
+			UmlItem c = (UmlItem) UmlClassInstance.all.elementAt(i);
+			if (c.stereotype().equals(niemStereotype)) {
+				String typeName = c.propertyValue(niemProperty(5));
+				String elementName = c.propertyValue(niemProperty(6));
+				String baseTypeName = c.propertyValue(niemProperty(7));
+
+				if (!typeName.equals("") && !typeName.equals("??") && !baseTypeName.equals("") && elementName.equals("")) 
+				{
+					String tagName = getName(typeName);
+					String prefix = getPrefix(typeName);
+					String schemaURI = Prefixes.get(prefix);
+					String baseTagName = getName(baseTypeName);
+					String basePrefix = getPrefix(baseTypeName);
+					String baseSchemaURI = Prefixes.get(basePrefix);
+					UmlClass type, baseType;
+					if (isNiemType(typeName) || isExternal(typeName))
+						continue;
+					type = findType(extensionPackage, schemaURI, tagName);
+					if (type == null)
+					{
+						UmlCom.trace("createSubset: type not found " + typeName);
+						continue;
+					}						
+					if (isNiemType(baseTypeName))
+						baseType = findType(subsetPackage, baseSchemaURI, baseTagName);
+					else
+						baseType = findType(extensionPackage, baseSchemaURI, baseTagName);
+					if (baseType == null)
+					{
+						UmlCom.trace("createSubset: type not found " + baseTypeName);
+						continue;
+					}
+					try {
+						UmlBaseRelation.create(aRelationKind.aGeneralisation, type, baseType);
+					} catch (Exception re) {
+						//UmlCom.trace("createSubset: " + typeName + " already related to " + baseTypeName + " " + re.toString());
+					}
+				}
+			}
+		}
 
 		// Add extension elements in type
 		//UmlCom.trace("createSubset: Add extension elements in type");
@@ -1002,7 +1154,7 @@ class NiemTools {
 				String elementName = c.propertyValue(niemProperty(6));
 				String multiplicity = c.propertyValue(niemProperty(8));
 
-				if (!isNiemType(typeName)) {
+				if (!typeName.equals("") && !isNiemType(typeName)) {
 					if (!elementName.equals("") && !elementName.equals("??")) {
 						String[] elements = elementName.split(",");
 						for (String e : elements) {
@@ -1031,7 +1183,43 @@ class NiemTools {
 				}
 			}
 		}
+		for (int i = 0; i < UmlClassInstance.all.size(); i++) {
+			UmlItem c = (UmlItem) UmlClassInstance.all.elementAt(i);
+			if (c.stereotype().equals(niemStereotype)) {
+				String typeName = c.propertyValue(niemProperty(5));
+				String elementName = c.propertyValue(niemProperty(6));
+				String multiplicity = c.propertyValue(niemProperty(8));
 
+				if (!typeName.equals("") && !isNiemType(typeName)) {
+					if (!elementName.equals("") && !elementName.equals("??")) {
+						String[] elements = elementName.split(",");
+						for (String e : elements) {
+							String e1 = e.trim();
+							if (e1.startsWith("(") && e1.endsWith(")"))
+								continue;
+							//UmlCom.trace("Adding element " + e1 + " in type " + typeName + " in subset");
+							UmlClassInstance element;
+							if (isNiemElement(e1))
+								element = findElement(subsetPackage, e1);
+							else
+								element = findElement(extensionPackage, e1);
+							if (element != null)
+							{
+								String cn = element.parent().propertyValue(uriProperty);
+								List<UmlClassInstance> enlist = (List<UmlClassInstance>) (ExtensionElementsInType.get(cn));
+								if (enlist == null) {
+									enlist = new ArrayList<UmlClassInstance>();
+									ExtensionElementsInType.put(cn, enlist);
+								}
+								enlist.add(element);
+								addElementInType(typeName, element, multiplicity);
+							}
+						}
+					}
+				}
+			}
+		}
+		
 		// Sorting
 		UmlCom.trace("Sorting namespaces");
 		subsetPackage.sort();
