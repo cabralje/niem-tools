@@ -21,6 +21,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -87,6 +88,8 @@ class NiemTools {
 
 	private static String stereotypeDelimiter = ":";
 	private static UmlPackage subsetPackage = null, extensionPackage = null, referencePackage = null;
+	private static UmlPackage subsetXSDPackage = null, extensionXSDPackage = null, referenceXSDPackage = null;
+
 	private static String xmlPrefix = "xs";
 	private static XPath xPath = XPathFactory.newInstance().newXPath();
 
@@ -148,7 +151,8 @@ class NiemTools {
 				currentNotes = notes;
 			else if (!currentNotes.contains(notes))
 				currentNotes = currentNotes + "; " + notes;
-			element.set_PropertyValue(notesProperty, currentNotes);
+			if (!currentNotes.equals(""))
+				element.set_PropertyValue(notesProperty, currentNotes);
 			return element;
 		}
 
@@ -179,7 +183,8 @@ class NiemTools {
 		element = UmlClassInstance.create(nsClassView, elementName2, baseType);
 		element.set_Description(description);
 		element.set_PropertyValue(uriProperty, schemaURI + hashDelimiter + elementName2);
-		element.set_PropertyValue(notesProperty, notes);
+		if (!notes.equals(""))
+			element.set_PropertyValue(notesProperty, notes);
 
 		return element;
 	}
@@ -343,7 +348,8 @@ class NiemTools {
 				currentNotes = notes;
 			else if (!currentNotes.contains(notes))
 				currentNotes = currentNotes + "; " + notes;
-			typeClass.set_PropertyValue(notesProperty, currentNotes);
+			if (!currentNotes.equals(""))
+				typeClass.set_PropertyValue(notesProperty, currentNotes);
 			return typeClass;
 		}
 		
@@ -364,7 +370,8 @@ class NiemTools {
 		{
 			typeClass.set_Description(description);
 			typeClass.set_PropertyValue(uriProperty, schemaURI + hashDelimiter + typeName2);
-			typeClass.set_PropertyValue(notesProperty, notes);
+			if (!notes.equals(""))
+				typeClass.set_PropertyValue(notesProperty, notes);
 		}
 		return typeClass;
 	}
@@ -382,7 +389,8 @@ class NiemTools {
 			}
 			String tn = schemaURI + hashDelimiter + tagName2;
 			typeClass.set_PropertyValue(uriProperty, tn);
-			typeClass.set_PropertyValue(notesProperty, notes);
+			if (!notes.equals(""))
+				typeClass.set_PropertyValue(notesProperty, notes);
 			typeClass.set_Description(description);
 		}
 		return typeClass;
@@ -694,9 +702,8 @@ class NiemTools {
 		return typeClass;
 	}
 
-	// create PIM
+	// create Platform Independent Model (PIM)
 	public static void createPIM(UmlPackage root) {
-		UmlCom.trace("Creating PIM");
 		UmlPackage pimPackage = null;
 
 		// Find or create PIM package
@@ -709,7 +716,7 @@ class NiemTools {
 		}
 		if (pimPackage == null) {
 			pimPackage = UmlPackage.create(root, "PIM");
-			// UmlCom.trace("PIM root-level package created");
+			UmlCom.trace("Creating PIM");
 		}
 
 		// Find or create package "NIEMSubset"
@@ -720,10 +727,8 @@ class NiemTools {
 					break;
 				}
 		}
-		if (subsetPackage == null) {
+		if (subsetPackage == null)
 			subsetPackage = UmlPackage.create(pimPackage, "NIEMSubset");
-			// UmlCom.trace("NIEMSubset package created");
-		}
 
 		// Find or create package "NIEMExtension"
 		for (UmlItem ch : pimPackage.children()) {
@@ -733,10 +738,8 @@ class NiemTools {
 					break;
 				}
 		}
-		if (extensionPackage == null) {
+		if (extensionPackage == null)
 			extensionPackage = UmlPackage.create(pimPackage, "NIEMExtension");
-			// UmlCom.trace("NIEMExtension package created");
-		}
 
 		// Find or create package "NIEMReference"
 		for (UmlItem ch : pimPackage.children()) {
@@ -746,12 +749,61 @@ class NiemTools {
 					break;
 				}
 		}
-		if (referencePackage == null) {
+		if (referencePackage == null)
 			referencePackage = UmlPackage.create(pimPackage, "NIEMReference");
-			// UmlCom.trace("NIEMReference package created");
-		}
 	}
 
+	// create Platform Specific Model (PSM)
+	// TODO create packages as deployment views
+	public static void createPSM(UmlPackage root) {
+		UmlCom.trace("Creating PSM");
+		UmlPackage psmPackage = null;
+
+		// Find or create PSM package
+		for (UmlItem ch : root.children()) {
+			if (ch.pretty_name().equals("PSM"))
+				if ((ch.kind().value() == anItemKind._aPackage)) {
+					psmPackage = (UmlPackage) ch;
+					break;
+				}
+		}
+		if (psmPackage == null)
+			psmPackage = UmlPackage.create(root, "PSM");
+
+		// Find or create package "NIEMSubsetXSD"
+		for (UmlItem ch : psmPackage.children()) {
+			if (ch.pretty_name().equals("NIEMSubsetXSD"))
+				if ((ch.kind().value() == anItemKind._aPackage)) {
+					subsetXSDPackage = (UmlPackage) ch;
+					break;
+				}
+		}
+		if (subsetXSDPackage == null)
+			subsetXSDPackage = UmlPackage.create(psmPackage, "NIEMSubsetXSD");
+
+		// Find or create package "NIEMExtensionXSD"
+		for (UmlItem ch : psmPackage.children()) {
+			if (ch.pretty_name().equals("NIEMExtensionXSD"))
+				if ((ch.kind().value() == anItemKind._aPackage)) {
+					extensionXSDPackage = (UmlPackage) ch;
+					break;
+				}
+		}
+		if (extensionXSDPackage == null)
+			extensionXSDPackage = UmlPackage.create(psmPackage, "NIEMExtensionXSD");
+
+		// Find or create package "NIEMReferenceXSD"
+		for (UmlItem ch : psmPackage.children()) {
+			if (ch.pretty_name().equals("NIEMReferenceXSD"))
+				if ((ch.kind().value() == anItemKind._aPackage)) {
+					referenceXSDPackage = (UmlPackage) ch;
+					break;
+				}
+		}
+		if (referenceXSDPackage == null)
+			referenceXSDPackage = UmlPackage.create(psmPackage, "NIEMReferenceXSD");
+	}
+	
 	// create NIEM subset and extension
 	// TODO add Augmentation points to subset
 	public static void createSubset() {
@@ -1086,6 +1138,26 @@ class NiemTools {
 		cacheModel(extensionPackage);
 
 		try {
+			FileWriter fw;
+			
+			// export catalog file
+			fw = new FileWriter(dir + "/xml-catalog.xml");
+			fw.write("<?xml version=\"1.0\" encoding=\"US-ASCII\"?>\n");
+			fw.write("<!DOCTYPE catalog PUBLIC \"-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN\" \"http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd\">\n");
+			fw.write("<catalog prefer=\"public\" xmlns=\"urn:oasis:names:tc:entity:xmlns:xml:catalog\">\n");
+			for (Entry<String, String> entry : Prefixes.entrySet())
+			{
+				String prefix = entry.getKey();
+				String schemaURI = Prefixes.get(prefix);
+				Namespace ns = Namespaces.get(schemaURI);
+				if (ns.referenceClassView == null)
+				  fw.write("<uri name=\"" + schemaURI + "\" uri=\"" + prefix + ".xsd\"/>\n");
+			}
+			fw.write("<nextCatalog  catalog=\"Subset/niem/xml-catalog.xml\" />\n");
+			fw.write("</catalog>\n");
+			fw.close();
+			
+			// export each schema
 			for (UmlItem item: extensionPackage.children())
 				if (item.kind() == anItemKind.aClassView)
 				{
@@ -1094,21 +1166,84 @@ class NiemTools {
 					String prefix = cv.name();
 					String schemaURI = cv.propertyValue(uriProperty);
 
+					// build list of referenced namespaces
+					HashSet<String> RefNamespaces = new HashSet<String>();
+					RefNamespaces.add("xs");
+					RefNamespaces.add("structures");
+					for (UmlItem item2 : cv.children())
+						if (item2.kind() == anItemKind.aClass)
+						{
+							UmlClass c = (UmlClass)item2;
+							for (UmlItem item3 : c.children())
+								if (item3.kind() == anItemKind.aRelation)
+								{
+									UmlRelation r = (UmlRelation)item3;
+									if (r.relationKind() == aRelationKind.aGeneralisation)
+									{
+										UmlClass baseType = r.roleType();
+										RefNamespaces.add(baseType.parent().name());
+										break;
+									}
+								}
+							for (UmlItem item4 : c.children())
+								if (item4.kind() == anItemKind.anAttribute)
+								{
+									UmlAttribute a = (UmlAttribute)item4;
+									String elementUri = a.propertyValue(uriProperty);
+									UmlClassInstance ci;
+									if (SubsetElements.containsKey(elementUri))
+										ci = (UmlClassInstance)SubsetElements.get(elementUri);
+									else
+										ci = (UmlClassInstance)ExtensionElements.get(elementUri);
+									RefNamespaces.add(ci.parent().name());
+								}
+						}
+					for (UmlItem item2 : cv.children())
+						if (item2.kind() == anItemKind.aClassInstance)
+						{
+							UmlClassInstance ci = (UmlClassInstance)item2;
+							UmlClass baseType = ci.type();
+							RefNamespaces.add(baseType.parent().name());
+						}
+					
 					// Open file for each extension schema and write header
-					FileWriter fw = new FileWriter(dir + "/" + prefix + ".xsd");
+					fw = new FileWriter(dir + "/" + prefix + ".xsd");
 					//UmlCom.trace("exportSchema: schema " + prefix + ".xsd");
-					fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+					//fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+					fw.write("<?xml version=\"1.0\" encoding=\"US-ASCII\"?>\n");
 					fw.write("<!-- NIEM extension schema generated by BOUML niemtools plug_out -->\n");
-					// TODO: only list namespaces referred to by this namespace
-					fw.write("<xs:schema targetNamespace=\"" + schemaURI + "\"");
-					for (Entry<String, String> entry2 : Prefixes.entrySet())
-						fw.write(" xmlns:" + entry2.getKey() + "=\"" + entry2.getValue() + "\"");
-					fw.write(" xsi:schemaLocation = \"");
-					for (Entry<String, String> entry3 : Prefixes.entrySet())
-						fw.write(entry3.getValue() + " " + entry3.getKey() + ".xsd" + " ");
-					fw.write("\"");
-					fw.write(">\n");
+					fw.write("<xs:schema targetNamespace=\"" + schemaURI + "\"\n");
+					
+					// export namespace definitions
+					fw.write(" xmlns=\"" + cv.propertyValue(uriProperty) + "\"\n");
+					fw.write("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+					for (String nsPrefix : RefNamespaces)
+						fw.write(" xmlns:" + nsPrefix + "=\"" + Prefixes.get(nsPrefix) + "\"");
+					
+					// export schemaLocation
+					//fw.write(" xsi:schemaLocation = \"");
+					//for (String nsPrefix : RefNamespaces)
+					//  fw.write(Prefixes.get(nsPrefix) + " " + nsPrefix + ".xsd" + " ");
+					//fw.write("\"");
 
+					// close top level element
+					fw.write(">\n");
+					
+					// export import namespaces
+					for (String nsPrefix : RefNamespaces)
+					{
+						String nsSchemaURI = Prefixes.get(nsPrefix);
+						if (!nsSchemaURI.equals(schemaURI) && !nsSchemaURI.equals(XMLConstants.W3C_XML_SCHEMA_NS_URI))
+						{
+							//if (nsPrefix.equals("j"))
+							//	fw.write("<xs:import namespace= \"" + Prefixes.get(nsPrefix) + "\" schemaLocation=\"Subset/niem/domains/jxdm/5.2/jxdm.xsd\"/>\n");
+							//else if (nsPrefix.equals("nc"))
+							//	fw.write("<xs:import namespace= \"" + Prefixes.get(nsPrefix) + "\" schemaLocation=\"Subset/niem/niem-core/3.0/niem-core.xsd\"/>\n");
+							//else
+							//	fw.write("<xs:import namespace= \"" + Prefixes.get(nsPrefix) + "\" schemaLocation=\"" + nsPrefix + ".xsd\"/>\n");
+							fw.write("<xs:import namespace= \"" + nsSchemaURI + "\"/>");
+						}
+					}
 					// export types
 					for (UmlItem item2 : cv.children())
 						if (item2.kind() == anItemKind.aClass)
@@ -1120,11 +1255,11 @@ class NiemTools {
 							String mappingNotes = c.propertyValue(notesProperty);
 							if (mappingNotes != null && !mappingNotes.equals(""))
 								fw.write("<!--" + mappingNotes + "-->");
-							fw.write("<xs:complexType name=\"" + typeName + "\">");
-							fw.write("<xs:annotation>");
-							fw.write("<xs:documentation>" + description + "</xs:documentation>");
-							fw.write("</xs:annotation>");
-							fw.write("<xs:complexContent>");
+							fw.write("<xs:complexType name=\"" + typeName + "\">\n");
+							fw.write("<xs:annotation>\n");
+							fw.write("<xs:documentation>" + description + "</xs:documentation>\n");
+							fw.write("</xs:annotation>\n");
+							fw.write("<xs:complexContent>\n");
 							for (UmlItem item3 : c.children())
 								if (item3.kind() == anItemKind.aRelation)
 								{
@@ -1140,8 +1275,8 @@ class NiemTools {
 								baseTypeName = "structures:AugmentationType";
 							if (baseTypeName.equals(""))
 								UmlCom.trace("exportSchema: type " + prefix + ":" + typeName + " has no base type");
-							fw.write("<xs:extension base=\"" + baseTypeName + "\">");
-							fw.write("<xs:sequence>");
+							fw.write("<xs:extension base=\"" + baseTypeName + "\">\n");
+							fw.write("<xs:sequence>\n");
 							for (UmlItem item4 : c.children())
 								if (item4.kind() == anItemKind.anAttribute)
 								{
@@ -1166,13 +1301,13 @@ class NiemTools {
 									String elementMappingNotes = a.propertyValue(notesProperty);
 									if (elementMappingNotes != null && !elementMappingNotes.equals(""))
 										fw.write("<!--" + elementMappingNotes + "-->");
-									fw.write("<xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>");
+									fw.write("<xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>\n");
 								}
 							//	fw.write("<xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>");
-							fw.write("</xs:sequence>");
-							fw.write("</xs:extension>");
-							fw.write("</xs:complexContent>");
-							fw.write("</xs:complexType>");
+							fw.write("</xs:sequence>\n");
+							fw.write("</xs:extension>\n");
+							fw.write("</xs:complexContent>\n");
+							fw.write("</xs:complexType>\n");
 						}
 
 					// export elements
@@ -1182,20 +1317,21 @@ class NiemTools {
 							UmlClassInstance ci = (UmlClassInstance)item2;
 							String elementName = ci.name();
 							String description = ci.description();
-							String baseTypeName = "";
+							UmlClass baseType = ci.type();
+							String baseTypeName = baseType.parent().name() + namespaceDelimiter + baseType.name();
 							String mappingNotes = ci.propertyValue(notesProperty);
 							if (mappingNotes != null && !mappingNotes.equals(""))
 								fw.write("<!--" + mappingNotes + "-->");
 							if (baseTypeName.equals(subsetAbstractType))
-								fw.write("<xs:element name=\"" + elementName + "\" abstract=\"true\">");
+								fw.write("<xs:element name=\"" + elementName + "\" abstract=\"true\">\n");
 							else
-								fw.write("<xs:element name=\"" + elementName + "\" type=\"" + baseTypeName + "\" nillable=\"true\">");
-							fw.write("<xs:annotation>");
-							fw.write("<xs:documentation>" + description + "</xs:documentation>");
-							fw.write("</xs:annotation>");
-							fw.write("</xs:element>");
+								fw.write("<xs:element name=\"" + elementName + "\" type=\"" + baseTypeName + "\" nillable=\"true\">\n");
+							fw.write("<xs:annotation>\n");
+							fw.write("<xs:documentation>" + description + "</xs:documentation>\n");
+							fw.write("</xs:annotation>\n");
+							fw.write("</xs:element>\n");
 						}
-					fw.write("</xs:schema>");
+					fw.write("</xs:schema>\n");
 					fw.close();
 				}
 		} catch (IOException e) {

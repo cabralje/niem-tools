@@ -48,14 +48,17 @@ class Main
 			try
 			{
 				//UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
-
+				JFileChooser fc;
+				String xsdDir;
 				UmlItem target = UmlCom.targetItem();
 
 				UmlCom.message("Memorize references ...");
 				target.memo_ref();
 
+				// create PIM and PSM
 				UmlPackage root = UmlBasePackage.getProject();
 				NiemTools.createPIM(root);
+				//NiemTools.createPSM(root);
 				
 				// int argc = argv.length-1;
 				switch (argv[0])
@@ -64,19 +67,30 @@ class Main
 					// Import extension and exchange schema
 					UmlCom.message("Exporting extension and exchange schema ...");
 					UmlCom.trace("Exporting extension and exchange schema");
-					NiemTools.exportSchema(root.propertyValue("html dir"));
+					xsdDir = root.propertyValue("xsd dir");
+					if (xsdDir == null)
+					{
+						fc = new JFileChooser(root.propertyValue("html dir"));
+						fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						fc.setDialogTitle("Directory of the schema to be exported");
+						if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
+							return;
+						xsdDir = fc.getSelectedFile().getAbsolutePath();
+						root.set_PropertyValue("xsd dir",xsdDir);
+					}
+					NiemTools.exportSchema(xsdDir);
 					break;
 
 				case "importSchema":
 					// Create PIM
 					//NiemTools.createPIM(root);
 					
-					// Imort schema
+					// Import schema
 					UmlCom.message("Importing NIEM schema");
 					// in java it is very complicated to select
 					// a directory through a dialog, and the dialog
 					// is very slow and ugly
-					JFileChooser fc = new JFileChooser(root.propertyValue("niem dir"));
+					fc = new JFileChooser(root.propertyValue("niem dir"));
 					fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					fc.setDialogTitle("Directory of the schema to be imported");
 					if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
@@ -146,7 +160,18 @@ class Main
 					// Generate extension schema
 					UmlCom.message("Generating extension schema ...");
 					UmlCom.trace("Generating extension schema");
-					NiemTools.exportSchema(root.propertyValue("html dir"));
+					xsdDir = root.propertyValue("xsd dir");
+					if (xsdDir == null)
+					{
+						fc = new JFileChooser(root.propertyValue("html dir"));
+						fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						fc.setDialogTitle("Directory of the schema to be exported");
+						if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
+							return;
+						xsdDir = fc.getSelectedFile().getAbsolutePath();
+						root.set_PropertyValue("xsd dir",xsdDir);
+					}
+					NiemTools.exportSchema(xsdDir);
 
 					// output UML objects
 					//NiemTools.outputUML();

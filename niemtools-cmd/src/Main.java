@@ -28,7 +28,8 @@ public class Main
 
 		// setup directories
 		root.set_PropertyValue("niem dir", "C:/Users/JamesECabral/OneDrive/xml/niem-3.2/niem");
-		root.set_PropertyValue("html dir", "C:/Users/JamesECabral/Desktop/html");
+		root.set_PropertyValue("html dir", "C:/Users/JamesECabral/OneDrive/xml/ecf-5.0/model");
+		root.set_PropertyValue("xsd dir", "C:/Users/JamesECabral/OneDrive/xml/ecf-5.0/model");
 		
 		try {
 			// Create PIM
@@ -80,7 +81,7 @@ public class Main
 
 			// Generate extension schema
 			UmlCom.trace("Generating extension schema");
-			NiemTools.exportSchema(root.propertyValue("html dir"));
+			NiemTools.exportSchema(root.propertyValue("xsd dir"));
 		}
 		catch (IOException e)
 		{
