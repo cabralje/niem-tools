@@ -831,8 +831,8 @@ class NiemTools {
 
 		// Copy subset base types
 		//UmlCom.trace("createSubset: Copy subset base types");
-		for (int i = 0; i < UmlClass.all.size(); i++) {
-			UmlItem c = (UmlItem) UmlClass.all.elementAt(i);
+		for (int i = 0; i < UmlItem.all.size(); i++) {
+			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String baseTypeName = c.propertyValue(niemProperty(7));
 				if (!baseTypeName.equals("") && !baseTypeName.equals("??") && !isExternal(baseTypeName)) 
@@ -847,7 +847,7 @@ class NiemTools {
 				}
 			}
 		}
-		for (int i = 0; i < UmlClassInstance.all.size(); i++) {
+/*		for (int i = 0; i < UmlClassInstance.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlClassInstance.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String baseTypeName = c.propertyValue(niemProperty(7));
@@ -862,12 +862,12 @@ class NiemTools {
 					}
 				}
 			}
-		}
+		}*/
 		
 		// Copy subset types and create extension types
 		//UmlCom.trace("createSubset: Copy subset types and create extension types");
-		for (int i = 0; i < UmlClass.all.size(); i++) {
-			UmlItem c = (UmlItem) UmlClass.all.elementAt(i);
+		for (int i = 0; i < UmlItem.all.size(); i++) {
+			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String typeName = c.propertyValue(niemProperty(5));
 				String notes = c.propertyValue(niemProperty(11));
@@ -900,7 +900,7 @@ class NiemTools {
 				}
 			}
 		}
-		for (int i = 0; i < UmlClassInstance.all.size(); i++) {
+/*		for (int i = 0; i < UmlClassInstance.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlClassInstance.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String typeName = c.propertyValue(niemProperty(5));
@@ -934,11 +934,11 @@ class NiemTools {
 				}
 			}
 		}
-		
+*/		
 		// Copy subset elements and create extension elements
 		//UmlCom.trace("createSubset: Copy subset elements and create extension elements");
-		for (int i = 0; i < UmlClass.all.size(); i++) {
-			UmlItem c = (UmlItem) UmlClass.all.elementAt(i);
+		for (int i = 0; i < UmlItem.all.size(); i++) {
+			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String typeName = c.propertyValue(niemProperty(5));
 				String elementName = c.propertyValue(niemProperty(6));
@@ -998,7 +998,7 @@ class NiemTools {
 				}
 			}
 		}
-		for (int i = 0; i < UmlClass.all.size(); i++) {
+/*		for (int i = 0; i < UmlClass.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlClass.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String typeName = c.propertyValue(niemProperty(5));
@@ -1059,11 +1059,11 @@ class NiemTools {
 				}
 			}
 		}
-
+*/
 		// Create extension base types
 		//UmlCom.trace("createSubset: Copy subset base types and create extension base types");
-		for (int i = 0; i < UmlClass.all.size(); i++) {
-			UmlItem c = (UmlItem) UmlClass.all.elementAt(i);
+		for (int i = 0; i < UmlItem.all.size(); i++) {
+			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String typeName = c.propertyValue(niemProperty(5));
 				String elementName = c.propertyValue(niemProperty(6));
@@ -1103,7 +1103,7 @@ class NiemTools {
 				}
 			}
 		}
-		for (int i = 0; i < UmlClassInstance.all.size(); i++) {
+/*		for (int i = 0; i < UmlClassInstance.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlClassInstance.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String typeName = c.propertyValue(niemProperty(5));
@@ -1144,11 +1144,11 @@ class NiemTools {
 				}
 			}
 		}
-
+*/
 		// Add extension elements in type
 		//UmlCom.trace("createSubset: Add extension elements in type");
-		for (int i = 0; i < UmlClass.all.size(); i++) {
-			UmlItem c = (UmlItem) UmlClass.all.elementAt(i);
+		for (int i = 0; i < UmlItem.all.size(); i++) {
+			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String typeName = c.propertyValue(niemProperty(5));
 				String elementName = c.propertyValue(niemProperty(6));
@@ -1183,7 +1183,7 @@ class NiemTools {
 				}
 			}
 		}
-		for (int i = 0; i < UmlClassInstance.all.size(); i++) {
+/*		for (int i = 0; i < UmlClassInstance.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlClassInstance.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String typeName = c.propertyValue(niemProperty(5));
@@ -1219,7 +1219,7 @@ class NiemTools {
 				}
 			}
 		}
-		
+*/		
 		// Sorting
 		UmlCom.trace("Sorting namespaces");
 		subsetPackage.sort();
@@ -1229,7 +1229,7 @@ class NiemTools {
 	// reset NIEM mappings
 	public static void deleteMapping() {
 		@SuppressWarnings("unchecked")
-		Iterator<UmlItem> it = UmlClass.all.iterator();
+		Iterator<UmlItem> it = UmlItem.all.iterator();
 		while (it.hasNext()) {
 			UmlItem item = it.next();
 			if (item.stereotype().equals(niemStereotype))
@@ -1254,8 +1254,8 @@ class NiemTools {
 			writer.writeNext(nextLine);
 
 			// Export NIEM Mappings for Classes
-			for (int i = 0; i < UmlClass.classes.size(); i++) {
-				UmlItem c = (UmlItem) UmlClass.classes.elementAt(i);
+			for (int i = 0; i < UmlItem.all.size(); i++) {
+				UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 
 				if (c.stereotype().equals(niemStereotype)) {
 					nextLine = itemCsv(c);
@@ -1734,13 +1734,22 @@ class NiemTools {
 	public static void importCsv(String filename) {
 		// Cache CIM classes
 		HashMap<String, UmlClass> CIMClasses = new HashMap<String, UmlClass>();
-		for (int i = 0; i < UmlClass.classes.size(); i++) {
-			UmlClass c = (UmlClass) UmlClass.classes.elementAt(i);
-			if (c.stereotype().equals(niemStereotype))
-				if (!CIMClasses.containsKey(c.pretty_name()))
-					CIMClasses.put(c.pretty_name(), c);
+		HashMap<String, UmlClassInstance> CIMInstances = new HashMap<String, UmlClassInstance>();
+		for (int i = 0; i < UmlItem.all.size(); i++) {
+			UmlItem item = (UmlItem)UmlItem.all.elementAt(i);
+			if (item.stereotype().equals(niemStereotype))
+				if (item.kind() == anItemKind.aClass)
+				{
+					UmlClass c = (UmlClass)item;
+					if (!CIMClasses.containsKey(c.pretty_name()))
+						CIMClasses.put(c.pretty_name(), c);
+				} else if (item.kind() == anItemKind.aClassInstance)
+				{
+					UmlClassInstance ci = (UmlClassInstance)item;
+					if (!CIMInstances.containsKey(ci.pretty_name()))
+						CIMInstances.put(ci.pretty_name(), ci);
+				}
 		}
-
 		try {
 
 			CSVReader reader = new CSVReader(new FileReader(filename));
@@ -1754,20 +1763,34 @@ class NiemTools {
 				String className = nextLine[0].trim();
 				String attributeName = nextLine[1].trim();
 
-				UmlClass c = CIMClasses.get(className);
-				if (c != null) {
-					if (attributeName.equals("")) {
+				if (!className.equals(""))
+				{
+					UmlClass c = CIMClasses.get(className);
+					if (c != null) 
+					{
+						if (attributeName.equals("")) 
+						{
+							// Import NIEM Mapping to Class
+							UmlCom.trace("Importing NIEM mapping for " + className);
+							for (int p = 4; p < map.length && p < nextLine.length; p++)
+								c.set_PropertyValue(niemProperty(p), nextLine[p]);
+						} else {
+							// Import NIEM Mapping to Attribute
+							for (UmlItem item : c.children())
+								if (item.stereotype().equals(niemStereotype) && (item.pretty_name().equals(attributeName)))
+									for (int p = 4; p < map.length && p < nextLine.length; p++)
+										item.set_PropertyValue(niemProperty(p), nextLine[p]);
+						}
+					}
+				} else if (!attributeName.equals(""))
+				{
+					UmlClassInstance ci = CIMInstances.get(attributeName);
+					if (ci != null)
+					{
 						// Import NIEM Mapping to Class
-						UmlCom.trace("Importing NIEM mapping for " + className);
+						UmlCom.trace("Importing NIEM mapping for " + attributeName);
 						for (int p = 4; p < map.length && p < nextLine.length; p++)
-							c.set_PropertyValue(niemProperty(p), nextLine[p]);
-					} else {
-						// Import NIEM Mapping to Attribute
-						for (UmlItem item : c.children())
-							if (item.stereotype().equals(niemStereotype) && (item.pretty_name().equals(attributeName)))
-
-								for (int p = 4; p < map.length && p < nextLine.length; p++)
-									item.set_PropertyValue(niemProperty(p), nextLine[p]);
+							ci.set_PropertyValue(niemProperty(p), nextLine[p]);
 					}
 				}
 			}
@@ -2341,6 +2364,11 @@ class NiemTools {
 				nextLine[1] = r.pretty_name();
 				nextLine[2] = r.multiplicity();
 				break;
+			case anItemKind._aClassInstance:
+				nextLine[0] = "";
+				nextLine[1] = item.pretty_name();
+				nextLine[2] = "";
+				break;
 			default:
 				nextLine[0] = item.parent().pretty_name();
 				nextLine[1] = item.pretty_name();
@@ -2392,7 +2420,7 @@ class NiemTools {
 	// (re-)associate the NIEM stereotype with all properties in the CIM
 	public static void resetStereotype() {
 		@SuppressWarnings("unchecked")
-		Iterator<UmlItem> it = UmlClass.all.iterator();
+		Iterator<UmlItem> it = UmlItem.all.iterator();
 		while (it.hasNext()) {
 			UmlItem item = (UmlItem) it.next();
 			if (item.stereotype().equals("niem:niem")) {
