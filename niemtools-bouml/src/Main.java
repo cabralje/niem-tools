@@ -1,4 +1,8 @@
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -49,7 +53,8 @@ class Main
 			{
 				//UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
 				JFileChooser fc;
-				String xsdDir;
+				String homeDir = System.getProperty("user.home");
+				String propFile = homeDir + "/niemtools.properties";
 				UmlItem target = UmlCom.targetItem();
 
 				UmlCom.message("Memorize references ...");
@@ -59,6 +64,22 @@ class Main
 				UmlPackage root = UmlBasePackage.getProject();
 				NiemTools.createPIM(root);
 				//NiemTools.createPSM(root);
+				//load properties
+				Properties properties = new Properties();
+				FileReader in = null;
+				try {
+					in = new FileReader(propFile);
+					properties.load(in);
+					in.close();
+				}
+				catch (FileNotFoundException e)
+				{
+					UmlCom.trace("Properties file " + propFile + " does not exist.");
+				}
+				String htmlDir = properties.getProperty("htmlDir", homeDir);
+				root.set_PropertyValue("html dir", htmlDir);
+				String xsdDir = properties.getProperty("xsdDir");
+				String niemDir = properties.getProperty("niemDir", homeDir);
 				
 				// int argc = argv.length-1;
 				switch (argv[0])
@@ -67,16 +88,15 @@ class Main
 					// Import extension and exchange schema
 					UmlCom.message("Exporting extension and exchange schema ...");
 					UmlCom.trace("Exporting extension and exchange schema");
-					xsdDir = root.propertyValue("xsd dir");
 					if (xsdDir == null)
 					{
-						fc = new JFileChooser(root.propertyValue("html dir"));
+						fc = new JFileChooser(homeDir);
 						fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 						fc.setDialogTitle("Directory of the schema to be exported");
 						if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
 							return;
 						xsdDir = fc.getSelectedFile().getAbsolutePath();
-						root.set_PropertyValue("xsd dir",xsdDir);
+						properties.setProperty("xsdDir", xsdDir);
 					}
 					NiemTools.exportSchema(xsdDir);
 					break;
@@ -90,15 +110,14 @@ class Main
 					// in java it is very complicated to select
 					// a directory through a dialog, and the dialog
 					// is very slow and ugly
-					fc = new JFileChooser(root.propertyValue("niem dir"));
+					fc = new JFileChooser(niemDir);
 					fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					fc.setDialogTitle("Directory of the schema to be imported");
 					if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
 						return;
 					String directory = fc.getSelectedFile().getAbsolutePath();
-					root.set_PropertyValue("niem dir",directory);
+					properties.setProperty("niemDir", directory);
 					NiemTools.importSchemaDir(directory,false);
-					UmlCom.message("Done");
 					break;
 
 				case "reset":
@@ -112,7 +131,7 @@ class Main
 					UmlCom.trace("Deleting NIEM Mapping");
 					NiemTools.deleteMapping();
 					UmlCom.trace("Importing NIEM Mapping");
-					JFileChooser fc2 = new JFileChooser(root.propertyValue("html dir"));
+					JFileChooser fc2 = new JFileChooser(htmlDir);
 					fc2.setFileFilter(new FileNameExtensionFilter("CSV file","csv"));
 					fc2.setDialogTitle("NIEM Mapping CSV file");
 					if (fc2.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
@@ -124,14 +143,13 @@ class Main
 				case "sort":
 			        UmlCom.trace("<b>Sort</b> release 5.0<br>");
 			        UmlCom.targetItem().sort();
-			        UmlCom.trace("Done<br>");
 					break;
 					
 				default:
 
 					// Generate UML Model HTML documentation
 					//	target.set_dir(argv.length - 1, argv);
-/*					target.set_dir(0,null);
+					target.set_dir(0,null);
 					UmlItem.frame();
 					UmlCom.message("Indexes ...");
 					UmlItem.generate_indexes();
@@ -140,36 +158,35 @@ class Main
 					UmlItem.end_file();
 					UmlItem.start_file("navig", null, true);
 					UmlItem.end_file();
-					UmlClass.generate();  */
+					UmlClass.generate(); 
 					
 					// Generate NIEM Mapping HTML
 					UmlCom.message ("Generating NIEM Mapping ...");
 					UmlCom.trace("Generating NIEM Mapping");
-					NiemTools.exportHtml(root.propertyValue("html dir"), "niem-mapping");
+					NiemTools.exportHtml(htmlDir, "niem-mapping");
 
 					// Generate NIEM Mapping CSV
 					UmlCom.message("Generating NIEM Mapping CSV ...");
 					UmlCom.trace("Generating NIEM Mapping CSV");
-					NiemTools.exportCsv(root.propertyValue("html dir"), "niem-mapping.csv");
+					NiemTools.exportCsv(htmlDir, "niem-mapping.csv");
 
 					// Generate NIEM Wantlist instance
 					UmlCom.message("Generating NIEM Wantlist ...");
 					UmlCom.trace("Generating NIEM Wantlist");
-					NiemTools.exportWantlist(root.propertyValue("html dir"), "wantlist");
+					NiemTools.exportWantlist(htmlDir, "wantlist");
 
 					// Generate extension schema
 					UmlCom.message("Generating extension schema ...");
 					UmlCom.trace("Generating extension schema");
-					xsdDir = root.propertyValue("xsd dir");
 					if (xsdDir == null)
 					{
-						fc = new JFileChooser(root.propertyValue("html dir"));
+						fc = new JFileChooser(htmlDir);
 						fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 						fc.setDialogTitle("Directory of the schema to be exported");
 						if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
 							return;
 						xsdDir = fc.getSelectedFile().getAbsolutePath();
-						root.set_PropertyValue("xsd dir",xsdDir);
+						properties.setProperty("xsdDir", xsdDir);
 					}
 					NiemTools.exportSchema(xsdDir);
 
@@ -177,6 +194,17 @@ class Main
 					//NiemTools.outputUML();
 
 					break;
+				}
+				// store properties
+				try {
+					FileWriter out = new FileWriter(propFile);
+					properties.setProperty("htmlDir", root.propertyValue("html dir"));
+					properties.store(out, "BOUML NiemTools plugout settings");
+					out.close();
+				}
+				catch (IOException e)
+				{
+					UmlCom.trace("Unable to write properties to " + propFile);
 				}
 				UmlCom.trace("Done");
 				UmlCom.message("");
