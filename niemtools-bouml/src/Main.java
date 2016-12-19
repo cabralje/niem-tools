@@ -55,6 +55,7 @@ class Main
 				JFileChooser fc;
 				String homeDir = System.getProperty("user.home");
 				String propFile = homeDir + "/niemtools.properties";
+				Boolean genHtml = false;
 				UmlItem target = UmlCom.targetItem();
 
 				UmlCom.message("Memorize references ...");
@@ -148,17 +149,20 @@ class Main
 				default:
 
 					// Generate UML Model HTML documentation
-					//	target.set_dir(argv.length - 1, argv);
-					target.set_dir(0,null);
-					UmlItem.frame();
-					UmlCom.message("Indexes ...");
-					UmlItem.generate_indexes();
-					UmlItem.start_file("index", target.name() + "\nDocumentation", false);
-					target.html(null, 0, 0);
-					UmlItem.end_file();
-					UmlItem.start_file("navig", null, true);
-					UmlItem.end_file();
-					UmlClass.generate(); 
+					if (genHtml)
+					{
+						//	target.set_dir(argv.length - 1, argv);
+						target.set_dir(0,null);
+						UmlItem.frame();
+						UmlCom.message("Indexes ...");
+						UmlItem.generate_indexes();
+						UmlItem.start_file("index", target.name() + "\nDocumentation", false);
+						target.html(null, 0, 0);
+						UmlItem.end_file();
+						UmlItem.start_file("navig", null, true);
+						UmlItem.end_file();
+						UmlClass.generate(); 
+					}
 					
 					// Generate NIEM Mapping HTML
 					UmlCom.message ("Generating NIEM Mapping ...");

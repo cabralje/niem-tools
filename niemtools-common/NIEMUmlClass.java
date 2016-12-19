@@ -102,7 +102,7 @@ class NiemTools {
 		UmlPackage rootPackage = (UmlPackage) (parentClassView.parent());
 		if (ci == null) {
 			UmlClass base;
-			if (baseName == null || baseName.equals("abstract")) // abstract
+			if (baseName == null) // abstract
 			{
 				if (rootPackage == referencePackage)
 					base = referenceAbstractType;
@@ -380,8 +380,11 @@ class NiemTools {
 	public static UmlClass addType(UmlClassView parentClassView, String schemaURI, String tagName, String description, String notes) {
 		String tagName2 = tagName.replace("-", "");
 		// String tagName2 = tagName;
+		// UmlCom.trace("addType:"  + tagName);
 		UmlClass typeClass = findType((UmlPackage) (parentClassView.parent()), schemaURI, tagName2);
 		if (typeClass == null) {
+			//if (tagName2.equals("abstract"))
+			//	UmlCom.trace("findType: abstract");
 			try {
 				typeClass = UmlClass.create(parentClassView, tagName2);
 			} catch (Exception e) {
@@ -481,17 +484,19 @@ class NiemTools {
 			NiemElementsInType = ElementsInType;
 			NiemEnumerations = Enumerations;
 			NiemTypes = Types;
-			referenceAbstractType = findType(referencePackage, localSchemaURI + localPrefix, abstractTypeName);
+			referenceAbstractType = NiemTypes.get(localSchemaURI + localPrefix + hashDelimiter + abstractTypeName);
+			//referenceAbstractType = findType(referencePackage, localSchemaURI + localPrefix, abstractTypeName);
 			//if (referenceAbstractType == null)
-			//	UmlCom.trace("createSubset: reference abstract type not found");
+			//	UmlCom.trace("cacheModel: reference abstract type not found");
 		} else if (rootPackage == subsetPackage) {
 			SubsetElements = Elements;
 			SubsetElementsInType = ElementsInType;
 			SubsetEnumerations = Enumerations;
 			SubsetTypes = Types;
-			subsetAbstractType = findType(subsetPackage, localSchemaURI + localPrefix, abstractTypeName);
+			subsetAbstractType = SubsetTypes.get(localSchemaURI + localPrefix + hashDelimiter + abstractTypeName);
+			//subsetAbstractType = findType(subsetPackage, localSchemaURI + localPrefix, abstractTypeName);
 			//if (subsetAbstractType == null)
-			//	UmlCom.trace("createSubset: subset abstract type not found");
+			//	UmlCom.trace("cacheModel: subset abstract type not found");
 		}
 		if (rootPackage == extensionPackage) {
 			ExtensionElements = Elements;
@@ -1319,7 +1324,7 @@ class NiemTools {
 		}
 	}
 
-	// FIXME generate extension and exchange schema
+	// generate extension and exchange schema
 	public static void exportSchema(String dir) {
 		cacheModel(referencePackage);
 		cacheModel(subsetPackage);
@@ -1421,7 +1426,7 @@ class NiemTools {
 					for (String nsPrefix : RefNamespaces)
 					{
 						String nsSchemaURI = Prefixes.get(nsPrefix);
-						if (!nsSchemaURI.equals(schemaURI) && !nsSchemaURI.equals(XMLConstants.W3C_XML_SCHEMA_NS_URI))
+						if (!nsSchemaURI.equals(schemaURI) && !nsSchemaURI.equals(localSchemaURI + localPrefix) && !nsSchemaURI.equals(XMLConstants.W3C_XML_SCHEMA_NS_URI))
 						{
 							//if (nsPrefix.equals("j"))
 							//	fw.write("<xs:import namespace= \"" + Prefixes.get(nsPrefix) + "\" schemaLocation=\"Subset/niem/domains/jxdm/5.2/jxdm.xsd\"/>\n");
@@ -1510,7 +1515,7 @@ class NiemTools {
 							String mappingNotes = ci.propertyValue(notesProperty);
 							if (mappingNotes != null && !mappingNotes.equals(""))
 								fw.write("<!--" + mappingNotes + "-->");
-							if (baseTypeName.equals(subsetAbstractType))
+							if (baseType == subsetAbstractType)
 								fw.write("<xs:element name=\"" + elementName + "\" abstract=\"true\">\n");
 							else
 								fw.write("<xs:element name=\"" + elementName + "\" type=\"" + baseTypeName + "\" nillable=\"true\">\n");
@@ -1673,14 +1678,14 @@ class NiemTools {
 	// get type by schemaURI and tagname
 	public static UmlClass findType(UmlPackage parentPackage, String schemaURI, String tagName) 
 	{
-		/*		if (tagName.equals("abstract"))
+		// UmlCom.trace("findType: " + schemaURI + ":" + tagName);
+		if (tagName.equals("abstract"))
 		{
 			if (parentPackage == referencePackage)
 				return referenceAbstractType;
 			else
 				return subsetAbstractType;
-		}*/
-		// UmlCom.trace("findType: " + schemaURI + ":" + tagName);
+		}
 		String tagName2 = tagName.replace("-", "");
 		String uri = schemaURI + hashDelimiter + tagName2;
 
