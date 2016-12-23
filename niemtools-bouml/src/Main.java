@@ -63,8 +63,8 @@ class Main
 
 				// create PIM and PSM
 				UmlPackage root = UmlBasePackage.getProject();
-				NiemTools.createPIM(root);
-				//NiemTools.createPSM(root);
+				//NiemTools.createPIM(root);
+
 				//load properties
 				Properties properties = new Properties();
 				FileReader in = null;
@@ -81,6 +81,7 @@ class Main
 				root.set_PropertyValue("html dir", htmlDir);
 				String xsdDir = properties.getProperty("xsdDir");
 				String niemDir = properties.getProperty("niemDir", homeDir);
+				String extensionURI = properties.getProperty("extensionURI");
 				
 				// int argc = argv.length-1;
 				switch (argv[0])
@@ -99,6 +100,12 @@ class Main
 						xsdDir = fc.getSelectedFile().getAbsolutePath();
 						properties.setProperty("xsdDir", xsdDir);
 					}
+					//NiemTools.deleteSubset(root);
+					//UmlCom.trace("Saving project");
+					//UmlBasePackage.saveProject();
+					//UmlBasePackage.loadProject("");
+					NiemTools.createPIM(root);
+					NiemTools.createSubset(extensionURI);
 					NiemTools.exportSchema(xsdDir);
 					break;
 
@@ -118,6 +125,11 @@ class Main
 						return;
 					String directory = fc.getSelectedFile().getAbsolutePath();
 					properties.setProperty("niemDir", directory);
+					//NiemTools.deletePIM(root);
+					//UmlCom.trace("Saving project");
+					//UmlBasePackage.saveProject();
+					//UmlBasePackage.loadProject("");
+					NiemTools.createPIM(root);
 					NiemTools.importSchemaDir(directory,false);
 					break;
 
@@ -147,7 +159,12 @@ class Main
 					break;
 					
 				default:
-
+					//NiemTools.deleteSubset(root);
+					//UmlCom.trace("Saving project");
+					//UmlBasePackage.saveProject();
+					//UmlBasePackage.loadProject("");
+					NiemTools.createPIM(root);
+					
 					// Generate UML Model HTML documentation
 					if (genHtml)
 					{
@@ -177,7 +194,8 @@ class Main
 					// Generate NIEM Wantlist instance
 					UmlCom.message("Generating NIEM Wantlist ...");
 					UmlCom.trace("Generating NIEM Wantlist");
-					NiemTools.exportWantlist(htmlDir, "wantlist");
+					NiemTools.createSubset(extensionURI);
+					NiemTools.exportWantlist(htmlDir, "wantlist.xml");
 
 					// Generate extension schema
 					UmlCom.message("Generating extension schema ...");
@@ -203,6 +221,7 @@ class Main
 				try {
 					FileWriter out = new FileWriter(propFile);
 					properties.setProperty("htmlDir", root.propertyValue("html dir"));
+					properties.setProperty("extensionURI", extensionURI);
 					properties.store(out, "BOUML NiemTools plugout settings");
 					out.close();
 				}

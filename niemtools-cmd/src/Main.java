@@ -48,6 +48,7 @@ public class Main
 		root.set_PropertyValue("html dir", htmlDir);
 		String xsdDir = properties.getProperty("xsdDir");
 		String niemDir = properties.getProperty("niemDir", homeDir);
+		String extensionURI = properties.getProperty("extensionURI", "http://local/");
 		
 		try {
 			// Create PIM
@@ -95,6 +96,7 @@ public class Main
 
 			// Generate NIEM Wantlist instance
 			UmlCom.trace("Generating NIEM Wantlist");
+			NiemTools.createSubset(extensionURI);
 			NiemTools.exportWantlist(htmlDir, "wantlist");
 
 			// Generate extension schema
@@ -105,6 +107,7 @@ public class Main
 			try {
 				FileWriter out = new FileWriter(propFile);
 				properties.setProperty("htmlDir", root.propertyValue("html dir"));
+				properties.setProperty("extensionURI", extensionURI);
 				properties.store(out, "BOUML NiemTools plugout settings");
 				out.close();
 			}

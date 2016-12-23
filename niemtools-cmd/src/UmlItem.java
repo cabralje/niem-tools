@@ -46,6 +46,13 @@ public class UmlItem implements Comparable {
 			return (UmlItem[]) children.toArray(new UmlItem[children.size()]);
 	}
 
+	public void deleteIt() throws RuntimeException {
+		    //UmlCom.send_cmd(identifier_(), OnInstanceCmd.deleteCmd);
+		    //UmlCom.check();
+		    parent().unload(true, false);
+		    _defined = false;
+	 }
+	  
 	public String pretty_name()
 	{
 		return name;
@@ -60,7 +67,9 @@ public class UmlItem implements Comparable {
 	{
 		return kind;
 	}
-
+	
+	public boolean defined_() { return _defined; }
+	
 	public UmlItem create_(anItemKind k, String s)
 	{
 		switch (k.value())
