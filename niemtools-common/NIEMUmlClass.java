@@ -55,6 +55,8 @@ class NiemTools {
 	private static UmlClass subsetAbstractType = null;
 	private static UmlClass subsetAugmentationType = null;
 	private static UmlClass subsetObjectType = null;
+	private static UmlClassInstance referenceAnyElement = null;
+	private static String anyElementName = "any";
 	private static String abstractTypeName = "abstract";
 	private static String augmentationTypeName = "AugmentationType";
 	private static String objectTypeName = "ObjectType";
@@ -62,7 +64,6 @@ class NiemTools {
 	public static int importPass;
 	private static String localPrefix = "local";
 	private static String structuresPrefix = "structures";
-	// TODO customize localSchemaURI
 	private static String extensionSchemaURI = "http://local/";
 	private static String notesProperty = "Notes";
 	private static String uriProperty = "URI";
@@ -486,6 +487,7 @@ class NiemTools {
 			NiemEnumerations = Enumerations;
 			NiemTypes = Types;
 			referenceAbstractType = NiemTypes.get(localPrefix + hashDelimiter + abstractTypeName);
+			referenceAnyElement = (UmlClassInstance)NiemElements.get(XMLConstants.W3C_XML_SCHEMA_NS_URI + hashDelimiter + anyElementName);
 			//referenceAbstractType = findType(referencePackage, localSchemaURI + localPrefix, abstractTypeName);
 			//if (referenceAbstractType == null)
 			//	UmlCom.trace("cacheModel: reference abstract type not found");
@@ -766,7 +768,6 @@ class NiemTools {
 	}
 
 	// create Platform Specific Model (PSM)
-	// TODO create packages as deployment views
 	public static void createPSM(UmlPackage root) {
 		UmlCom.trace("Creating PSM");
 		UmlPackage psmPackage = null;
@@ -817,7 +818,6 @@ class NiemTools {
 	}
 	
 	// create NIEM subset and extension
-	// TODO add Augmentation points to subset
 	public static void createSubset(String extensionURI) {
 		extensionSchemaURI = extensionURI;
 		
@@ -1459,7 +1459,10 @@ class NiemTools {
 									String elementMappingNotes = a.propertyValue(notesProperty);
 									if (elementMappingNotes != null && !elementMappingNotes.equals(""))
 										fw.write("<!--" + elementMappingNotes + "-->");
-									fw.write("<xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>\n");
+									if (elementName.equals("xs:any"))
+										fw.write("<xs:any/>");
+									else										
+										fw.write("<xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>\n");
 								}
 							//	fw.write("<xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>");
 							fw.write("</xs:sequence>\n");
@@ -2100,8 +2103,18 @@ class NiemTools {
 		// cache reference model
 		cacheModel(referencePackage);
 
+		// import abstract types
+		UmlClassView cv;
+		if (referenceAbstractType == null)
+		{
+			String localUri = localPrefix;
+			cv = addNamespace(referencePackage, localPrefix, localUri);
+			referenceAbstractType = addType(cv, cv.propertyValue(uriProperty), abstractTypeName, "abstract type", "");
+			NiemTypes.put(referenceAbstractType.propertyValue(uriProperty), referenceAbstractType);
+		}
+		
 		// import XML namespace and simple types
-		UmlClassView cv = addNamespace(referencePackage, xmlPrefix, XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		cv = addNamespace(referencePackage, xmlPrefix, XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		String[] xmlTypeNames = { "anyURI", "base64Binary", "blockSet", "boolean", "byte", "date", "dateTime",
 				"decimal", "derivationControl", "derivationSet", "double", "duration", "ENTITIES", "ENTITY", "float",
 				"formChoice", "fullDerivationSet", "gDay", "gMonth", "gMonthDay", "gYear", "gYearMonth", "hexBinary",
@@ -2118,15 +2131,14 @@ class NiemTools {
 				NiemTypes.put(type.propertyValue(uriProperty), type);
 		}
 
-		// import abstract types
-		if (referenceAbstractType == null)
+		// import xs:any element
+		if (referenceAnyElement == null)
 		{
-			String localUri = localPrefix;
-			cv = addNamespace(referencePackage, localPrefix, localUri);
-			referenceAbstractType = addType(cv, cv.propertyValue(uriProperty), abstractTypeName, "abstract type", "");
-			NiemTypes.put(referenceAbstractType.propertyValue(uriProperty), referenceAbstractType);
+			referenceAnyElement = addElement(null, cv, XMLConstants.W3C_XML_SCHEMA_NS_URI, anyElementName, null, "");
+			if (referenceAnyElement != null)
+				NiemElements.put(referenceAnyElement.propertyValue(uriProperty), referenceAnyElement);
 		}
-
+		
 		// Configure DOM
 		Path path = FileSystems.getDefault().getPath(dir);
 
