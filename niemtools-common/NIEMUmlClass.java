@@ -53,14 +53,20 @@ import com.opencsv.CSVWriter;
 class NiemTools {
 	private static UmlClass referenceAbstractType = null;
 	private static UmlClass subsetAbstractType = null;
+	private static UmlClass subsetAugmentationType = null;
+	private static UmlClass subsetObjectType = null;
 	private static String abstractTypeName = "abstract";
+	private static String augmentationTypeName = "AugmentationType";
+	private static String objectTypeName = "ObjectType";
 	private static String hashDelimiter = ",";
 	public static int importPass;
 	private static String localPrefix = "local";
+	private static String structuresPrefix = "structures";
 	// TODO customize localSchemaURI
 	private static String extensionSchemaURI = "http://local/";
 	private static String notesProperty = "Notes";
 	private static String uriProperty = "URI";
+	private static String substitutionProperty = "substitutesFor";
 
 	// NIEM mapping spreadsheet column headings, NIEM profile profile stereotype
 	private static final String[][] map = { { "Model Class", "", }, { "Model Attribute", "", },
@@ -489,6 +495,8 @@ class NiemTools {
 			SubsetEnumerations = Enumerations;
 			SubsetTypes = Types;
 			subsetAbstractType = SubsetTypes.get(localPrefix + hashDelimiter + abstractTypeName);
+			subsetAugmentationType = SubsetTypes.get(structuresPrefix + hashDelimiter + augmentationTypeName);
+			subsetObjectType = SubsetTypes.get(structuresPrefix + hashDelimiter + objectTypeName);
 			//subsetAbstractType = findType(subsetPackage, localSchemaURI + localPrefix, abstractTypeName);
 			//if (subsetAbstractType == null)
 			//	UmlCom.trace("cacheModel: subset abstract type not found");
@@ -837,6 +845,19 @@ class NiemTools {
 
 		// Copy subset base types
 		//UmlCom.trace("createSubset: Copy subset base types");
+		if (subsetObjectType == null)
+		{
+			subsetObjectType = copyType(structuresPrefix + namespaceDelimiter + objectTypeName);
+			if (subsetObjectType != null)
+				SubsetTypes.put(subsetObjectType.propertyValue(uriProperty), subsetObjectType);
+		}
+		if (subsetAugmentationType == null)
+		{
+			subsetAugmentationType = copyType(structuresPrefix + namespaceDelimiter + augmentationTypeName);
+			if (subsetAugmentationType != null)
+				SubsetTypes.put(subsetAugmentationType.propertyValue(uriProperty), subsetAugmentationType);
+		}
+		UmlClass type;
 		for (int i = 0; i < UmlItem.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
@@ -846,7 +867,7 @@ class NiemTools {
 					if (isNiemType(baseTypeName)) 
 					{
 						// UmlCom.trace("Adding type " + baseTypeName + " to subset");
-						UmlClass type = copyType(baseTypeName);
+						type = copyType(baseTypeName);
 						if (type != null)
 							SubsetTypes.put(type.propertyValue(uriProperty), type);
 					}
@@ -859,14 +880,14 @@ class NiemTools {
 		for (int i = 0; i < UmlItem.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
-				String typeName = c.propertyValue(niemProperty(5));
-				String notes = c.propertyValue(niemProperty(11));
-				String description = c.description();
+				String typeName = c.propertyValue(niemProperty(5)).trim();
+				String notes = c.propertyValue(niemProperty(11)).trim();
+				String description = c.description().trim();
 
 				if (!typeName.equals("") && !typeName.equals("??") && !isExternal(typeName)) {
 					if (isNiemType(typeName)) {
 						//UmlCom.trace("Adding type " + typeName + " to subset");
-						UmlClass type = copyType(typeName);
+						type = copyType(typeName);
 						if (type != null)
 							SubsetTypes.put(type.propertyValue(uriProperty), type);
 					} else {
@@ -879,7 +900,7 @@ class NiemTools {
 							UmlCom.trace("createSubset: type " + typeName + " not found in reference model");
 							continue;
 						}
-						UmlClass type = addType(typeName, description, notes);
+						type = addType(typeName, description, notes);
 						if (type != null)
 						{
 							String uri = type.propertyValue(uriProperty);
@@ -896,32 +917,41 @@ class NiemTools {
 		for (int i = 0; i < UmlItem.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
-				String typeName = c.propertyValue(niemProperty(5));
-				String elementName = c.propertyValue(niemProperty(6));
-				String baseTypeName = c.propertyValue(niemProperty(7));
-				String multiplicity = c.propertyValue(niemProperty(8));
-				String description = c.description();
-				String mappingNotes = c.propertyValue(niemProperty(11));
+				String typeName = c.propertyValue(niemProperty(5)).trim();
+				String elementName = c.propertyValue(niemProperty(6)).trim();
+				String baseTypeName = c.propertyValue(niemProperty(7)).trim();
+				String multiplicity = c.propertyValue(niemProperty(8)).trim();
+				String description = c.description().trim();
+				String mappingNotes = c.propertyValue(niemProperty(11)).trim();
 
 				if (!elementName.equals("") && !elementName.equals("??") && !isExternal(elementName)) {
 					//	String elementName2 = elementName.replace(" ", "").replace("(", "").replace(")", "");
 					String[] elements = elementName.split(",");
+					String headElement = null;
+					Boolean substitution = elementName.contains("(");
 					for (String e : elements) 
 					{
 						String e1 = e.trim();
 						String e2 = e1;
-						boolean inType = true;
+						if (substitution && headElement == null)
+							headElement = e2;
+						boolean representation = false;
 						if (e2.startsWith("(") && e2.endsWith(")"))
 						{
-							inType = false;
+							representation = true;
 							e2 = e2.substring(1,e2.length()-1);
 						}
 						if (isNiemElement(e2)) {
 							//UmlCom.trace("Adding element " + e2 + " in subset");
 							UmlClassInstance element = copyElement(e2);
-							if (element != null)
-								SubsetElements.put(element.propertyValue(uriProperty), element);
-							if (inType && !typeName.equals("") && isNiemElementInType(typeName, e2)) {
+							if (element == null) {
+								UmlCom.trace("createSubset: could not create element " + e2);
+								continue;
+							}
+							SubsetElements.put(element.propertyValue(uriProperty), element);
+							if (substitution && representation && headElement != null)
+								element.set_PropertyValue(substitutionProperty, headElement);
+							if (!representation && !typeName.equals("") && isNiemElementInType(typeName, e2)) {
 								//UmlCom.trace("Adding element " + e2 + " in type " + typeName + " in subset");
 								String cn = element.parent().propertyValue(uriProperty);
 								List<UmlClassInstance> enlist = (List<UmlClassInstance>) (SubsetElementsInType.get(cn));
@@ -935,20 +965,28 @@ class NiemTools {
 							//UmlCom.trace("Adding element " + e + " in extension");
 							String prefix = getPrefix(e2);
 							String schemaURI = Prefixes.get(prefix);
+							String baseTagName = baseTypeName.trim();
+							if (substitution && !representation)
+								baseTagName = "abstract";
 							Namespace ns = findNamespace(schemaURI);
 							if (ns != null && ns.referenceClassView != null)
 							{
 								UmlCom.trace("createSubset: element " + e2 + " not found in reference model");
 								continue;
 							}
-							if (baseTypeName.trim().equals(""))
+							if (baseTagName.equals(""))
 							{
 								UmlCom.trace("createSubset: base type not found for element " +  e2);
 								continue;
 							}
-							UmlClassInstance ci = addElement(e2, baseTypeName, description, mappingNotes);
-							if (ci != null)
-								ExtensionElements.put(ci.propertyValue(uriProperty), ci);
+							UmlClassInstance ci = addElement(e2, baseTagName, description, mappingNotes);
+							if (ci == null) {
+								UmlCom.trace("createSubset: could not create element " + e2);
+								continue;
+							}
+							ExtensionElements.put(ci.propertyValue(uriProperty), ci);
+							if (substitution && representation && headElement != null)
+								ci.set_PropertyValue(substitutionProperty, headElement);
 						}
 					}
 				}
@@ -960,9 +998,9 @@ class NiemTools {
 		for (int i = 0; i < UmlItem.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
-				String typeName = c.propertyValue(niemProperty(5));
-				String elementName = c.propertyValue(niemProperty(6));
-				String baseTypeName = c.propertyValue(niemProperty(7));
+				String typeName = c.propertyValue(niemProperty(5)).trim();
+				String elementName = c.propertyValue(niemProperty(6)).trim();
+				String baseTypeName = c.propertyValue(niemProperty(7)).trim();
 
 				if (!typeName.equals("") && !typeName.equals("??") && !baseTypeName.equals("") && elementName.equals("")) 
 				{
@@ -972,7 +1010,7 @@ class NiemTools {
 					String baseTagName = getName(baseTypeName);
 					String basePrefix = getPrefix(baseTypeName);
 					String baseSchemaURI = Prefixes.get(basePrefix);
-					UmlClass type, baseType;
+					UmlClass baseType;
 					if (isNiemType(typeName) || isExternal(typeName))
 						continue;
 					type = findType(extensionPackage, schemaURI, tagName);
@@ -987,11 +1025,32 @@ class NiemTools {
 						baseType = findType(extensionPackage, baseSchemaURI, baseTagName);
 					if (baseType == null)
 					{
-						UmlCom.trace("createSubset: type not found " + baseTypeName);
+						UmlCom.trace("createSubset: base type not found " + baseTypeName);
 						continue;
 					}
 					try {
 						UmlBaseRelation.create(aRelationKind.aGeneralisation, type, baseType);
+					} catch (Exception re) {
+						//UmlCom.trace("createSubset: " + typeName + " already related to " + baseTypeName + " " + re.toString());
+					}
+				}
+				
+				// Add generalizations for extension augmentations
+				if (typeName.endsWith(augmentationTypeName)) 
+				{
+					String tagName = getName(typeName);
+					String prefix = getPrefix(typeName);
+					String schemaURI = Prefixes.get(prefix);
+					if (isNiemType(typeName) || isExternal(typeName))
+						continue;
+					type = findType(extensionPackage, schemaURI, tagName);
+					if (type == null)
+					{
+						UmlCom.trace("createSubset: type not found " + typeName);
+						continue;
+					}	
+					try {
+						UmlBaseRelation.create(aRelationKind.aGeneralisation, type, subsetAugmentationType);
 					} catch (Exception re) {
 						//UmlCom.trace("createSubset: " + typeName + " already related to " + baseTypeName + " " + re.toString());
 					}
@@ -1004,9 +1063,9 @@ class NiemTools {
 		for (int i = 0; i < UmlItem.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
-				String typeName = c.propertyValue(niemProperty(5));
-				String elementName = c.propertyValue(niemProperty(6));
-				String multiplicity = c.propertyValue(niemProperty(8));
+				String typeName = c.propertyValue(niemProperty(5)).trim();
+				String elementName = c.propertyValue(niemProperty(6)).trim();
+				String multiplicity = c.propertyValue(niemProperty(8)).trim();
 
 				if (!typeName.equals("") && !isNiemType(typeName)) {
 					if (!elementName.equals("") && !elementName.equals("??")) {
@@ -1264,8 +1323,8 @@ class NiemTools {
 
 					// build list of referenced namespaces
 					HashSet<String> RefNamespaces = new HashSet<String>();
-					RefNamespaces.add("xs");
-					RefNamespaces.add("structures");
+					RefNamespaces.add(xmlPrefix);
+					RefNamespaces.add(structuresPrefix);
 					for (UmlItem item2 : cv.children())
 						if (item2.kind() == anItemKind.aClass)
 						{
@@ -1300,6 +1359,9 @@ class NiemTools {
 							UmlClassInstance ci = (UmlClassInstance)item2;
 							UmlClass baseType = ci.type();
 							RefNamespaces.add(baseType.parent().name());
+							String headElement = ci.propertyValue(substitutionProperty);
+							if (headElement != null)
+								RefNamespaces.add(getPrefix(headElement));
 						}
 					
 					// Open file for each extension schema and write header
@@ -1367,8 +1429,8 @@ class NiemTools {
 										break;
 									}
 								}
-							if (typeName.endsWith("AugmentationType"))
-								baseTypeName = "structures:AugmentationType";
+							//if (typeName.endsWith("AugmentationType"))
+							//	baseTypeName = "structures:AugmentationType";
 							if (baseTypeName.equals(""))
 								UmlCom.trace("exportSchema: type " + prefix + ":" + typeName + " has no base type");
 							fw.write("<xs:extension base=\"" + baseTypeName + "\">\n");
@@ -1416,10 +1478,13 @@ class NiemTools {
 							UmlClass baseType = ci.type();
 							String baseTypeName = baseType.parent().name() + namespaceDelimiter + baseType.name();
 							String mappingNotes = ci.propertyValue(notesProperty);
+							String headElement = ci.propertyValue(substitutionProperty);
 							if (mappingNotes != null && !mappingNotes.equals(""))
 								fw.write("<!--" + mappingNotes + "-->");
 							if (baseType == subsetAbstractType)
 								fw.write("<xs:element name=\"" + elementName + "\" abstract=\"true\">\n");
+							else if (headElement != null)
+								fw.write("<xs:element name=\"" + elementName + "\" type=\"" + baseTypeName + "\" substitutionGroup=\"" + headElement + "\" nillable=\"true\">\n");
 							else
 								fw.write("<xs:element name=\"" + elementName + "\" type=\"" + baseTypeName + "\" nillable=\"true\">\n");
 							fw.write("<xs:annotation>\n");
@@ -1492,7 +1557,7 @@ class NiemTools {
 							UmlClass c = (UmlClass)item2;
 							String typeName = c.name();
 							//UmlCom.trace("exportWantlist: export type " + typeName);
-							if (prefix.equals("structures") && typeName.equals("AugmentationType"))
+							if (prefix.equals(structuresPrefix) && typeName.equals(augmentationTypeName))
 								continue;
 							fw.write("<w:Type w:name=\"" + prefix + namespaceDelimiter + typeName + "\" w:isRequested=\"true\">\n");
 
