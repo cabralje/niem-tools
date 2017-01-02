@@ -19,12 +19,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,6 +76,11 @@ class NiemTools {
 	private static String uriProperty = "URI";
 	private static String substitutionProperty = "substitutesFor";
 	private static String codeListProperty = "codeList";
+	public static final String niemStereotype = "niem-profile:niem";
+	private static String stereotypeDelimiter = ":";
+	private static String xmlPrefix = "xs";
+	private static Set<String> externalPrefixes = new HashSet<String>();
+	private static Map<String,String> externalSchemaURL = new HashMap<String,String>();
 
 	// NIEM mapping spreadsheet column headings, NIEM profile profile stereotype
 	private static final String[][] map = { { "Model Class", "", }, { "Model Attribute", "", },
@@ -77,29 +89,26 @@ class NiemTools {
 			{ "NIEM Multiplicity", "Multiplicity" }, { "Old XPath", "OldXPath" },
 			{ "Old Multiplicity", "OldMultiplicity" }, { "NIEM Mapping Notes", "Notes" } , { "Code List Code=Definition;" , "CodeList"} };
 	private static String namespaceDelimiter = ":";
-	private static HashMap<String, UmlItem> NiemElements = new HashMap<String, UmlItem>();
-	private static HashMap<String, List<UmlClassInstance>> NiemElementsInType = new HashMap<String, List<UmlClassInstance>>();
-	private static HashMap<String, List<UmlExtraClassMember>> NiemEnumerations = new HashMap<String, List<UmlExtraClassMember>>();
-	private static HashMap<String, Namespace> Namespaces = new HashMap<String, Namespace>();
-	private static HashMap<String, String> Prefixes = new HashMap<String, String>();
-	public static final String niemStereotype = "niem-profile:niem";
-	private static HashMap<String, UmlClass> NiemTypes = new HashMap<String, UmlClass>();
+	private static Map<String, UmlItem> NiemElements = new HashMap<String, UmlItem>();
+	private static Map<String, List<UmlClassInstance>> NiemElementsInType = new HashMap<String, List<UmlClassInstance>>();
+	private static Map<String, List<UmlExtraClassMember>> NiemEnumerations = new HashMap<String, List<UmlExtraClassMember>>();
+	private static Map<String, Namespace> Namespaces = new HashMap<String, Namespace>();
+	private static Map<String, String> Prefixes = new HashMap<String, String>();
+	private static Map<String, UmlClass> NiemTypes = new HashMap<String, UmlClass>();
 
-	private static HashMap<String, UmlItem> SubsetElements = new HashMap<String, UmlItem>();
-	private static HashMap<String, List<UmlClassInstance>> SubsetElementsInType = new HashMap<String, List<UmlClassInstance>>();
-	private static HashMap<String, List<UmlExtraClassMember>> SubsetEnumerations = new HashMap<String, List<UmlExtraClassMember>>();
-	private static HashMap<String, UmlClass> SubsetTypes = new HashMap<String, UmlClass>();
+	private static Map<String, UmlItem> SubsetElements = new HashMap<String, UmlItem>();
+	private static Map<String, List<UmlClassInstance>> SubsetElementsInType = new HashMap<String, List<UmlClassInstance>>();
+	private static Map<String, List<UmlExtraClassMember>> SubsetEnumerations = new HashMap<String, List<UmlExtraClassMember>>();
+	private static Map<String, UmlClass> SubsetTypes = new HashMap<String, UmlClass>();
 
-	private static HashMap<String, UmlItem> ExtensionElements = new HashMap<String, UmlItem>();
-	private static HashMap<String, List<UmlClassInstance>> ExtensionElementsInType = new HashMap<String, List<UmlClassInstance>>();
-	private static HashMap<String, List<UmlExtraClassMember>> ExtensionEnumerations = new HashMap<String, List<UmlExtraClassMember>>();
-	private static HashMap<String, UmlClass> ExtensionTypes = new HashMap<String, UmlClass>();
+	private static Map<String, UmlItem> ExtensionElements = new HashMap<String, UmlItem>();
+	private static Map<String, List<UmlClassInstance>> ExtensionElementsInType = new HashMap<String, List<UmlClassInstance>>();
+	private static Map<String, List<UmlExtraClassMember>> ExtensionEnumerations = new HashMap<String, List<UmlExtraClassMember>>();
+	private static Map<String, UmlClass> ExtensionTypes = new HashMap<String, UmlClass>();
 
-	private static String stereotypeDelimiter = ":";
 	private static UmlPackage subsetPackage = null, extensionPackage = null, referencePackage = null;
 	private static UmlPackage subsetXSDPackage = null, extensionXSDPackage = null, referenceXSDPackage = null;
 
-	private static String xmlPrefix = "xs";
 	private static XPath xPath = XPathFactory.newInstance().newXPath();
 
 	// add element to reference model
@@ -133,8 +142,8 @@ class NiemTools {
 	// add element to extension
 	public static UmlClassInstance addElement(String elementName, String typeName, String description, String notes) {
 		// abort if external schame
-		if (isExternal(typeName))
-			return null;
+//		if (isExternal(typeName))
+//			return null;
 
 		// UmlCom.trace("Copying " + elementName + " to subset");
 		// get schemaURI
@@ -164,9 +173,13 @@ class NiemTools {
 		}
 
 		// if namespace doesn't exist, create it
-		UmlClassView nsClassView = addNamespace(subsetPackage, prefix, schemaURI);
+		UmlClassView nsClassView;
+		if (isNiemElement(elementName))
+			nsClassView = addNamespace(subsetPackage, prefix, schemaURI);
+		else
+			nsClassView = addNamespace(extensionPackage, prefix, schemaURI);
 		if (nsClassView == null) {
-			UmlCom.trace("Subset classview not found for " + schemaURI);
+			UmlCom.trace("Subset/extension classview not found for " + schemaURI);
 			return null;
 		}
 
@@ -181,8 +194,10 @@ class NiemTools {
 			baseType = findType(extensionPackage, typeSchemaURI, typeName2);
 		if (baseType == null) 
 		{
-			UmlCom.trace("Base type not found in extension/subset for " + typePrefix + ":" + typeName2);
-			return null;
+			if (!isExternal(typePrefix + ":"))
+				UmlCom.trace("Base type not found in extension/subset for " + typePrefix + ":" + typeName2);
+			baseType = subsetAbstractType;
+//			return null;
 		}
 
 		// create element
@@ -200,8 +215,8 @@ class NiemTools {
 	public static UmlAttribute addElementInType(Document doc, UmlClassView parentClassView, String schemaURI,
 			String typeName, String propertyName, String multiplicity) {
 		// abort if external schame
-		if (isExternal(typeName) || isExternal(propertyName))
-			return null;
+//		if (isExternal(typeName) || isExternal(propertyName))
+//			return null;
 
 		UmlClass type = findType((UmlPackage) (parentClassView.parent()), schemaURI, typeName);
 		if (type == null) {
@@ -219,8 +234,8 @@ class NiemTools {
 	// add element in type to extension
 	public static UmlAttribute addElementInType(String typeName, UmlClassInstance element, String multiplicity) {
 		// abort if external schame
-		if (isExternal(typeName))
-			return null;
+//		if (isExternal(typeName))
+//			return null;
 
 		if (element == null)
 		{
@@ -254,9 +269,10 @@ class NiemTools {
 			return null;
 		}
 		String propertyName = element.parent().name() + namespaceDelimiter + element.pretty_name();
+		String propertyName2 = propertyName.replace("-", "");
 		UmlAttribute at = null;
 		try {
-			at = UmlAttribute.create(type, propertyName);
+			at = UmlAttribute.create(type, propertyName2);
 		} catch (Exception re) {
 			// UmlCom.trace("addElementInType: element " + element.name() + " already exists in type " + type.name() + re.toString());
 		}
@@ -329,8 +345,8 @@ class NiemTools {
 	// add type to extension
 	public static UmlClass addType(String typeName, String description, String notes) {
 		// abort if external schema
-		if (isExternal(typeName))
-			return null;
+//		if (isExternal(typeName))
+//			return null;
 
 		// UmlCom.trace("Copying " + typeName + " to subset");
 		// get schemaURI
@@ -356,9 +372,13 @@ class NiemTools {
 		}
 
 		// if namespace doesn't exist, create it
-		UmlClassView nsClassView = addNamespace(extensionPackage, prefix, schemaURI);
+		UmlClassView nsClassView;
+		if (isNiemType(typeName))
+			nsClassView = addNamespace(subsetPackage, prefix, schemaURI);
+		else
+			nsClassView = addNamespace(extensionPackage, prefix, schemaURI);
 		if (nsClassView == null) {
-			UmlCom.trace("Extension classview not found for " + schemaURI);
+			UmlCom.trace("Subset/extension classview not found for " + schemaURI);
 			return null;
 		}
 		// create type
@@ -405,10 +425,10 @@ class NiemTools {
 	public static void cacheModel(UmlPackage rootPackage) {
 		// Cache namespaces, types and elements
 		String schemaURI;
-		HashMap<String, UmlItem> Elements = null;
-		HashMap<String, List<UmlClassInstance>> ElementsInType = null;
-		HashMap<String, List<UmlExtraClassMember>> Enumerations = null;
-		HashMap<String, UmlClass> Types = null;
+		Map<String, UmlItem> Elements = null;
+		Map<String, List<UmlClassInstance>> ElementsInType = null;
+		Map<String, List<UmlExtraClassMember>> Enumerations = null;
+		Map<String, UmlClass> Types = null;
 
 		if (rootPackage == referencePackage) {
 			Elements = NiemElements;
@@ -818,8 +838,8 @@ class NiemTools {
 	}
 
 	// create NIEM subset and extension
-	public static void createSubset(String extensionURI) {
-		extensionSchemaURI = extensionURI;
+	public static void createSubset(String IEPDURI) {
+		extensionSchemaURI = IEPDURI;
 
 		// String[] nextLine = new String[map.length];
 
@@ -862,7 +882,8 @@ class NiemTools {
 			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String baseTypeName = c.propertyValue(niemProperty(7));
-				if (!baseTypeName.equals("") && !baseTypeName.equals("??") && !isExternal(baseTypeName)) 
+//				if (!baseTypeName.equals("") && !baseTypeName.equals("??") && !isExternal(baseTypeName)) 
+				if (!baseTypeName.equals("") && !baseTypeName.equals("??")) 
 				{
 					if (isNiemType(baseTypeName)) 
 					{
@@ -884,7 +905,8 @@ class NiemTools {
 				String notes = c.propertyValue(niemProperty(11)).trim();
 				String description = c.description().trim();
 
-				if (!typeName.equals("") && !typeName.equals("??") && !isExternal(typeName)) {
+//				if (!typeName.equals("") && !typeName.equals("??") && !isExternal(typeName)) {
+				if (!typeName.equals("") && !typeName.equals("??")) {
 					if (isNiemType(typeName)) {
 						//UmlCom.trace("Adding type " + typeName + " to subset");
 						type = copyType(typeName);
@@ -925,7 +947,8 @@ class NiemTools {
 				String mappingNotes = c.propertyValue(niemProperty(11)).trim();
 				String codeList = c.propertyValue(niemProperty(12)).trim();
 
-				if (!elementName.equals("") && !elementName.equals("??") && !isExternal(elementName)) {
+//				if (!elementName.equals("") && !elementName.equals("??") && !isExternal(elementName)) {
+				if (!elementName.equals("") && !elementName.equals("??")) {
 					//	String elementName2 = elementName.replace(" ", "").replace("(", "").replace(")", "");
 					String[] elements = elementName.split(",");
 					String headElement = null;
@@ -1014,7 +1037,8 @@ class NiemTools {
 					String basePrefix = getPrefix(baseTypeName);
 					String baseSchemaURI = Prefixes.get(basePrefix);
 					UmlClass baseType;
-					if (isNiemType(typeName) || isExternal(typeName))
+//					if (isNiemType(typeName) || isExternal(typeName))
+					if (isNiemType(typeName))			
 						continue;
 					type = findType(extensionPackage, schemaURI, tagName);
 					if (type == null)
@@ -1044,7 +1068,8 @@ class NiemTools {
 					String tagName = getName(typeName);
 					String prefix = getPrefix(typeName);
 					String schemaURI = Prefixes.get(prefix);
-					if (isNiemType(typeName) || isExternal(typeName))
+//					if (isNiemType(typeName) || isExternal(typeName))
+					if (isNiemType(typeName))
 						continue;
 					type = findType(extensionPackage, schemaURI, tagName);
 					if (type == null)
@@ -1112,7 +1137,7 @@ class NiemTools {
 		Iterator<UmlItem> it = UmlItem.all.iterator();
 		while (it.hasNext()) {
 			UmlItem item = it.next();
-			if (item.stereotype().equals(niemStereotype))
+			if (item.stereotype().equals(niemStereotype) && item.kind()  != anItemKind.aClassInstance)
 				for (int p = 4; p < map.length; p++)
 					item.set_PropertyValue(niemProperty(p), "");
 		}
@@ -1208,45 +1233,43 @@ class NiemTools {
 	}
 
 	// generate Genericode code list
-	public static void exportCodeList(String dir, String elementName, String codeListURI, String codeList, String version)
+	public static void exportCodeList(String dir, String elementName, String codeListURI, String codeList, String version, String date)
 	{
 		try {
 			FileWriter fw;
 
 			// export catalog file
 			fw = new FileWriter(dir + "/" + elementName + ".gc");
-			fw.write("<?xml version=\"1.0\" encoding=\"US-ASCII\"?>");
-			fw.write("<gc:CodeList xmlns:ct=\"http://release.niem.gov/niem/conformanceTargets/3.0/\" xmlns:gc=\"http://docs.oasis-open.org/codelist/ns/genericode/1.0/\" xmlns:gca=\"http://example.org/namespace/genericode-appinfo\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://docs.oasis-open.org/codelist/ns/genericode/1.0/ https://docs.oasis-open.org/codelist/cs-genericode-1.0/xsd/genericode.xsd\">");
-			fw.write("<Annotation><AppInfo><gca:ConformanceTargets ct:conformanceTargets=\"http://reference.niem.gov/niem/specification/code-lists/1.0/#GenericodeCodeListDocument\"/></AppInfo></Annotation>");
-			fw.write("<Identification><ShortName>" + elementName + "</ShortName>");
-			fw.write("<Version>" + version + "</Version>");
-			fw.write("<CanonicalUri>" + codeListURI + "</CanonicalUri>");
-			fw.write("<CanonicalVersionUri>" + codeListURI + "/" + version + "</CanonicalVersionUri>");
-			fw.write("</Identification>");
-			fw.write("<ColumnSet>");
-			fw.write("<Column Id=\"code\" Use=\"required\"><ShortName>code</ShortName>");
-			fw.write("<CanonicalUri>http://reference.niem.gov/niem/specification/code-lists/1.0/column/code</CanonicalUri>");
-			fw.write("<Data Type=\"normalizedString\" Lang=\"en\"/></Column>");
-			fw.write("<Column Id=\"definition\" Use=\"optional\"><ShortName>definition</ShortName>");
-			fw.write("<CanonicalUri>http://reference.niem.gov/niem/specification/code-lists/1.0/column/definition</CanonicalUri>");
-			fw.write("<Data Type=\"normalizedString\" Lang=\"en\"/></Column>");
-			fw.write("<Key Id=\"codeKey\"><ShortName>CodeKey</ShortName><ColumnRef Ref=\"code\"/></Key>");
-			fw.write("</ColumnSet>");
-			fw.write("<SimpleCodeList>");
-
-			String[] codes = codeList.split(";");
-			for (String code : codes)
-			{
-				String[] pairs = code.split("=");
-				if (pairs.length != 2)
+			fw.write("<?xml version=\"1.0\" encoding=\"US-ASCII\"?>"
+					+ "<!-- Genericode code list generated by BOUML niemtools plug_out (https://github.com/cabralje/niem-tools) -->\n"
+					+ "<gc:CodeList xmlns:ct=\"http://release.niem.gov/niem/conformanceTargets/3.0/\" xmlns:gc=\"http://docs.oasis-open.org/codelist/ns/genericode/1.0/\" xmlns:gca=\"http://example.org/namespace/genericode-appinfo\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://docs.oasis-open.org/codelist/ns/genericode/1.0/ https://docs.oasis-open.org/codelist/cs-genericode-1.0/xsd/genericode.xsd\">"
+					+ "<Annotation><AppInfo><gca:ConformanceTargets ct:conformanceTargets=\"http://reference.niem.gov/niem/specification/code-lists/1.0/#GenericodeCodeListDocument\"/></AppInfo></Annotation>"
+					+ "<Identification><ShortName>" + elementName + "</ShortName>"
+					+ "<Version>" + version + "</Version>"
+					+ "<CanonicalUri>" + codeListURI + "</CanonicalUri>"
+					+ "<CanonicalVersionUri>" + codeListURI + "/" + date + "</CanonicalVersionUri>"
+					+ "</Identification>"
+					+ "<ColumnSet>"
+					+ "<Column Id=\"code\" Use=\"required\"><ShortName>code</ShortName>"
+					+ "<CanonicalUri>http://reference.niem.gov/niem/specification/code-lists/1.0/column/code</CanonicalUri>"
+					+ "<Data Type=\"normalizedString\" Lang=\"en\"/></Column>"
+					+ "<Column Id=\"definition\" Use=\"optional\"><ShortName>definition</ShortName>"
+					+ "<CanonicalUri>http://reference.niem.gov/niem/specification/code-lists/1.0/column/definition</CanonicalUri>"
+					+ "<Data Type=\"normalizedString\" Lang=\"en\"/></Column>"
+					+ "<Key Id=\"codeKey\"><ShortName>CodeKey</ShortName><ColumnRef Ref=\"code\"/></Key>"
+					+ "</ColumnSet>"
+					+ "<SimpleCodeList>");
+			if (codeList.contains(";"))
+			{	
+				String[] codes = codeList.split(";");
+				for (String code : codes)
 				{
-					UmlCom.trace("exportCodeList: invalid code list value " + code);
-					continue;
+					String[] pairs = code.split("=");
+					fw.write("<Row><Value ColumnRef=\"code\"><SimpleValue>" + pairs[0].trim() + "</SimpleValue></Value>");
+					if (pairs.length > 1)
+						fw.write("<Value ColumnRef=\"definition\"><SimpleValue>" + pairs[1].trim() + "</SimpleValue></Value>");
+					fw.write("</Row>");
 				}
-				String value = pairs[0].trim();
-				String definition = pairs[1].trim();
-				fw.write("<Row><Value ColumnRef=\"code\"><SimpleValue>" + value + "</SimpleValue></Value>");
-				fw.write("<Value ColumnRef=\"definition\"><SimpleValue>" + definition + "</SimpleValue></Value></Row>");
 			}
 			fw.write("</SimpleCodeList></gc:CodeList>");
 			fw.close();
@@ -1261,7 +1284,10 @@ class NiemTools {
 
 	// generate NIEM mapping spreadsheet in CSV format
 	// roundtripping is supported with importCsv()
-	public static void exportCsv(String dir, String filename) {
+	public static void exportCsv(String dir, String filename, String externalSchemas) {
+		
+		setExternalSchemas(externalSchemas);
+		
 		UmlItem.directory = dir;
 
 		try {
@@ -1305,17 +1331,18 @@ class NiemTools {
 	}
 
 	// generate NIEM mapping spreadsheet in HTML format
-	public static void exportHtml(String dir, String filename) {
+	public static void exportHtml(String dir, String filename, String externalSchemas) {
+		
+		setExternalSchemas(externalSchemas);
 		// cache NIEM namespaces, elements and types
 		cacheModel(referencePackage);
 		try {
 			// Write rest of header
 			FileWriter fw = new FileWriter(dir + "/" + filename + ".html");
 			fw.write("<html>");
-			fw.write(
-					"<head><title>NIEM Mapping</title><link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" /></head>");
-			fw.write("<body><div class = \"title\">NIEM Mapping</div>");
-			fw.write("<table><tr bgcolor=\"#f0f0f0\">");
+			fw.write("<head><title>NIEM Mapping</title><link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" /></head>"
+					+"<body><div class = \"title\">NIEM Mapping</div>"
+					+"<table><tr bgcolor=\"#f0f0f0\">");
 			for (int i = 0; i < map.length; i++)
 				fw.write("<td>" + map[i][0] + "</td>");
 			fw.write("</tr>\n");
@@ -1341,32 +1368,20 @@ class NiemTools {
 	}
 
 	// generate extension and exchange schema
-	public static void exportSchema(String dir) {
+	public static void exportSchema(String dir, String IEPDURI, String IEPDName, String IEPDVersion, String IEPDStatus, String IEPDOrganization, String IEPDContact, String externalSchemas) {
 
+		setExternalSchemas(externalSchemas);
 		cacheModel(referencePackage);
 		cacheModel(subsetPackage);
 		cacheModel(extensionPackage);
 
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date date = new Date();
+		String today = dateFormat.format(date);
+
 		try {
 			FileWriter fw;
-
-			// export catalog file
-			fw = new FileWriter(dir + "/xml-catalog.xml");
-			fw.write("<?xml version=\"1.0\" encoding=\"US-ASCII\"?>\n");
-			fw.write("<!DOCTYPE catalog PUBLIC \"-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN\" \"http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd\">\n");
-			fw.write("<catalog prefer=\"public\" xmlns=\"urn:oasis:names:tc:entity:xmlns:xml:catalog\">\n");
-			for (Entry<String, String> entry : Prefixes.entrySet())
-			{
-				String prefix = entry.getKey();
-				String schemaURI = Prefixes.get(prefix);
-				Namespace ns = Namespaces.get(schemaURI);
-				if (ns.referenceClassView == null)
-					fw.write("<uri name=\"" + schemaURI + "\" uri=\"" + prefix + ".xsd\"/>\n");
-			}
-			fw.write("<nextCatalog  catalog=\"codes/xml-catalog.xml\" />\n");
-			fw.write("<nextCatalog  catalog=\"Subset/niem/xml-catalog.xml\" />\n");
-			fw.write("</catalog>\n");
-			fw.close();
+			Set<String> CodeListNamespaces = new HashSet<String>();
 
 			// export each schema
 			for (UmlItem item: extensionPackage.children())
@@ -1375,10 +1390,12 @@ class NiemTools {
 					UmlClassView cv = (UmlClassView)item;
 					cv.sort();
 					String prefix = cv.name();
+					if (isExternal(prefix + ":"))
+						continue;
 					String schemaURI = cv.propertyValue(uriProperty);
 
 					// build list of referenced namespaces
-					HashSet<String> RefNamespaces = new HashSet<String>();
+					Set<String> RefNamespaces = new TreeSet<String>();
 					RefNamespaces.add(xmlPrefix);
 					RefNamespaces.add(structuresPrefix);
 					for (UmlItem item2 : cv.children())
@@ -1424,9 +1441,9 @@ class NiemTools {
 					fw = new FileWriter(dir + "/" + prefix + ".xsd");
 					//UmlCom.trace("exportSchema: schema " + prefix + ".xsd");
 					//fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-					fw.write("<?xml version=\"1.0\" encoding=\"US-ASCII\"?>\n");
-					fw.write("<!-- NIEM extension schema generated by BOUML niemtools plug_out -->\n");
-					fw.write("<xs:schema targetNamespace=\"" + schemaURI + "\"\n");
+					fw.write("<?xml version=\"1.0\" encoding=\"US-ASCII\"?>\n"
+							+ "<!-- NIEM extension schema generated by BOUML niemtools plug_out (https://github.com/cabralje/niem-tools) -->\n"
+							+ "<xs:schema targetNamespace=\"" + schemaURI + "\"\n");
 
 					// export namespace definitions
 					fw.write(" xmlns=\"" + cv.propertyValue(uriProperty) + "\"\n");
@@ -1440,28 +1457,22 @@ class NiemTools {
 					//  fw.write(Prefixes.get(nsPrefix) + " " + nsPrefix + ".xsd" + " ");
 					//fw.write("\"");
 
-					fw.write(" version=\"1\"");
-					fw.write(" xmlns:clsa=\"http://reference.niem.gov/niem/specification/code-lists/1.0/code-lists-schema-appinfo/\"");
-					fw.write(" xmlns:ct=\"http://release.niem.gov/niem/conformanceTargets/3.0/\"");
-					fw.write(" ct:conformanceTargets=\"http://reference.niem.gov/niem/specification/naming-and-design-rules/3.0/#ReferenceSchemaDocument http://reference.niem.gov/niem/specification/code-lists/1.0/#SchemaDocument\"");
+					fw.write(" xmlns:clsa=\"http://reference.niem.gov/niem/specification/code-lists/1.0/code-lists-schema-appinfo/\""
+							+ " xmlns:ct=\"http://release.niem.gov/niem/conformanceTargets/3.0/\""
+							+ " xmlns:term=\"http://release.niem.gov/niem/localTerminology/3.0/\""
+							+ " ct:conformanceTargets=\"http://reference.niem.gov/niem/specification/naming-and-design-rules/3.0/#ExtensionSchemaDocument http://reference.niem.gov/niem/specification/code-lists/1.0/#SchemaDocument\""
+							+ " elementFormDefault=\"qualified\" attributeFormDefault=\"unqualified\" version=\"" + IEPDVersion + "\"");
 
 					// close top level element
 					fw.write(">\n");
+					fw.write("<xs:annotation><xs:documentation> Schema for namespace " + Prefixes.get(prefix) + "</xs:documentation></xs:annotation>" );
 
 					// export import namespaces
 					for (String nsPrefix : RefNamespaces)
 					{
 						String nsSchemaURI = Prefixes.get(nsPrefix);
 						if (!nsSchemaURI.equals(schemaURI) && !nsSchemaURI.equals(localPrefix) && !nsSchemaURI.equals(XMLConstants.W3C_XML_SCHEMA_NS_URI))
-						{
-							//if (nsPrefix.equals("j"))
-							//	fw.write("<xs:import namespace= \"" + Prefixes.get(nsPrefix) + "\" schemaLocation=\"Subset/niem/domains/jxdm/5.2/jxdm.xsd\"/>\n");
-							//else if (nsPrefix.equals("nc"))
-							//	fw.write("<xs:import namespace= \"" + Prefixes.get(nsPrefix) + "\" schemaLocation=\"Subset/niem/niem-core/3.0/niem-core.xsd\"/>\n");
-							//else
-							//	fw.write("<xs:import namespace= \"" + Prefixes.get(nsPrefix) + "\" schemaLocation=\"" + nsPrefix + ".xsd\"/>\n");
 							fw.write("<xs:import namespace= \"" + nsSchemaURI + "\"/>");
-						}
 					}
 					// export types
 					for (UmlItem item2 : cv.children())
@@ -1474,11 +1485,11 @@ class NiemTools {
 							String mappingNotes = c.propertyValue(notesProperty);
 							if (mappingNotes != null && !mappingNotes.equals(""))
 								fw.write("<!--" + mappingNotes + "-->");
-							fw.write("<xs:complexType name=\"" + typeName + "\">\n");
-							fw.write("<xs:annotation>\n");
-							fw.write("<xs:documentation>" + description + "</xs:documentation>\n");
-							fw.write("</xs:annotation>\n");
-							fw.write("<xs:complexContent>\n");
+							fw.write("<xs:complexType name=\"" + typeName + "\">\n"
+									+ "<xs:annotation>\n"
+									+ "<xs:documentation>" + description + "</xs:documentation>\n"
+									+ "</xs:annotation>\n"
+									+ "<xs:complexContent>\n");
 							for (UmlItem item3 : c.children())
 								if (item3.kind() == anItemKind.aRelation)
 								{
@@ -1494,8 +1505,7 @@ class NiemTools {
 							//	baseTypeName = "structures:AugmentationType";
 							if (baseTypeName.equals(""))
 								UmlCom.trace("exportSchema: type " + prefix + ":" + typeName + " has no base type");
-							fw.write("<xs:extension base=\"" + baseTypeName + "\">\n");
-							fw.write("<xs:sequence>\n");
+							fw.write("<xs:extension base=\"" + baseTypeName + "\">\n<xs:sequence>\n");
 							c.sortChildren();
 							for (UmlItem item4 : c.children())
 								if (item4.kind() == anItemKind.anAttribute)
@@ -1523,14 +1533,13 @@ class NiemTools {
 										fw.write("<!--" + elementMappingNotes + "-->");
 									if (elementName.equals("xs:any"))
 										fw.write("<xs:any/>");
-									else										
+//									else if (isExternal(elementName))									
+//										fw.write("<!--xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/-->\n");
+									else
 										fw.write("<xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>\n");
 								}
 							//	fw.write("<xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>");
-							fw.write("</xs:sequence>\n");
-							fw.write("</xs:extension>\n");
-							fw.write("</xs:complexContent>\n");
-							fw.write("</xs:complexType>\n");
+							fw.write("</xs:sequence>\n</xs:extension>\n</xs:complexContent>\n</xs:complexType>\n");
 						}
 
 					// export elements
@@ -1553,40 +1562,343 @@ class NiemTools {
 								fw.write("<xs:element name=\"" + elementName + "\" type=\"" + baseTypeName + "\" substitutionGroup=\"" + headElement + "\" nillable=\"true\">\n");
 							else
 								fw.write("<xs:element name=\"" + elementName + "\" type=\"" + baseTypeName + "\" nillable=\"true\">\n");
-							fw.write("<xs:annotation>\n");
-							fw.write("<xs:documentation>" + description + "</xs:documentation>\n");
+							fw.write("<xs:annotation>\n<xs:documentation>" + description + "</xs:documentation>\n");
 							if (codeList != null) 
 							{
 								String codeListURI = extensionSchema(elementName);
-								fw.write("<xs:appinfo>");
-								fw.write("<clsa:SimpleCodeListBinding codeListURI=\"" + codeListURI + "\" columnName=\"code\"/>");
-								fw.write("</xs:appinfo>");
-								exportCodeList(dir, elementName, codeListURI, codeList, "5.0");
+								fw.write("<xs:appinfo>"
+										+ "<clsa:SimpleCodeListBinding codeListURI=\"" + codeListURI + "\" columnName=\"code\"/>"
+										+" </xs:appinfo>");
+								exportCodeList(dir, elementName, codeListURI, codeList, IEPDVersion, today);
+								CodeListNamespaces.add(elementName);
 							}
-							fw.write("</xs:annotation>\n");
-							fw.write("</xs:element>\n");
+							fw.write("</xs:annotation></xs:element>\n");
 						}
 					fw.write("</xs:schema>\n");
 					fw.close();
 				}
+			
+			// export catalog file
+			UmlCom.trace("Generating XML catalog");
+			fw = new FileWriter(dir + "/xml-catalog.xml");
+			fw.write("<?xml version=\"1.0\" encoding=\"US-ASCII\"?>\n"
+					+"<!-- XML catalog generated by BOUML niemtools plug_out (https://github.com/cabralje/niem-tools) -->\n"
+					+"<!DOCTYPE catalog PUBLIC \"-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN\" \"http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd\">\n"
+					+"<catalog prefer=\"public\" xmlns=\"urn:oasis:names:tc:entity:xmlns:xml:catalog\">\n");
+			for (Entry<String, String> entry : Prefixes.entrySet())
+			{
+				String prefix = entry.getKey();
+				String schemaURI = Prefixes.get(prefix);
+				Namespace ns = Namespaces.get(schemaURI);
+				if (isExternal(prefix + ":"))
+					fw.write("<uri name=\"" + schemaURI + "\" uri=\"" + externalSchemaURL.get(schemaURI) + "\"/>\n");
+				else if (ns.referenceClassView == null)
+					fw.write("<uri name=\"" + schemaURI + "\" uri=\"" + prefix + ".xsd\"/>\n");
+			}
+			for (String codeList : CodeListNamespaces)
+				fw.write("<uri name=\"" + extensionSchema(codeList) + "\" uri=\"" + codeList + ".gc\"/>\n");
+			fw.write("<nextCatalog  catalog=\"Subset/niem/xml-catalog.xml\" />\n</catalog>\n");
+			fw.close();
+
+			// cache list of ports, operations and messages
+			//UmlCom.trace("exportSchema: cache ports, operations and messages");
+			Map<String,UmlClass> ports = new TreeMap<String,UmlClass>();
+			Map<String,UmlOperation> operations = new TreeMap<String,UmlOperation>();
+			Set<String> messages = new TreeSet<String>();
+			Map<String, String> outputMessages = new TreeMap<String,String>();
+			Map<String, ArrayList<String>> inputMessages = new TreeMap<String, ArrayList<String>>();
+			for (int i = 0; i < UmlClass.classes.size(); i++)
+			{
+				UmlItem item = (UmlItem) UmlClass.classes.elementAt(i);
+				if (item.stereotype().equals("interface"))
+				{
+					UmlClass c = (UmlClass)item;
+					String portName = c.name();
+					ports.put(portName, c);
+					//UmlCom.trace("Port: " + c.name());
+					for (UmlItem item2 : c.children())
+					{
+						if (item2.kind() == anItemKind.anOperation)
+						{
+							UmlOperation operation = (UmlOperation)item2;
+							String operationName = operation.name();
+							//UmlCom.trace("Operation: " + operationName);
+							operations.put(operationName,operation);
+							UmlClass c1 = null, c2=null;
+							UmlParameter[] params = operation.params();
+							if (params != null)
+								for (UmlParameter param : params)
+								{
+									try {
+										c2 = param.type.type;
+									}
+									catch (Exception e) {
+										UmlCom.trace("exportSchema: could not find input message for " + operationName);
+									}
+									if (c2 != null)
+									{
+										if (c2.stereotype().equals(niemStereotype))
+										{
+											String inputMessage = c2.propertyValue(niemProperty(4));
+											if (inputMessage != null) {
+												//UmlCom.trace("Input Message: " + inputMessage);
+												messages.add(inputMessage);
+												ArrayList<String> inputs = inputMessages.get(operationName);
+												if (inputs==null)
+													inputs = new ArrayList<String>();
+												if (!inputs.contains(inputMessage))
+													inputs.add(inputMessage);
+												inputMessages.put(operationName, inputs);
+											}
+										}
+									}
+							}
+							try {
+								c1 = operation.returnType().type;
+							}
+							catch (Exception e)
+							{
+								UmlCom.trace("exportSchema: could not find output message for " + operationName+ " " + e.toString());
+							}
+							if (c1 != null)
+							{
+								if (c1.stereotype().equals(niemStereotype))
+								{
+									String outputMessage = c1.propertyValue(niemProperty(4));
+									if (outputMessage != null) {
+										//UmlCom.trace("Output Message: " + outputMessage);
+										messages.add(outputMessage);
+										outputMessages.put(operationName, outputMessage);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// export MPD catalog
+			UmlCom.trace("Generating MPD catalog");
+			fw = new FileWriter(dir + "/mpd-catalog.xml");
+			fw.write("<?xml version=\"1.0\" encoding=\"US-ASCII\"?>");
+			fw.write("<c:Catalog");
+			for (Entry<String, String> entry : Prefixes.entrySet())
+			{
+				String prefix = entry.getKey();
+				fw.write(" xmlns:" + prefix + "=\"" + Prefixes.get(prefix) + "\"");
+			}
+			fw.write(" xmlns:c=\"http://reference.niem.gov/niem/resource/mpd/catalog/3.0/\" xsi:schemaLocation=\"http://reference.niem.gov/niem/resource/mpd/catalog/3.0/ ../../mpd-toolkit-3.0/mpd-catalog-3.0.xsd\">");
+			fw.write("<c:MPD c:mpdURI=\"" + extensionSchema("") + "\" c:mpdClassURIList=\"http://reference.niem.gov/niem/specification/model-package-description/3.0/#MPD http://reference.niem.gov/niem/specification/model-package-description/3.0/#IEPD\" c:mpdName=\"" + IEPDName + "\" c:mpdVersionID=\"" + IEPDVersion + "\">"
+					+ "<c:MPDInformation>"
+					+ "<c:AuthoritativeSource>"
+					+ "<nc:EntityOrganization>"
+					+ "<nc:OrganizationName>" + IEPDOrganization + "</nc:OrganizationName>"
+					+ "<nc:OrganizationPrimaryContactInformation>"
+					+ "<nc:ContactWebsiteURI>" + IEPDContact + "</nc:ContactWebsiteURI>"
+					+ "</nc:OrganizationPrimaryContactInformation>"
+					+ "</nc:EntityOrganization>"
+					+ "</c:AuthoritativeSource>"
+					+ "<c:CreationDate>" + today + "</c:CreationDate>"
+					+ "<c:StatusText>" + IEPDStatus + "</c:StatusText>"
+					+ "</c:MPDInformation>");
+
+			for (String message : messages)
+			{   
+				String elementName = getName(message);
+				UmlClassInstance ci = null;
+				if (isNiemElement(message))
+					ci = findElement(subsetPackage, message);
+				else
+					ci = findElement(extensionPackage, message);						
+				fw.write("<c:IEPConformanceTarget structures:id=\"" + elementName+ "\">");
+				if (ci == null)
+					UmlCom.trace("exportSchema: could not find root element " + message);
+				else
+					fw.write("<nc:DescriptionText>" + ci.description() + "</nc:DescriptionText>");
+				fw.write("<c:HasDocumentElement c:qualifiedNameList=\"" + message + "\"/>"
+						+ "<c:XMLSchemaValid>"
+						+ "<c:XMLCatalog c:pathURI=\"xml-catalog.xml\"/>"
+						+ "</c:XMLSchemaValid>"
+						+ "<c:IEPSampleXMLDocument c:pathURI=\"" + elementName + ".xml\"/>"
+						+ "</c:IEPConformanceTarget>");
+			}
+			fw.write("<c:ReadMe c:pathURI=\"readme.txt\"/>"
+					+ "<c:MPDChangeLog c:pathURI=\"changelog.txt\"/>"
+					+ "<c:Wantlist c:pathURI=\"Subset/niem/wantlist.xml\"/>"
+					+ "<c:ConformanceAssertion c:pathURI=\"conformance-assertion.pdf\"/>");
+
+			for (Entry<String, String> entry : Prefixes.entrySet())
+			{
+				String prefix = entry.getKey();
+				String schemaURI = Prefixes.get(prefix);
+				Namespace ns = Namespaces.get(schemaURI);
+				if (ns.referenceClassView == null)
+					fw.write("<c:ExtensionSchemaDocument c:pathURI=\"" + prefix + ".xsd\"/>");
+			}
+
+			fw.write("</c:MPD></c:Catalog>");
+			fw.close();
+
+			// export WSDL definitions
+			String WSDLFile = "WebServices";
+			String WSDLXSDFile = "WebServicesWrappers";
+			String WSDLURI = IEPDURI + WSDLFile;
+			String WSDLXSDURI = IEPDURI + WSDLXSDFile;
+			
+			UmlCom.trace("Generating document/literal wrapper schema");
+			fw = new FileWriter(dir + "/" + WSDLXSDFile + ".xsd");
+			fw.write("<xs:schema targetNamespace=\"" + WSDLXSDURI+ "\" xmlns:wrapper=\"" + WSDLXSDURI + "\"");
+			
+			// build list of referenced namespaces
+			Set<String> RefNamespaces = new TreeSet<String>();
+			RefNamespaces.add(xmlPrefix);
+			//RefNamespaces.add(structuresPrefix);
+			for (String message : messages)
+				RefNamespaces.add(getPrefix(message));
+			for (String nsPrefix : RefNamespaces)
+				fw.write(" xmlns:" + nsPrefix + "=\"" + Prefixes.get(nsPrefix) + "\"");
+			fw.write(" elementFormDefault=\"qualified\" attributeFormDefault=\"unqualified\">");
+			for (String nsPrefix : RefNamespaces)
+				fw.write("<xs:import namespace=\"" + Prefixes.get(nsPrefix) + "\"/>");
+			
+			fw.write("<!-- document/literal wrappers -->");
+			for (UmlOperation operation : operations.values())
+			{
+				String operationName = operation.name();
+				ArrayList<String> inputs = inputMessages.get(operationName);
+				if (inputs != null)
+				{
+					String inputType = operationName + "RequestType";
+					fw.write("<xs:complexType name=\"" + inputType + "\">" 
+								+ "<xs:sequence>");
+					for (String inputMessage : inputs)
+					{
+						if (isExternal(inputMessage))
+							fw.write("<!--xs:element ref=\"" + inputMessage + "\"/-->");
+						else
+							fw.write("<xs:element ref=\"" + inputMessage + "\"/>");							
+					}
+					fw.write("</xs:sequence>"
+							+ "</xs:complexType>"
+						+ "<xs:element name=\"" + operationName + "Request\" type=\"wrapper:" + inputType + "\"/>");
+				}
+				String outputMessage = outputMessages.get(operationName);
+				if (outputMessage != null)
+				{
+					String outputType = operationName + "ResponseType";
+					fw.write("<xs:complexType name=\"" + outputType + "\">" 
+							+ "<xs:sequence>");
+					if (isExternal(outputMessage))
+						fw.write("<!--xs:element ref=\"" + outputMessage + "\"/-->");
+					else
+						fw.write("<xs:element ref=\"" + outputMessage + "\"/>");						
+					fw.write("</xs:sequence>"
+							+ "</xs:complexType>"
+							+ "<xs:element name=\"" + operationName + "Response\" type=\"wrapper:" + outputType + "\"/>");
+				}
+			}
+			fw.write("</xs:schema>");
+			fw.close();
+			
+			UmlCom.trace("Generating WSDL file");
+			fw = new FileWriter(dir + "/" + WSDLFile + ".wsdl");
+			fw.write("<definitions targetNamespace=\"" + WSDLURI + "\" xmlns:tns=\"" + WSDLURI + "\""
+					+ " xmlns:wrapper=\"" + WSDLXSDURI + "\""
+					+ " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+					+ " xmlns:soap=\"http://schemas.xmlsoap.org/wsdl/soap/\""
+					+ " xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\""
+					+ " xmlns=\"http://schemas.xmlsoap.org/wsdl/\""
+					+ " xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\""
+					+ " xmlns:wsrmp=\"http://docs.oasis-open.org/ws-rx/wsrmp/200702\""
+					+ " xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-361 wssecurity-utility-1.0.xsd\">"					
+					+ "<wsp:UsingPolicy wsdl:required=\"true\"/>"
+					+ "<wsp:Policy wsu:Id=\"MyPolicy\">"
+						+ "<wsrmp:RMAssertion/>"
+					+ "</wsp:Policy>"
+					+ "<wsdl:types>"
+					+ "<xsd:import namespace=\"" + WSDLXSDURI + "\" schemaLocation=\"" + WSDLXSDFile + ".xsd\"/>"
+					+ "</wsdl:types>");
+			
+			fw.write("<!-- messages -->");
+			for (UmlOperation operation : operations.values())
+			{   
+				String operationName = operation.name();
+				fw.write("<message name=\"" + operationName + "Request\">"
+						+ "<part name=\"body\" element=\"" + "wrapper:" + operationName+ "Request\"/>"
+						+ "</message>"
+						+ "<message name=\"" + operationName + "Response\">"
+						+ "<part name=\"body\" element=\"" + "wrapper:" + operationName+ "Response\"/>"
+						+ "</message>");
+			}
+
+			fw.write("<!-- ports -->");
+			for (UmlClass port : ports.values())
+			{
+				String portName = port.name();
+				fw.write("<portType name=\"" + portName + "\">");
+				for (UmlItem item : port.children())
+				{
+					if (item.kind() == anItemKind.anOperation)
+					{
+						UmlOperation operation = (UmlOperation)item;
+						String operationName = operation.name();						
+						fw.write("<operation name=\"" + operationName + "\">"
+							+ "<input message=\"tns:" + operationName + "Request\"/>"
+							+ "<output message=\"tns:" + operationName + "Response\"/>"
+							+ "</operation>");
+					}
+				}
+				fw.write("</portType>");
+			}
+
+			fw.write("<!-- bindings -->");
+			for (UmlClass port : ports.values())
+			{
+					String portName = port.name();
+					fw.write("<binding name=\"" + portName + "Soap/\" type=\"tns:" + portName + "\">"
+							+ "<wsp:PolicyReference URI=\"#MyPolicy\"/>"
+							+ "<soap:binding style=\"document\" transport=\"http://schemas.xmlsoap.org/soap/http\"/>");
+					for (UmlItem item : port.children())
+					{
+						if (item.kind() == anItemKind.anOperation)
+						{
+							UmlOperation oper = (UmlOperation)item;
+							String operationName = oper.name();
+							fw.write("<operation name=\"" + operationName + "\">"
+								+ "<soap:operation soapAction=\"" + WSDLURI + "/" + portName + "/" + operationName + "\"/>"
+								+ "<input>"
+									+ "	<soap:body use=\"literal\"/>"
+								+ "</input>"
+								+ "<output>"
+									+ "	<soap:body use=\"literal\"/>"
+								+ "</output>"
+								+ "</operation>");
+						}
+					}
+					fw.write("</binding>");
+				}
+			fw.write("<!-- services not defined here...defined in an implementation-specific WSDL that imports this one -->"
+					+ "</definitions>");
+			fw.close();
+
 		} catch (IOException e) {
 			UmlCom.trace("exportSchema: IO exception: " + e.toString());
 		}
 	}
 
-
 	// generate NIEM wantlist for import into Subset Schema Generator Tool (SSGT)
-	public static void exportWantlist(String dir, String filename) {
+	public static void exportWantlist(String dir, String filename, String externalSchemas) {
 
 		//createSubset();
-
+		setExternalSchemas(externalSchemas);
+		
 		UmlItem.directory = dir;
 		try {
 			// Export schema
 			//UmlCom.trace("exportWantlist: create header");
 			FileWriter fw = new FileWriter(dir + "/" + filename);
 			fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-			fw.write("<!-- NIEM Wantlist generated by BOUML niemtools plug_out -->\n");
+			fw.write("<!-- NIEM wantlist generated by BOUML niemtools plug_out (https://github.com/cabralje/niem-tools) -->\n");
 			fw.write("<w:WantList w:release=\"3.2\" w:product=\"NIEM\" w:nillableDefault=\"true\" ");
 			for (UmlItem item: subsetPackage.children())
 				if (item.kind() == anItemKind.aClassView)
@@ -1788,10 +2100,12 @@ class NiemTools {
 	}
 
 	// import NIEM mapping spreadsheet in CSV format
-	public static void importCsv(String filename) {
+	public static void importCsv(String filename, String externalSchemas) {
+
+		setExternalSchemas(externalSchemas);
 		// Cache CIM classes
-		HashMap<String, UmlClass> CIMClasses = new HashMap<String, UmlClass>();
-		HashMap<String, UmlClassInstance> CIMInstances = new HashMap<String, UmlClassInstance>();
+		Map<String, UmlClass> CIMClasses = new HashMap<String, UmlClass>();
+		Map<String, UmlClassInstance> CIMInstances = new HashMap<String, UmlClassInstance>();
 		for (int i = 0; i < UmlItem.all.size(); i++) {
 			UmlItem item = (UmlItem)UmlItem.all.elementAt(i);
 			if (item.stereotype().equals(niemStereotype))
@@ -2173,9 +2487,10 @@ class NiemTools {
 
 	// import NIEM reference model into HashMaps to support validation of NIEM
 	// elements and types
-	public static void importSchemaDir(String dir, Boolean includeEnums) throws IOException {
+	public static void importSchemaDir(String dir, Boolean includeEnums, String externalSchemas) throws IOException {
 		// cache reference model
 		cacheModel(referencePackage);
+		setExternalSchemas(externalSchemas);
 
 		// import abstract types
 		UmlClassView cv;
@@ -2313,9 +2628,25 @@ class NiemTools {
 	// identify UBL types and elements
 	public static Boolean isExternal(String tagName) {
 		String prefix = getPrefix(tagName);
-		return (prefix.equals("cac") || prefix.equals("cbc") || prefix.equals("ds"));
+		return externalPrefixes.contains(prefix);
 	}
 
+	public static void setExternalSchemas(String externalSchemas) {
+		String[] external = externalSchemas.split(",");
+		for (int i =0 ; i < external.length; i++)
+		{
+			String[] part = external[i].split("=");
+			if (part.length>2) {
+				String prefix = part[0].trim();
+				String schemaURI = part[1].trim();
+				String schemaLocation = part[2].trim();
+				externalPrefixes.add(prefix);
+				Prefixes.put(prefix, schemaURI);
+				externalSchemaURL.put(schemaURI, schemaLocation);
+			}
+		}
+	}
+	
 	// indicate whether an element exists in reference model
 	public static Boolean isNiemElement(String elementName) {
 
