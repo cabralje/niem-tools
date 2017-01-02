@@ -123,10 +123,10 @@ abstract class UmlItem extends UmlBaseItem implements Comparable {
 						if (files[i].isFile() &&
 								(files[i].getName().toLowerCase().endsWith(".html"))) {
 							if (!rem) {
-								ConfirmBox msg = new ConfirmBox("Delete already existing html files ?");
+/*								ConfirmBox msg = new ConfirmBox("Delete already existing html files ?");
 
 								if (!msg.ok())
-									break;
+									break;*/
 								rem = true;
 							}
 							files[i].delete();
@@ -137,9 +137,10 @@ abstract class UmlItem extends UmlBaseItem implements Comparable {
 					for (i = 0; i != files.length; i += 1) {
 						if (files[i].isFile() &&
 								(files[i].getName().equals("style.css"))) {
-							ConfirmBox msg = new ConfirmBox("Delete already existing style.css ?");
+/*							ConfirmBox msg = new ConfirmBox("Delete already existing style.css ?");
 
-							replace_css = msg.ok();
+							replace_css = msg.ok();*/
+							replace_css = true;
 							break;
 						}
 					}
@@ -338,6 +339,8 @@ abstract class UmlItem extends UmlBaseItem implements Comparable {
 
 	public static void generate_indexes() throws IOException
 	{
+		NiemTools.hideReferenceModel();
+		
 		UmlClass.generate_index();
 		UmlOperation.generate_index();
 		UmlAttribute.generate_index();
@@ -444,11 +447,11 @@ abstract class UmlItem extends UmlBaseItem implements Comparable {
 		fw.write("</html>");
 		fw.close();
 
-		UmlCom.trace("document with frame produced in <i>"
-				+ directory + "/index-withframe.html");
+		//UmlCom.trace("document with frame produced in <i>"
+		//		+ directory + "/index-withframe.html");
 
-		UmlCom.trace("document without frame produced in <i>"
-				+ directory + "/index.html");
+		//UmlCom.trace("document without frame produced in <i>"
+		//		+ directory + "/index.html");
 	}
 
 	/**
@@ -462,6 +465,10 @@ abstract class UmlItem extends UmlBaseItem implements Comparable {
 	}
 
 	public void html(String pfix, int rank, String what, int level, String kind) throws IOException {
+		
+		if (!known)
+			return;
+		
 		define();
 
 		chapter(what, pfix, rank, kind, level);
@@ -481,6 +488,9 @@ abstract class UmlItem extends UmlBaseItem implements Comparable {
 			rank = 1;
 			fw.write("<div class=\"sub\">\n");    
 			for (int i = 0; i != ch.length; i += 1) {
+				UmlItem item = ch[i];
+				if (!item.known)
+					continue;
 				ch[i].html(spfix, rank, level);
 				if (ch[i].chapterp())
 					rank += 1;
@@ -713,8 +723,8 @@ abstract class UmlItem extends UmlBaseItem implements Comparable {
 			writeq(pretty_name());
 			fw.write("</b></a>");
 		}
-		else
-			writeq(pretty_name());
+//		else
+//			writeq(pretty_name());
 	}
 
 	public void write(String target) throws IOException {
@@ -729,8 +739,9 @@ abstract class UmlItem extends UmlBaseItem implements Comparable {
 			writeq(pretty_name());
 			fw.write("</b></a>");
 		}
-		else
-			writeq(name());
+//		else
+//			writeq(name());
+			
 	}
 
 	public static void writeq(String s) throws IOException
@@ -936,7 +947,8 @@ abstract class UmlItem extends UmlBaseItem implements Comparable {
 
 			for (int i = 0; i != n; i += 1) {
 				UmlItem x = (UmlItem) v.elementAt(i);
-
+				if (!x.known)
+					continue;
 				fw.write("<tr bgcolor=\"#f0f0f0\"><td>");
 				x.write("projectFrame");
 				fw.write("</td><td>");

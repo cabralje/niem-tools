@@ -42,7 +42,7 @@ class Main
 				JFileChooser fc;
 				String homeDir = System.getProperty("user.home");
 				String propFile = homeDir + "/niemtools.properties";
-				Boolean genHtml = false;
+				Boolean genHtml = true;
 				UmlItem target = UmlCom.targetItem();
 
 				UmlCom.message("Memorize references ...");
@@ -120,8 +120,7 @@ class Main
 					}
 					
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					UmlCom.trace("main: Exception " + e1.toString());
 				}
 				
 				// int argc = argv.length-1;
@@ -179,8 +178,11 @@ class Main
 					// Generate UML Model HTML documentation
 					if (genHtml)
 					{
+						UmlCom.trace("Generating HTML documentation");
 						//	target.set_dir(argv.length - 1, argv);
-						target.set_dir(0,null);
+						String[] params = {htmlDir};
+						target.set_dir(1, params);
+						//target.set_dir(0,null);
 						UmlItem.frame();
 						UmlCom.message("Indexes ...");
 						UmlItem.generate_indexes();

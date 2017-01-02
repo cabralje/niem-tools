@@ -785,6 +785,7 @@ class NiemTools {
 		}
 		if (referencePackage == null)
 			referencePackage = UmlPackage.create(pimPackage, "NIEMReference");
+			referencePackage.set_Stereotype("framework");
 	}
 
 	// create Platform Specific Model (PSM)
@@ -2099,6 +2100,20 @@ class NiemTools {
 		return (i >= 0) ? typeName.substring(0, i) : "";
 	}
 
+	// hide reference model from documentation
+	public static void hideReferenceModel()
+	{
+		hideItem(referencePackage);
+	}
+	
+	// hide item from documentation
+	public static void hideItem(UmlItem item)
+	{
+		item.known = false;
+		for (UmlItem child : item.children())
+			hideItem(child);
+	}
+	
 	// import NIEM mapping spreadsheet in CSV format
 	public static void importCsv(String filename, String externalSchemas) {
 
@@ -2789,7 +2804,7 @@ class NiemTools {
 		return nextLine;
 	}
 
-	// return the NIEM steteotype associated with a column in the NIEM mapping
+	// return the NIEM stereotype associated with a column in the NIEM mapping
 	// spreadsheet
 	public static String niemProperty(int p) {
 		return niemStereotype + stereotypeDelimiter + map[p][1];
@@ -2827,6 +2842,7 @@ class NiemTools {
 		}
 	}
 
+	// output a column of the NIEM mapping spreadsheet in HTML format
 	public static void writeItemHtml(FileWriter fw, UmlItem item) throws IOException {
 		if (item.known) {
 			fw.write("<a href=\"");
@@ -2912,9 +2928,22 @@ class NiemTools {
 					column[p] = (column[p] != null) ? column[p].trim() : "";
 				}
 
+				// determine if this is an extension		
+				Boolean extension = false;
+				String[] xPathElements = column[4].split("/");
+				for (String element : xPathElements)
+				{
+					String prefix = getPrefix(element);
+					if (!prefix.equals("") && !isNiemSchema(prefix) && !isExternal(element.trim()))
+					{
+						extension = true;
+						continue;
+					}
+				}
+//				String prefix = getPrefix(column[5]);
+//				Boolean extension = ((prefix != null) && (!prefix.equals("")) && (!isNiemSchema(prefix)));
+				
 				// export XPath
-				String prefix = getPrefix(column[5]);
-				Boolean extension = ((prefix != null) && (!prefix.equals("")) && (!isNiemSchema(prefix)));
 				bgcolor = (extension) ? extensionBGColor : defaultBGColor;
 				fgcolor = (column[4].equals(column[9])) ? defaultFGColor : changedFGColor;
 				fw.write(columnHtml(column[4], bgcolor, fgcolor));
@@ -2925,7 +2954,7 @@ class NiemTools {
 					String[] tt = column[5].split(",");
 					for (String ttt : tt) {
 						ttt = ttt.trim();
-						if (!isNiemType(ttt))
+						if (!isNiemType(ttt) && !isExternal(ttt))
 							fgcolor = invalidFGColor;
 					}
 				}
@@ -2939,7 +2968,7 @@ class NiemTools {
 						ppp = ppp.trim();
 						Matcher mat = Pattern.compile("\\((.*?)\\)").matcher(ppp);
 						if (!mat.find())
-							if (!isNiemElementInType(column[5], ppp))
+							if (!isNiemElementInType(column[5], ppp) && !isExternal(ppp))
 								fgcolor = invalidFGColor;
 					}
 				}
@@ -2951,7 +2980,7 @@ class NiemTools {
 					String[] bb = column[7].split(",");
 					for (String bbb : bb) {
 						bbb = bbb.trim();
-						if (!isNiemType(bbb))
+						if (!isNiemType(bbb) && !isExternal(bbb))
 							fgcolor = invalidFGColor;
 					}
 				}

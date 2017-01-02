@@ -88,6 +88,10 @@ public void memo_ref() {
    * generate the html definition in an own file
    */
   public void html() throws IOException {
+	  
+	if (!known)
+		return;
+	
     UmlCom.message(name());
     
     if (stereotype().equals("stereotype"))
@@ -381,8 +385,12 @@ public void memo_ref() {
     fw.write("<table border=\"0\" width=\"100%\">\n<tr>\n<td nowrap=\"nowrap\">");
     
     for (int i = 0; i != n; i += 1) {
-      ((UmlItem) classes.elementAt(i)).write("projectFrame");
-      fw.write("<br />\n");
+    	UmlItem item = (UmlItem)classes.elementAt(i);
+    	if (item.known)
+    	{
+    		((UmlItem) classes.elementAt(i)).write("projectFrame");
+    		fw.write("<br />\n");
+    	}
     }
     
     fw.write("</td>\n</tr>\n</table>\n");
