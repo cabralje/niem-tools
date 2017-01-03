@@ -194,7 +194,7 @@ class NiemTools {
 			baseType = findType(extensionPackage, typeSchemaURI, typeName2);
 		if (baseType == null) 
 		{
-			if (!isExternal(typePrefix + ":"))
+			if (!isExternalPrefix(typePrefix))
 				UmlCom.trace("Base type not found in extension/subset for " + typePrefix + ":" + typeName2);
 			baseType = subsetAbstractType;
 //			return null;
@@ -1391,7 +1391,7 @@ class NiemTools {
 					UmlClassView cv = (UmlClassView)item;
 					cv.sort();
 					String prefix = cv.name();
-					if (isExternal(prefix + ":"))
+					if (isExternalPrefix(prefix))
 						continue;
 					String schemaURI = cv.propertyValue(uriProperty);
 
@@ -1591,7 +1591,7 @@ class NiemTools {
 				String prefix = entry.getKey();
 				String schemaURI = Prefixes.get(prefix);
 				Namespace ns = Namespaces.get(schemaURI);
-				if (isExternal(prefix + ":"))
+				if (isExternalPrefix(prefix))
 					fw.write("<uri name=\"" + schemaURI + "\" uri=\"" + externalSchemaURL.get(schemaURI) + "\"/>\n");
 				else if (ns.referenceClassView == null)
 					fw.write("<uri name=\"" + schemaURI + "\" uri=\"" + prefix + ".xsd\"/>\n");
@@ -1774,7 +1774,7 @@ class NiemTools {
 								+ "<xs:sequence>");
 					for (String inputMessage : inputs)
 					{
-						if (isExternal(inputMessage))
+						if (isExternalPrefix(getPrefix(inputMessage)))
 							fw.write("<!--xs:element ref=\"" + inputMessage + "\"/-->");
 						else
 							fw.write("<xs:element ref=\"" + inputMessage + "\"/>");							
@@ -1789,7 +1789,7 @@ class NiemTools {
 					String outputType = operationName + "ResponseType";
 					fw.write("<xs:complexType name=\"" + outputType + "\">" 
 							+ "<xs:sequence>");
-					if (isExternal(outputMessage))
+					if (isExternalPrefix(getPrefix(outputMessage)))
 						fw.write("<!--xs:element ref=\"" + outputMessage + "\"/-->");
 					else
 						fw.write("<xs:element ref=\"" + outputMessage + "\"/>");						
@@ -2641,11 +2641,20 @@ class NiemTools {
 	}
 
 	// identify UBL types and elements
-	public static Boolean isExternal(String tagName) {
-		String prefix = getPrefix(tagName);
+	public static Boolean isExternalPrefix(String prefix) {
+//		String prefix = getPrefix(tagName);
 		return externalPrefixes.contains(prefix);
 	}
 
+	// identify UBL types and elements
+	public static Boolean isNiemPrefix(String prefix) {
+		String schemaURI = Prefixes.get(prefix);
+		Namespace ns = Namespaces.get(schemaURI);
+		if (ns == null)
+			return false;
+		return ns.referenceClassView != null;
+	}
+	
 	public static void setExternalSchemas(String externalSchemas) {
 		String[] external = externalSchemas.split(",");
 		for (int i =0 ; i < external.length; i++)
@@ -2665,7 +2674,7 @@ class NiemTools {
 	// indicate whether an element exists in reference model
 	public static Boolean isNiemElement(String elementName) {
 
-		if (elementName.equals("") || elementName.equals("??") || isExternal(elementName))
+		if (elementName.equals("") || elementName.equals("??") || isExternalPrefix(getPrefix(elementName)))
 			return false;
 
 		// UmlCom.trace("isNiemElement: Find element " + elementName);
@@ -2741,7 +2750,7 @@ class NiemTools {
 
 	// indicate whether a type exists in reference model
 	public static Boolean isNiemType(String typeName) {
-		if (typeName.equals("") || typeName.equals("??") || isExternal(typeName))
+		if (typeName.equals("") || typeName.equals("??") || isExternalPrefix(getPrefix(typeName)))
 			return false;
 
 		String prefix = getPrefix(typeName);
@@ -2934,71 +2943,89 @@ class NiemTools {
 				for (String element : xPathElements)
 				{
 					String prefix = getPrefix(element);
-					if (!prefix.equals("") && !isNiemSchema(prefix) && !isExternal(element.trim()))
+					if (!prefix.equals("") && !isNiemSchema(prefix) && !isExternalPrefix(getPrefix(element.trim())))
 					{
 						extension = true;
 						continue;
 					}
 				}
-//				String prefix = getPrefix(column[5]);
-//				Boolean extension = ((prefix != null) && (!prefix.equals("")) && (!isNiemSchema(prefix)));
 				
 				// export XPath
+				String XPath = column[4].trim();
+				String oldXPath = column[9].trim();
 				bgcolor = (extension) ? extensionBGColor : defaultBGColor;
-				fgcolor = (column[4].equals(column[9])) ? defaultFGColor : changedFGColor;
-				fw.write(columnHtml(column[4], bgcolor, fgcolor));
+				fgcolor = (XPath.equals(oldXPath)) ? defaultFGColor : changedFGColor;
+				fw.write(columnHtml(XPath, bgcolor, fgcolor));
 
 				// export Type
+				String type = column[5].trim();
+				String typePrefix = getPrefix(type);
+				bgcolor = defaultBGColor;
 				fgcolor = defaultFGColor;
-				if (!extension) {
-					String[] tt = column[5].split(",");
-					for (String ttt : tt) {
-						ttt = ttt.trim();
-						if (!isNiemType(ttt) && !isExternal(ttt))
-							fgcolor = invalidFGColor;
-					}
+				if (!type.equals("")) {
+					if (isNiemPrefix(getPrefix(type)) && !isNiemType(type))
+						fgcolor = invalidFGColor;
+					if (!isNiemPrefix(typePrefix) && !isExternalPrefix(typePrefix))
+						bgcolor = extensionBGColor; 
 				}
-				fw.write(columnHtml(column[5], bgcolor, fgcolor));
+				fw.write(columnHtml(type, bgcolor, fgcolor));
 
 				// export Property
+				String property = column[6];
 				fgcolor = defaultFGColor;
-				if ((!column[5].equals("") && (!extension))) {
-					String[] pp = column[6].split(",");
+				bgcolor = defaultBGColor;
+				if (!property.equals("")) {
+					String[] pp = property.split(",");
 					for (String ppp : pp) {
 						ppp = ppp.trim();
 						Matcher mat = Pattern.compile("\\((.*?)\\)").matcher(ppp);
 						if (!mat.find())
-							if (!isNiemElementInType(column[5], ppp) && !isExternal(ppp))
+						{
+							String prefix = getPrefix(ppp);
+							if (isNiemPrefix(typePrefix) && isNiemPrefix(prefix) && !isNiemElementInType(type, ppp))
 								fgcolor = invalidFGColor;
+							prefix = getPrefix(property);
+							if (!isNiemPrefix(prefix) && !isExternalPrefix(prefix))
+								bgcolor = extensionBGColor;
+						}
 					}
 				}
-				fw.write(columnHtml(column[6], bgcolor, fgcolor));
+				fw.write(columnHtml(property, bgcolor, fgcolor));
 
 				// export BaseType
+				String baseType = column[7].trim();
+				String basePrefix = getPrefix(baseType);
+				bgcolor = defaultBGColor;
 				fgcolor = defaultFGColor;
-				if (!extension) {
-					String[] bb = column[7].split(",");
-					for (String bbb : bb) {
-						bbb = bbb.trim();
-						if (!isNiemType(bbb) && !isExternal(bbb))
-							fgcolor = invalidFGColor;
-					}
+				if (!baseType.equals("")) {
+					if (!isNiemPrefix(basePrefix) && !isExternalPrefix(basePrefix))
+						bgcolor = extensionBGColor; 
+					if (isNiemPrefix(basePrefix) && !isNiemType(baseType))
+						fgcolor = invalidFGColor;
 				}
-				fw.write(columnHtml(column[7], bgcolor, fgcolor));
+				fw.write(columnHtml(baseType, bgcolor, fgcolor));
 
 				// export Multiplicity
+				bgcolor = defaultBGColor;
 				fgcolor = (column[8].equals(column[10])) ? defaultFGColor : changedFGColor;
 				fw.write(columnHtml(column[8], bgcolor, fgcolor));
 
 				// export Old XPath
+				bgcolor = defaultBGColor;
 				fgcolor = defaultFGColor;
 				fw.write(columnHtml(column[9], bgcolor, fgcolor));
 
 				// export Old Multiplicity
+				bgcolor = defaultBGColor;
 				fw.write(columnHtml(column[10], bgcolor, fgcolor));
 
 				// export NIEM Mapping Notes
+				bgcolor = defaultBGColor;
 				fw.write(columnHtml(column[11], bgcolor, fgcolor));
+				
+				// export code list
+				bgcolor = defaultBGColor;
+				fw.write(columnHtml(column[12], bgcolor, fgcolor));				
 			}
 
 			fw.write("</tr>");
