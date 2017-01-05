@@ -1928,7 +1928,7 @@ class NiemTools {
 								continue;
 							//UmlCom.trace("exportWantlist: export element " + elementName);
 							fw.write("<w:Element w:name=\"" + prefix + namespaceDelimiter + elementName
-									+ "\" w:isReference=\"false\" w:nillable=\"false\"/>\n");
+									+ "\" w:isReference=\"false\" w:nillable=\"true\"/>\n");
 						}
 				}
 
