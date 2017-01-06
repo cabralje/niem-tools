@@ -107,7 +107,6 @@ class NiemTools {
 	private static Map<String, UmlClass> ExtensionTypes = new HashMap<String, UmlClass>();
 
 	private static UmlPackage subsetPackage = null, extensionPackage = null, referencePackage = null;
-	private static UmlPackage subsetXSDPackage = null, extensionXSDPackage = null, referenceXSDPackage = null;
 
 	private static XPath xPath = XPathFactory.newInstance().newXPath();
 
@@ -271,11 +270,23 @@ class NiemTools {
 		String propertyName = element.parent().name() + namespaceDelimiter + element.pretty_name();
 		String propertyName2 = propertyName.replace("-", "");
 		UmlAttribute at = null;
-		try {
-			at = UmlAttribute.create(type, propertyName2);
-		} catch (Exception re) {
-			// UmlCom.trace("addElementInType: element " + element.name() + " already exists in type " + type.name() + re.toString());
+		for (UmlItem item : type.children())
+		{
+			if (item.kind() == anItemKind.anAttribute && item.name().equals(propertyName2))
+			{
+				at = (UmlAttribute)item;
+				String previousMultiplicity = at.multiplicity();
+				if (!previousMultiplicity.equals(multiplicity))
+					UmlCom.trace("addElementInType:  " + type.parent().name() + ":" + type.pretty_name() + "/"  + element.parent().name() + ":" + element.pretty_name() + " has conflicting multiplicities " + previousMultiplicity + " and " + multiplicity);
+				return at;
+			} 
 		}
+		if (at == null)
+			try {
+				at = UmlAttribute.create(type, propertyName2);
+			} catch (Exception re) {
+				// UmlCom.trace("addElementInType: element " + element.name() + " already exists in type " + type.name() + re.toString());
+			}
 		if (at != null) {
 			at.set_Description(element.description());
 			at.set_PropertyValue(uriProperty, element.propertyValue(uriProperty));
@@ -532,7 +543,7 @@ class NiemTools {
 	}
 
 	protected static String columnHtml(String value, String bgcolor, String fgcolor) {
-		return "<td bgcolor=\"" + bgcolor + "\"><font color = \"" + fgcolor + "\">" + value + "</font></td>";
+		return "<td  style=\"word-wrap: break-word\" bgcolor=\"" + bgcolor + "\"><font color = \"" + fgcolor + "\">" + value + "</font></td>";
 	}
 
 	// copy element from NIEM reference model to subset
@@ -627,11 +638,23 @@ class NiemTools {
 		 */
 		// UmlCom.trace("copyElementInType: Adding " + element.pretty_name() + " to type " + type.pretty_name());
 		UmlAttribute at = null;
-		try {
-			at = UmlAttribute.create(type, element.pretty_name());
-		} catch (RuntimeException re) {
-			// UmlCom.trace("copyElementInType: attribute already exists " + element + " " + re.toString());
+		for (UmlItem item : type.children())
+		{
+			if (item.kind() == anItemKind.anAttribute && item.name().equals(element.pretty_name()))
+			{
+				at = (UmlAttribute)item;
+				String previousMultiplicity = at.multiplicity();
+				if (!previousMultiplicity.equals(multiplicity))
+					UmlCom.trace("copyElementInType:  " + type.parent().name() + ":" + type.pretty_name() + "/"  + element.parent().name() + ":" + element.pretty_name() + " has conflicting multiplicities " + previousMultiplicity + " and " + multiplicity);
+				return at;
+			} 
 		}
+		if (at == null)
+			try {
+				at = UmlAttribute.create(type, element.pretty_name());
+			} catch (RuntimeException re) {
+				// UmlCom.trace("copyElementInType: attribute already exists " + element + " " + re.toString());
+			}
 		if (at != null) {
 			at.set_Description(element.description());
 			at.set_PropertyValue(uriProperty, element.propertyValue(uriProperty));
@@ -788,58 +811,8 @@ class NiemTools {
 			referencePackage.set_Stereotype("framework");
 	}
 
-	// create Platform Specific Model (PSM)
-	public static void createPSM(UmlPackage root) {
-		UmlCom.trace("Creating PSM");
-		UmlPackage psmPackage = null;
-
-		// Find or create PSM package
-		for (UmlItem ch : root.children()) {
-			if (ch.pretty_name().equals("PSM"))
-				if ((ch.kind().value() == anItemKind._aPackage)) {
-					psmPackage = (UmlPackage) ch;
-					break;
-				}
-		}
-		if (psmPackage == null)
-			psmPackage = UmlPackage.create(root, "PSM");
-
-		// Find or create package "NIEMSubsetXSD"
-		for (UmlItem ch : psmPackage.children()) {
-			if (ch.pretty_name().equals("NIEMSubsetXSD"))
-				if ((ch.kind().value() == anItemKind._aPackage)) {
-					subsetXSDPackage = (UmlPackage) ch;
-					break;
-				}
-		}
-		if (subsetXSDPackage == null)
-			subsetXSDPackage = UmlPackage.create(psmPackage, "NIEMSubsetXSD");
-
-		// Find or create package "NIEMExtensionXSD"
-		for (UmlItem ch : psmPackage.children()) {
-			if (ch.pretty_name().equals("NIEMExtensionXSD"))
-				if ((ch.kind().value() == anItemKind._aPackage)) {
-					extensionXSDPackage = (UmlPackage) ch;
-					break;
-				}
-		}
-		if (extensionXSDPackage == null)
-			extensionXSDPackage = UmlPackage.create(psmPackage, "NIEMExtensionXSD");
-
-		// Find or create package "NIEMReferenceXSD"
-		for (UmlItem ch : psmPackage.children()) {
-			if (ch.pretty_name().equals("NIEMReferenceXSD"))
-				if ((ch.kind().value() == anItemKind._aPackage)) {
-					referenceXSDPackage = (UmlPackage) ch;
-					break;
-				}
-		}
-		if (referenceXSDPackage == null)
-			referenceXSDPackage = UmlPackage.create(psmPackage, "NIEMReferenceXSD");
-	}
-
 	// create NIEM subset and extension
-	public static void createSubset(String IEPDURI) {
+	public static void createSubsetAndExtension(String IEPDURI) {
 		extensionSchemaURI = IEPDURI;
 
 		// String[] nextLine = new String[map.length];
@@ -1343,9 +1316,9 @@ class NiemTools {
 			fw.write("<html>");
 			fw.write("<head><title>NIEM Mapping</title><link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" /></head>"
 					+"<body><div class = \"title\">NIEM Mapping</div>"
-					+"<table><tr bgcolor=\"#f0f0f0\">");
+					+"<table style=\"table-layout: fixed; width: 100%\"><tr bgcolor=\"#f0f0f0\">");
 			for (int i = 0; i < map.length; i++)
-				fw.write("<td>" + map[i][0] + "</td>");
+				fw.write("<td style=\"word-wrap: break-word\">" + map[i][0] + "</td>");
 			fw.write("</tr>\n");
 
 			// Show NIEM Mappings for Classes
@@ -1801,7 +1774,7 @@ class NiemTools {
 			fw.write("</xs:schema>");
 			fw.close();
 			
-			UmlCom.trace("Generating WSDL file");
+			UmlCom.trace("Generating WSDL");
 			fw = new FileWriter(dir + "/" + WSDLFile + ".wsdl");
 			fw.write("<definitions targetNamespace=\"" + WSDLURI + "\" xmlns:tns=\"" + WSDLURI + "\""
 					+ " xmlns:wrapper=\"" + WSDLXSDURI + "\""

@@ -195,8 +195,8 @@ class Main
 					}
 					
 					// Generate NIEM Mapping HTML
-					UmlCom.message ("Generating NIEM Mapping ...");
-					UmlCom.trace("Generating NIEM Mapping");
+					UmlCom.message ("Generating NIEM Mapping HTML ...");
+					UmlCom.trace("Generating NIEM Mapping HTML");
 					NiemTools.exportHtml(htmlDir, "niem-mapping", externalSchemas);
 
 					// Generate NIEM Mapping CSV
@@ -207,7 +207,7 @@ class Main
 					// Generate NIEM Wantlist instance
 					UmlCom.message("Generating NIEM Wantlist ...");
 					UmlCom.trace("Generating NIEM Wantlist");
-					NiemTools.createSubset(IEPDURI);
+					NiemTools.createSubsetAndExtension(IEPDURI);
 					NiemTools.exportWantlist(htmlDir, "wantlist.xml", externalSchemas);
 
 					// Generate extension schema

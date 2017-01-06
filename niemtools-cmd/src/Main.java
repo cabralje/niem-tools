@@ -99,7 +99,7 @@ public class Main
 
 			// Generate NIEM Wantlist instance
 			UmlCom.trace("Generating NIEM Wantlist");
-			NiemTools.createSubset(extensionURI);
+			NiemTools.createSubsetAndExtension(extensionURI);
 			NiemTools.exportWantlist(htmlDir, "wantlist",externalSchemas);
 
 			// Generate extension schema
