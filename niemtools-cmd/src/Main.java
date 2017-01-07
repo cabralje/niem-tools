@@ -55,8 +55,8 @@ public class Main
 		
 		try {
 			// Create PIM
-			UmlCom.trace("Generating PIM");
-			NiemTools.createPIM(root);
+			// UmlCom.trace("Generating NIEM");
+			NiemTools.createNIEM(root);
 			
 			// Import schemas
 			UmlCom.trace("Importing NIEM schema");

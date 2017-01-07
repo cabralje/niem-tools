@@ -1,10 +1,10 @@
-// James E. Cabral Jr, MTG Management Consultants LLC jcabral@mtgmc.com
+// James E. Cabral Jr, MTG Management Consultants LLC jcabral@mtgmc.com, https://github.com/cabralje/niemtools
 // Original version:  9/24/15
-// Current version: 11/23/16
+// Current version: 1/7/2017
 
 // This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) v3.2 defined at http://niem.gov.
 // Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
-// UML Platform Speciic Model (PSM), the NIEM reference model, and a UML Platform Specific Model (PSM), NIEM XML Schema.
+// UML Platform Specific Model (PSM), the NIEM reference/subset/extension model, and a UML Platform Specific Model (NIEM), NIEM XML Schema.
 //
 // NOTE: This plug_out requires that the BOUML project include a simple NIEM profile that provides the stereotypes required for mapping.
 
@@ -141,8 +141,8 @@ class NiemTools {
 	// add element to extension
 	public static UmlClassInstance addElement(String elementName, String typeName, String description, String notes) {
 		// abort if external schame
-//		if (isExternal(typeName))
-//			return null;
+		//		if (isExternal(typeName))
+		//			return null;
 
 		// UmlCom.trace("Copying " + elementName + " to subset");
 		// get schemaURI
@@ -196,7 +196,7 @@ class NiemTools {
 			if (!isExternalPrefix(typePrefix))
 				UmlCom.trace("Base type not found in extension/subset for " + typePrefix + ":" + typeName2);
 			baseType = subsetAbstractType;
-//			return null;
+			//			return null;
 		}
 
 		// create element
@@ -214,8 +214,8 @@ class NiemTools {
 	public static UmlAttribute addElementInType(Document doc, UmlClassView parentClassView, String schemaURI,
 			String typeName, String propertyName, String multiplicity) {
 		// abort if external schame
-//		if (isExternal(typeName) || isExternal(propertyName))
-//			return null;
+		//		if (isExternal(typeName) || isExternal(propertyName))
+		//			return null;
 
 		UmlClass type = findType((UmlPackage) (parentClassView.parent()), schemaURI, typeName);
 		if (type == null) {
@@ -233,8 +233,8 @@ class NiemTools {
 	// add element in type to extension
 	public static UmlAttribute addElementInType(String typeName, UmlClassInstance element, String multiplicity) {
 		// abort if external schame
-//		if (isExternal(typeName))
-//			return null;
+		//		if (isExternal(typeName))
+		//			return null;
 
 		if (element == null)
 		{
@@ -356,8 +356,8 @@ class NiemTools {
 	// add type to extension
 	public static UmlClass addType(String typeName, String description, String notes) {
 		// abort if external schema
-//		if (isExternal(typeName))
-//			return null;
+		//		if (isExternal(typeName))
+		//			return null;
 
 		// UmlCom.trace("Copying " + typeName + " to subset");
 		// get schemaURI
@@ -542,8 +542,9 @@ class NiemTools {
 		}
 	}
 
-	protected static String columnHtml(String value, String bgcolor, String fgcolor) {
-		return "<td  style=\"word-wrap: break-word\" bgcolor=\"" + bgcolor + "\"><font color = \"" + fgcolor + "\">" + value + "</font></td>";
+	protected static String columnHtml(String value, String bgcolor, String fgcolor, Boolean wordwrap) {
+		String style = wordwrap ? "word-wrap: break-word" : "";
+		return "<td  style=\"" + style + "\" bgcolor=\"" + bgcolor + "\"><font color = \"" + fgcolor + "\">" + value + "</font></td>";
 	}
 
 	// copy element from NIEM reference model to subset
@@ -753,22 +754,22 @@ class NiemTools {
 		return typeClass;
 	}
 
-	// create Platform Independent Model (PIM)
-	public static void createPIM(UmlPackage root) {
+	// create Platform Independent Model (NIEM)
+	public static void createNIEM(UmlPackage root) {
 		UmlPackage pimPackage = null;
 
-		//UmlCom.trace("Creating PIM folders");
-		// Find or create PIM package
+		//UmlCom.trace("Creating NIEM folders");
+		// Find or create NIEM package
 		for (UmlItem ch : root.children()) {
-			if (ch.pretty_name().equals("PIM"))
+			if (ch.pretty_name().equals("NIEM"))
 				if ((ch.kind().value() == anItemKind._aPackage)) {
 					pimPackage = (UmlPackage) ch;
 					break;
 				}
 		}
 		if (pimPackage == null) {
-			pimPackage = UmlPackage.create(root, "PIM");
-			UmlCom.trace("Creating PIM");
+			pimPackage = UmlPackage.create(root, "NIEM");
+			// UmlCom.trace("Creating NIEM");
 		}
 
 		// Find or create package "NIEMSubset"
@@ -808,7 +809,7 @@ class NiemTools {
 		}
 		if (referencePackage == null)
 			referencePackage = UmlPackage.create(pimPackage, "NIEMReference");
-			referencePackage.set_Stereotype("framework");
+		referencePackage.set_Stereotype("framework");
 	}
 
 	// create NIEM subset and extension
@@ -856,7 +857,7 @@ class NiemTools {
 			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String baseTypeName = c.propertyValue(niemProperty(7));
-//				if (!baseTypeName.equals("") && !baseTypeName.equals("??") && !isExternal(baseTypeName)) 
+				//				if (!baseTypeName.equals("") && !baseTypeName.equals("??") && !isExternal(baseTypeName)) 
 				if (!baseTypeName.equals("") && !baseTypeName.equals("??")) 
 				{
 					if (isNiemType(baseTypeName)) 
@@ -879,7 +880,7 @@ class NiemTools {
 				String notes = c.propertyValue(niemProperty(11)).trim();
 				String description = c.description().trim();
 
-//				if (!typeName.equals("") && !typeName.equals("??") && !isExternal(typeName)) {
+				//				if (!typeName.equals("") && !typeName.equals("??") && !isExternal(typeName)) {
 				if (!typeName.equals("") && !typeName.equals("??")) {
 					if (isNiemType(typeName)) {
 						//UmlCom.trace("Adding type " + typeName + " to subset");
@@ -921,7 +922,7 @@ class NiemTools {
 				String mappingNotes = c.propertyValue(niemProperty(11)).trim();
 				String codeList = c.propertyValue(niemProperty(12)).trim();
 
-//				if (!elementName.equals("") && !elementName.equals("??") && !isExternal(elementName)) {
+				//				if (!elementName.equals("") && !elementName.equals("??") && !isExternal(elementName)) {
 				if (!elementName.equals("") && !elementName.equals("??")) {
 					//	String elementName2 = elementName.replace(" ", "").replace("(", "").replace(")", "");
 					String[] elements = elementName.split(",");
@@ -1011,7 +1012,7 @@ class NiemTools {
 					String basePrefix = getPrefix(baseTypeName);
 					String baseSchemaURI = Prefixes.get(basePrefix);
 					UmlClass baseType;
-//					if (isNiemType(typeName) || isExternal(typeName))
+					//					if (isNiemType(typeName) || isExternal(typeName))
 					if (isNiemType(typeName))			
 						continue;
 					type = findType(extensionPackage, schemaURI, tagName);
@@ -1042,7 +1043,7 @@ class NiemTools {
 					String tagName = getName(typeName);
 					String prefix = getPrefix(typeName);
 					String schemaURI = Prefixes.get(prefix);
-//					if (isNiemType(typeName) || isExternal(typeName))
+					//					if (isNiemType(typeName) || isExternal(typeName))
 					if (isNiemType(typeName))
 						continue;
 					type = findType(extensionPackage, schemaURI, tagName);
@@ -1118,7 +1119,7 @@ class NiemTools {
 	}
 
 	// delete PIM model
-	public static void deletePIM(UmlPackage root) {
+	public static void deleteNIEM(UmlPackage root) {
 		UmlPackage pimPackage = null;
 
 		//UmlCom.trace("Deleting PIM");
@@ -1126,7 +1127,7 @@ class NiemTools {
 
 		// Delete reference model
 		for (UmlItem ch : root.children()) {
-			if (ch.pretty_name().equals("PIM"))
+			if (ch.pretty_name().equals("NIEM"))
 				if ((ch.kind().value() == anItemKind._aPackage)) {
 					pimPackage = (UmlPackage) ch;
 					//pimPackage.deleteIt();
@@ -1135,14 +1136,14 @@ class NiemTools {
 		}
 		// Find PIM package
 		for (UmlItem ch : root.children()) {
-			if (ch.pretty_name().equals("PIM"))
+			if (ch.pretty_name().equals("NIEM"))
 				if ((ch.kind().value() == anItemKind._aPackage)) {
 					pimPackage = (UmlPackage) ch;
 					break;
 				}
 		}
 		if (pimPackage == null) {
-			UmlCom.trace("PIM not found");
+			UmlCom.trace("NIEM not found");
 			return;
 		}
 
@@ -1168,14 +1169,14 @@ class NiemTools {
 
 		// Find PIM package
 		for (UmlItem ch : root.children()) {
-			if (ch.pretty_name().equals("PIM"))
+			if (ch.pretty_name().equals("NIEM"))
 				if ((ch.kind().value() == anItemKind._aPackage)) {
 					pimPackage = (UmlPackage) ch;
 					break;
 				}
 		}
 		if (pimPackage == null) {
-			UmlCom.trace("PIM not found");
+			UmlCom.trace("NIEM not found");
 			return;
 		}
 
@@ -1259,9 +1260,9 @@ class NiemTools {
 	// generate NIEM mapping spreadsheet in CSV format
 	// roundtripping is supported with importCsv()
 	public static void exportCsv(String dir, String filename, String externalSchemas) {
-		
+
 		setExternalSchemas(externalSchemas);
-		
+
 		UmlItem.directory = dir;
 
 		try {
@@ -1306,7 +1307,7 @@ class NiemTools {
 
 	// generate NIEM mapping spreadsheet in HTML format
 	public static void exportHtml(String dir, String filename, String externalSchemas) {
-		
+
 		setExternalSchemas(externalSchemas);
 		// cache NIEM namespaces, elements and types
 		cacheModel(referencePackage);
@@ -1507,8 +1508,8 @@ class NiemTools {
 										fw.write("<!--" + elementMappingNotes + "-->");
 									if (elementName.equals("xs:any"))
 										fw.write("<xs:any/>");
-//									else if (isExternal(elementName))									
-//										fw.write("<!--xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/-->\n");
+									//									else if (isExternal(elementName))									
+									//										fw.write("<!--xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/-->\n");
 									else
 										fw.write("<xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>\n");
 								}
@@ -1551,7 +1552,7 @@ class NiemTools {
 					fw.write("</xs:schema>\n");
 					fw.close();
 				}
-			
+
 			// export catalog file
 			UmlCom.trace("Generating XML catalog");
 			fw = new FileWriter(dir + "/xml-catalog.xml");
@@ -1626,7 +1627,7 @@ class NiemTools {
 											}
 										}
 									}
-							}
+								}
 							try {
 								c1 = operation.returnType().type;
 							}
@@ -1718,11 +1719,11 @@ class NiemTools {
 			String WSDLXSDFile = "WebServicesWrappers";
 			String WSDLURI = IEPDURI + WSDLFile;
 			String WSDLXSDURI = IEPDURI + WSDLXSDFile;
-			
+
 			UmlCom.trace("Generating document/literal wrapper schema");
 			fw = new FileWriter(dir + "/" + WSDLXSDFile + ".xsd");
 			fw.write("<xs:schema targetNamespace=\"" + WSDLXSDURI+ "\" xmlns:wrapper=\"" + WSDLXSDURI + "\"");
-			
+
 			// build list of referenced namespaces
 			Set<String> RefNamespaces = new TreeSet<String>();
 			RefNamespaces.add(xmlPrefix);
@@ -1734,7 +1735,7 @@ class NiemTools {
 			fw.write(" elementFormDefault=\"qualified\" attributeFormDefault=\"unqualified\">");
 			for (String nsPrefix : RefNamespaces)
 				fw.write("<xs:import namespace=\"" + Prefixes.get(nsPrefix) + "\"/>");
-			
+
 			fw.write("<!-- document/literal wrappers -->");
 			for (UmlOperation operation : operations.values())
 			{
@@ -1744,7 +1745,7 @@ class NiemTools {
 				{
 					String inputType = operationName + "RequestType";
 					fw.write("<xs:complexType name=\"" + inputType + "\">" 
-								+ "<xs:sequence>");
+							+ "<xs:sequence>");
 					for (String inputMessage : inputs)
 					{
 						if (isExternalPrefix(getPrefix(inputMessage)))
@@ -1754,7 +1755,7 @@ class NiemTools {
 					}
 					fw.write("</xs:sequence>"
 							+ "</xs:complexType>"
-						+ "<xs:element name=\"" + operationName + "Request\" type=\"wrapper:" + inputType + "\"/>");
+							+ "<xs:element name=\"" + operationName + "Request\" type=\"wrapper:" + inputType + "\"/>");
 				}
 				String outputMessage = outputMessages.get(operationName);
 				if (outputMessage != null)
@@ -1773,7 +1774,7 @@ class NiemTools {
 			}
 			fw.write("</xs:schema>");
 			fw.close();
-			
+
 			UmlCom.trace("Generating WSDL");
 			fw = new FileWriter(dir + "/" + WSDLFile + ".wsdl");
 			fw.write("<definitions targetNamespace=\"" + WSDLURI + "\" xmlns:tns=\"" + WSDLURI + "\""
@@ -1787,12 +1788,12 @@ class NiemTools {
 					+ " xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-361 wssecurity-utility-1.0.xsd\">"					
 					+ "<wsp:UsingPolicy wsdl:required=\"true\"/>"
 					+ "<wsp:Policy wsu:Id=\"MyPolicy\">"
-						+ "<wsrmp:RMAssertion/>"
+					+ "<wsrmp:RMAssertion/>"
 					+ "</wsp:Policy>"
 					+ "<wsdl:types>"
 					+ "<xsd:import namespace=\"" + WSDLXSDURI + "\" schemaLocation=\"" + WSDLXSDFile + ".xsd\"/>"
 					+ "</wsdl:types>");
-			
+
 			fw.write("<!-- messages -->");
 			for (UmlOperation operation : operations.values())
 			{   
@@ -1817,9 +1818,9 @@ class NiemTools {
 						UmlOperation operation = (UmlOperation)item;
 						String operationName = operation.name();						
 						fw.write("<operation name=\"" + operationName + "\">"
-							+ "<input message=\"tns:" + operationName + "Request\"/>"
-							+ "<output message=\"tns:" + operationName + "Response\"/>"
-							+ "</operation>");
+								+ "<input message=\"tns:" + operationName + "Request\"/>"
+								+ "<output message=\"tns:" + operationName + "Response\"/>"
+								+ "</operation>");
 					}
 				}
 				fw.write("</portType>");
@@ -1828,29 +1829,29 @@ class NiemTools {
 			fw.write("<!-- bindings -->");
 			for (UmlClass port : ports.values())
 			{
-					String portName = port.name();
-					fw.write("<binding name=\"" + portName + "Soap/\" type=\"tns:" + portName + "\">"
-							+ "<wsp:PolicyReference URI=\"#MyPolicy\"/>"
-							+ "<soap:binding style=\"document\" transport=\"http://schemas.xmlsoap.org/soap/http\"/>");
-					for (UmlItem item : port.children())
+				String portName = port.name();
+				fw.write("<binding name=\"" + portName + "Soap/\" type=\"tns:" + portName + "\">"
+						+ "<wsp:PolicyReference URI=\"#MyPolicy\"/>"
+						+ "<soap:binding style=\"document\" transport=\"http://schemas.xmlsoap.org/soap/http\"/>");
+				for (UmlItem item : port.children())
+				{
+					if (item.kind() == anItemKind.anOperation)
 					{
-						if (item.kind() == anItemKind.anOperation)
-						{
-							UmlOperation oper = (UmlOperation)item;
-							String operationName = oper.name();
-							fw.write("<operation name=\"" + operationName + "\">"
+						UmlOperation oper = (UmlOperation)item;
+						String operationName = oper.name();
+						fw.write("<operation name=\"" + operationName + "\">"
 								+ "<soap:operation soapAction=\"" + WSDLURI + "/" + portName + "/" + operationName + "\"/>"
 								+ "<input>"
-									+ "	<soap:body use=\"literal\"/>"
+								+ "	<soap:body use=\"literal\"/>"
 								+ "</input>"
 								+ "<output>"
-									+ "	<soap:body use=\"literal\"/>"
+								+ "	<soap:body use=\"literal\"/>"
 								+ "</output>"
 								+ "</operation>");
-						}
 					}
-					fw.write("</binding>");
 				}
+				fw.write("</binding>");
+			}
 			fw.write("<!-- services not defined here...defined in an implementation-specific WSDL that imports this one -->"
 					+ "</definitions>");
 			fw.close();
@@ -1865,7 +1866,7 @@ class NiemTools {
 
 		//createSubset();
 		setExternalSchemas(externalSchemas);
-		
+
 		UmlItem.directory = dir;
 		try {
 			// Export schema
@@ -2070,7 +2071,7 @@ class NiemTools {
 		if (typeName == null)
 			return "";
 		int i = typeName.indexOf(namespaceDelimiter);
-		return (i >= 0) ? typeName.substring(0, i) : "";
+		return (i >= 0) ? typeName.substring(0, i).trim() : "";
 	}
 
 	// hide reference model from documentation
@@ -2078,7 +2079,7 @@ class NiemTools {
 	{
 		hideItem(referencePackage);
 	}
-	
+
 	// hide item from documentation
 	public static void hideItem(UmlItem item)
 	{
@@ -2086,27 +2087,27 @@ class NiemTools {
 		for (UmlItem child : item.children())
 			hideItem(child);
 	}
-	
+
 	// import NIEM mapping spreadsheet in CSV format
 	public static void importCsv(String filename, String externalSchemas) {
 
 		setExternalSchemas(externalSchemas);
-		// Cache CIM classes
-		Map<String, UmlClass> CIMClasses = new HashMap<String, UmlClass>();
-		Map<String, UmlClassInstance> CIMInstances = new HashMap<String, UmlClassInstance>();
+		// Cache UML classes
+		Map<String, UmlClass> UMLClasses = new HashMap<String, UmlClass>();
+		Map<String, UmlClassInstance> UMLInstances = new HashMap<String, UmlClassInstance>();
 		for (int i = 0; i < UmlItem.all.size(); i++) {
 			UmlItem item = (UmlItem)UmlItem.all.elementAt(i);
 			if (item.stereotype().equals(niemStereotype))
 				if (item.kind() == anItemKind.aClass)
 				{
 					UmlClass c = (UmlClass)item;
-					if (!CIMClasses.containsKey(c.pretty_name()))
-						CIMClasses.put(c.pretty_name(), c);
+					if (!UMLClasses.containsKey(c.pretty_name()))
+						UMLClasses.put(c.pretty_name(), c);
 				} else if (item.kind() == anItemKind.aClassInstance)
 				{
 					UmlClassInstance ci = (UmlClassInstance)item;
-					if (!CIMInstances.containsKey(ci.pretty_name()))
-						CIMInstances.put(ci.pretty_name(), ci);
+					if (!UMLInstances.containsKey(ci.pretty_name()))
+						UMLInstances.put(ci.pretty_name(), ci);
 				}
 		}
 		try {
@@ -2124,7 +2125,7 @@ class NiemTools {
 
 				if (!className.equals(""))
 				{
-					UmlClass c = CIMClasses.get(className);
+					UmlClass c = UMLClasses.get(className);
 					if (c != null) 
 					{
 						if (attributeName.equals("")) 
@@ -2143,7 +2144,7 @@ class NiemTools {
 					}
 				} else if (!attributeName.equals(""))
 				{
-					UmlClassInstance ci = CIMInstances.get(attributeName);
+					UmlClassInstance ci = UMLInstances.get(attributeName);
 					if (ci != null)
 					{
 						// Import NIEM Mapping to Class
@@ -2476,6 +2477,7 @@ class NiemTools {
 	// import NIEM reference model into HashMaps to support validation of NIEM
 	// elements and types
 	public static void importSchemaDir(String dir, Boolean includeEnums, String externalSchemas) throws IOException {
+	
 		// cache reference model
 		cacheModel(referencePackage);
 		setExternalSchemas(externalSchemas);
@@ -2493,7 +2495,7 @@ class NiemTools {
 		// import XML namespace and simple types
 		cv = addNamespace(referencePackage, xmlPrefix, XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		String[] xmlTypeNames = { "anyURI", "base64Binary", "blockSet", "boolean", "byte", "date", "dateTime",
-				"decimal", "derivationControl", "derivationSet", "double", "duration", "ENTITIES", "ENTITY", "float",
+				"deUMLal", "derivationControl", "derivationSet", "double", "duration", "ENTITIES", "ENTITY", "float",
 				"formChoice", "fullDerivationSet", "gDay", "gMonth", "gMonthDay", "gYear", "gYearMonth", "hexBinary",
 				"int", "integer", "language", "long", "Name", "namespaceList", "NCName", "negativeInteger", "NMTOKEN",
 				"NMTOKENS", "nonNegativeInteger", "nonPositiveInteger", "normalizedString", "NOTATION",
@@ -2615,7 +2617,7 @@ class NiemTools {
 
 	// identify UBL types and elements
 	public static Boolean isExternalPrefix(String prefix) {
-//		String prefix = getPrefix(tagName);
+		//		String prefix = getPrefix(tagName);
 		return externalPrefixes.contains(prefix);
 	}
 
@@ -2627,7 +2629,7 @@ class NiemTools {
 			return false;
 		return ns.referenceClassView != null;
 	}
-	
+
 	public static void setExternalSchemas(String externalSchemas) {
 		String[] external = externalSchemas.split(",");
 		for (int i =0 ; i < external.length; i++)
@@ -2643,7 +2645,7 @@ class NiemTools {
 			}
 		}
 	}
-	
+
 	// indicate whether an element exists in reference model
 	public static Boolean isNiemElement(String elementName) {
 
@@ -2811,7 +2813,7 @@ class NiemTools {
 		}
 	}*/
 
-	// (re-)associate the NIEM stereotype with all properties in the CIM
+	// (re-)associate the NIEM stereotype with all properties in the UML
 	public static void resetStereotype() {
 		@SuppressWarnings("unchecked")
 		Iterator<UmlItem> it = UmlItem.all.iterator();
@@ -2822,6 +2824,34 @@ class NiemTools {
 				item.applyStereotype();
 			}
 		}
+	}
+
+	// verify reference model exists (NIEM)
+	public static boolean verifyNIEM(UmlPackage root) {
+		UmlPackage pimPackage = null;
+
+		//UmlCom.trace("Creating NIEM folders");
+		// Find NIEM package
+		for (UmlItem ch : root.children()) {
+			if (ch.pretty_name().equals("NIEM"))
+				if ((ch.kind().value() == anItemKind._aPackage)) {
+					pimPackage = (UmlPackage) ch;
+					break;
+				}
+		}
+		if (pimPackage != null)
+			// Find package "NIEMReference"
+			for (UmlItem ch : pimPackage.children()) {
+				if (ch.pretty_name().equals("NIEMReference"))
+					if ((ch.kind().value() == anItemKind._aPackage)) {
+						referencePackage = (UmlPackage) ch;
+						return true;
+					}
+			}
+
+		UmlCom.trace("NIEM reference model does not exist.  Import NIEM reference schemas first.");
+		return false;
+
 	}
 
 	// output a column of the NIEM mapping spreadsheet in HTML format
@@ -2851,16 +2881,16 @@ class NiemTools {
 			// UmlCom.trace(item.pretty_name());
 			switch (item.kind().value()) {
 			case anItemKind._aClass: {
-				fw.write("<tr bgcolor=\"#f0f0f0\"><td>");
+				fw.write("<tr bgcolor=\"#f0f0f0\"><td style=\"word-wrap: break-word\">");
 				writeItemHtml(fw, item);
 				fw.write("</td><td>");
 				fw.write("</td><td>");
 			}
 			break;
 			case anItemKind._anAttribute: {
-				fw.write("<tr><td>");
+				fw.write("<tr><td style=\"word-wrap: break-word\">");
 				writeItemHtml(fw, item.parent());
-				fw.write("</td><td>");
+				fw.write("</td><td style=\"word-wrap: break-word\">");
 				writeItemHtml(fw, item);
 				fw.write("</td><td>");
 				UmlAttribute a = (UmlAttribute) item;
@@ -2873,9 +2903,9 @@ class NiemTools {
 						|| (rel.relationKind() == aRelationKind.aRealization))
 					return;
 				else {
-					fw.write("<tr><td>");
+					fw.write("<tr><td style=\"word-wrap: break-word\">");
 					writeItemHtml(fw, item.parent());
-					fw.write("</td><td>");
+					fw.write("</td><td style=\"word-wrap: break-word\">");
 					writeItemHtml(fw, item);
 					fw.write("</td><td>");
 					fw.write(rel.multiplicity());
@@ -2911,7 +2941,7 @@ class NiemTools {
 				}
 
 				// determine if this is an extension		
-				Boolean extension = false;
+/*				Boolean extension = false;
 				String[] xPathElements = column[4].split("/");
 				for (String element : xPathElements)
 				{
@@ -2921,14 +2951,15 @@ class NiemTools {
 						extension = true;
 						continue;
 					}
-				}
-				
+				}*/
+
 				// export XPath
 				String XPath = column[4].trim();
 				String oldXPath = column[9].trim();
-				bgcolor = (extension) ? extensionBGColor : defaultBGColor;
+				//bgcolor = (extension) ? extensionBGColor : defaultBGColor;
+				bgcolor = defaultBGColor;
 				fgcolor = (XPath.equals(oldXPath)) ? defaultFGColor : changedFGColor;
-				fw.write(columnHtml(XPath, bgcolor, fgcolor));
+				fw.write(columnHtml(XPath, bgcolor, fgcolor, true));
 
 				// export Type
 				String type = column[5].trim();
@@ -2941,7 +2972,7 @@ class NiemTools {
 					if (!isNiemPrefix(typePrefix) && !isExternalPrefix(typePrefix))
 						bgcolor = extensionBGColor; 
 				}
-				fw.write(columnHtml(type, bgcolor, fgcolor));
+				fw.write(columnHtml(type, bgcolor, fgcolor, true));
 
 				// export Property
 				String property = column[6];
@@ -2963,42 +2994,42 @@ class NiemTools {
 						}
 					}
 				}
-				fw.write(columnHtml(property, bgcolor, fgcolor));
+				fw.write(columnHtml(property, bgcolor, fgcolor, true));
 
 				// export BaseType
 				String baseType = column[7].trim();
 				String basePrefix = getPrefix(baseType);
 				bgcolor = defaultBGColor;
 				fgcolor = defaultFGColor;
-				if (!baseType.equals("")) {
+				if (!baseType.equals("") && !baseType.equals(abstractTypeName)) {
 					if (!isNiemPrefix(basePrefix) && !isExternalPrefix(basePrefix))
 						bgcolor = extensionBGColor; 
 					if (isNiemPrefix(basePrefix) && !isNiemType(baseType))
 						fgcolor = invalidFGColor;
 				}
-				fw.write(columnHtml(baseType, bgcolor, fgcolor));
+				fw.write(columnHtml(baseType, bgcolor, fgcolor, true));
 
 				// export Multiplicity
 				bgcolor = defaultBGColor;
 				fgcolor = (column[8].equals(column[10])) ? defaultFGColor : changedFGColor;
-				fw.write(columnHtml(column[8], bgcolor, fgcolor));
+				fw.write(columnHtml(column[8], bgcolor, fgcolor, false));
 
 				// export Old XPath
 				bgcolor = defaultBGColor;
 				fgcolor = defaultFGColor;
-				fw.write(columnHtml(column[9], bgcolor, fgcolor));
+				fw.write(columnHtml(column[9], bgcolor, fgcolor, true));
 
 				// export Old Multiplicity
 				bgcolor = defaultBGColor;
-				fw.write(columnHtml(column[10], bgcolor, fgcolor));
+				fw.write(columnHtml(column[10], bgcolor, fgcolor, false));
 
 				// export NIEM Mapping Notes
 				bgcolor = defaultBGColor;
-				fw.write(columnHtml(column[11], bgcolor, fgcolor));
-				
+				fw.write(columnHtml(column[11], bgcolor, fgcolor, true));
+
 				// export code list
 				bgcolor = defaultBGColor;
-				fw.write(columnHtml(column[12], bgcolor, fgcolor));				
+				fw.write(columnHtml(column[12], bgcolor, fgcolor, true));				
 			}
 
 			fw.write("</tr>");

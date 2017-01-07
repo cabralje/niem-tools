@@ -146,7 +146,11 @@ class Main
 					//UmlCom.trace("Saving project");
 					//UmlBasePackage.saveProject();
 					//UmlBasePackage.loadProject("");
-					NiemTools.createPIM(root);
+
+					if (NiemTools.verifyNIEM(root)) {
+						UmlCom.trace("NIEM reference model already exists. Please delete NIEM package first.");
+						break;
+					}
 					NiemTools.importSchemaDir(directory,false, externalSchemas);
 					break;
 
@@ -173,7 +177,9 @@ class Main
 					//UmlCom.trace("Saving project");
 					//UmlBasePackage.saveProject();
 					//UmlBasePackage.loadProject("");
-					NiemTools.createPIM(root);
+					if (!NiemTools.verifyNIEM(root))
+						break;
+
 					
 					// Generate UML Model HTML documentation
 					if (genHtml)
@@ -207,6 +213,7 @@ class Main
 					// Generate NIEM Wantlist instance
 					UmlCom.message("Generating NIEM Wantlist ...");
 					UmlCom.trace("Generating NIEM Wantlist");
+					NiemTools.createNIEM(root);
 					NiemTools.createSubsetAndExtension(IEPDURI);
 					NiemTools.exportWantlist(htmlDir, "wantlist.xml", externalSchemas);
 
