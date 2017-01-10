@@ -782,7 +782,7 @@ class NiemTools {
 		}
 		if (subsetPackage == null)
 		{
-			UmlCom.trace("Creating NIEMSubset");
+			// UmlCom.trace("Creating NIEMSubset");
 			subsetPackage = UmlPackage.create(pimPackage, "NIEMSubset");
 		}
 		// Find or create package "NIEMExtension"
@@ -795,7 +795,7 @@ class NiemTools {
 		}
 		if (extensionPackage == null)
 		{
-			UmlCom.trace("Creating NIEMExtension");
+			// UmlCom.trace("Creating NIEMExtension");
 			extensionPackage = UmlPackage.create(pimPackage, "NIEMExtension");
 		}
 
