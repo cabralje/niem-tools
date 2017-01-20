@@ -1101,7 +1101,7 @@ class NiemTools {
 		}
 
 		// Sorting
-		UmlCom.trace("Sorting namespaces");
+		// UmlCom.trace("Sorting namespaces");
 		subsetPackage.sort();
 		extensionPackage.sort();
 	}
@@ -2656,7 +2656,7 @@ class NiemTools {
 		String prefix = getPrefix(elementName);
 		String schemaURI = Prefixes.get(prefix);
 		if (schemaURI == null) {
-			UmlCom.trace("isNiemElement: Cannot find prefix " + prefix);
+			UmlCom.trace("isNiemElement: Cannot find prefix " + prefix + " for element " + elementName);
 			return false;
 		}
 		String tagName = getName(elementName);
