@@ -73,6 +73,7 @@ class NiemTools {
 	private static String structuresPrefix = "structures";
 	private static String extensionSchemaURI = "http://local/";
 	private static String notesProperty = "Notes";
+	private static String nillableProperty = "isNillable";
 	private static String uriProperty = "URI";
 	private static String substitutionProperty = "substitutesFor";
 	private static String codeListProperty = "codeList";
@@ -940,6 +941,9 @@ class NiemTools {
 							representation = true;
 							e2 = e2.substring(1,e2.length()-1);
 						}
+						Boolean isNillable = e2.startsWith("@");
+						if (isNillable)
+							e2 = e2.substring(1);
 						if (isNiemElement(e2)) {
 							//UmlCom.trace("Adding element " + e2 + " in subset");
 							UmlClassInstance element = copyElement(e2);
@@ -948,6 +952,8 @@ class NiemTools {
 								continue;
 							}
 							SubsetElements.put(element.propertyValue(uriProperty), element);
+							if (isNillable)
+								element.set_PropertyValue(nillableProperty, "true");
 							if (substitution && representation && headElement != null)
 								element.set_PropertyValue(substitutionProperty, headElement);
 							if (!representation && !typeName.equals("") && isNiemElementInType(typeName, e2)) {
@@ -984,6 +990,8 @@ class NiemTools {
 								continue;
 							}
 							ExtensionElements.put(ci.propertyValue(uriProperty), ci);
+							if (isNillable)
+								ci.set_PropertyValue(nillableProperty, "true");
 							if (substitution && representation && headElement != null)
 								ci.set_PropertyValue(substitutionProperty, headElement);
 							if (!codeList.equals(""))
@@ -1077,6 +1085,9 @@ class NiemTools {
 							String e1 = e.trim();
 							if (e1.startsWith("(") && e1.endsWith(")"))
 								continue;
+							Boolean isNillable = e1.startsWith("@");
+							if (isNillable)
+								e1 = e1.substring(1);
 							//UmlCom.trace("Adding element " + e1 + " in type " + typeName + " in subset");
 							UmlClassInstance element;
 							if (isNiemElement(e1))
@@ -1529,14 +1540,17 @@ class NiemTools {
 							String mappingNotes = ci.propertyValue(notesProperty);
 							String headElement = ci.propertyValue(substitutionProperty);
 							String codeList = ci.propertyValue(codeListProperty);
+							String isNillable = ci.propertyValue(nillableProperty);
+							if (isNillable == null)
+								isNillable = "false";
 							if (mappingNotes != null && !mappingNotes.equals(""))
 								fw.write("<!--" + mappingNotes + "-->");
 							if (baseType == subsetAbstractType)
 								fw.write("<xs:element name=\"" + elementName + "\" abstract=\"true\">\n");
 							else if (headElement != null)
-								fw.write("<xs:element name=\"" + elementName + "\" type=\"" + baseTypeName + "\" substitutionGroup=\"" + headElement + "\" nillable=\"true\">\n");
+								fw.write("<xs:element name=\"" + elementName + "\" type=\"" + baseTypeName + "\" substitutionGroup=\"" + headElement + "\" nillable=\"" + isNillable + "\">\n");
 							else
-								fw.write("<xs:element name=\"" + elementName + "\" type=\"" + baseTypeName + "\" nillable=\"true\">\n");
+								fw.write("<xs:element name=\"" + elementName + "\" type=\"" + baseTypeName + "\" nillable=\"" + isNillable + "\">\n");
 							fw.write("<xs:annotation>\n<xs:documentation>" + description + "</xs:documentation>\n");
 							if (codeList != null) 
 							{
@@ -1901,8 +1915,11 @@ class NiemTools {
 							if (prefix.equals(xmlPrefix) && elementName.equals(anyElementName))
 								continue;
 							//UmlCom.trace("exportWantlist: export element " + elementName);
+							String isNillable = ci.propertyValue(nillableProperty);
+							if (isNillable == null)
+								isNillable = "false";
 							fw.write("<w:Element w:name=\"" + prefix + namespaceDelimiter + elementName
-									+ "\" w:isReference=\"false\" w:nillable=\"true\"/>\n");
+									+ "\" w:isReference=\"false\" w:nillable=\"" + isNillable + "\"/>\n");							
 						}
 				}
 
