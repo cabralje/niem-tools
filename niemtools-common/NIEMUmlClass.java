@@ -86,7 +86,7 @@ class NiemTools {
 	// NIEM mapping spreadsheet column headings, NIEM profile profile stereotype
 	private static final String[][] map = { { "Model Class", "", }, { "Model Attribute", "", },
 			{ "Model Multiplicity", "", }, { "Model Definition", "", }, { "NIEM XPath", "XPath" },
-			{ "NIEM Type", "Type" }, { "NIEM Property (Representation)", "Property" }, { "NIEM Base Type", "BaseType" },
+			{ "NIEM Type", "Type" }, { "NIEM Property, @Reference, (Representation)", "Property" }, { "NIEM Base Type", "BaseType" },
 			{ "NIEM Multiplicity", "Multiplicity" }, { "Old XPath", "OldXPath" },
 			{ "Old Multiplicity", "OldMultiplicity" }, { "NIEM Mapping Notes", "Notes" } , { "Code List Code=Definition;" , "CodeList"} };
 	private static String namespaceDelimiter = ":";
