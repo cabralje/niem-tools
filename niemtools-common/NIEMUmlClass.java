@@ -195,7 +195,7 @@ class NiemTools {
 		if (baseType == null) 
 		{
 			if (!isExternalPrefix(typePrefix))
-				UmlCom.trace("Base type not found in extension/subset for " + typePrefix + ":" + typeName2);
+				UmlCom.trace("Base type not found in extension/subset for " + typePrefix + namespaceDelimiter + typeName2);
 			baseType = subsetAbstractType;
 			//			return null;
 		}
@@ -278,7 +278,7 @@ class NiemTools {
 				at = (UmlAttribute)item;
 				String previousMultiplicity = at.multiplicity();
 				if (!previousMultiplicity.equals(multiplicity))
-					UmlCom.trace("addElementInType:  " + type.parent().name() + ":" + type.pretty_name() + "/"  + element.parent().name() + ":" + element.pretty_name() + " has conflicting multiplicities " + previousMultiplicity + " and " + multiplicity);
+					UmlCom.trace("addElementInType:  " + type.parent().name() + namespaceDelimiter + type.pretty_name() + "/"  + element.parent().name() + ":" + element.pretty_name() + " has conflicting multiplicities " + previousMultiplicity + " and " + multiplicity);
 				return at;
 			} 
 		}
@@ -570,7 +570,7 @@ class NiemTools {
 		// if type doesn't exist in reference model, return
 		UmlClassInstance sourceElement = findElement(referencePackage, schemaURI, elementName2);
 		if (sourceElement == null) {
-			UmlCom.trace("Element " + schemaURI + ":" + elementName2 + " not found in reference");
+			UmlCom.trace("Element " + schemaURI + namespaceDelimiter + elementName2 + " not found in reference");
 			return null;
 		}
 		// UmlCom.trace("Element found in reference model");
@@ -600,7 +600,7 @@ class NiemTools {
 						SubsetTypes.put(baseType.propertyValue(uriProperty), baseType);
 				}
 				if (baseType == null) {
-					UmlCom.trace("Base type not found in subset for " + baseSchemaURI + ":" + pt);
+					UmlCom.trace("Base type not found in subset for " + baseSchemaURI + namespaceDelimiter + pt);
 					return null;
 				}
 			}
@@ -647,7 +647,7 @@ class NiemTools {
 				at = (UmlAttribute)item;
 				String previousMultiplicity = at.multiplicity();
 				if (!previousMultiplicity.equals(multiplicity))
-					UmlCom.trace("copyElementInType:  " + type.parent().name() + ":" + type.pretty_name() + "/"  + element.parent().name() + ":" + element.pretty_name() + " has conflicting multiplicities " + previousMultiplicity + " and " + multiplicity);
+					UmlCom.trace("copyElementInType:  " + type.parent().name() + namespaceDelimiter + type.pretty_name() + "/"  + element.parent().name() + ":" + element.pretty_name() + " has conflicting multiplicities " + previousMultiplicity + " and " + multiplicity);
 				return at;
 			} 
 		}
@@ -696,7 +696,7 @@ class NiemTools {
 		// if type doesn't exist in reference model, return
 		UmlClass sourceType = findType(referencePackage, schemaURI, typeName2);
 		if (sourceType == null) {
-			UmlCom.trace("copyType: Type " + schemaURI + ":" + typeName2 + " not found in reference");
+			UmlCom.trace("copyType: Type " + schemaURI + namespaceDelimiter + typeName2 + " not found in reference");
 			return null;
 		}
 		// UmlCom.trace("Type found in reference model");
@@ -1490,7 +1490,7 @@ class NiemTools {
 							//if (typeName.endsWith("AugmentationType"))
 							//	baseTypeName = "structures:AugmentationType";
 							if (baseTypeName.equals(""))
-								UmlCom.trace("exportSchema: type " + prefix + ":" + typeName + " has no base type");
+								UmlCom.trace("exportSchema: type " + prefix + namespaceDelimiter + typeName + " has no base type");
 							fw.write("<xs:extension base=\"" + baseTypeName + "\">\n<xs:sequence>\n");
 							c.sortChildren();
 							for (UmlItem item4 : c.children())
@@ -1514,6 +1514,14 @@ class NiemTools {
 										maxoccurs = occurs[1];
 									} else
 										minoccurs = maxoccurs = multiplicity;
+									try {
+										if (Integer.parseInt(minoccurs) < 0)
+											throw new NumberFormatException();
+										if (!maxoccurs.equals("unbounded") && (Integer.parseInt(maxoccurs) < 1))
+												throw new NumberFormatException();
+									} catch (NumberFormatException e) {
+										UmlCom.trace("Invalid multiplicity " + multiplicity + " for " + prefix + namespaceDelimiter + typeName + "/" + elementName );
+									}
 									String elementMappingNotes = a.propertyValue(notesProperty);
 									if (elementMappingNotes != null && !elementMappingNotes.equals(""))
 										fw.write("<!--" + elementMappingNotes + "-->");
@@ -1962,6 +1970,14 @@ class NiemTools {
 										maxoccurs = occurs[1];
 									} else
 										minoccurs = maxoccurs = multiplicity;
+									try {
+										if (Integer.parseInt(minoccurs) < 0)
+											throw new NumberFormatException();
+										if (!maxoccurs.equals("unbounded") && (Integer.parseInt(maxoccurs) < 1))
+												throw new NumberFormatException();
+									} catch (NumberFormatException e) {
+										UmlCom.trace("Invalid multiplicity " + multiplicity + " for " + prefix + namespaceDelimiter + typeName + "/" + elementPrefix + namespaceDelimiter + elementName );
+									}
 									//if (((!minoccurs.equals("0") && !minoccurs.equals("1"))) || ((!maxoccurs.equals("1") && !maxoccurs.equals("unbounded"))))
 									//	UmlCom.trace("createSubset: unusual multiplicity " + multiplicity + " for element " + elementName);;
 
@@ -2034,7 +2050,7 @@ class NiemTools {
 	// get type by schemaURI and tagname
 	public static UmlClass findType(UmlPackage parentPackage, String schemaURI, String tagName) 
 	{
-		// UmlCom.trace("findType: " + schemaURI + ":" + tagName);
+		// UmlCom.trace("findType: " + schemaURI + namespaceDelimiter + tagName);
 		if (tagName.equals("abstract"))
 		{
 			if (parentPackage == referencePackage)
@@ -3028,7 +3044,25 @@ class NiemTools {
 
 				// export Multiplicity
 				bgcolor = defaultBGColor;
-				fgcolor = (column[8].equals(column[10])) ? defaultFGColor : changedFGColor;
+				String multiplicity = column[8];
+				fgcolor = (multiplicity.equals(column[10])) ? defaultFGColor : changedFGColor;
+				String minoccurs, maxoccurs;
+				if ((multiplicity.equals("")))
+					minoccurs = maxoccurs = "1";
+				else if (multiplicity.contains(",")) {
+					String[] occurs = multiplicity.split(",");
+					minoccurs = occurs[0];
+					maxoccurs = occurs[1];
+				} else
+					minoccurs = maxoccurs = multiplicity;
+				try {
+					if (Integer.parseInt(minoccurs) < 0)
+						throw new NumberFormatException();
+					if (!maxoccurs.equals("unbounded") && (Integer.parseInt(maxoccurs) < 1))
+							throw new NumberFormatException();
+				} catch (NumberFormatException e) {
+					fgcolor = invalidFGColor;
+				}
 				fw.write(columnHtml(column[8], bgcolor, fgcolor, false));
 
 				// export Old XPath
