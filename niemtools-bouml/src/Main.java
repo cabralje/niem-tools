@@ -146,11 +146,7 @@ class Main
 					//UmlCom.trace("Saving project");
 					//UmlBasePackage.saveProject();
 					//UmlBasePackage.loadProject("");
-
-					if (NiemTools.verifyNIEM(root)) {
-						UmlCom.trace("NIEM reference model already exists. Please delete NIEM package first.");
-						break;
-					}
+					NiemTools.createNIEM(root);
 					NiemTools.importSchemaDir(directory,false, externalSchemas);
 					break;
 
@@ -180,7 +176,6 @@ class Main
 					if (!NiemTools.verifyNIEM(root))
 						break;
 
-					
 					// Generate UML Model HTML documentation
 					if (genHtml)
 					{
