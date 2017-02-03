@@ -1757,7 +1757,7 @@ class NiemTools {
 
 			// export WSDL definitions
 			String WSDLFile = "WebServices";
-			String WSDLXSDFile = "WebServicesWrappers";
+			String WSDLXSDFile = "MessageWrappers";
 			String WSDLURI = IEPDURI + WSDLFile;
 			String WSDLXSDURI = IEPDURI + WSDLXSDFile;
 
