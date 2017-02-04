@@ -979,7 +979,7 @@ class NiemTools {
 									SubsetElementsInType.put(cn, enlist);
 								}
 								copyElementInType(typeName, element, multiplicity);
-								if (!codeList.equals(""))
+								if (!codeList.equals("") && (!substitution || representation))
 									element.set_PropertyValue(codeListProperty, codeList);
 							}
 						} else {
@@ -1010,7 +1010,7 @@ class NiemTools {
 								ci.set_PropertyValue(nillableProperty, "true");
 							if (substitution && representation && headElement != null)
 								ci.set_PropertyValue(substitutionProperty, headElement);
-							if (!codeList.equals(""))
+							if (!codeList.equals("") && (!substitution || representation))
 								ci.set_PropertyValue(codeListProperty, codeList);
 						}
 					}
