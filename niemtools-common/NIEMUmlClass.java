@@ -979,6 +979,8 @@ class NiemTools {
 									SubsetElementsInType.put(cn, enlist);
 								}
 								copyElementInType(typeName, element, multiplicity);
+								if (!codeList.equals(""))
+									element.set_PropertyValue(codeListProperty, codeList);
 							}
 						} else {
 							//UmlCom.trace("Adding element " + e + " in extension");
@@ -1495,6 +1497,7 @@ class NiemTools {
 											+ "<xs:documentation>" + description + "</xs:documentation>\n"
 										+ "</xs:annotation>\n"
 									+ "<xs:complexContent>\n");
+							String augmentationPoint = null, augmentationPointMin = null, augmentationPointMax = null;
 							for (UmlItem item3 : c.children())
 								if (item3.kind() == anItemKind.aRelation)
 								{
@@ -1549,9 +1552,17 @@ class NiemTools {
 									//									else if (isExternal(elementName))									
 									//										fw.write("<!--xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/-->\n");
 									else
-										fw.write("<xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>\n");
+										if (elementName.endsWith("AugmentationPoint"))
+										{
+											augmentationPoint = elementName;
+											augmentationPointMin = minoccurs;
+											augmentationPointMax = maxoccurs;
+										} else
+											fw.write("<xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>\n");
 								}
 							//	fw.write("<xs:element ref=\"" + elementName + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>");
+							if (augmentationPoint != null)
+								fw.write("<xs:element ref=\"" + augmentationPoint + "\" minOccurs=\"" + augmentationPointMin + "\" maxOccurs=\"" + augmentationPointMax + "\"/>\n");
 							fw.write("</xs:sequence>\n</xs:extension>\n</xs:complexContent>\n</xs:complexType>\n");
 						}
 
@@ -1594,6 +1605,27 @@ class NiemTools {
 					fw.close();
 				}
 
+			// export code lists for subset elements
+			for (UmlItem item: subsetPackage.children())
+				if (item.kind() == anItemKind.aClassView)
+				{
+					UmlClassView cv = (UmlClassView)item;
+					cv.sort();
+					for (UmlItem item2 : cv.children())
+						if (item2.kind() == anItemKind.aClassInstance)
+						{
+							UmlClassInstance ci = (UmlClassInstance)item2;
+							String elementName = ci.name();
+							String codeList = ci.propertyValue(codeListProperty);
+							if (codeList != null) 
+							{
+								String codeListURI = extensionSchema(elementName);
+								exportCodeList(dir, elementName, codeListURI, codeList, IEPDVersion, today);
+								CodeListNamespaces.add(elementName);
+							}
+						}
+				}
+			
 			// export catalog file
 			UmlCom.trace("Generating XML catalog");
 			fw = new FileWriter(dir + "/xml-catalog.xml");
