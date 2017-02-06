@@ -970,6 +970,8 @@ class NiemTools {
 								element.set_PropertyValue(nillableProperty, "true");
 							if (substitution && representation && headElement != null)
 								element.set_PropertyValue(substitutionProperty, headElement);
+							if (!codeList.equals("") && (!substitution || representation))
+								element.set_PropertyValue(codeListProperty, codeList);
 							if (!representation && !typeName.equals("") && isNiemElementInType(typeName, e2)) {
 								//UmlCom.trace("Adding element " + e2 + " in type " + typeName + " in subset");
 								String cn = element.parent().propertyValue(uriProperty);
@@ -979,8 +981,6 @@ class NiemTools {
 									SubsetElementsInType.put(cn, enlist);
 								}
 								copyElementInType(typeName, element, multiplicity);
-								if (!codeList.equals("") && (!substitution || representation))
-									element.set_PropertyValue(codeListProperty, codeList);
 							}
 						} else {
 							//UmlCom.trace("Adding element " + e + " in extension");
