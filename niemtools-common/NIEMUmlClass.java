@@ -81,12 +81,15 @@ class NiemTools {
 	private static String codeListProperty = "codeList";
 	private static String codeListDelimiter = ";";
 	private static String codeListDefDelimiter = "=";
+	private static String multiplicityDelimiter = "\\.\\.";
 	public static final String niemStereotype = "niem-profile:niem";
 	private static String stereotypeDelimiter = ":";
+	private static String WSDLFile = "WebServices";
+	private static String WSDLXSDFile = "MessageWrappers";
 	private static String xmlPrefix = "xs";
 	private static Set<String> externalPrefixes = new HashSet<String>();
 	private static Map<String,String> externalSchemaURL = new HashMap<String,String>();
-
+	
 	// NIEM mapping spreadsheet column headings, NIEM profile profile stereotype
 	private static final String[][] map = { { "Model Class", "", }, { "Model Attribute", "", },
 			{ "Model Multiplicity", "", }, { "Model Definition", "", }, { "NIEM XPath", "XPath" },
@@ -1674,6 +1677,7 @@ class NiemTools {
 								{
 									try {
 										c2 = param.type.type;
+										// String mult = param.multiplicity;
 									}
 									catch (Exception e) {
 										UmlCom.trace("exportSchema: could not find input message for " + operationName);
@@ -1686,6 +1690,8 @@ class NiemTools {
 											if (inputMessage != null) {
 												//UmlCom.trace("Input Message: " + inputMessage);
 												messages.add(inputMessage);
+												if (param.multiplicity != null)
+													inputMessage = inputMessage + "," + param.multiplicity;
 												ArrayList<String> inputs = inputMessages.get(operationName);
 												if (inputs==null)
 													inputs = new ArrayList<String>();
@@ -1783,8 +1789,6 @@ class NiemTools {
 			fw.close();
 
 			// export WSDL definitions
-			String WSDLFile = "WebServices";
-			String WSDLXSDFile = "MessageWrappers";
 			String WSDLURI = IEPDURI + WSDLFile;
 			String WSDLXSDURI = IEPDURI + WSDLXSDFile;
 
@@ -1828,10 +1832,30 @@ class NiemTools {
 							+ "<xs:sequence>");
 					for (String inputMessage : inputs)
 					{
-						if (isExternalPrefix(getPrefix(inputMessage)))
-							fw.write("<!--xs:element ref=\"" + inputMessage + "\"/-->");
+						String inputMessage2 = inputMessage;
+						String mult = "";
+						if (inputMessage.contains(","))
+						{
+							String inputMessageParts[] = inputMessage.split(",");
+							inputMessage2 = inputMessageParts[0];
+							mult = inputMessageParts[1];
+						}
+						String minoccurs = "1";
+						String maxoccurs = "1";
+						if (!(mult.equals("")))
+						{
+							if (mult.contains("..")) {
+								String[] occurs = mult.split("\\.\\.");
+								minoccurs = occurs[0];
+								maxoccurs = occurs[1];
+							} else minoccurs = maxoccurs = mult;
+						}
+							
+						if (isExternalPrefix(getPrefix(inputMessage2)))
+							fw.write("<!--xs:element ref=\"" + inputMessage2 + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/-->\n");
 						else
-							fw.write("<xs:element ref=\"" + inputMessage + "\"/>");							
+							fw.write("<xs:element ref=\"" + inputMessage2 + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>\n");
+					
 					}
 					fw.write("</xs:sequence>"
 							+ "</xs:complexType>"
