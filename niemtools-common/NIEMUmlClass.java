@@ -79,6 +79,8 @@ class NiemTools {
 	private static String uriProperty = "URI";
 	private static String substitutionProperty = "substitutesFor";
 	private static String codeListProperty = "codeList";
+	private static String codeListDelimiter = ";";
+	private static String codeListDefDelimiter = "=";
 	public static final String niemStereotype = "niem-profile:niem";
 	private static String stereotypeDelimiter = ":";
 	private static String xmlPrefix = "xs";
@@ -94,19 +96,16 @@ class NiemTools {
 	private static String namespaceDelimiter = ":";
 	private static Map<String, UmlItem> NiemElements = new HashMap<String, UmlItem>();
 	private static Map<String, List<UmlClassInstance>> NiemElementsInType = new HashMap<String, List<UmlClassInstance>>();
-	private static Map<String, List<UmlExtraClassMember>> NiemEnumerations = new HashMap<String, List<UmlExtraClassMember>>();
 	private static Map<String, Namespace> Namespaces = new HashMap<String, Namespace>();
 	private static Map<String, String> Prefixes = new HashMap<String, String>();
 	private static Map<String, UmlClass> NiemTypes = new HashMap<String, UmlClass>();
 
 	private static Map<String, UmlItem> SubsetElements = new HashMap<String, UmlItem>();
 	private static Map<String, List<UmlClassInstance>> SubsetElementsInType = new HashMap<String, List<UmlClassInstance>>();
-	private static Map<String, List<UmlExtraClassMember>> SubsetEnumerations = new HashMap<String, List<UmlExtraClassMember>>();
 	private static Map<String, UmlClass> SubsetTypes = new HashMap<String, UmlClass>();
 
 	private static Map<String, UmlItem> ExtensionElements = new HashMap<String, UmlItem>();
 	private static Map<String, List<UmlClassInstance>> ExtensionElementsInType = new HashMap<String, List<UmlClassInstance>>();
-	private static Map<String, List<UmlExtraClassMember>> ExtensionEnumerations = new HashMap<String, List<UmlExtraClassMember>>();
 	private static Map<String, UmlClass> ExtensionTypes = new HashMap<String, UmlClass>();
 
 	private static UmlPackage subsetPackage = null, extensionPackage = null, referencePackage = null;
@@ -450,24 +449,20 @@ class NiemTools {
 		String schemaURI;
 		Map<String, UmlItem> Elements = null;
 		Map<String, List<UmlClassInstance>> ElementsInType = null;
-		Map<String, List<UmlExtraClassMember>> Enumerations = null;
 		Map<String, UmlClass> Types = null;
 
 		if (rootPackage == referencePackage) {
 			Elements = NiemElements;
 			ElementsInType = NiemElementsInType;
-			Enumerations = NiemEnumerations;
 			Types = NiemTypes;
 		} else if (rootPackage == subsetPackage) {
 			Elements = SubsetElements;
 			ElementsInType = SubsetElementsInType;
-			Enumerations = SubsetEnumerations;
 			Types = SubsetTypes;
 		}
 		if (rootPackage == extensionPackage) {
 			Elements = ExtensionElements;
 			ElementsInType = ExtensionElementsInType;
-			Enumerations = ExtensionEnumerations;
 			Types = ExtensionTypes;
 		}
 
@@ -530,7 +525,6 @@ class NiemTools {
 		if (rootPackage == referencePackage) {
 			NiemElements = Elements;
 			NiemElementsInType = ElementsInType;
-			NiemEnumerations = Enumerations;
 			NiemTypes = Types;
 			referenceAbstractType = NiemTypes.get(localPrefix + hashDelimiter + abstractTypeName);
 			referenceAnyElement = (UmlClassInstance)NiemElements.get(XMLConstants.W3C_XML_SCHEMA_NS_URI + hashDelimiter + anyElementName);
@@ -540,7 +534,6 @@ class NiemTools {
 		} else if (rootPackage == subsetPackage) {
 			SubsetElements = Elements;
 			SubsetElementsInType = ElementsInType;
-			SubsetEnumerations = Enumerations;
 			SubsetTypes = Types;
 			subsetAbstractType = SubsetTypes.get(localPrefix + hashDelimiter + abstractTypeName);
 			subsetAugmentationType = SubsetTypes.get(structuresPrefix + hashDelimiter + augmentationTypeName);
@@ -552,7 +545,6 @@ class NiemTools {
 		if (rootPackage == extensionPackage) {
 			ExtensionElements = Elements;
 			ExtensionElementsInType = ElementsInType;
-			ExtensionEnumerations = Enumerations;
 			ExtensionTypes = Types;
 		}
 	}
@@ -738,6 +730,9 @@ class NiemTools {
 		SubsetTypes.put(typeClass.propertyValue(uriProperty), typeClass);
 		typeClass.set_Description(sourceType.description());
 		typeClass.set_PropertyValue(uriProperty, sourceType.propertyValue(uriProperty));
+		String codeList = sourceType.propertyValue(codeListProperty);
+		if (codeList != null)
+			typeClass.set_PropertyValue(codeListProperty, codeList);
 
 		// copy base type
 		for (UmlItem item : sourceType.children())
@@ -1261,12 +1256,12 @@ class NiemTools {
 					+ "<Key Id=\"codeKey\"><ShortName>CodeKey</ShortName><ColumnRef Ref=\"code\"/></Key>"
 					+ "</ColumnSet>"
 					+ "<SimpleCodeList>");
-			if (codeList.contains(";"))
+			if (codeList.contains(codeListDelimiter))
 			{	
-				String[] codes = codeList.split(";");
+				String[] codes = codeList.split(codeListDelimiter);
 				for (String code : codes)
 				{
-					String[] pairs = code.split("=");
+					String[] pairs = code.split(codeListDefDelimiter);
 					fw.write("<Row><Value ColumnRef=\"code\"><SimpleValue>" + pairs[0].trim() + "</SimpleValue></Value>");
 					if (pairs.length > 1)
 						fw.write("<Value ColumnRef=\"definition\"><SimpleValue>" + pairs[1].trim() + "</SimpleValue></Value>");
@@ -2051,6 +2046,20 @@ class NiemTools {
 											+ "\" w:isReference=\"false\" w:minOccurs=\"" + minoccurs
 											+ "\" w:maxOccurs=\"" + maxoccurs + "\"/>\n");
 								}
+							
+								// export enumerations
+								String codeList = c.propertyValue(codeListProperty);
+								if (codeList != null)
+								{
+									//UmlCom.trace("exportWantlist: Exporting numerations for " + c.pretty_name());
+									String[]codes = codeList.split(codeListDelimiter);
+									for (String co : codes)
+									{
+										co = co.trim();
+										if (!co.equals(""))
+											fw.write("<w:Facet w:facet=\"enumeration\" w:value=\"" + co + "\"/>");
+									}
+								}
 							fw.write("</w:Type>");
 						} 
 				}
@@ -2493,56 +2502,6 @@ class NiemTools {
 		return ns;
 	}
 
-	// import NIEM reference model elements in Types into HashMaps
-	public static void importEnumerations(DocumentBuilder db, String filename) {
-		// UmlCom.trace("Importing enumerations from schema " + filename);
-		String fn = "\n" + filename + "\n";
-		try {
-			// parse schema
-			Document doc = db.parse(new File(filename));
-			xPath.setNamespaceContext(new NamespaceResolver(doc, true));
-			Namespace ns = importNamespaces(doc);
-
-			// compile XPath queries
-			XPathExpression xe1 = xPath.compile("xs:enumeration");
-			XPathExpression xe2 = xPath.compile("xs:annotation[1]/xs:documentation[1]");
-
-			// import enumerated values for simple types (codes)
-			NodeList list = (NodeList) xPath.evaluate("xs:simpleType[@name]/xs:restriction[1]/[ns:enumeration]",
-					doc.getDocumentElement(), XPathConstants.NODESET);
-			for (int i = 0; i < list.getLength(); i++) {
-				Element r = (Element) list.item(i);
-				Element s = (Element) r.getParentNode();
-				String en = s.getAttribute("name");
-
-				// import elements in type
-				List<UmlExtraClassMember> cmlist = (List<UmlExtraClassMember>) (NiemEnumerations
-						.get(ns.schemaURI + hashDelimiter + en));
-				if (cmlist == null) {
-					cmlist = new ArrayList<UmlExtraClassMember>();
-					NiemEnumerations.put(ns.schemaURI + hashDelimiter + en, cmlist);
-				}
-				NodeList elist = (NodeList) xe1.evaluate(r, XPathConstants.NODESET);
-				for (int j = 0; j < elist.getLength(); j++) {
-					Element e = (Element) elist.item(j);
-					String et = e.getAttribute("value");
-					try {
-						UmlExtraClassMember cm = addEnumeration(ns.referenceClassView, ns.schemaURI, en, et);
-						cm.set_Description(xe2.evaluate(e));
-						cmlist.add(cm);
-					} catch (Exception re) {
-						UmlCom.trace(fn + "importEnumerations: cannot create value " + et + " in type " + en + " "
-								+ re.toString());
-						fn = "";
-					}
-				}
-			}
-		} catch (Exception e) {
-			UmlCom.trace(fn + "importEnumerations: " + e.toString());
-			fn = "";
-		}
-	}
-
 	// import namespaces and return target namespace
 	public static Namespace importNamespaces(Document doc) {
 		// reset prefixes
@@ -2631,6 +2590,17 @@ class NiemTools {
 		// Walk directory to import in passes (1: types, 2: elements, 3:
 		// elements in types, 4: enumerations
 		for (importPass = 0; importPass < passes; importPass++) {
+			switch (NiemTools.importPass) {
+			case 0:
+				UmlCom.trace("\nImporting types");
+				break;
+			case 1:
+				UmlCom.trace("\nImporting elements");
+				break;
+			case 2:
+				UmlCom.trace("\nImporting elements in types");
+				break;
+			}
 			Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -2647,8 +2617,9 @@ class NiemTools {
 					String filename = file.toString();
 					String filepath1 = filename.replaceFirst(java.util.regex.Matcher.quoteReplacement(importPath), "");
 					String filepath = filepath1.replaceAll(java.util.regex.Matcher.quoteReplacement("\\"), "/");
-					UmlCom.trace("Importing " + filepath);
 					if (filename.endsWith(".xsd"))
+					{
+						UmlCom.trace("Importing " + filepath);
 						switch (NiemTools.importPass) {
 						case 0:
 							Namespace ns = importTypes(db, filename);
@@ -2660,10 +2631,8 @@ class NiemTools {
 						case 2:
 							importElementsInTypes(db, filename);
 							break;
-							/*
-							 * case 3: importEnumerations(db, filename); break;
-							 */
 						}
+					}
 					return FileVisitResult.CONTINUE;
 				}
 			});
@@ -2691,6 +2660,8 @@ class NiemTools {
 
 			// compile XPath queries
 			XPathExpression xe = xPath.compile("xs:annotation[1]/xs:documentation[1]");
+			XPathExpression xe1 = xPath.compile("xs:restriction[1]/xs:enumeration");
+			//XPathExpression xe2 = xPath.compile("xs:annotation[1]/xs:documentation[1]");
 
 			// import types
 			NodeList list = (NodeList) xPath.evaluate("xs:complexType|xs:simpleType[@name]", doc.getDocumentElement(),
@@ -2707,7 +2678,21 @@ class NiemTools {
 					}
 					NiemTypes.put(c.propertyValue(uriProperty), c);
 					if (nodeType == "xs:simpleType")
+					{
 						c.set_Stereotype("enum_pattern");
+						// import enumerated values for simple types (codes)
+						NodeList elist = (NodeList) xe1.evaluate(e, XPathConstants.NODESET);
+						String codeList = "";
+						for (int j = 0; j < elist.getLength(); j++) {
+						  Element e2 = (Element) elist.item(j);
+						  String v = e2.getAttribute("value");
+						  //String d = xe2.evaluate(e2);
+						  //codeList += v + "=" + d + "; ";
+						  codeList += v + codeListDelimiter + " ";
+							}
+						if (!codeList.equals(""))
+					      c.set_PropertyValue(codeListProperty, codeList);
+					}
 				} catch (NullPointerException re) {
 					UmlCom.trace(fn + "importTypes: null pointer " + en);
 					fn = "";
