@@ -81,7 +81,6 @@ class NiemTools {
 	private static String codeListProperty = "codeList";
 	private static String codeListDelimiter = ";";
 	private static String codeListDefDelimiter = "=";
-	private static String multiplicityDelimiter = "\\.\\.";
 	public static final String niemStereotype = "niem-profile:niem";
 	private static String stereotypeDelimiter = ":";
 	private static String WSDLFile = "WebServices";
@@ -1688,7 +1687,7 @@ class NiemTools {
 										{
 											String inputMessage = c2.propertyValue(niemProperty(4));
 											if (inputMessage != null) {
-												//UmlCom.trace("Input Message: " + inputMessage);
+												//UmlCom.trace("Input Message: " + inputMessage + " from operation " + operationName);
 												messages.add(inputMessage);
 												if (param.multiplicity != null)
 													inputMessage = inputMessage + "," + param.multiplicity;
@@ -1715,7 +1714,7 @@ class NiemTools {
 								{
 									String outputMessage = c1.propertyValue(niemProperty(4));
 									if (outputMessage != null) {
-										//UmlCom.trace("Output Message: " + outputMessage);
+										//UmlCom.trace("Output Message: " + outputMessage + " from operation " + operationName);
 										messages.add(outputMessage);
 										outputMessages.put(operationName, outputMessage);
 									}
