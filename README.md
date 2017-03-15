@@ -1,5 +1,5 @@
 # niem-tools
-This is a <a href="http://bouml.fr">BOUML</a> "plugout" that supports mapping UML abstract class models to the NIEM 3 framework.
+This is a <a href="http://bouml.fr">BOUML</a> "plugout" that supports mapping UML abstract class models to the <a href="http://niem.gov">NIEM</a> 3 framework.
 
 <a href="http://mtgmc.com">MTG Management Consultants LLC</a> developed this UML-based tool for developing and managing NIEM architectures.  
 
