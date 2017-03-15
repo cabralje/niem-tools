@@ -1,11 +1,11 @@
 # niem-tools
-This is a <a href="http://bouml.fr">BOUML</a> "plugout" that supports mapping UML abstract class models to the <a href="http://niem.gov">NIEM</a> 3 framework.
+This is a [BOUML](http://bouml.fr "BOUML") "plugout" that supports mapping UML abstract class models to the [NIEM](http://niem.gov "NIEM") 3 framework.
 
-<a href="http://mtgmc.com">MTG Management Consultants LLC</a> developed this UML-based tool for developing and managing NIEM architectures.  
+[MTG Management Consultants LLC](http://mtgmc.com "MTG") developed this UML-based tool for developing and managing NIEM architectures.  
 
 The advantages relative to other tools include:
 
-<b>Standards-Based</b> – Conforms to UML 2.0 and NIEM NDR
+<b>Standards-Based</b> – Conforms to UML 2.0 and NIEM Naming and Design Rules (NDR)
 
 <b>Inexpensive</b> – An open source “plugout” module for BOUML, a low cost UML modeling program
 
