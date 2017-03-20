@@ -203,7 +203,7 @@ class Main
 					// Generate NIEM Mapping CSV
 					UmlCom.message("Generating NIEM Mapping CSV ...");
 					UmlCom.trace("Generating NIEM Mapping CSV");
-					NiemTools.exportCsv(htmlDir, "niem-mapping.csv", externalSchemas);
+					//NiemTools.exportCsv(htmlDir, "niem-mapping.csv", externalSchemas);
 
 					// Generate NIEM Wantlist instance
 					UmlCom.message("Generating NIEM Wantlist ...");

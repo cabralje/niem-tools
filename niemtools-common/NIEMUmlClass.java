@@ -58,6 +58,8 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
 class NiemTools {
+//	private static Boolean _TRACE = true;
+	private static Boolean _TRACE = false;
 	private static UmlClass referenceAbstractType = null;
 	private static UmlClass subsetAbstractType = null;
 	private static UmlClass subsetAugmentationType = null;
@@ -83,12 +85,12 @@ class NiemTools {
 	private static String codeListDefDelimiter = "=";
 	public static final String niemStereotype = "niem-profile:niem";
 	private static String stereotypeDelimiter = ":";
-	private static String WSDLFile = "WebServices";
+	private static String WSDLPrefix = "WSDL";
 	private static String WSDLXSDFile = "MessageWrappers";
 	private static String xmlPrefix = "xs";
 	private static Set<String> externalPrefixes = new HashSet<String>();
 	private static Map<String,String> externalSchemaURL = new HashMap<String,String>();
-	
+
 	// NIEM mapping spreadsheet column headings, NIEM profile profile stereotype
 	private static final String[][] map = { { "Model Class", "", }, { "Model Attribute", "", },
 			{ "Model Multiplicity", "", }, { "Model Definition", "", }, { "NIEM XPath", "XPath" },
@@ -148,14 +150,14 @@ class NiemTools {
 		//		if (isExternal(typeName))
 		//			return null;
 
-		// UmlCom.trace("Copying " + elementName + " to subset");
+		trace("Copying " + elementName + " to subset");
 		// get schemaURI
 		String prefix = getPrefix(elementName);
 		String schemaURI = Prefixes.get(prefix);
 		if (schemaURI == null)
 			schemaURI = extensionSchema(prefix);
 
-		// UmlCom.trace("Namespace found");
+		trace("Namespace found");
 		// if element already exists in subset, return
 		String elementName2 = getName(elementName);
 		UmlClassInstance element;
@@ -164,7 +166,7 @@ class NiemTools {
 		else
 			element = findElement(extensionPackage, schemaURI, elementName2);
 		if (element != null) {
-			// UmlCom.trace("Element " + element + " already exists in subset/extension");
+			trace("Element " + element + " already exists in subset/extension");
 			String currentNotes = element.propertyValue(notesProperty);
 			if (currentNotes == null)
 				currentNotes = notes;
@@ -204,7 +206,7 @@ class NiemTools {
 		}
 
 		// create element
-		// UmlCom.trace("Copying element " + element + " in subset");
+		trace("Copying element " + element + " in subset");
 		element = UmlClassInstance.create(nsClassView, elementName2, baseType);
 		element.set_Description(description);
 		element.set_PropertyValue(uriProperty, schemaURI + hashDelimiter + elementName2);
@@ -250,7 +252,7 @@ class NiemTools {
 		if (schemaURI == null)
 			schemaURI = extensionSchema(prefix);
 
-		// UmlCom.trace("Namespace found");
+		trace("Namespace found");
 		// if type already exists in subset, return
 		String typeName2 = getName(typeName);
 		UmlClass type = findType(extensionPackage, schemaURI, typeName2);
@@ -289,7 +291,7 @@ class NiemTools {
 			try {
 				at = UmlAttribute.create(type, propertyName2);
 			} catch (Exception re) {
-				// UmlCom.trace("addElementInType: element " + element.name() + " already exists in type " + type.name() + re.toString());
+				trace("addElementInType: element " + element.name() + " already exists in type " + type.name() + re.toString());
 			}
 		if (at != null) {
 			at.set_Description(element.description());
@@ -320,14 +322,14 @@ class NiemTools {
 		Namespace ns = Namespaces.get(schemaURI);
 		if (ns == null) {
 			// create namespace
-			// UmlCom.trace("Adding namespace " + schemaURI);
+			trace("Adding namespace " + schemaURI);
 			ns = new Namespace(schemaURI);
 			Namespaces.put(schemaURI, ns);
 		}
 		// remove special characters in prefix names
 		String prefix2 = prefix.replaceAll("[^a-zA-Z0-9-_]+","");
 		if (!Prefixes.containsKey(prefix2)) {
-			// UmlCom.trace("Adding prefix " + prefix2);
+			trace("Adding prefix " + prefix2);
 			Prefixes.put(prefix2, schemaURI);
 		}
 
@@ -335,11 +337,10 @@ class NiemTools {
 			if (ns.referenceClassView != null)
 				return ns.referenceClassView;
 		} else if (ns.nsClassView != null) {
-			// UmlCom.trace("Classview for subset/extension already exists for
-			// schema " + prefix);
+			trace("Classview for subset/extension already exists for schema " + prefix);
 			return ns.nsClassView;
 		}
-		// UmlCom.trace("Creating classview for " + schemaURI);
+		trace("Creating classview for " + schemaURI);
 		UmlClassView namespaceClassView = null;
 		try {
 			namespaceClassView = UmlClassView.create(parentPackage, prefix2);
@@ -359,7 +360,7 @@ class NiemTools {
 			ns.filepath = prefix2 + ".xsd";
 			namespaceClassView.set_PropertyValue(filepathProperty, prefix2 + ".xsd");
 		}
-		
+
 		return namespaceClassView;
 	}
 
@@ -369,14 +370,14 @@ class NiemTools {
 		//		if (isExternal(typeName))
 		//			return null;
 
-		// UmlCom.trace("Copying " + typeName + " to subset");
+		trace("Copying " + typeName + " to subset");
 		// get schemaURI
 		String prefix = getPrefix(typeName);
 		String schemaURI = Prefixes.get(prefix);
 		if (schemaURI == null)
 			schemaURI = extensionSchema(prefix);
 
-		// UmlCom.trace("Namespace found");
+		trace("Namespace found");
 		// if type already exists in subset, return
 		String typeName2 = getName(typeName);
 		UmlClass typeClass = findType(extensionPackage, schemaURI, typeName2);
@@ -403,11 +404,11 @@ class NiemTools {
 			return null;
 		}
 		// create type
-		// UmlCom.trace("Copying type " + typeName + " to subset");
+		trace("Copying type " + typeName + " to subset");
 		try {
 			typeClass = UmlClass.create(nsClassView, typeName2);
 		} catch (RuntimeException re) {
-			//UmlCom.trace("addType: type already exists in extension " + typeName);
+			trace("addType: type already exists in extension " + typeName);
 		}
 		if (typeClass != null)
 		{
@@ -423,11 +424,11 @@ class NiemTools {
 	public static UmlClass addType(UmlClassView parentClassView, String schemaURI, String tagName, String description, String notes) {
 		String tagName2 = tagName.replace("-", "");
 		// String tagName2 = tagName;
-		// UmlCom.trace("addType:"  + tagName);
+		trace("addType:"  + tagName);
 		UmlClass typeClass = findType((UmlPackage) (parentClassView.parent()), schemaURI, tagName2);
 		if (typeClass == null) {
 			//if (tagName2.equals("abstract"))
-			//	UmlCom.trace("findType: abstract");
+			trace("findType: abstract");
 			try {
 				typeClass = UmlClass.create(parentClassView, tagName2);
 			} catch (Exception e) {
@@ -446,7 +447,7 @@ class NiemTools {
 	public static void cacheModel(UmlPackage rootPackage) {
 		if (rootPackage == null)
 			return;
-		
+
 		// Cache namespaces, types and elements
 		String schemaURI;
 		Map<String, UmlItem> Elements = null;
@@ -475,7 +476,7 @@ class NiemTools {
 			schemaURI = cv.propertyValue(uriProperty);
 			String prefix = cv.pretty_name();
 			if (!Prefixes.containsKey(prefix)) {
-				//UmlCom.trace("Adding prefix " + prefix);
+				trace("Adding prefix " + prefix);
 				Prefixes.put(prefix, schemaURI);
 			}
 			Namespace ns = Namespaces.get(schemaURI);
@@ -491,7 +492,7 @@ class NiemTools {
 
 			if (rootPackage == referencePackage || rootPackage == extensionPackage)
 				ns.filepath = cv.propertyValue(filepathProperty);
-			
+
 			for (UmlItem c : cv.children()) {
 				schemaURI = c.propertyValue(uriProperty);
 				if (schemaURI != null)
@@ -518,7 +519,7 @@ class NiemTools {
 			}
 			for (UmlItem a : c.children())
 				if (a.kind() == anItemKind.anAttribute) {
-					// UmlCom.trace("Caching " + a.propertyValue(uriProperty));
+					trace("Caching " + a.propertyValue(uriProperty));
 					UmlClassInstance ci = (UmlClassInstance) Elements.get(a.propertyValue(uriProperty));
 					enlist.add(ci);
 				}
@@ -532,7 +533,7 @@ class NiemTools {
 			referenceAnyElement = (UmlClassInstance)NiemElements.get(XMLConstants.W3C_XML_SCHEMA_NS_URI + hashDelimiter + anyElementName);
 			//referenceAbstractType = findType(referencePackage, localSchemaURI + localPrefix, abstractTypeName);
 			//if (referenceAbstractType == null)
-			//	UmlCom.trace("cacheModel: reference abstract type not found");
+			trace("cacheModel: reference abstract type not found");
 		} else if (rootPackage == subsetPackage) {
 			SubsetElements = Elements;
 			SubsetElementsInType = ElementsInType;
@@ -542,7 +543,7 @@ class NiemTools {
 			subsetObjectType = SubsetTypes.get(structuresPrefix + hashDelimiter + objectTypeName);
 			//subsetAbstractType = findType(subsetPackage, localSchemaURI + localPrefix, abstractTypeName);
 			//if (subsetAbstractType == null)
-			//	UmlCom.trace("cacheModel: subset abstract type not found");
+			trace("cacheModel: subset abstract type not found");
 		}
 		if (rootPackage == extensionPackage) {
 			ExtensionElements = Elements;
@@ -558,7 +559,7 @@ class NiemTools {
 
 	// copy element from NIEM reference model to subset
 	public static UmlClassInstance copyElement(String elementName) {
-		// UmlCom.trace("Copying " + elementName + " to subset");
+		trace("Copying " + elementName + " to subset");
 		// get schemaURI
 		String prefix = getPrefix(elementName);
 		String schemaURI = Prefixes.get(prefix);
@@ -566,12 +567,12 @@ class NiemTools {
 			UmlCom.trace("Namespace not found for prefix " + prefix);
 			return null;
 		}
-		// UmlCom.trace("Namespace found");
+		trace("Namespace found");
 		// if element already exists in subset, return
 		String elementName2 = getName(elementName);
 		UmlClassInstance element = findElement(subsetPackage, schemaURI, elementName2);
 		if (element != null) {
-			// UmlCom.trace("Element " + element + " already exists in subset");
+			trace("Element " + element + " already exists in subset");
 			return element;
 		}
 
@@ -581,7 +582,7 @@ class NiemTools {
 			UmlCom.trace("Element " + schemaURI + namespaceDelimiter + elementName2 + " not found in reference");
 			return null;
 		}
-		// UmlCom.trace("Element found in reference model");
+		trace("Element found in reference model");
 
 		// if namespace doesn't exist, create it
 		UmlClassView nsClassView = addNamespace(subsetPackage, prefix, schemaURI);
@@ -613,7 +614,7 @@ class NiemTools {
 				}
 			}
 		// create element
-		// UmlCom.trace("Copying element " + element + " in subset");
+		trace("Copying element " + element + " in subset");
 		element = UmlClassInstance.create(nsClassView, elementName2, baseType);
 		element.set_Description(sourceElement.description());
 		element.set_PropertyValue(uriProperty, sourceElement.propertyValue(uriProperty));
@@ -628,7 +629,7 @@ class NiemTools {
 		if (schemaURI == null)
 			return null;
 
-		// UmlCom.trace("Namespace found");
+		trace("Namespace found");
 		// if type already exists in subset, return
 		String typeName2 = getName(typeName);
 		UmlClass type = findType(subsetPackage, schemaURI, typeName2);
@@ -642,11 +643,11 @@ class NiemTools {
 	// copy element in type from NIEM reference model to subset
 	public static UmlAttribute copyElementInType(UmlClass type, UmlClassInstance element, String multiplicity) {
 		/*
-		 * if (type == null) { UmlCom.trace("copElementInType: type is null");
+		 * if (type == null) { UmlCom.trace("copyElementInType: type is null");
 		 * return null; } if (element == null) {
 		 * UmlCom.trace("copElementInType: element is null"); return null; }
 		 */
-		// UmlCom.trace("copyElementInType: Adding " + element.pretty_name() + " to type " + type.pretty_name());
+		trace("copyElementInType: Adding " + element.pretty_name() + " to type " + type.pretty_name());
 		UmlAttribute at = null;
 		for (UmlItem item : type.children())
 		{
@@ -663,7 +664,7 @@ class NiemTools {
 			try {
 				at = UmlAttribute.create(type, element.pretty_name());
 			} catch (RuntimeException re) {
-				// UmlCom.trace("copyElementInType: attribute already exists " + element + " " + re.toString());
+				trace("copyElementInType: attribute already exists " + element + " " + re.toString());
 			}
 		if (at != null) {
 			at.set_Description(element.description());
@@ -679,7 +680,7 @@ class NiemTools {
 
 	// copy type from NIEM reference model to subset
 	public static UmlClass copyType(String typeName) {
-		// UmlCom.trace("Copying " + typeName + " to subset");
+		trace("Copying " + typeName + " to subset");
 		// get schemaURI
 		String prefix = getPrefix(typeName);
 		String schemaURI = Prefixes.get(prefix);
@@ -687,7 +688,7 @@ class NiemTools {
 			UmlCom.trace("copyType: Namespace not found for prefix " + prefix);
 			return null;
 		}
-		// UmlCom.trace("Namespace found");
+		trace("Namespace found");
 		// if type already exists in subset, return
 		String typeName2 = getName(typeName);
 		return copyType(schemaURI, prefix, typeName2);
@@ -697,7 +698,7 @@ class NiemTools {
 	public static UmlClass copyType(String schemaURI, String prefix, String typeName2) {
 		UmlClass typeClass = findType(subsetPackage, schemaURI, typeName2);
 		if (typeClass != null) {
-			// UmlCom.trace("Type " + typeName + " already exists in subset");
+			trace("Type " + typeName2 + " already exists in subset");
 			return typeClass;
 		}
 
@@ -707,17 +708,16 @@ class NiemTools {
 			UmlCom.trace("copyType: Type " + schemaURI + namespaceDelimiter + typeName2 + " not found in reference");
 			return null;
 		}
-		// UmlCom.trace("Type found in reference model");
+		trace("Type found in reference model");
 		// if namespace doesn't exist, create it
 		UmlClassView nsClassView = addNamespace(subsetPackage, prefix, schemaURI);
 		if (nsClassView == null) {
 			UmlCom.trace("copyType: Subset classview not found for " + schemaURI);
 			return null;
 		}
-		// UmlCom.trace("Subset classview created " + nsClassView.pretty_name()
-		// + " " + nsClassView.propertyValue(uriProperty));
+		trace("Subset classview created " + nsClassView.pretty_name() + " " + nsClassView.propertyValue(uriProperty));
 		// create type
-		//UmlCom.trace("Copying type " + typeName2 + " to subset schema " + nsClassView.pretty_name());
+		trace("Copying type " + typeName2 + " to subset schema " + nsClassView.pretty_name());
 		try {
 			typeClass = UmlClass.create(nsClassView, typeName2);
 		} catch (Exception e) {
@@ -770,7 +770,7 @@ class NiemTools {
 	public static void createNIEM(UmlPackage root) {
 		UmlPackage pimPackage = null;
 
-		//UmlCom.trace("Creating NIEM folders");
+		trace("Creating NIEM folders");
 		// Find or create NIEM package
 		for (UmlItem ch : root.children()) {
 			if (ch.pretty_name().equals("NIEM"))
@@ -781,7 +781,7 @@ class NiemTools {
 		}
 		if (pimPackage == null) {
 			pimPackage = UmlPackage.create(root, "NIEM");
-			// UmlCom.trace("Creating NIEM");
+			trace("Creating NIEM");
 		}
 
 		// Find or create package "NIEMSubset"
@@ -794,7 +794,7 @@ class NiemTools {
 		}
 		if (subsetPackage == null)
 		{
-			// UmlCom.trace("Creating NIEMSubset");
+			trace("Creating NIEMSubset");
 			subsetPackage = UmlPackage.create(pimPackage, "NIEMSubset");
 		}
 		// Find or create package "NIEMExtension"
@@ -807,7 +807,7 @@ class NiemTools {
 		}
 		if (extensionPackage == null)
 		{
-			// UmlCom.trace("Creating NIEMExtension");
+			trace("Creating NIEMExtension");
 			extensionPackage = UmlPackage.create(pimPackage, "NIEMExtension");
 		}
 
@@ -830,13 +830,13 @@ class NiemTools {
 
 		// String[] nextLine = new String[map.length];
 
-		//UmlCom.trace("Creating subset");
+		trace("Creating subset");
 		// cache NIEM namespaces, elements and types
-		//UmlCom.trace("createSubset: Cache reference model");
+		trace("createSubset: Cache reference model");
 		cacheModel(referencePackage);
-		//UmlCom.trace("createSubset: Cache subset model");
+		trace("createSubset: Cache subset model");
 		cacheModel(subsetPackage);
-		//UmlCom.trace("createSubset: Cache extension model");
+		trace("createSubset: Cache extension model");
 		cacheModel(extensionPackage);
 
 		// add abstract types
@@ -851,7 +851,7 @@ class NiemTools {
 		}
 
 		// Copy subset base types
-		//UmlCom.trace("createSubset: Copy subset base types");
+		trace("createSubset: Copy subset base types");
 		if (subsetObjectType == null)
 		{
 			subsetObjectType = copyType(structuresPrefix + namespaceDelimiter + objectTypeName);
@@ -874,7 +874,7 @@ class NiemTools {
 				{
 					if (isNiemType(baseTypeName)) 
 					{
-						// UmlCom.trace("Adding type " + baseTypeName + " to subset");
+						trace("Adding type " + baseTypeName + " to subset");
 						type = copyType(baseTypeName);
 						if (type != null)
 							SubsetTypes.put(type.propertyValue(uriProperty), type);
@@ -884,7 +884,7 @@ class NiemTools {
 		}
 
 		// Copy subset types and create extension types
-		//UmlCom.trace("createSubset: Copy subset types and create extension types");
+		trace("createSubset: Copy subset types and create extension types");
 		for (int i = 0; i < UmlItem.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
@@ -895,12 +895,12 @@ class NiemTools {
 				//				if (!typeName.equals("") && !typeName.equals("??") && !isExternal(typeName)) {
 				if (!typeName.equals("") && !typeName.equals("??")) {
 					if (isNiemType(typeName)) {
-						//UmlCom.trace("Adding type " + typeName + " to subset");
+						trace("Adding type " + typeName + " to subset");
 						type = copyType(typeName);
 						if (type != null)
 							SubsetTypes.put(type.propertyValue(uriProperty), type);
 					} else {
-						// UmlCom.trace("Adding type " + typeName + " to extension");
+						trace("Adding type " + typeName + " to extension");
 						String prefix = getPrefix(typeName);
 						String schemaURI = Prefixes.get(prefix);
 						Namespace ns = findNamespace(schemaURI);
@@ -913,7 +913,7 @@ class NiemTools {
 						if (type != null)
 						{
 							String uri = type.propertyValue(uriProperty);
-							// UmlCom.trace("Added " + uri + " to extension");
+							trace("Added " + uri + " to extension");
 							ExtensionTypes.put(uri, type);
 						}
 					}
@@ -922,7 +922,7 @@ class NiemTools {
 		}
 
 		// Copy subset elements and create extension elements
-		//UmlCom.trace("createSubset: Copy subset elements and create extension elements");
+		trace("createSubset: Copy subset elements and create extension elements");
 		for (int i = 0; i < UmlItem.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
@@ -956,7 +956,7 @@ class NiemTools {
 						if (isNillable)
 							e2 = e2.substring(1);
 						if (isNiemElement(e2)) {
-							//UmlCom.trace("Adding element " + e2 + " in subset");
+							trace("Adding element " + e2 + " in subset");
 							UmlClassInstance element = copyElement(e2);
 							if (element == null) {
 								UmlCom.trace("createSubset: could not create element " + e2);
@@ -970,7 +970,7 @@ class NiemTools {
 							if (!codeList.equals("") && (!substitution || representation))
 								element.set_PropertyValue(codeListProperty, codeList);
 							if (!representation && !typeName.equals("") && isNiemElementInType(typeName, e2)) {
-								//UmlCom.trace("Adding element " + e2 + " in type " + typeName + " in subset");
+								trace("Adding element " + e2 + " in type " + typeName + " in subset");
 								String cn = element.parent().propertyValue(uriProperty);
 								List<UmlClassInstance> enlist = (List<UmlClassInstance>) (SubsetElementsInType.get(cn));
 								if (enlist == null) {
@@ -980,7 +980,7 @@ class NiemTools {
 								copyElementInType(typeName, element, multiplicity);
 							}
 						} else {
-							//UmlCom.trace("Adding element " + e + " in extension");
+							trace("Adding element " + e + " in extension");
 							String prefix = getPrefix(e2);
 							String schemaURI = Prefixes.get(prefix);
 							String baseTagName = baseTypeName.trim();
@@ -1016,7 +1016,7 @@ class NiemTools {
 		}
 
 		// Create extension base types
-		//UmlCom.trace("createSubset: Copy subset base types and create extension base types");
+		trace("createSubset: Copy subset base types and create extension base types");
 		for (int i = 0; i < UmlItem.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
@@ -1054,7 +1054,7 @@ class NiemTools {
 					try {
 						UmlBaseRelation.create(aRelationKind.aGeneralisation, type, baseType);
 					} catch (Exception re) {
-						//UmlCom.trace("createSubset: " + typeName + " already related to " + baseTypeName + " " + re.toString());
+						trace("createSubset: " + typeName + " already related to " + baseTypeName + " " + re.toString());
 					}
 				}
 
@@ -1076,14 +1076,14 @@ class NiemTools {
 					try {
 						UmlBaseRelation.create(aRelationKind.aGeneralisation, type, subsetAugmentationType);
 					} catch (Exception re) {
-						//UmlCom.trace("createSubset: " + typeName + " already related to " + baseTypeName + " " + re.toString());
+						trace("createSubset: " + typeName + " already related to " + baseTypeName + " " + re.toString());
 					}
 				}
 			}
 		}
 
 		// Add extension elements in type
-		//UmlCom.trace("createSubset: Add extension elements in type");
+		trace("createSubset: Add extension elements in type");
 		for (int i = 0; i < UmlItem.all.size(); i++) {
 			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
@@ -1101,7 +1101,7 @@ class NiemTools {
 							Boolean isNillable = e1.startsWith("@");
 							if (isNillable)
 								e1 = e1.substring(1);
-							//UmlCom.trace("Adding element " + e1 + " in type " + typeName + " in subset");
+							trace("Adding element " + e1 + " in type " + typeName + " in subset");
 							UmlClassInstance element;
 							if (isNiemElement(e1))
 								element = findElement(subsetPackage, e1);
@@ -1125,7 +1125,7 @@ class NiemTools {
 		}
 
 		// Sorting
-		// UmlCom.trace("Sorting namespaces");
+		trace("Sorting namespaces");
 		subsetPackage.sort();
 		extensionPackage.sort();
 	}
@@ -1146,7 +1146,7 @@ class NiemTools {
 	public static void deleteNIEM(UmlPackage root) {
 		UmlPackage pimPackage = null;
 
-		//UmlCom.trace("Deleting PIM");
+		trace("Deleting PIM");
 		deleteSubset(root);
 
 		// Delete reference model
@@ -1176,7 +1176,7 @@ class NiemTools {
 			if (ch.pretty_name().equals("NIEMReference"))
 				if ((ch.kind().value() == anItemKind._aPackage)) {
 					referencePackage = (UmlPackage) ch;
-					//UmlCom.trace("Deleting NIEMExtension");
+					trace("Deleting NIEMExtension");
 					//subsetPackage.deleteIt();
 					break;
 				}
@@ -1189,7 +1189,7 @@ class NiemTools {
 	public static void deleteSubset(UmlPackage root) {
 		UmlPackage pimPackage = null;
 
-		//UmlCom.trace("Deleting Subset");
+		trace("Deleting Subset");
 
 		// Find PIM package
 		for (UmlItem ch : root.children()) {
@@ -1209,7 +1209,7 @@ class NiemTools {
 			if (ch.pretty_name().equals("NIEMSubset"))
 				if ((ch.kind().value() == anItemKind._aPackage)) {
 					subsetPackage = (UmlPackage) ch;
-					//UmlCom.trace("Deleting NIEMSubset");
+					trace("Deleting NIEMSubset");
 					//subsetPackage.deleteIt();
 					break;
 				}
@@ -1222,7 +1222,7 @@ class NiemTools {
 			if (ch.pretty_name().equals("NIEMExtension"))
 				if ((ch.kind().value() == anItemKind._aPackage)) {
 					extensionPackage = (UmlPackage) ch;
-					//UmlCom.trace("Deleting NIEMExtension");
+					trace("Deleting NIEMExtension");
 					//extensionPackage.deleteIt();
 					break;
 				}
@@ -1289,24 +1289,32 @@ class NiemTools {
 
 		UmlItem.directory = dir;
 
+		trace("Creating CSV file" + dir + "/" + filename);
+		
 		try {
 			FileWriter fw = new FileWriter(dir + "/" + filename);
 			CSVWriter writer = new CSVWriter(fw);
-
+			
+			trace("CSV file created " + dir + "/" + filename);
+			
 			// Write header
 			String[] nextLine = new String[map.length];
-			for (int i = 0; i < map.length; i++)
+			trace("Header");
+			for (int i = 0; i < map.length; i++) {
 				nextLine[i] = map[i][0];
+				trace(nextLine[i]);
+			}
 			writer.writeNext(nextLine);
 
 			// Export NIEM Mappings for Classes
+			trace("Rows");
 			for (int i = 0; i < UmlClass.classes.size(); i++) {
 				UmlItem c = (UmlItem) UmlClass.classes.elementAt(i);
 
 				if (c.stereotype().equals(niemStereotype)) {
 					nextLine = itemCsv(c);
-					// UmlCom.trace("0:" + nextLine[0] + " 1:" + nextLine[1] + "
-					// 2:" + nextLine[2] + " 3:" + nextLine[3] );
+					trace("0:" + nextLine[0] + " 1:" + nextLine[1] + 
+							"2:" + nextLine[2] + " 3:" + nextLine[3] );
 					writer.writeNext(nextLine);
 
 					// Export NIEM Mapping for Attributes and Relations
@@ -1314,9 +1322,9 @@ class NiemTools {
 						if (ch.stereotype().equals(niemStereotype)) {
 							nextLine = itemCsv(ch);
 							if (nextLine != null) {
-								// UmlCom.trace("0:" + nextLine[0] + " 1:" +
-								// nextLine[1] + " 2:" + nextLine[2] + " 3:" +
-								// nextLine[3] );
+								trace("0:" + nextLine[0] + " 1:" +
+									nextLine[1] + " 2:" + nextLine[2] + " 3:" +
+									nextLine[3] );
 								writer.writeNext(nextLine);
 							}
 						}
@@ -1438,7 +1446,7 @@ class NiemTools {
 
 					// Open file for each extension schema and write header
 					fw = new FileWriter(dir + "/" + prefix + ".xsd");
-					//UmlCom.trace("exportSchema: schema " + prefix + ".xsd");
+					trace("exportSchema: schema " + prefix + ".xsd");
 					//fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 					fw.write("<?xml version=\"1.0\" encoding=\"US-ASCII\"?>\n"
 							+ "<!-- NIEM extension schema generated by BOUML niemtools plug_out (https://github.com/cabralje/niem-tools) -->\n"
@@ -1471,7 +1479,7 @@ class NiemTools {
 					{
 						String nsSchemaURI = Prefixes.get(nsPrefix);
 						if (isExternalPrefix(nsPrefix))
-						    fw.write("<xs:import namespace=\"" + nsSchemaURI + "\" schemaLocation=\"" + externalSchemaURL.get(nsSchemaURI) + "\"/>");
+							fw.write("<xs:import namespace=\"" + nsSchemaURI + "\" schemaLocation=\"" + externalSchemaURL.get(nsSchemaURI) + "\"/>");
 						else {
 							Namespace ns = Namespaces.get(nsSchemaURI);
 							if (!nsSchemaURI.equals(schemaURI) && !nsSchemaURI.equals(localPrefix) && !nsSchemaURI.equals(XMLConstants.W3C_XML_SCHEMA_NS_URI) && ns != null)
@@ -1490,9 +1498,9 @@ class NiemTools {
 							if (mappingNotes != null && !mappingNotes.equals(""))
 								fw.write("<!--" + mappingNotes + "-->");
 							fw.write("<xs:complexType name=\"" + typeName + "\">\n"
-										+ "<xs:annotation>\n"
-											+ "<xs:documentation>" + description + "</xs:documentation>\n"
-										+ "</xs:annotation>\n"
+									+ "<xs:annotation>\n"
+									+ "<xs:documentation>" + description + "</xs:documentation>\n"
+									+ "</xs:annotation>\n"
 									+ "<xs:complexContent>\n");
 							String augmentationPoint = null, augmentationPointMin = null, augmentationPointMax = null;
 							for (UmlItem item3 : c.children())
@@ -1537,7 +1545,7 @@ class NiemTools {
 										if (Integer.parseInt(minoccurs) < 0)
 											throw new NumberFormatException();
 										if (!maxoccurs.equals("unbounded") && (Integer.parseInt(maxoccurs) < 1))
-												throw new NumberFormatException();
+											throw new NumberFormatException();
 									} catch (NumberFormatException e) {
 										UmlCom.trace("Invalid multiplicity " + multiplicity + " for " + prefix + namespaceDelimiter + typeName + "/" + elementName );
 									}
@@ -1622,7 +1630,7 @@ class NiemTools {
 							}
 						}
 				}
-			
+
 			// export catalog file
 			UmlCom.trace("Generating XML catalog");
 			fw = new FileWriter(dir + "/xml-catalog.xml");
@@ -1646,7 +1654,7 @@ class NiemTools {
 			fw.close();
 
 			// cache list of ports, operations and messages
-			//UmlCom.trace("exportSchema: cache ports, operations and messages");
+			trace("exportSchema: cache ports, operations and messages");
 			Map<String,UmlClass> ports = new TreeMap<String,UmlClass>();
 			Map<String,UmlOperation> operations = new TreeMap<String,UmlOperation>();
 			Set<String> messages = new TreeSet<String>();
@@ -1660,14 +1668,14 @@ class NiemTools {
 					UmlClass c = (UmlClass)item;
 					String portName = c.name();
 					ports.put(portName, c);
-					//UmlCom.trace("Port: " + c.name());
+					trace("Port: " + c.name());
 					for (UmlItem item2 : c.children())
 					{
 						if (item2.kind() == anItemKind.anOperation)
 						{
 							UmlOperation operation = (UmlOperation)item2;
 							String operationName = operation.name();
-							//UmlCom.trace("Operation: " + operationName);
+							trace("Operation: " + operationName);
 							operations.put(operationName,operation);
 							UmlClass c1 = null, c2=null;
 							UmlParameter[] params = operation.params();
@@ -1687,7 +1695,7 @@ class NiemTools {
 										{
 											String inputMessage = c2.propertyValue(niemProperty(4));
 											if (inputMessage != null) {
-												//UmlCom.trace("Input Message: " + inputMessage + " from operation " + operationName);
+												trace("Input Message: " + inputMessage + " from operation " + operationName);
 												messages.add(inputMessage);
 												if (param.multiplicity != null)
 													inputMessage = inputMessage + "," + param.multiplicity;
@@ -1714,7 +1722,7 @@ class NiemTools {
 								{
 									String outputMessage = c1.propertyValue(niemProperty(4));
 									if (outputMessage != null) {
-										//UmlCom.trace("Output Message: " + outputMessage + " from operation " + operationName);
+										trace("Output Message: " + outputMessage + " from operation " + operationName);
 										messages.add(outputMessage);
 										outputMessages.put(operationName, outputMessage);
 									}
@@ -1738,16 +1746,16 @@ class NiemTools {
 			fw.write(" xmlns:c=\"http://reference.niem.gov/niem/resource/mpd/catalog/3.0/\" xsi:schemaLocation=\"http://reference.niem.gov/niem/resource/mpd/catalog/3.0/ ../../mpd-toolkit-3.0/mpd-catalog-3.0.xsd\">");
 			fw.write("<c:MPD c:mpdURI=\"" + extensionSchema("") + "\" c:mpdClassURIList=\"http://reference.niem.gov/niem/specification/model-package-description/3.0/#MPD http://reference.niem.gov/niem/specification/model-package-description/3.0/#IEPD\" c:mpdName=\"" + IEPDName + "\" c:mpdVersionID=\"" + IEPDVersion + "\">"
 					+ "<c:MPDInformation>"
-						+ "<c:AuthoritativeSource>"
-							+ "<nc:EntityOrganization>"
-								+ "<nc:OrganizationName>" + IEPDOrganization + "</nc:OrganizationName>"
-								+ "<nc:OrganizationPrimaryContactInformation>"
-									+ "<nc:ContactWebsiteURI>" + IEPDContact + "</nc:ContactWebsiteURI>"
-								+ "</nc:OrganizationPrimaryContactInformation>"
-							+ "</nc:EntityOrganization>"
-						+ "</c:AuthoritativeSource>"
-						+ "<c:CreationDate>" + today + "</c:CreationDate>"
-						+ "<c:StatusText>" + IEPDStatus + "</c:StatusText>"
+					+ "<c:AuthoritativeSource>"
+					+ "<nc:EntityOrganization>"
+					+ "<nc:OrganizationName>" + IEPDOrganization + "</nc:OrganizationName>"
+					+ "<nc:OrganizationPrimaryContactInformation>"
+					+ "<nc:ContactWebsiteURI>" + IEPDContact + "</nc:ContactWebsiteURI>"
+					+ "</nc:OrganizationPrimaryContactInformation>"
+					+ "</nc:EntityOrganization>"
+					+ "</c:AuthoritativeSource>"
+					+ "<c:CreationDate>" + today + "</c:CreationDate>"
+					+ "<c:StatusText>" + IEPDStatus + "</c:StatusText>"
 					+ "</c:MPDInformation>");
 
 			for (String message : messages)
@@ -1765,7 +1773,7 @@ class NiemTools {
 					fw.write("<nc:DescriptionText>" + ci.description() + "</nc:DescriptionText>");
 				fw.write("<c:HasDocumentElement c:qualifiedNameList=\"" + message + "\"/>"
 						+ "<c:XMLSchemaValid>"
-							+ "<c:XMLCatalog c:pathURI=\"xml-catalog.xml\"/>"
+						+ "<c:XMLCatalog c:pathURI=\"xml-catalog.xml\"/>"
 						+ "</c:XMLSchemaValid>"
 						+ "<c:IEPSampleXMLDocument c:pathURI=\"" + elementName + ".xml\"/>"
 						+ "</c:IEPConformanceTarget>");
@@ -1788,7 +1796,7 @@ class NiemTools {
 			fw.close();
 
 			// export WSDL definitions
-			String WSDLURI = IEPDURI + WSDLFile;
+			String WSDLURI = IEPDURI + WSDLPrefix;
 			String WSDLXSDURI = IEPDURI + WSDLXSDFile;
 
 			UmlCom.trace("Generating document/literal wrapper schema");
@@ -1818,7 +1826,7 @@ class NiemTools {
 						fw.write("<xs:import namespace=\"" + Prefixes.get(nsPrefix) + "\" schemaLocation=\"" + ns.filepath + "\"/>");
 				}
 			}
-			
+
 			fw.write("<!-- document/literal wrappers -->");
 			for (UmlOperation operation : operations.values())
 			{
@@ -1849,12 +1857,12 @@ class NiemTools {
 								maxoccurs = occurs[1];
 							} else minoccurs = maxoccurs = mult;
 						}
-							
+
 						if (isExternalPrefix(getPrefix(inputMessage2)))
 							fw.write("<!--xs:element ref=\"" + inputMessage2 + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/-->\n");
 						else
 							fw.write("<xs:element ref=\"" + inputMessage2 + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/>\n");
-					
+
 					}
 					fw.write("</xs:sequence>"
 							+ "</xs:complexType>"
@@ -1878,43 +1886,53 @@ class NiemTools {
 			fw.write("</xs:schema>");
 			fw.close();
 
-			UmlCom.trace("Generating WSDL");
-			fw = new FileWriter(dir + "/" + WSDLFile + ".wsdl");
-			fw.write("<definitions targetNamespace=\"" + WSDLURI + "\" xmlns:tns=\"" + WSDLURI + "\""
-					+ " xmlns:wrapper=\"" + WSDLXSDURI + "\""
-					+ " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
-					+ " xmlns:soap=\"http://schemas.xmlsoap.org/wsdl/soap/\""
-					+ " xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\""
-					+ " xmlns=\"http://schemas.xmlsoap.org/wsdl/\""
-					+ " xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\""
-					+ " xmlns:wsrmp=\"http://docs.oasis-open.org/ws-rx/wsrmp/200702\""
-					+ " xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-361 wssecurity-utility-1.0.xsd\">"					
-					+ "<wsp:UsingPolicy wsdl:required=\"true\"/>"
-					+ "<wsp:Policy wsu:Id=\"MyPolicy\">"
-						+ "<wsrmp:RMAssertion/>"
-					+ "</wsp:Policy>"
-					+ "<wsdl:types>"
-						+ "<xsd:schema>"
-							+ "<xsd:import namespace=\"" + WSDLXSDURI + "\" schemaLocation=\"" + WSDLXSDFile + ".xsd\"/>"
-						+ "</xsd:schema>"
-					+ "</wsdl:types>");
-
-			fw.write("<!-- messages -->");
-			for (UmlOperation operation : operations.values())
-			{   
-				String operationName = operation.name();
-				fw.write("<message name=\"" + operationName + "Request\">"
-							+ "<part name=\"body\" element=\"" + "wrapper:" + operationName+ "Request\"/>"
-						+ "</message>"
-						+ "<message name=\"" + operationName + "Response\">"
-							+ "<part name=\"body\" element=\"" + "wrapper:" + operationName+ "Response\"/>"
-						+ "</message>");
-			}
-
-			fw.write("<!-- ports -->");
+			UmlCom.trace("Generating WSDLs");
 			for (UmlClass port : ports.values())
 			{
 				String portName = port.name();
+				fw = new FileWriter(dir + "/" + portName + ".wsdl");
+				fw.write("<definitions targetNamespace=\"" + WSDLURI + "/" + portName + "\" xmlns:tns=\"" + WSDLURI + "/" + portName + "\""
+						+ " xmlns:wrapper=\"" + WSDLXSDURI + "\""
+						+ " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
+						+ " xmlns:soap=\"http://schemas.xmlsoap.org/wsdl/soap/\""
+						+ " xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\""
+						+ " xmlns=\"http://schemas.xmlsoap.org/wsdl/\""
+						+ " xmlns:wsp=\"http://schemas.xmlsoap.org/ws/2004/09/policy\""
+						+ " xmlns:wsrmp=\"http://docs.oasis-open.org/ws-rx/wsrmp/200702\""
+						+ " xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-361 wssecurity-utility-1.0.xsd\">"					
+						+ "<wsp:UsingPolicy wsdl:required=\"true\"/>"
+						+ "<wsp:Policy wsu:Id=\"MyPolicy\">"
+						+ "<wsrmp:RMAssertion/>"
+						+ "</wsp:Policy>"
+						+ "<wsdl:types>"
+						+ "<xsd:schema>"
+						+ "<xsd:import namespace=\"" + WSDLXSDURI + "\" schemaLocation=\"" + WSDLXSDFile + ".xsd\"/>"
+						+ "</xsd:schema>"
+						+ "</wsdl:types>");
+
+				fw.write("<!-- messages -->");
+				//			for (UmlOperation operation : operations.values())
+				//			{   
+				//				String operationName = operation.name();
+				for (UmlItem item : port.children())
+				{
+					if (item.kind() == anItemKind.anOperation)
+					{
+						UmlOperation operation = (UmlOperation)item;
+						String operationName = operation.name();	
+						fw.write("<message name=\"" + operationName + "Request\">"
+								+ "<part name=\"body\" element=\"" + "wrapper:" + operationName+ "Request\"/>"
+								+ "</message>"
+								+ "<message name=\"" + operationName + "Response\">"
+								+ "<part name=\"body\" element=\"" + "wrapper:" + operationName+ "Response\"/>"
+								+ "</message>");
+					}
+				}
+
+				fw.write("<!-- ports -->");
+				//			for (UmlClass port : ports.values())
+				//			{
+				//				String portName = port.name();
 				fw.write("<portType name=\"" + portName + "\">");
 				for (UmlItem item : port.children())
 				{
@@ -1923,18 +1941,18 @@ class NiemTools {
 						UmlOperation operation = (UmlOperation)item;
 						String operationName = operation.name();						
 						fw.write("<operation name=\"" + operationName + "\">"
-									+ "<input message=\"tns:" + operationName + "Request\"/>"
-									+ "<output message=\"tns:" + operationName + "Response\"/>"
+								+ "<input message=\"tns:" + operationName + "Request\"/>"
+								+ "<output message=\"tns:" + operationName + "Response\"/>"
 								+ "</operation>");
 					}
 				}
 				fw.write("</portType>");
-			}
+				//		}
 
-			fw.write("<!-- bindings -->");
-			for (UmlClass port : ports.values())
-			{
-				String portName = port.name();
+				fw.write("<!-- bindings -->");
+				//			for (UmlClass port : ports.values())
+				//			{
+				//				String portName = port.name();
 				fw.write("<binding name=\"" + portName + "Soap\" type=\"tns:" + portName + "\">"
 						+ "<wsp:PolicyReference URI=\"#MyPolicy\"/>"
 						+ "<soap:binding style=\"document\" transport=\"http://schemas.xmlsoap.org/soap/http\"/>");
@@ -1946,21 +1964,21 @@ class NiemTools {
 						String operationName = oper.name();
 						fw.write("<operation name=\"" + operationName + "\">"
 								+ "<soap:operation soapAction=\"" + WSDLURI + "/" + portName + "/" + operationName + "\"/>"
-									+ "<input>"
-										+ "	<soap:body use=\"literal\"/>"
-									+ "</input>"
-									+ "<output>"
-										+ "	<soap:body use=\"literal\"/>"
-										+ "</output>"
+								+ "<input>"
+								+ "	<soap:body use=\"literal\"/>"
+								+ "</input>"
+								+ "<output>"
+								+ "	<soap:body use=\"literal\"/>"
+								+ "</output>"
 								+ "</operation>");
 					}
 				}
 				fw.write("</binding>");
+				//			}
+				fw.write("<!-- services not defined here...defined in an implementation-specific WSDL that imports this one -->"
+						+ "</definitions>");
+				fw.close();
 			}
-			fw.write("<!-- services not defined here...defined in an implementation-specific WSDL that imports this one -->"
-					+ "</definitions>");
-			fw.close();
-
 		} catch (IOException e) {
 			UmlCom.trace("exportSchema: IO exception: " + e.toString());
 		}
@@ -1975,7 +1993,7 @@ class NiemTools {
 		UmlItem.directory = dir;
 		try {
 			// Export schema
-			//UmlCom.trace("exportWantlist: create header");
+			trace("exportWantlist: create header");
 			FileWriter fw = new FileWriter(dir + "/" + filename);
 			fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 			fw.write("<!-- NIEM wantlist generated by BOUML niemtools plug_out (https://github.com/cabralje/niem-tools) -->\n");
@@ -2005,7 +2023,7 @@ class NiemTools {
 							String elementName = ci.name();
 							if (prefix.equals(xmlPrefix) && elementName.equals(anyElementName))
 								continue;
-							//UmlCom.trace("exportWantlist: export element " + elementName);
+							trace("exportWantlist: export element " + elementName);
 							String isNillable = ci.propertyValue(nillableProperty);
 							if (isNillable == null)
 								isNillable = "false";
@@ -2028,7 +2046,7 @@ class NiemTools {
 						{
 							UmlClass c = (UmlClass)item2;
 							String typeName = c.name();
-							//UmlCom.trace("exportWantlist: export type " + typeName);
+							trace("exportWantlist: export type " + typeName);
 							if (prefix.equals(structuresPrefix) && typeName.equals(augmentationTypeName))
 								continue;
 							fw.write("<w:Type w:name=\"" + prefix + namespaceDelimiter + typeName + "\" w:isRequested=\"true\">\n");
@@ -2041,9 +2059,9 @@ class NiemTools {
 									UmlClassInstance ci = (UmlClassInstance)SubsetElements.get(uri);
 									String elementPrefix = ci.parent().name();
 									String elementName = a.name();
-									//UmlCom.trace("exportWantlist: adding attribute " + elementName);
+									trace("exportWantlist: adding attribute " + elementName);
 									String multiplicity = a.multiplicity();
-									//UmlCom.trace("exportWantlist: with multiplicity " + multiplicity);
+									trace("exportWantlist: with multiplicity " + multiplicity);
 									String minoccurs, maxoccurs;
 									if ((multiplicity.equals("")))
 										minoccurs = maxoccurs = "1";
@@ -2057,32 +2075,32 @@ class NiemTools {
 										if (Integer.parseInt(minoccurs) < 0)
 											throw new NumberFormatException();
 										if (!maxoccurs.equals("unbounded") && (Integer.parseInt(maxoccurs) < 1))
-												throw new NumberFormatException();
+											throw new NumberFormatException();
 									} catch (NumberFormatException e) {
 										UmlCom.trace("Invalid multiplicity " + multiplicity + " for " + prefix + namespaceDelimiter + typeName + "/" + elementPrefix + namespaceDelimiter + elementName );
 									}
 									//if (((!minoccurs.equals("0") && !minoccurs.equals("1"))) || ((!maxoccurs.equals("1") && !maxoccurs.equals("unbounded"))))
 									//	UmlCom.trace("createSubset: unusual multiplicity " + multiplicity + " for element " + elementName);;
 
-									//UmlCom.trace("exportWantlist: export element " + elementName + " in type " + typeName);
+									trace("exportWantlist: export element " + elementName + " in type " + typeName);
 									fw.write("\t<w:ElementInType w:name=\"" + elementPrefix + namespaceDelimiter + elementName
 											+ "\" w:isReference=\"false\" w:minOccurs=\"" + minoccurs
 											+ "\" w:maxOccurs=\"" + maxoccurs + "\"/>\n");
 								}
-							
-								// export enumerations
-								String codeList = c.propertyValue(codeListProperty);
-								if (codeList != null)
+
+							// export enumerations
+							String codeList = c.propertyValue(codeListProperty);
+							if (codeList != null)
+							{
+								trace("exportWantlist: Exporting numerations for " + c.pretty_name());
+								String[]codes = codeList.split(codeListDelimiter);
+								for (String co : codes)
 								{
-									//UmlCom.trace("exportWantlist: Exporting numerations for " + c.pretty_name());
-									String[]codes = codeList.split(codeListDelimiter);
-									for (String co : codes)
-									{
-										co = co.trim();
-										if (!co.equals(""))
-											fw.write("<w:Facet w:facet=\"enumeration\" w:value=\"" + co + "\"/>");
-									}
+									co = co.trim();
+									if (!co.equals(""))
+										fw.write("<w:Facet w:facet=\"enumeration\" w:value=\"" + co + "\"/>");
 								}
+							}
 							fw.write("</w:Type>");
 						} 
 				}
@@ -2147,7 +2165,7 @@ class NiemTools {
 	// get type by schemaURI and tagname
 	public static UmlClass findType(UmlPackage parentPackage, String schemaURI, String tagName) 
 	{
-		// UmlCom.trace("findType: " + schemaURI + namespaceDelimiter + tagName);
+		trace("findType: " + schemaURI + namespaceDelimiter + tagName);
 		if (tagName.equals("abstract"))
 		{
 			if (parentPackage == referencePackage)
@@ -2294,7 +2312,7 @@ class NiemTools {
 
 	// import NIEM reference model elements into HashMaps
 	public static Namespace importElements(DocumentBuilder db, String filename) {
-		// UmlCom.trace("Importing elements from schema " + filename);
+		trace("Importing elements from schema " + filename);
 		String fn = "\n" + filename + "\n";
 		Namespace ns = null;
 		try {
@@ -2329,13 +2347,13 @@ class NiemTools {
 			UmlCom.trace(fn + "importElements: " + e.toString());
 			fn = "";
 		}
-		
+
 		return ns;
 	}
 
 	// import NIEM reference model elements in Types into HashMaps
 	public static Namespace importElementsInTypes(DocumentBuilder db, String filename) {
-		// UmlCom.trace("Importing elements in types from schema " + filename);
+		trace("Importing elements in types from schema " + filename);
 		String fn = "\n" + filename + "\n";
 		Document doc = null;
 		Namespace ns = null;
@@ -2521,7 +2539,7 @@ class NiemTools {
 				UmlCom.trace(filename + "\nimportElementsInTypes: import elements in type " + re.toString());
 			}
 		}
-		
+
 		return ns;
 	}
 
@@ -2562,7 +2580,7 @@ class NiemTools {
 	// import NIEM reference model into HashMaps to support validation of NIEM
 	// elements and types
 	public static void importSchemaDir(String dir, Boolean includeEnums, String externalSchemas) throws IOException {
-	
+
 		// cache reference model
 		cacheModel(referencePackage);
 		setExternalSchemas(externalSchemas);
@@ -2607,7 +2625,7 @@ class NiemTools {
 		Path path = FileSystems.getDefault().getPath(dir);
 		String importPath = path.toString();
 		//String importPath = "";
-		
+
 		int passes = (includeEnums) ? 4 : 3;
 
 		// Walk directory to import in passes (1: types, 2: elements, 3:
@@ -2672,7 +2690,7 @@ class NiemTools {
 
 	// import NIEM reference model types into HashMaps
 	public static Namespace importTypes(DocumentBuilder db, String filename) {
-		// UmlCom.trace("Importing types from schema " + filename);
+		trace("Importing types from schema " + filename);
 		String fn = "\n" + filename + "\n";
 		Namespace ns = null;
 		try {
@@ -2707,14 +2725,14 @@ class NiemTools {
 						NodeList elist = (NodeList) xe1.evaluate(e, XPathConstants.NODESET);
 						String codeList = "";
 						for (int j = 0; j < elist.getLength(); j++) {
-						  Element e2 = (Element) elist.item(j);
-						  String v = e2.getAttribute("value");
-						  //String d = xe2.evaluate(e2);
-						  //codeList += v + "=" + d + "; ";
-						  codeList += v + codeListDelimiter + " ";
-							}
+							Element e2 = (Element) elist.item(j);
+							String v = e2.getAttribute("value");
+							//String d = xe2.evaluate(e2);
+							//codeList += v + "=" + d + "; ";
+							codeList += v + codeListDelimiter + " ";
+						}
 						if (!codeList.equals(""))
-					      c.set_PropertyValue(codeListProperty, codeList);
+							c.set_PropertyValue(codeListProperty, codeList);
 					}
 				} catch (NullPointerException re) {
 					UmlCom.trace(fn + "importTypes: null pointer " + en);
@@ -2731,7 +2749,7 @@ class NiemTools {
 			UmlCom.trace(fn + "importTypes: " + re.toString());
 			fn = "";
 		}
-		
+
 		return ns;
 	}
 
@@ -2772,7 +2790,7 @@ class NiemTools {
 		if (elementName.equals("") || elementName.equals("??") || isExternalPrefix(getPrefix(elementName)))
 			return false;
 
-		// UmlCom.trace("isNiemElement: Find element " + elementName);
+		trace("isNiemElement: Find element " + elementName);
 		String prefix = getPrefix(elementName);
 		String schemaURI = Prefixes.get(prefix);
 		if (schemaURI == null) {
@@ -2781,14 +2799,13 @@ class NiemTools {
 		}
 		String tagName = getName(elementName);
 		String tagName2 = tagName.replace("-", "");
-		// UmlCom.trace("isNiemElement Searching for element " + schemaURI +
-		// hashDelimiter + tagName2);
+		trace("isNiemElement Searching for element " + schemaURI + hashDelimiter + tagName2);
 		return NiemElements.containsKey(schemaURI + hashDelimiter + tagName2);
 	}
 
 	// get type by prefix and tagname
 	public static Boolean isNiemElementInType(String typeName, String elementName) {
-		//UmlCom.trace("isNiemElement: is element " + elementName + " in type " + typeName + "?");
+		trace("isNiemElement: is element " + elementName + " in type " + typeName + "?");
 		if (!isNiemType(typeName) || !isNiemElement(elementName))
 			return false;
 
@@ -2946,11 +2963,18 @@ class NiemTools {
 		}
 	}
 
+	// output debugging information
+	public static void trace(String output)
+	{
+		if (_TRACE)
+			UmlCom.trace(output);
+	}
+	
 	// verify reference model exists (NIEM)
 	public static boolean verifyNIEM(UmlPackage root) {
 		UmlPackage pimPackage = null;
 
-		//UmlCom.trace("Creating NIEM folders");
+		trace("Creating NIEM folders");
 		// Find NIEM package
 		for (UmlItem ch : root.children()) {
 			if (ch.pretty_name().equals("NIEM"))
@@ -2998,7 +3022,7 @@ class NiemTools {
 	public static void writeLineHtml(FileWriter fw, UmlItem item) {
 		try {
 			// Export Class, Property and Multiplicity
-			// UmlCom.trace(item.pretty_name());
+			trace(item.pretty_name());
 			switch (item.kind().value()) {
 			case anItemKind._aClass: {
 				fw.write("<tr bgcolor=\"#f0f0f0\"><td style=\"word-wrap: break-word\">");
@@ -3061,7 +3085,7 @@ class NiemTools {
 				}
 
 				// determine if this is an extension		
-/*				Boolean extension = false;
+				/*				Boolean extension = false;
 				String[] xPathElements = column[4].split("/");
 				for (String element : xPathElements)
 				{
@@ -3146,7 +3170,7 @@ class NiemTools {
 					if (Integer.parseInt(minoccurs) < 0)
 						throw new NumberFormatException();
 					if (!maxoccurs.equals("unbounded") && (Integer.parseInt(maxoccurs) < 1))
-							throw new NumberFormatException();
+						throw new NumberFormatException();
 				} catch (NumberFormatException e) {
 					fgcolor = invalidFGColor;
 				}
