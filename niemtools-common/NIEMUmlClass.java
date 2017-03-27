@@ -383,6 +383,9 @@ class NiemTools {
 		UmlClass typeClass = findType(extensionPackage, schemaURI, typeName2);
 		if (typeClass != null)
 		{
+			String currentDescription = typeClass.description();
+			if ((currentDescription.equals("")) && (description != null))
+				typeClass.set_Description(description);
 			String currentNotes = typeClass.propertyValue(notesProperty);
 			if (currentNotes == null)
 				currentNotes = notes;
@@ -889,8 +892,13 @@ class NiemTools {
 			UmlItem c = (UmlItem) UmlItem.all.elementAt(i);
 			if (c.stereotype().equals(niemStereotype)) {
 				String typeName = c.propertyValue(niemProperty(5)).trim();
+				String elementName = c.propertyValue(niemProperty(6)).trim();
 				String notes = c.propertyValue(niemProperty(11)).trim();
-				String description = c.description().trim();
+				String description = null;
+				if (elementName.equals(""))
+					description = c.description().trim();
+				if (typeName.endsWith("AugmentationType"))
+					description = "An augmentation type";
 
 				//				if (!typeName.equals("") && !typeName.equals("??") && !isExternal(typeName)) {
 				if (!typeName.equals("") && !typeName.equals("??")) {
@@ -934,6 +942,9 @@ class NiemTools {
 				String mappingNotes = c.propertyValue(niemProperty(11)).trim();
 				String codeList = c.propertyValue(niemProperty(12)).trim();
 
+				if (elementName.contains("Augmentation"))
+					description = "An augmentation";
+				
 				//				if (!elementName.equals("") && !elementName.equals("??") && !isExternal(elementName)) {
 				if (!elementName.equals("") && !elementName.equals("??")) {
 					//	String elementName2 = elementName.replace(" ", "").replace("(", "").replace(")", "");
