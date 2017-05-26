@@ -309,7 +309,8 @@ class NiemTools {
 	public static UmlExtraClassMember addEnumeration(UmlClassView parentClassView, String schemaURI, String typeName,
 			String propertyName) {
 		// String propertyName2 = propertyName.replace("-", "");
-		String propertyName2 = propertyName;
+		String propertyName2 = propertyName.replace("\"", "&quot;");
+		//String propertyName2 = propertyName;
 		UmlClass type = findType((UmlPackage) (parentClassView.parent()), schemaURI, typeName);
 		if (type == null)
 			return null;
@@ -346,7 +347,7 @@ class NiemTools {
 			namespaceClassView = UmlClassView.create(parentPackage, prefix2);
 			namespaceClassView.set_PropertyValue(uriProperty, schemaURI);
 		} catch (Exception e) {
-			UmlCom.trace("Multiple namespace URIs for prefix " + prefix2);
+			UmlCom.trace("Multiple namespace URIs for prefix " + prefix2 + " " + schemaURI + " and " + Prefixes.get(prefix2));
 			namespaceClassView = UmlClassView.create(parentPackage, prefix2 + "-" + ThreadLocalRandom.current().nextInt());
 		}
 		if (parentPackage == referencePackage)
