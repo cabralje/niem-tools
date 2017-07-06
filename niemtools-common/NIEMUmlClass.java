@@ -1869,7 +1869,9 @@ class NiemTools {
 								maxoccurs = occurs[1];
 							} else minoccurs = maxoccurs = mult;
 						}
-
+						if (maxoccurs.equals("*"))
+							maxoccurs = "unbounded";
+						
 						if (isExternalPrefix(getPrefix(inputMessage2)))
 							fw.write("<!--xs:element ref=\"" + inputMessage2 + "\" minOccurs=\"" + minoccurs + "\" maxOccurs=\"" + maxoccurs + "\"/-->\n");
 						else
@@ -2229,12 +2231,12 @@ class NiemTools {
 	// return NIEM version
 	public static String getNiemVersion() {
 		String niemVersion = "3.2";
-		String schemaURI = Prefixes.get("nc");
+	/*	String schemaURI = Prefixes.get("nc");
 		//Matcher mat = Pattern.compile(".*?niem-core/.*?").matcher(schemaURI);
 		Matcher mat = Pattern.compile(".*niem-core/(.*?)/").matcher(schemaURI);
 		//UmlCom.trace("NIEM URI: " + schemaURI);
 		if (mat.find())
-			niemVersion = mat.group(1);
+			niemVersion = mat.group(1); */
 		UmlCom.trace("NIEM version: " + niemVersion);
 		return niemVersion;
 	}
