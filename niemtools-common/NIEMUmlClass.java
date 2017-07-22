@@ -1611,7 +1611,7 @@ class NiemTools {
 							{
 								String codeListURI = extensionSchema(elementName);
 								fw.write("<xs:appinfo>"
-										+ "<clsa:SimpleCodeListBinding codeListURI=\"" + codeListURI + "\" columnName=\"code\"/>"
+										+ "<clsa:SimpleCodeListBinding codeListURI=\"" + codeListURI + "/>"
 										+" </xs:appinfo>");
 								exportCodeList(dir, elementName, codeListURI, codeList, IEPDVersion, today);
 								CodeListNamespaces.add(elementName);
