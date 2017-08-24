@@ -1706,11 +1706,13 @@ class NiemTools {
 										if (c2.stereotype().equals(niemStereotype))
 										{
 											String inputMessage = c2.propertyValue(niemProperty(4));
-											if (inputMessage != null) {
+											if (inputMessage != null && !inputMessage.equals("")) {
 												trace("Input Message: " + inputMessage + " from operation " + operationName);
 												messages.add(inputMessage);
 												if (param.multiplicity != null)
 													inputMessage = inputMessage + "," + param.multiplicity;
+												else
+													inputMessage = inputMessage + ",1";													
 												ArrayList<String> inputs = inputMessages.get(operationName);
 												if (inputs==null)
 													inputs = new ArrayList<String>();
@@ -1733,7 +1735,7 @@ class NiemTools {
 								if (c1.stereotype().equals(niemStereotype))
 								{
 									String outputMessage = c1.propertyValue(niemProperty(4));
-									if (outputMessage != null) {
+									if (outputMessage != null && !outputMessage.equals("")) {
 										trace("Output Message: " + outputMessage + " from operation " + operationName);
 										messages.add(outputMessage);
 										outputMessages.put(operationName, outputMessage);
@@ -1843,6 +1845,7 @@ class NiemTools {
 			for (UmlOperation operation : operations.values())
 			{
 				String operationName = operation.name();
+				trace("Generating document/literal wrapper for " + operationName);
 				ArrayList<String> inputs = inputMessages.get(operationName);
 				if (inputs != null)
 				{
@@ -1852,12 +1855,14 @@ class NiemTools {
 					for (String inputMessage : inputs)
 					{
 						String inputMessage2 = inputMessage;
-						String mult = "";
+						String mult = "1";
 						if (inputMessage.contains(","))
 						{
 							String inputMessageParts[] = inputMessage.split(",");
 							inputMessage2 = inputMessageParts[0];
-							mult = inputMessageParts[1];
+							if (inputMessageParts.length > 1) {
+								mult = inputMessageParts[1];
+							}
 						}
 						String minoccurs = "1";
 						String maxoccurs = "1";
@@ -1905,6 +1910,7 @@ class NiemTools {
 			{
 				String portName = port.name();
 				fw = new FileWriter(dir + "/" + portName + ".wsdl");
+				// UmlCom.trace("WSDL: " + portName + ".wsdl");
 				fw.write("<definitions targetNamespace=\"" + WSDLURI + "/" + portName + "\" xmlns:tns=\"" + WSDLURI + "/" + portName + "\""
 						+ " xmlns:wrapper=\"" + WSDLXSDURI + "\""
 						+ " xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\""
@@ -2248,7 +2254,7 @@ class NiemTools {
 		int i = typeName.indexOf(namespaceDelimiter);
 		return (i >= 0) ? typeName.substring(0, i).trim() : "";
 	}
-
+	
 	// hide reference model from documentation
 	public static void hideReferenceModel()
 	{

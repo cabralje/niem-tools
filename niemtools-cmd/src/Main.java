@@ -31,6 +31,7 @@ public class Main
 
 		// setup directories
 		String homeDir = System.getProperty("user.home");
+		//String propFile = homeDir + "/niemtools.properties";		
 		String propFile = homeDir + "/niemtools.properties";
 		//load properties
 		Properties properties = new Properties();

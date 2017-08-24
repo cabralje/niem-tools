@@ -41,7 +41,9 @@ class Main
 				//UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
 				JFileChooser fc;
 				String homeDir = System.getProperty("user.home");
-				String propFile = homeDir + "/niemtools.properties";
+				UmlPackage root = UmlBasePackage.getProject();
+				//String propFile = homeDir + "/niemtools.properties";		
+				String propFile = homeDir + "/" + root.name() + ".properties";
 				Boolean genHtml = true;
 				UmlItem target = UmlCom.targetItem();
 
@@ -49,7 +51,6 @@ class Main
 				target.memo_ref();
 
 				// create PIM and PSM
-				UmlPackage root = UmlBasePackage.getProject();
 				//NiemTools.createPIM(root);
 
 				//load properties
@@ -236,7 +237,6 @@ class Main
 				try {
 					FileWriter out = new FileWriter(propFile);
 					properties.setProperty("htmlDir", root.propertyValue("html dir"));
-					//properties.setProperty("extensionURI", IEPDURI);
 					properties.store(out, "BOUML NiemTools plugout settings");
 					out.close();
 				}

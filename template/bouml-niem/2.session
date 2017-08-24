@@ -1,0 +1,12 @@
+window_sizes 2565 1526 641 1918 1241 216
+cleanlooks_style
+show_stereotypes
+selected class_ref 214146 // uri
+open
+  class_ref 206082 // niem
+  usecaseview_ref 134658 // Use Cases
+  classview_ref 179330 // Interfaces and Operations
+  classview_ref 179586 // Message1
+  classview_ref 179970 // Primitive Types
+end
+end
