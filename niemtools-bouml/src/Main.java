@@ -69,6 +69,7 @@ class Main
 				String htmlDir = properties.getProperty("htmlDir", homeDir);
 				root.set_PropertyValue("html dir", htmlDir);
 				String xsdDir = properties.getProperty("xsdDir");
+				String jsonDir = properties.getProperty("jsonDir");
 				String niemDir = properties.getProperty("niemDir", homeDir);
 				
 				// get IEPD properties 
@@ -220,14 +221,25 @@ class Main
 					{
 						fc = new JFileChooser(htmlDir);
 						fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-						fc.setDialogTitle("Directory of the schema to be exported");
+						fc.setDialogTitle("Directory of the XML schema to be exported");
 						if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
 							return;
 						xsdDir = fc.getSelectedFile().getAbsolutePath();
 						properties.setProperty("xsdDir", xsdDir);
 					}
-					NiemTools.exportSchema(xsdDir, IEPDURI, IEPDName, IEPDVersion, IEPDStatus, IEPDOrganization, IEPDContact, externalSchemas);
-
+					if (jsonDir == null)
+					{
+						fc = new JFileChooser(htmlDir);
+						fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						fc.setDialogTitle("Directory of the JSON schema to be exported");
+						if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
+							return;
+						jsonDir = fc.getSelectedFile().getAbsolutePath();
+						properties.setProperty("jsonDir", jsonDir);
+					}
+					NiemTools.exportSchema(IEPDURI, IEPDName, IEPDVersion, IEPDStatus, IEPDOrganization, IEPDContact, externalSchemas, xsdDir, jsonDir);
+					NiemTools.exportNiemJsonSchema(jsonDir);
+					
 					// output UML objects
 					//NiemTools.outputUML();
 

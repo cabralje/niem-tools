@@ -48,6 +48,7 @@ public class Main
 		String htmlDir = properties.getProperty("htmlDir", homeDir);
 		root.set_PropertyValue("html dir", htmlDir);
 		String xsdDir = properties.getProperty("xsdDir");
+		String jsonDir = properties.getProperty("jsonDir");
 		String niemDir = properties.getProperty("niemDir", homeDir);
 		String extensionURI = properties.getProperty("extensionURI", "http://local/");
 		String externalSchemas = "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,"
@@ -105,7 +106,7 @@ public class Main
 
 			// Generate extension schema
 			UmlCom.trace("Generating extension schema");
-			NiemTools.exportSchema(xsdDir, "http://example.org/iepd", "IEPD", "1.0", "Draft", "Organization", "Contact", externalSchemas);
+			NiemTools.exportSchema("http://example.org/iepd", "IEPD", "1.0", "Draft", "Organization", "Contact", externalSchemas, xsdDir, jsonDir);
 			
 			// store properties
 			try {
