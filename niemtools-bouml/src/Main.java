@@ -179,7 +179,7 @@ class Main
 						break;
 
 					// Generate UML Model HTML documentation
-					if (genHtml)
+					/* if (genHtml)
 					{
 						UmlCom.trace("Generating HTML documentation");
 						//	target.set_dir(argv.length - 1, argv);
@@ -205,7 +205,7 @@ class Main
 					// Generate NIEM Mapping CSV
 					UmlCom.message("Generating NIEM Mapping CSV ...");
 					UmlCom.trace("Generating NIEM Mapping CSV");
-					NiemTools.exportCsv(htmlDir, "niem-mapping.csv", externalSchemas);
+					NiemTools.exportCsv(htmlDir, "niem-mapping.csv", externalSchemas); */
 
 					// Generate NIEM Wantlist instance
 					UmlCom.message("Generating NIEM Wantlist ...");
@@ -238,7 +238,6 @@ class Main
 						properties.setProperty("jsonDir", jsonDir);
 					}
 					NiemTools.exportSchema(IEPDURI, IEPDName, IEPDVersion, IEPDStatus, IEPDOrganization, IEPDContact, externalSchemas, xsdDir, jsonDir);
-					NiemTools.exportNiemJsonSchema(jsonDir);
 					
 					// output UML objects
 					//NiemTools.outputUML();
