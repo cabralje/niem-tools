@@ -73,7 +73,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
 class NiemTools {
-	// private static Boolean _TRACE = true;
+	//private static Boolean _TRACE = true;
 	private static Boolean _TRACE = false;
 	private static UmlClass referenceAbstractType = null;
 	private static UmlClass subsetAbstractType = null;
@@ -638,7 +638,7 @@ class NiemTools {
 				if (ns != null) {
 					UmlClassView cv = ns.referenceClassView;
 					if (cv != null) {
-						String basePrefix = cv.name();
+						String basePrefix = sourceBaseType.parent().name();
 						baseType = copyType(baseSchemaURI, basePrefix, pt);
 					}
 					if (baseType != null)
@@ -734,7 +734,7 @@ class NiemTools {
 	public static UmlClass copyType(String schemaURI, String prefix, String typeName2) {
 		UmlClass typeClass = findType(subsetPackage, schemaURI, typeName2);
 		if (typeClass != null) {
-			trace("Type " + typeName2 + " already exists in subset");
+			trace("Type " + prefix + ":" + typeName2 + " already exists in subset");
 			return typeClass;
 		}
 
@@ -744,7 +744,7 @@ class NiemTools {
 			UmlCom.trace("copyType: Type " + schemaURI + namespaceDelimiter + typeName2 + " not found in reference");
 			return null;
 		}
-		trace("Type found in reference model");
+		trace("Type " + prefix + ":" + typeName2 + " found in reference model");
 		// if namespace doesn't exist, create it
 		UmlClassView nsClassView = addNamespace(subsetPackage, prefix, schemaURI);
 		if (nsClassView == null) {
