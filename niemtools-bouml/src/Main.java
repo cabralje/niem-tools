@@ -15,7 +15,8 @@ class Main
 {
 	public static void main(String argv[])
 	{
-
+		Boolean genHtml = false;
+		
 		JFrame frame = new JFrame();
 		
 		try
@@ -44,7 +45,7 @@ class Main
 				UmlPackage root = UmlBasePackage.getProject();
 				//String propFile = homeDir + "/niemtools.properties";		
 				String propFile = homeDir + "/" + root.name() + ".properties";
-				Boolean genHtml = true;
+
 				UmlItem target = UmlCom.targetItem();
 
 				UmlCom.message("Memorize references ...");
@@ -72,59 +73,6 @@ class Main
 				String jsonDir = properties.getProperty("jsonDir");
 				String niemDir = properties.getProperty("niemDir", homeDir);
 				
-				// get IEPD properties 
-				String IEPDURI = null, IEPDName = null, IEPDVersion = null, IEPDStatus = null, IEPDOrganization = null, IEPDContact = null, externalSchemas = null;
-				try {
-					IEPDURI = root.propertyValue("IEPDURI");
-					if (IEPDURI==null)
-					{
-						IEPDURI = "http://local";
-						root.set_PropertyValue("IEPDURI", IEPDURI);
-					}
-					IEPDName = root.propertyValue("IEPDName");
-					if (IEPDName==null)
-					{
-						IEPDName = "IEPD";
-						root.set_PropertyValue("IEPDName", IEPDName);
-					}
-					IEPDVersion = root.propertyValue("IEPDVersion");
-					if (IEPDVersion==null)
-					{
-						IEPDVersion = "1.0";
-						root.set_PropertyValue("IEPDVersion", IEPDName);
-					}
-					IEPDStatus = root.propertyValue("IEPDStatus");
-					if (IEPDStatus==null)
-					{
-						IEPDStatus = "Draft";
-						root.set_PropertyValue("IEPDStatus", IEPDStatus);
-					}
-					IEPDOrganization = root.propertyValue("IEPDOrganization");
-					if (IEPDOrganization==null)
-					{
-						IEPDOrganization = "Organization";
-						root.set_PropertyValue("IEPDOrganization", IEPDOrganization);
-					}
-					IEPDContact = root.propertyValue("IEPDContact");
-					if (IEPDContact==null)
-					{
-						IEPDName = "Contact";
-						root.set_PropertyValue("IEPDContact", IEPDContact);
-					}
-					externalSchemas = root.propertyValue("externalSchemas");
-					if (externalSchemas==null)
-					{
-						// format for external namespaces: prefix = schemaURI = URL of schema file
-						externalSchemas = "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,"
-										+ "cbc=urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonBasicComponents-2.1.xsd,"
-										+ "ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd";
-						root.set_PropertyValue("externalSchemas", externalSchemas);
-					}
-					
-				} catch (Exception e1) {
-					UmlCom.trace("main: Exception " + e1.toString());
-				}
-				
 				// int argc = argv.length-1;
 				switch (argv[0])
 				{
@@ -149,7 +97,7 @@ class Main
 					//UmlBasePackage.saveProject();
 					//UmlBasePackage.loadProject("");
 					NiemTools.createNIEM(root);
-					NiemTools.importSchemaDir(directory,false, externalSchemas);
+					NiemTools.importSchemaDir(directory,false);
 					break;
 
 				case "import":
@@ -162,7 +110,7 @@ class Main
 					if (fc2.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
 						return;
 					String filename = fc2.getSelectedFile().getAbsolutePath();
-					NiemTools.importCsv(filename, externalSchemas);
+					NiemTools.importCsv(filename);
 					break;
 
 				case "sort":
@@ -200,19 +148,19 @@ class Main
 					// Generate NIEM Mapping HTML
 					UmlCom.message ("Generating NIEM Mapping HTML ...");
 					UmlCom.trace("Generating NIEM Mapping HTML");
-					NiemTools.exportHtml(htmlDir, "niem-mapping", externalSchemas);
+					NiemTools.exportHtml(htmlDir, "niem-mapping");
 
 					// Generate NIEM Mapping CSV
 					UmlCom.message("Generating NIEM Mapping CSV ...");
 					UmlCom.trace("Generating NIEM Mapping CSV");
-					NiemTools.exportCsv(htmlDir, "niem-mapping.csv", externalSchemas); 
+					NiemTools.exportCsv(htmlDir, "niem-mapping.csv"); 
 
 					// Generate NIEM Wantlist instance
 					UmlCom.message("Generating NIEM Wantlist ...");
 					UmlCom.trace("Generating NIEM Wantlist");
 					NiemTools.createNIEM(root);
-					NiemTools.createSubsetAndExtension(IEPDURI);
-					NiemTools.exportWantlist(htmlDir, "wantlist.xml", externalSchemas);
+					NiemTools.createSubsetAndExtension();
+					NiemTools.exportWantlist(htmlDir, "wantlist.xml");
 
 					// Generate extension schema
 					UmlCom.message("Generating extension schema ...");
@@ -237,7 +185,7 @@ class Main
 						jsonDir = fc.getSelectedFile().getAbsolutePath();
 						properties.setProperty("jsonDir", jsonDir);
 					}
-					NiemTools.exportSchema(IEPDURI, IEPDName, IEPDVersion, IEPDStatus, IEPDOrganization, IEPDContact, externalSchemas, xsdDir, jsonDir);
+					NiemTools.exportIEPD(xsdDir, jsonDir);
 					
 					// output UML objects
 					//NiemTools.outputUML();

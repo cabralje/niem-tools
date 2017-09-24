@@ -17,7 +17,7 @@ public class UmlItem implements Comparable {
 
 	public UmlItem() {
 		super();
-		set_Stereotype(NiemTools.niemStereotype);
+		set_Stereotype(NiemTools.NIEM_STEREOTYPE_TYPE);
 	}
 
 	public UmlItem(long id, String n)
@@ -26,7 +26,7 @@ public class UmlItem implements Comparable {
 		name = n;
 		_name = n;
 		known = false;
-		set_Stereotype(NiemTools.niemStereotype);
+		set_Stereotype(NiemTools.NIEM_STEREOTYPE_TYPE);
 	}
 
 	public UmlItem(UmlItem p, anItemKind k, String n) {
@@ -35,7 +35,7 @@ public class UmlItem implements Comparable {
 		kind = k;
 		name = n;
 		_name = n;
-		set_Stereotype(NiemTools.niemStereotype);
+		set_Stereotype(NiemTools.NIEM_STEREOTYPE_TYPE);
 	}
 
 	public UmlItem[] children()
