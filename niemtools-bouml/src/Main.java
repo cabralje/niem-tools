@@ -96,7 +96,8 @@ class Main
 					//UmlCom.trace("Saving project");
 					//UmlBasePackage.saveProject();
 					//UmlBasePackage.loadProject("");
-					NiemTools.createNIEM(root);
+					NiemTools.deleteNIEM(true);
+					NiemTools.createNIEM();
 					NiemTools.importSchemaDir(directory,false);
 					break;
 
@@ -123,7 +124,7 @@ class Main
 					//UmlCom.trace("Saving project");
 					//UmlBasePackage.saveProject();
 					//UmlBasePackage.loadProject("");
-					if (!NiemTools.verifyNIEM(root))
+					if (!NiemTools.verifyNIEM())
 						break;
 
 					// Generate UML Model HTML documentation
@@ -155,11 +156,20 @@ class Main
 					UmlCom.trace("Generating NIEM Mapping CSV");
 					NiemTools.exportCsv(htmlDir, "niem-mapping.csv"); 
 
+					// Clearing NIEM Models
+					UmlCom.message("Restting NIEM models");
+					UmlCom.trace("Resetting NIEM models");
+					NiemTools.deleteNIEM(false);
+					NiemTools.createNIEM();
+					
+					// Generating NIEM Models
+					UmlCom.message("Generating NIEM subset and extension models");
+					UmlCom.trace("Generating NIEM subset and extension models");
+					NiemTools.createSubsetAndExtension();
+					
 					// Generate NIEM Wantlist instance
 					UmlCom.message("Generating NIEM Wantlist ...");
 					UmlCom.trace("Generating NIEM Wantlist");
-					NiemTools.createNIEM(root);
-					NiemTools.createSubsetAndExtension();
 					NiemTools.exportWantlist(htmlDir, "wantlist.xml");
 
 					// Generate extension schema
