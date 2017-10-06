@@ -1501,8 +1501,23 @@ class NiemTools {
 								if (exportJSON && prefix.equals(XSD_PREFIX)) {
 									String jsonPrimitive = "string";
 									switch (typeName) {
-										case "boolean": jsonPrimitive = "boolean"; break;
-										case "integer": jsonPrimitive = "number"; break;
+										case "boolean": 
+											jsonPrimitive = "boolean"; break;
+										case "decimal":
+										case "double":
+										case "float":
+										case "int":
+										case "integer": 
+										case "long":
+										case "negativeInteger":
+										case "nonNegativeInteger":
+										case "nonPositiveInteger":
+										case "positiveInteger":
+										case "short":
+										case "unsignedInt":
+										case "unsignedLong":
+										case "unsignedShort":
+											jsonPrimitive = "number"; break;
 									}		
 									jsonType = "\"" + getPrefixedName(type) + "\": {\n" 
 											+ "\"type\": \"" + jsonPrimitive + "\"\n" + "}\n";
