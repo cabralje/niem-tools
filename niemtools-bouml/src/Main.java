@@ -53,6 +53,8 @@ class Main
 
 				// create PIM and PSM
 				//NiemTools.createPIM(root);
+				NiemTools niemTools = new NiemTools();
+				niemTools.cacheModels();
 
 				//load properties
 				Properties properties = new Properties();
@@ -96,14 +98,15 @@ class Main
 					//UmlCom.trace("Saving project");
 					//UmlBasePackage.saveProject();
 					//UmlBasePackage.loadProject("");
-					NiemTools.deleteNIEM(true);
-					NiemTools.createNIEM();
-					NiemTools.importSchemaDir(directory,false);
+					niemTools.deleteNIEM(true);
+					niemTools.createNIEM();
+					niemTools.cacheModels();
+					niemTools.importSchemaDir(directory,false);
 					break;
 
 				case "import":
 					UmlCom.trace("Deleting NIEM Mapping");
-					NiemTools.deleteMapping();
+					niemTools.deleteMapping();
 					UmlCom.trace("Importing NIEM Mapping");
 					JFileChooser fc2 = new JFileChooser(htmlDir);
 					fc2.setFileFilter(new FileNameExtensionFilter("CSV file","csv"));
@@ -111,7 +114,7 @@ class Main
 					if (fc2.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
 						return;
 					String filename = fc2.getSelectedFile().getAbsolutePath();
-					NiemTools.importCsv(filename);
+					niemTools.importCsv(filename);
 					break;
 
 				case "sort":
@@ -124,7 +127,7 @@ class Main
 					//UmlCom.trace("Saving project");
 					//UmlBasePackage.saveProject();
 					//UmlBasePackage.loadProject("");
-					if (!NiemTools.verifyNIEM())
+					if (!niemTools.verifyNIEM())
 						break;
 
 					// Generate UML Model HTML documentation
@@ -149,28 +152,29 @@ class Main
 					// Generate NIEM Mapping HTML
 					UmlCom.message ("Generating NIEM Mapping HTML ...");
 					UmlCom.trace("Generating NIEM Mapping HTML");
-					NiemTools.exportHtml(htmlDir, "niem-mapping");
+					niemTools.exportHtml(htmlDir, "niem-mapping");
 
 					// Generate NIEM Mapping CSV
 					UmlCom.message("Generating NIEM Mapping CSV ...");
 					UmlCom.trace("Generating NIEM Mapping CSV");
-					NiemTools.exportCsv(htmlDir, "niem-mapping.csv"); 
+					niemTools.exportCsv(htmlDir, "niem-mapping.csv"); 
 
 					// Clearing NIEM Models
-					UmlCom.message("Restting NIEM models");
+					UmlCom.message("Resetting NIEM models");
 					UmlCom.trace("Resetting NIEM models");
-					NiemTools.deleteNIEM(false);
-					NiemTools.createNIEM();
+					niemTools.deleteNIEM(false);
+					niemTools.createNIEM();
+					niemTools.cacheModels();
 					
 					// Generating NIEM Models
 					UmlCom.message("Generating NIEM subset and extension models");
 					UmlCom.trace("Generating NIEM subset and extension models");
-					NiemTools.createSubsetAndExtension();
+					niemTools.createSubsetAndExtension();
 					
 					// Generate NIEM Wantlist instance
 					UmlCom.message("Generating NIEM Wantlist ...");
 					UmlCom.trace("Generating NIEM Wantlist");
-					NiemTools.exportWantlist(htmlDir, "wantlist.xml");
+					niemTools.exportWantlist(htmlDir, "wantlist.xml");
 
 					// Generate extension schema
 					UmlCom.message("Generating extension schema ...");
@@ -195,7 +199,7 @@ class Main
 						jsonDir = fc.getSelectedFile().getAbsolutePath();
 						properties.setProperty("jsonDir", jsonDir);
 					}
-					NiemTools.exportIEPD(xsdDir, jsonDir);
+					niemTools.exportIEPD(xsdDir, jsonDir);
 					
 					// output UML objects
 					//NiemTools.outputUML();

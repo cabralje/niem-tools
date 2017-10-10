@@ -55,7 +55,8 @@ public class Main
 		try {
 			// Create PIM
 			// UmlCom.trace("Generating NIEM");
-			NiemTools.createNIEM();
+			NiemTools niemTools = new NiemTools();
+			niemTools.createNIEM();
 			
 			// Import schemas
 			UmlCom.trace("Importing NIEM schema");
@@ -69,11 +70,11 @@ public class Main
 				return;
 			String directory = fc.getSelectedFile().getAbsolutePath();
 			properties.setProperty("niemDir", directory);
-			NiemTools.importSchemaDir(directory,false);
+			niemTools.importSchemaDir(directory,false);
 
 			// Import NIEM Mapping CSV file
 			UmlCom.trace("Deleting NIEM Mapping");
-			NiemTools.deleteMapping();
+			niemTools.deleteMapping();
 			UmlCom.trace("Importing NIEM Mapping");
 			JFileChooser fc2 = new JFileChooser(htmlDir);
 			fc2.setFileFilter(new FileNameExtensionFilter("CSV file","csv"));
@@ -81,7 +82,7 @@ public class Main
 			if (fc2.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
 				return;
 			String filename = fc2.getSelectedFile().getAbsolutePath();
-			NiemTools.importCsv(filename);
+			niemTools.importCsv(filename);
 			
 			// Generate indexes
 			//UmlCom.trace("Memorizing references");
@@ -90,20 +91,20 @@ public class Main
 			
 			// Generate NIEM Mapping HTML
 			UmlCom.trace("Generating NIEM Mapping");
-			NiemTools.exportHtml(htmlDir, "niem-mapping.html");
+			niemTools.exportHtml(htmlDir, "niem-mapping.html");
 
 			// Generate NIEM Mapping CSV
 			UmlCom.trace("Generating NIEM Mapping CSV");
-			NiemTools.exportCsv(htmlDir, "niem-mapping.csv");
+			niemTools.exportCsv(htmlDir, "niem-mapping.csv");
 
 			// Generate NIEM Wantlist instance
 			UmlCom.trace("Generating NIEM Wantlist");
-			NiemTools.createSubsetAndExtension();
-			NiemTools.exportWantlist(htmlDir, "wantlist.xml");
+			niemTools.createSubsetAndExtension();
+			niemTools.exportWantlist(htmlDir, "wantlist.xml");
 
 			// Generate extension schema
 			UmlCom.trace("Generating extension schema");
-			NiemTools.exportIEPD(xsdDir, jsonDir);
+			niemTools.exportIEPD(xsdDir, jsonDir);
 			
 			// store properties
 			try {
