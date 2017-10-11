@@ -39,6 +39,8 @@ class Main
 
 			try
 			{
+				// TODO user interface for setting/confirming project properties
+				
 				//UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
 				JFileChooser fc;
 				String homeDir = System.getProperty("user.home");
@@ -170,6 +172,7 @@ class Main
 					UmlCom.message("Generating NIEM subset and extension models");
 					UmlCom.trace("Generating NIEM subset and extension models");
 					niemTools.createSubsetAndExtension();
+
 					
 					// Generate NIEM Wantlist instance
 					UmlCom.message("Generating NIEM Wantlist ...");
@@ -199,6 +202,7 @@ class Main
 						jsonDir = fc.getSelectedFile().getAbsolutePath();
 						properties.setProperty("jsonDir", jsonDir);
 					}
+					niemTools.cacheModels(); // cache substitutions
 					niemTools.exportIEPD(xsdDir, jsonDir);
 					
 					// output UML objects
