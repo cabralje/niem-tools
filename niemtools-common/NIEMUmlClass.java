@@ -580,6 +580,7 @@ class NiemTools {
 					getPrefixedName(STRUCTURES_PREFIX, SIMPLE_OBJECT_ATTRIBUTE_GROUP));
 			getNamespace(subsetPackage, XSD_PREFIX, XSD_URI);
 			copyElement(getPrefixedName(XSD_PREFIX, ANY_ELEMENT_NAME));
+			copyType("xs:NCName"); // JSON-LD @id is type xs:NCName
 		} else if (modelPackage == extensionPackage) {
 			ExtensionElements = Elements;
 			ExtensionElementsInType = ElementsInType;
@@ -1250,7 +1251,7 @@ class NiemTools {
 		String maxOccurs = getMaxOccurs(multiplicity);
 		if (isAttribute(element)) {
 			if (elementName.equals(getPrefixedName(STRUCTURES_PREFIX, "@id")) || elementName.equals(getPrefixedName(STRUCTURES_PREFIX, "@ref"))) {
-				elementName = "xs:string";
+				elementName = "xs:NCName";
 				elementName2 = "@id";
 			} else {
 				elementName = filterAttributePrefix(elementName);
