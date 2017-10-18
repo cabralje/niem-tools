@@ -84,6 +84,7 @@ class NiemTools {
 	// JSON
 	private static final String JSON_SCHEMA_URI = "http://json-schema.org/draft-04/schema#";
 	private static final String JSON_SCHEMA_FILE_TYPE = ".schema.json";
+	private static final String OPENAPI_FILE_TYPE = ".json";
 	// XML
 	private static final String XML_URI = XMLConstants.XML_NS_URI;
 	private static final String XML_PREFIX = XMLConstants.XML_NS_PREFIX;
@@ -179,14 +180,15 @@ class NiemTools {
 	private static final String FILE_PATH_PROPERTY = "path";
 	private static final String MESSAGE_ELEMENT_PROPERTY = "messageElement";
 	private static final String WSDL_SUFFIX = "WSDL";
-	private static final String WSDL_XSD_SUFFIX = "MessageWrappers";
+	private static final String JSON_SUFFIX = "JSON";	
+	private static final String MESSAGE_WRAPPERS_FILE_NAME = "MessageWrappers";
 	private static final String LOCAL_PREFIX = "local";
 	private static final String LOCAL_URI = "local";
 	private static final String ABSTRACT_TYPE_NAME = "abstract";
 	private static final String ANY_ELEMENT_NAME = "any";
 	// Niem-tools web services
 	private static final String WSDL_PREFIX = "tns";
-	private static final String WSDL_XSD_PREFIX = "wrapper";
+	private static final String WRAPPER_PREFIX = "wrapper";
 	private static final String RESPONSE_MESSAGE_SUFFIX = "Response";
 	private static final String REQUEST_MESSAGE_SUFFIX = "Request";
 	// IEPD Properties
@@ -1225,17 +1227,17 @@ class NiemTools {
 		exportSchema(subsetPackage, null, Paths.get(jsonDir, NIEM_DIR).toString());
 		exportSchema(extensionPackage, xmlDir, jsonDir);
 
-		try {
-			if (exportXML) {
-				exportMPDCatalog(xmlDir, CodeListNamespaces, messages);
-				exportWSDL(xmlDir, ports, operations, messages, outputMessages, inputMessages);
-			}
+		if (exportXML) try {
+			exportMPDCatalog(xmlDir, CodeListNamespaces, messages);
+			exportWSDL(xmlDir, ports, operations, messages, outputMessages, inputMessages);
 		} catch (Exception e) {
-			UmlCom.trace("exportIEPD: error exporting MPD catalog or WSDL" + e.toString());
+			UmlCom.trace("exportIEPD: error exporting MPD catalog or WSDL " + e.toString());
 		}
 
-		if (exportJSON) {
-			// TODO export OpenAPI file
+		if (exportJSON) try {
+				exportOpenAPI(jsonDir, ports, operations, messages, outputMessages, inputMessages);
+		} catch (Exception e) {
+			UmlCom.trace("exportIEPD: error exporting OpenAPI files " + e.toString());
 		}
 	}
 
@@ -1243,13 +1245,11 @@ class NiemTools {
 	 * return JSON property description of an element with name elementName and
 	 * multiplicity
 	 */
-	private static String exportJsonElementInTypeSchema(UmlClassInstance element, String multiplicity,
-			String localPrefix) {
-		String elementName = getPrefixedName(element);
+	private static String exportJsonElementInTypeSchema(String elementName, String multiplicity, String localPrefix, boolean isAttribute) {
 		String elementName2 = null;
 		String minOccurs = getMinOccurs(multiplicity);
 		String maxOccurs = getMaxOccurs(multiplicity);
-		if (isAttribute(element)) {
+		if (isAttribute) {
 			if (elementName.equals(getPrefixedName(STRUCTURES_PREFIX, "@id")) || elementName.equals(getPrefixedName(STRUCTURES_PREFIX, "@ref"))) {
 				elementName = "xs:NCName";
 				elementName2 = "@id";
@@ -1531,6 +1531,7 @@ class NiemTools {
 						continue;
 					RefNamespaces.add(getPrefix(element));
 					String elementName = getPrefixedName(element);
+					boolean elementIsAttribute = isAttribute(element);
 					trace("exportSchema: exporting element in type " + elementName);
 					if (elementName.equals(anyElement)) {
 						anyJSON = true;
@@ -1548,7 +1549,7 @@ class NiemTools {
 						// add head element if not abstract
 						if ((elementBaseType != subsetAbstractType)) {
 							RefNamespaces.add(getPrefix(elementBaseType));
-							String jsonElementInType = exportJsonElementInTypeSchema(element, multiplicity2, prefix);
+							String jsonElementInType = exportJsonElementInTypeSchema(elementName, multiplicity2, prefix, elementIsAttribute);
 							if (jsonElementInType != null)
 								jsonElementsInType.add(jsonElementInType);
 						}
@@ -1556,13 +1557,13 @@ class NiemTools {
 						// add substitution elements
 						for (UmlClassInstance element2 : enlist) {
 							RefNamespaces.add(getPrefix(element2));
-							String jsonElementInType = exportJsonElementInTypeSchema(element2, multiplicity2, prefix);
+							String jsonElementInType = exportJsonElementInTypeSchema(getPrefixedName(element2), multiplicity2, prefix, isAttribute(element2));
 							if (jsonElementInType != null)
 								jsonElementsInType.add(jsonElementInType);
 						}
 					} else if ((elementBaseType != subsetAbstractType)) {
 						RefNamespaces.add(getPrefix(elementBaseType));
-						String jsonElementInType = exportJsonElementInTypeSchema(element, multiplicity, prefix);
+						String jsonElementInType = exportJsonElementInTypeSchema(elementName, multiplicity, prefix, elementIsAttribute);
 						if (jsonElementInType != null)
 							jsonElementsInType.add(jsonElementInType);
 						if (Integer.parseInt(getMinOccurs(multiplicity)) > 0)
@@ -1590,7 +1591,7 @@ class NiemTools {
 							String minOccurs = getMinOccurs(multiplicity);
 							if ((elementBaseType != subsetAbstractType) && (elementBaseType != referenceAbstractType)) {
 								RefNamespaces.add(getPrefix(elementBaseType));
-								String jsonElementInType = exportJsonElementInTypeSchema(element, multiplicity, prefix);
+								String jsonElementInType = exportJsonElementInTypeSchema(elementName, multiplicity, prefix, isAttribute(element));
 								if (jsonElementInType != null)
 									jsonElementsInType.add(jsonElementInType);
 								if (Integer.parseInt(minOccurs) > 0)
@@ -1621,7 +1622,7 @@ class NiemTools {
 		// define JSON type
 		TreeSet<String> jsonDefinition = new TreeSet<String>();
 		String description = type.description();
-		if (description != null && description.equals(""))
+		if (description != null && !description.equals(""))
 			jsonDefinition.add("\"description\": \"" + filterQuotes(description) + "\"");
 		//UmlClass baseType = getBaseType(type);
 		//if (baseType != null)
@@ -1713,6 +1714,315 @@ class NiemTools {
 		trace("exportMPDCatalog: done generating MPD catalog");
 	}
 
+	/** exports OpenAPI/Swagger 2.0 service definition */
+	private static void exportOpenAPI(String jsonDir, Map<String, UmlClass> ports, Map<String, UmlOperation> operations,
+			Set<String> messages, Map<String, String> outputMessages, Map<String, ArrayList<String>> inputMessages)
+					throws IOException {
+		
+		String JSONURI = getProperty(IEPD_URI_PROPERTY) + JSON_SUFFIX;
+		String WRAPPERURI = getProperty(IEPD_URI_PROPERTY) + MESSAGE_WRAPPERS_FILE_NAME;
+//
+		UmlCom.trace("Generating JSON Message Wrappers file");
+		TreeSet<String> jsonDefinitions = new TreeSet<String>();
+		TreeSet<String> jsonProperties = new TreeSet<String>();
+		TreeSet<String> jsonRequired = new TreeSet<String>();
+		for (UmlOperation operation : operations.values()) {
+			String operationName = operation.name();
+			trace("exportOpenAPI: generating document/literal wrapper for " + operationName);
+			ArrayList<String> inputs = inputMessages.get(operationName);
+			if (inputs != null) {
+				TreeSet<String> jsonRequiredElementsInType = new TreeSet<String>();
+				TreeSet<String> jsonElementsInType = new TreeSet<String>();
+				String inputType = operationName + "RequestType";
+				String elementName = operationName + "Request";
+				String prefix = getPrefix(operationName);
+				for (String inputMessage : inputs) {
+					String inputMessage2 = inputMessage;
+					String mult = "1";
+					if (inputMessage.contains(",")) {
+						String inputMessageParts[] = inputMessage.split(",");
+						inputMessage2 = inputMessageParts[0];
+						if (inputMessageParts.length > 1)
+							mult = inputMessageParts[1];
+					}
+					mult=mult.replaceAll("\\.\\.",",").replaceAll("\\*", "unbounded");
+					if (!isExternalPrefix(getPrefix(inputMessage2)))
+						jsonElementsInType.add(exportJsonElementInTypeSchema(inputMessage2, mult, prefix, false));
+					if (Integer.parseInt(getMinOccurs(mult)) > 0)
+						jsonRequiredElementsInType.add("\"" + inputMessage2 + "\"");
+				}
+				
+				// export type wrapper
+				TreeSet<String> jsonDefinition = new TreeSet<String>();
+				//String description = "";
+				//if (description != null && !description.equals(""))
+				//	jsonDefinition.add("\"description\": \"" + filterQuotes(description) + "\"");
+				jsonDefinition.add("\"type\": \"object\"");
+				if (jsonElementsInType != null)
+					jsonDefinition.add("\"properties\": {\n" + String.join(",", jsonElementsInType) + "\n}");
+				if (jsonRequiredElementsInType != null)
+					jsonDefinition.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
+				String typeSchema = "\"" + getPrefixedName(WRAPPER_PREFIX, inputType) + "\": {\n" + String.join(",", jsonDefinition) + "\n}\n";
+				jsonDefinitions.add(typeSchema);
+				
+				// export element wrapper
+				String elementSchema = "\"" + getPrefixedName(WRAPPER_PREFIX, elementName) + "\": {\n" + "\"$ref\": \"#/definitions/" + getPrefixedName(WRAPPER_PREFIX, inputType) + "\"" + "\n}\n";
+				jsonProperties.add(elementSchema);
+			}
+			String outputMessage = outputMessages.get(operationName);
+			if (outputMessage != null) {
+				TreeSet<String> jsonRequiredElementsInType = new TreeSet<String>();
+				TreeSet<String> jsonElementsInType = new TreeSet<String>();
+				String outputType = operationName + "ResponseType";
+				String elementName = operationName + "Response";
+				String mult = "1";
+				if (!isExternalPrefix(getPrefix(outputMessage))) {
+					jsonElementsInType.add(exportJsonElementInTypeSchema(outputMessage, mult, WRAPPER_PREFIX, false));
+					jsonRequiredElementsInType.add("\"" + outputMessage + "\"");
+				}
+				
+				// export type wrapper
+				TreeSet<String> jsonDefinition = new TreeSet<String>();
+				//String description = "";
+				//if (description != null && !description.equals(""))
+				//	jsonDefinition.add("\"description\": \"" + filterQuotes(description) + "\"");
+				jsonDefinition.add("\"type\": \"object\"");
+				if (jsonElementsInType != null)
+					jsonDefinition.add("\"properties\": {\n" + String.join(",", jsonElementsInType) + "\n}");
+				if (jsonRequiredElementsInType != null)
+					jsonDefinition.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
+				String typeSchema = "\"" + getPrefixedName(WRAPPER_PREFIX, outputType) + "\": {\n" + String.join(",", jsonDefinition) + "\n}\n";
+				jsonDefinitions.add(typeSchema);
+				
+				// export element wrapper
+				String elementSchema = "\"" + getPrefixedName(WRAPPER_PREFIX, elementName) + "\": {\n" + "\"$ref\": \"#/definitions/" + getPrefixedName(WRAPPER_PREFIX, outputType) + "\"" + "\n}\n";
+				//jsonDefinitions.add(elementSchema);
+				jsonProperties.add(elementSchema);
+				}
+			}
+
+		// export JSON Message Wrapper schema
+		FileWriter file = new FileWriter(Paths.get(jsonDir, MESSAGE_WRAPPERS_FILE_NAME + JSON_SCHEMA_FILE_TYPE).toFile());
+		file.write("{");
+		writeJson(file, "$id", WRAPPERURI);
+		writeJson(file, "$schema", JSON_SCHEMA_URI);
+		writeJson(file, "type", "object");
+		file.write("\"additionalProperties\" : false,\n");
+
+		// export JSON-LD namespace definitions
+		file.write("\"@context\" : {\n");
+		for (String nsPrefix : RefNamespaces) {
+			if (!nsPrefix.equals(LOCAL_PREFIX))
+				writeJson(file, nsPrefix, Prefixes.get(nsPrefix) + "#");
+		}
+		writeJson(file, CODELIST_APPINFO_PREFIX, CODELIST_APPINFO_URI + "#");
+		writeJson(file, CT_PREFIX, CT_URI + "#");
+		writeJson(file, WRAPPER_PREFIX, WRAPPERURI + "#");
+		writeJsonLast(file, TERM_PREFIX, TERM_URI + "#");
+		file.write("},");
+		file.write("\"definitions\": {\n" + String.join(",", jsonDefinitions) + "\n" + "},\n"
+				+ "\"properties\" : {" + String.join(",", jsonProperties) + "\n" + "},\n" + "\"required\" : ["
+				+ String.join(",", jsonRequired) + "]\n" + "}\n");
+		file.close();
+		
+		// generate OpenAPI definitions
+		UmlCom.trace("Generating OpenAPIs");
+		for (UmlClass port : ports.values()) {
+			String portName = port.name();
+			file = new FileWriter(Paths.get(jsonDir, portName + OPENAPI_FILE_TYPE).toFile());
+			trace("OpenAPI: " + portName + OPENAPI_FILE_TYPE);
+			
+			// write OpenAPI header
+			file.write("{\n" + 
+					"  \"swagger\": \"2.0\",\n" + 
+					"  \"info\": {\n" + 
+					"    \"version\": \"1.0.0\",\n" + 
+					"    \"title\": \"Swagger Petstore\",\n" + 
+					"    \"description\": \"A sample API that uses a petstore as an example to demonstrate features in the swagger-2.0 specification\",\n" + 
+					"    \"termsOfService\": \"http://swagger.io/terms/\",\n" + 
+					"    \"contact\": {\n" + 
+					"      \"name\": \"Swagger API Team\",\n" + 
+					"      \"email\": \"foo@example.com\",\n" + 
+					"      \"url\": \"http://madskristensen.net\"\n" + 
+					"    },\n" + 
+					"    \"license\": {\n" + 
+					"      \"name\": \"MIT\",\n" + 
+					"      \"url\": \"http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT\"\n" + 
+					"    }\n" + 
+					"  },\n" + 
+					"  \"host\": \"petstore.swagger.io\",\n" + 
+					"  \"basePath\": \"/api\",\n" +
+					"  \"schemes\": [\n" + 
+					"    \"http\"\n" + 
+					"  ],\n" + 
+					"  \"consumes\": [\n" + 
+					"    \"application/json\"\n" + 
+					"  ],\n" + 
+					"  \"produces\": [\n" + 
+					"    \"application/json\"\n" + 
+					"  ],");
+			
+			// write OpenAPI paths
+			file.write("  \"paths\": {");
+			// for each path
+				file.write("\n"
+					+ "    \"/pets\": {");
+				// for each operation
+					file.write("\n"
+					+ "      \"get\": {\n" + 
+					"        \"description\": \"Returns all pets from the system that the user has access to\\nNam sed condimentum est. Maecenas tempor sagittis sapien, nec rhoncus sem sagittis sit amet. Aenean at gravida augue, ac iaculis sem. Curabitur odio lorem, ornare eget elementum nec, cursus id lectus. Duis mi turpis, pulvinar ac eros ac, tincidunt varius justo. In hac habitasse platea dictumst. Integer at adipiscing ante, a sagittis ligula. Aenean pharetra tempor ante molestie imperdiet. Vivamus id aliquam diam. Cras quis velit non tortor eleifend sagittis. Praesent at enim pharetra urna volutpat venenatis eget eget mauris. In eleifend fermentum facilisis. Praesent enim enim, gravida ac sodales sed, placerat id erat. Suspendisse lacus dolor, consectetur non augue vel, vehicula interdum libero. Morbi euismod sagittis libero sed lacinia.\\n\\nSed tempus felis lobortis leo pulvinar rutrum. Nam mattis velit nisl, eu condimentum ligula luctus nec. Phasellus semper velit eget aliquet faucibus. In a mattis elit. Phasellus vel urna viverra, condimentum lorem id, rhoncus nibh. Ut pellentesque posuere elementum. Sed a varius odio. Morbi rhoncus ligula libero, vel eleifend nunc tristique vitae. Fusce et sem dui. Aenean nec scelerisque tortor. Fusce malesuada accumsan magna vel tempus. Quisque mollis felis eu dolor tristique, sit amet auctor felis gravida. Sed libero lorem, molestie sed nisl in, accumsan tempor nisi. Fusce sollicitudin massa ut lacinia mattis. Sed vel eleifend lorem. Pellentesque vitae felis pretium, pulvinar elit eu, euismod sapien.\\n\",\n" + 
+					"        \"operationId\": \"findPets\",\n" + 
+					"        \"parameters\": [");
+					// for each input parameter
+						file.write("\n"
+					+ "          {\n" + 
+					"            \"name\": \"tags\",\n" + 
+					"            \"in\": \"query\",\n" + 
+					"            \"description\": \"tags to filter by\",\n" + 
+					"            \"required\": false,\n" + 
+					"            \"type\": \"array\",\n" + 
+					"            \"collectionFormat\": \"csv\",\n" + 
+					"            \"items\": {\n" + 
+					"            \"type\": \"string\"\n" + 
+					"            }\n" + 
+					"          }");
+						// if more parameters
+						//file.write(",");
+					file.write("\n"
+							+ "],\n" + 
+					"        \"responses\": {\n");
+					// for each response code
+						file.write("\n"
+					+ "          \"200\": {\n" + 
+					"            \"description\": \"pet response\",\n" + 
+					"            \"schema\": {\n" + 
+					"              \"type\": \"array\",\n" + 
+					"              \"items\": {\n" + 
+					"                \"$ref\": \"#/definitions/Pet\"\n" + 
+					"              }\n" + 
+					"            }\n" + 
+					"          }");
+						//if more response codes
+						//file.write(",");
+					file.write(",\n"
+					+ "          \"default\": {\n" + 
+					"            \"description\": \"unexpected error\",\n" + 
+					"            \"schema\": {\n" + 
+					"              \"$ref\": \"#/definitions/Error\"\n" + 
+					"            }\n" + 
+					"          }\n" + 
+					"        }"); 
+					file.write("\n      }");
+					// if more operations
+					//file.write(",");
+				file.write("\n      }");
+				// if more paths
+				//file.write(",");
+			file.write("\n      },\n");
+			// write OpenAPI definitions
+			file.write("  \"definitions\": {");
+			// for each type
+				file.write("\n    \"Pet\": {\n" + 
+						"      \"type\": \"object\",\n" + 
+						"      \"allOf\": [\n" + 
+						"        {\n" + 
+						"          \"$ref\": \"#/definitions/NewPet\"\n" + 
+						"        },\n" + 
+						"        {\n" + 
+						"          \"required\": [\n" + 
+						"            \"id\"\n" + 
+						"          ],\n" + 
+						"          \"properties\": {\n" + 
+						"            \"id\": {\n" + 
+						"              \"type\": \"integer\",\n" + 
+						"              \"format\": \"int64\"\n" + 
+						"            }\n" + 
+						"          }\n" + 
+						"        }\n" + 
+						"      ]\n" + 
+						"    }");
+				// if more types
+				//file.write(",");
+				file.write("\n}\n");
+			file.write("}\n");
+//			file.write("<definitions targetNamespace=\"" + WSDLURI + "/" + portName + "\"");
+//			writeXmlNs(file, WSDL_PREFIX, WSDLURI + "/" + portName);
+//			writeXmlNs(file, WSDL_XSD_PREFIX, WSDLXSDURI);
+//			writeXmlNs(file, "xsd", XSD_URI);
+//			writeXmlNs(file, SOAP_PREFIX, SOAP_URI);
+//			writeXmlNs(file, WSDL_SCHEMA_PREFIX, WSDL_SCHEMA_URI);
+//			writeXmlNs(file, "", WSDL_SCHEMA_URI);
+//			writeXmlNs(file, WSP_PREFIX, WSP_URI);
+//			writeXmlNs(file, WSRMP_PREFIX, WSRMP_URI);
+//			writeXmlNs(file, WSU_PREFIX, WSU_URI);
+//			file.write(">");
+//			file.write("<wsp:UsingPolicy wsdl:required=\"true\"/>" + "<wsp:Policy wsu:Id=\"" + WSP_POLICY + "\">"
+//					+ "<wsrmp:RMAssertion/>" + "</wsp:Policy>" + "<wsdl:types>" + "<xsd:schema>"
+//					+ "<xsd:import namespace=\"" + WSDLXSDURI + "\" schemaLocation=\"" + WSDL_XSD_SUFFIX + XSD_FILE_TYPE
+//					+ "\"/>" + "</xsd:schema>" + "</wsdl:types>");
+//
+//			file.write("<!-- messages -->");
+//			// for (UmlOperation operation : operations.values())
+//			// {
+//			// String operationName = operation.name();
+//			for (UmlItem item : port.children()) {
+//				if (item.kind() == anItemKind.anOperation) {
+//					UmlOperation operation = (UmlOperation) item;
+//					String operationName = operation.name();
+//					file.write("<message name=\"" + operationName + REQUEST_MESSAGE_SUFFIX + "\">"
+//							+ "<part name=\"body\" element=\"" + getPrefixedName(WSDL_XSD_PREFIX, operationName)
+//							+ REQUEST_MESSAGE_SUFFIX + "\"/>" + "</message>" + "<message name=\"" + operationName
+//							+ RESPONSE_MESSAGE_SUFFIX + "\">" + "<part name=\"body\" element=\""
+//							+ getPrefixedName(WSDL_XSD_PREFIX, operationName) + RESPONSE_MESSAGE_SUFFIX + "\"/>"
+//							+ "</message>");
+//				}
+//			}
+//
+//			file.write("<!-- ports -->");
+//			// for (UmlClass port : ports.values())
+//			// {
+//			// String portName = port.name();
+//			file.write("<portType name=\"" + portName + "\">");
+//			for (UmlItem item : port.children()) {
+//				if (item.kind() == anItemKind.anOperation) {
+//					UmlOperation operation = (UmlOperation) item;
+//					String operationName = operation.name();
+//					file.write("<operation name=\"" + operationName + "\">" + "<input message=\""
+//							+ getPrefixedName(WSDL_PREFIX, operationName) + REQUEST_MESSAGE_SUFFIX + "\"/>"
+//							+ "<output message=\"" + getPrefixedName(WSDL_PREFIX, operationName)
+//							+ RESPONSE_MESSAGE_SUFFIX + "\"/>" + "</operation>");
+//				}
+//			}
+//			file.write("</portType>");
+//			// }
+//
+//			file.write("<!-- bindings -->");
+//			// for (UmlClass port : ports.values())
+//			// {
+//			// String portName = port.name();
+//			file.write("<binding name=\"" + portName + "Soap\" type=\"" + getPrefixedName(WSDL_PREFIX, portName) + "\">"
+//					+ "<wsp:PolicyReference URI=\"#" + WSP_POLICY + "\"/>"
+//					+ "<soap:binding style=\"document\" transport=\"" + SOAP_HTTP_BINDING_URI + "\"/>");
+//			for (UmlItem item : port.children()) {
+//				if (item.kind() == anItemKind.anOperation) {
+//					UmlOperation oper = (UmlOperation) item;
+//					String operationName = oper.name();
+//					file.write("<operation name=\"" + operationName + "\">" + "<soap:operation soapAction=\"" + WSDLURI
+//							+ "/" + portName + "/" + operationName + "\"/>" + "<input>"
+//							+ "	<soap:body use=\"literal\"/>" + "</input>" + "<output>"
+//							+ "	<soap:body use=\"literal\"/>" + "</output>" + "</operation>");
+//				}
+//			}
+//			file.write("</binding>");
+//			// }
+//			file.write(
+//					"<!-- services not defined here...defined in an implementation-specific WSDL that imports this one -->"
+//							+ "</definitions>");
+			file.close();
+		}
+
+	}
+	
 	/** exports NIEM extension and exchange schema */
 	private static void exportSchema(UmlPackage modelPackage, String xmlDir, String jsonDir) {
 
@@ -2035,12 +2345,12 @@ class NiemTools {
 					throws IOException {
 
 		String WSDLURI = getProperty(IEPD_URI_PROPERTY) + WSDL_SUFFIX;
-		String WSDLXSDURI = getProperty(IEPD_URI_PROPERTY) + WSDL_XSD_SUFFIX;
+		String WRAPPERURI = getProperty(IEPD_URI_PROPERTY) + MESSAGE_WRAPPERS_FILE_NAME;
 
 		UmlCom.trace("Generating document/literal wrapper schema");
-		FileWriter xml = new FileWriter(Paths.get(xmlDir, WSDL_XSD_SUFFIX + XSD_FILE_TYPE).toFile());
-		xml.write("<xs:schema targetNamespace=\"" + WSDLXSDURI + "\"");
-		writeXmlNs(xml, WSDL_XSD_PREFIX, WSDLXSDURI);
+		FileWriter file = new FileWriter(Paths.get(xmlDir, MESSAGE_WRAPPERS_FILE_NAME + XSD_FILE_TYPE).toFile());
+		file.write("<xs:schema targetNamespace=\"" + WRAPPERURI + "\"");
+		writeXmlNs(file, WRAPPER_PREFIX, WRAPPERURI);
 
 		// build list of referenced namespaces
 		Set<String> RefNamespaces = new TreeSet<String>();
@@ -2049,30 +2359,30 @@ class NiemTools {
 		for (String message : messages)
 			RefNamespaces.add(getPrefix(message));
 		for (String nsPrefix : RefNamespaces)
-			xml.write(" " + NAMESPACE_ATTRIBUTE + ":" + nsPrefix + "=\"" + Prefixes.get(nsPrefix) + "\"");
-		xml.write(" elementFormDefault=\"qualified\" attributeFormDefault=\"unqualified\">");
+			file.write(" " + NAMESPACE_ATTRIBUTE + ":" + nsPrefix + "=\"" + Prefixes.get(nsPrefix) + "\"");
+		file.write(" elementFormDefault=\"qualified\" attributeFormDefault=\"unqualified\">");
 		for (String nsPrefix : RefNamespaces) {
 			String nsSchemaURI = Prefixes.get(nsPrefix);
 			if (isExternalPrefix(nsPrefix)) {
 				if (nsSchemaURI != null)
-					xml.write("<xs:import namespace=\"" + nsSchemaURI + "\" schemaLocation=\""
+					file.write("<xs:import namespace=\"" + nsSchemaURI + "\" schemaLocation=\""
 							+ externalSchemaURL.get(nsSchemaURI) + "\"/>");
 			} else if (!nsPrefix.equals(XSD_PREFIX)) {
 				Namespace ns = Namespaces.get(nsSchemaURI);
 				if (ns != null)
-					xml.write("<xs:import namespace=\"" + Prefixes.get(nsPrefix) + "\" schemaLocation=\"" + ns.filepath
+					file.write("<xs:import namespace=\"" + Prefixes.get(nsPrefix) + "\" schemaLocation=\"" + ns.filepath
 							+ "\"/>");
 			}
 		}
 
-		xml.write("<!-- document/literal wrappers -->");
+		file.write("<!-- document/literal wrappers -->");
 		for (UmlOperation operation : operations.values()) {
 			String operationName = operation.name();
 			trace("exportWSDL: generating document/literal wrapper for " + operationName);
 			ArrayList<String> inputs = inputMessages.get(operationName);
 			if (inputs != null) {
 				String inputType = operationName + "RequestType";
-				xml.write("<xs:complexType name=\"" + inputType + "\">" + "<xs:sequence>");
+				file.write("<xs:complexType name=\"" + inputType + "\">" + "<xs:sequence>");
 				for (String inputMessage : inputs) {
 					String inputMessage2 = inputMessage;
 					String mult = "1";
@@ -2097,53 +2407,53 @@ class NiemTools {
 						maxOccurs = "unbounded";
 
 					if (isExternalPrefix(getPrefix(inputMessage2)))
-						xml.write("<!--xs:element ref=\"" + inputMessage2 + "\" minOccurs=\"" + minOccurs
+						file.write("<!--xs:element ref=\"" + inputMessage2 + "\" minOccurs=\"" + minOccurs
 								+ "\" maxOccurs=\"" + maxOccurs + "\"/-->\n");
 					else
-						xml.write("<xs:element ref=\"" + inputMessage2 + "\" minOccurs=\"" + minOccurs
+						file.write("<xs:element ref=\"" + inputMessage2 + "\" minOccurs=\"" + minOccurs
 								+ "\" maxOccurs=\"" + maxOccurs + "\"/>\n");
 
 				}
-				xml.write("</xs:sequence>" + "</xs:complexType>" + "<xs:element name=\"" + operationName
-						+ "Request\" type=\"" + getPrefixedName(WSDL_XSD_PREFIX, inputType) + "\"/>");
+				file.write("</xs:sequence>" + "</xs:complexType>" + "<xs:element name=\"" + operationName
+						+ "Request\" type=\"" + getPrefixedName(WRAPPER_PREFIX, inputType) + "\"/>");
 			}
 			String outputMessage = outputMessages.get(operationName);
 			if (outputMessage != null) {
 				String outputType = operationName + "ResponseType";
-				xml.write("<xs:complexType name=\"" + outputType + "\">" + "<xs:sequence>");
+				file.write("<xs:complexType name=\"" + outputType + "\">" + "<xs:sequence>");
 				if (isExternalPrefix(getPrefix(outputMessage)))
-					xml.write("<!--xs:element ref=\"" + outputMessage + "\"/-->");
+					file.write("<!--xs:element ref=\"" + outputMessage + "\"/-->");
 				else
-					xml.write("<xs:element ref=\"" + outputMessage + "\"/>");
-				xml.write("</xs:sequence>" + "</xs:complexType>" + "<xs:element name=\"" + operationName
-						+ "Response\" type=\"" + getPrefixedName(WSDL_XSD_PREFIX, outputType) + "\"/>");
+					file.write("<xs:element ref=\"" + outputMessage + "\"/>");
+				file.write("</xs:sequence>" + "</xs:complexType>" + "<xs:element name=\"" + operationName
+						+ "Response\" type=\"" + getPrefixedName(WRAPPER_PREFIX, outputType) + "\"/>");
 			}
 		}
-		xml.write("</xs:schema>");
-		xml.close();
+		file.write("</xs:schema>");
+		file.close();
 
 		UmlCom.trace("Generating WSDLs");
 		for (UmlClass port : ports.values()) {
 			String portName = port.name();
-			xml = new FileWriter(Paths.get(xmlDir, portName + WSDL_FILE_TYPE).toFile());
-			trace("WSDL: " + portName + ".wsdl");
-			xml.write("<definitions targetNamespace=\"" + WSDLURI + "/" + portName + "\"");
-			writeXmlNs(xml, WSDL_PREFIX, WSDLURI + "/" + portName);
-			writeXmlNs(xml, WSDL_XSD_PREFIX, WSDLXSDURI);
-			writeXmlNs(xml, "xsd", XSD_URI);
-			writeXmlNs(xml, SOAP_PREFIX, SOAP_URI);
-			writeXmlNs(xml, WSDL_SCHEMA_PREFIX, WSDL_SCHEMA_URI);
-			writeXmlNs(xml, "", WSDL_SCHEMA_URI);
-			writeXmlNs(xml, WSP_PREFIX, WSP_URI);
-			writeXmlNs(xml, WSRMP_PREFIX, WSRMP_URI);
-			writeXmlNs(xml, WSU_PREFIX, WSU_URI);
-			xml.write(">");
-			xml.write("<wsp:UsingPolicy wsdl:required=\"true\"/>" + "<wsp:Policy wsu:Id=\"" + WSP_POLICY + "\">"
+			file = new FileWriter(Paths.get(xmlDir, portName + WSDL_FILE_TYPE).toFile());
+			trace("WSDL: " + portName + WSDL_FILE_TYPE);
+			file.write("<definitions targetNamespace=\"" + WSDLURI + "/" + portName + "\"");
+			writeXmlNs(file, WSDL_PREFIX, WSDLURI + "/" + portName);
+			writeXmlNs(file, WRAPPER_PREFIX, WRAPPERURI);
+			writeXmlNs(file, "xsd", XSD_URI);
+			writeXmlNs(file, SOAP_PREFIX, SOAP_URI);
+			writeXmlNs(file, WSDL_SCHEMA_PREFIX, WSDL_SCHEMA_URI);
+			writeXmlNs(file, "", WSDL_SCHEMA_URI);
+			writeXmlNs(file, WSP_PREFIX, WSP_URI);
+			writeXmlNs(file, WSRMP_PREFIX, WSRMP_URI);
+			writeXmlNs(file, WSU_PREFIX, WSU_URI);
+			file.write(">");
+			file.write("<wsp:UsingPolicy wsdl:required=\"true\"/>" + "<wsp:Policy wsu:Id=\"" + WSP_POLICY + "\">"
 					+ "<wsrmp:RMAssertion/>" + "</wsp:Policy>" + "<wsdl:types>" + "<xsd:schema>"
-					+ "<xsd:import namespace=\"" + WSDLXSDURI + "\" schemaLocation=\"" + WSDL_XSD_SUFFIX + XSD_FILE_TYPE
+					+ "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + MESSAGE_WRAPPERS_FILE_NAME + XSD_FILE_TYPE
 					+ "\"/>" + "</xsd:schema>" + "</wsdl:types>");
 
-			xml.write("<!-- messages -->");
+			file.write("<!-- messages -->");
 			// for (UmlOperation operation : operations.values())
 			// {
 			// String operationName = operation.name();
@@ -2151,56 +2461,56 @@ class NiemTools {
 				if (item.kind() == anItemKind.anOperation) {
 					UmlOperation operation = (UmlOperation) item;
 					String operationName = operation.name();
-					xml.write("<message name=\"" + operationName + REQUEST_MESSAGE_SUFFIX + "\">"
-							+ "<part name=\"body\" element=\"" + getPrefixedName(WSDL_XSD_PREFIX, operationName)
+					file.write("<message name=\"" + operationName + REQUEST_MESSAGE_SUFFIX + "\">"
+							+ "<part name=\"body\" element=\"" + getPrefixedName(WRAPPER_PREFIX, operationName)
 							+ REQUEST_MESSAGE_SUFFIX + "\"/>" + "</message>" + "<message name=\"" + operationName
 							+ RESPONSE_MESSAGE_SUFFIX + "\">" + "<part name=\"body\" element=\""
-							+ getPrefixedName(WSDL_XSD_PREFIX, operationName) + RESPONSE_MESSAGE_SUFFIX + "\"/>"
+							+ getPrefixedName(WRAPPER_PREFIX, operationName) + RESPONSE_MESSAGE_SUFFIX + "\"/>"
 							+ "</message>");
 				}
 			}
 
-			xml.write("<!-- ports -->");
+			file.write("<!-- ports -->");
 			// for (UmlClass port : ports.values())
 			// {
 			// String portName = port.name();
-			xml.write("<portType name=\"" + portName + "\">");
+			file.write("<portType name=\"" + portName + "\">");
 			for (UmlItem item : port.children()) {
 				if (item.kind() == anItemKind.anOperation) {
 					UmlOperation operation = (UmlOperation) item;
 					String operationName = operation.name();
-					xml.write("<operation name=\"" + operationName + "\">" + "<input message=\""
+					file.write("<operation name=\"" + operationName + "\">" + "<input message=\""
 							+ getPrefixedName(WSDL_PREFIX, operationName) + REQUEST_MESSAGE_SUFFIX + "\"/>"
 							+ "<output message=\"" + getPrefixedName(WSDL_PREFIX, operationName)
 							+ RESPONSE_MESSAGE_SUFFIX + "\"/>" + "</operation>");
 				}
 			}
-			xml.write("</portType>");
+			file.write("</portType>");
 			// }
 
-			xml.write("<!-- bindings -->");
+			file.write("<!-- bindings -->");
 			// for (UmlClass port : ports.values())
 			// {
 			// String portName = port.name();
-			xml.write("<binding name=\"" + portName + "Soap\" type=\"" + getPrefixedName(WSDL_PREFIX, portName) + "\">"
+			file.write("<binding name=\"" + portName + "Soap\" type=\"" + getPrefixedName(WSDL_PREFIX, portName) + "\">"
 					+ "<wsp:PolicyReference URI=\"#" + WSP_POLICY + "\"/>"
 					+ "<soap:binding style=\"document\" transport=\"" + SOAP_HTTP_BINDING_URI + "\"/>");
 			for (UmlItem item : port.children()) {
 				if (item.kind() == anItemKind.anOperation) {
 					UmlOperation oper = (UmlOperation) item;
 					String operationName = oper.name();
-					xml.write("<operation name=\"" + operationName + "\">" + "<soap:operation soapAction=\"" + WSDLURI
+					file.write("<operation name=\"" + operationName + "\">" + "<soap:operation soapAction=\"" + WSDLURI
 							+ "/" + portName + "/" + operationName + "\"/>" + "<input>"
 							+ "	<soap:body use=\"literal\"/>" + "</input>" + "<output>"
 							+ "	<soap:body use=\"literal\"/>" + "</output>" + "</operation>");
 				}
 			}
-			xml.write("</binding>");
+			file.write("</binding>");
 			// }
-			xml.write(
+			file.write(
 					"<!-- services not defined here...defined in an implementation-specific WSDL that imports this one -->"
 							+ "</definitions>");
-			xml.close();
+			file.close();
 		}
 	}
 
