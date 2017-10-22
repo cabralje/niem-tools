@@ -5,4 +5,5 @@ public class UmlParameter {
 	  
 	  String multiplicity;
 	  
+	  String name;
 }
