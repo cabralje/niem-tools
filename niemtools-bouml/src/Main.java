@@ -15,7 +15,7 @@ class Main
 {
 	public static void main(String argv[])
 	{
-		Boolean genHtml = false;
+		Boolean genHtml = true;
 		
 		JFrame frame = new JFrame();
 		
@@ -39,7 +39,7 @@ class Main
 
 			try
 			{
-				// TODO user interface for setting/confirming project properties
+				// TODO: user interface for setting/confirming project properties
 				
 				//UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
 				JFileChooser fc;
@@ -71,7 +71,8 @@ class Main
 					UmlCom.trace("Properties file " + propFile + " does not exist.");
 				}
 				// get local locations
-				String htmlDir = properties.getProperty("htmlDir", homeDir);
+				String htmlDir = NiemTools.getProperty("html dir");
+				//String htmlDir = properties.getProperty("htmlDir", homeDir);
 				root.set_PropertyValue("html dir", htmlDir);
 				String xsdDir = properties.getProperty("xsdDir");
 				String jsonDir = properties.getProperty("jsonDir");

@@ -70,7 +70,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-// OpenCSV library
+//OpenCSV library
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
@@ -2632,7 +2632,7 @@ class NiemTools {
 	}
 
 	/** return project property with name propertyName */
-	private static String getProperty(String propertyName) {
+	public static String getProperty(String propertyName) {
 		return UmlBasePackage.getProject().propertyValue(propertyName);
 	}
 
@@ -3808,14 +3808,15 @@ class NiemTools {
 	public void exportCsv(String dir, String filename) {
 
 		cacheExternalSchemas();
-
+		
 		UmlItem.directory = dir;
 		String path = Paths.get(dir, filename).toString();
 
 		try {
 			FileWriter fw = new FileWriter(path);
+			trace("exportCsv: open CSV " + path);
 			CSVWriter writer = new CSVWriter(fw);
-
+			
 			// Write header
 			String[] nextLine = new String[NIEM_STEREOTYPE_MAP.length];
 			for (int column = 0; column < NIEM_STEREOTYPE_MAP.length; column++)
@@ -3826,6 +3827,7 @@ class NiemTools {
 			Iterator<UmlItem> it = (UmlClass.classes.iterator());
 			while (it.hasNext()) {
 				UmlItem thisClass = (UmlItem) it.next();
+				trace("exportCsv: " + thisClass.name());
 				if (!thisClass.stereotype().equals(NIEM_STEREOTYPE_TYPE))
 					continue;
 				nextLine = getItemCsv(thisClass);
