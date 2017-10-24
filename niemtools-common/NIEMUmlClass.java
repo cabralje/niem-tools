@@ -1289,7 +1289,7 @@ class NiemTools {
 	}
 
 	/** exports OpenAPI/Swagger 2.0 service definition */
-	private static void exportOpenAPI(String jsonDir, Map<String, UmlClass> ports, Set<String> messageNamespaces)
+	private static void exportOpenAPI(String jsonDir, String openapiDir, Map<String, UmlClass> ports, Set<String> messageNamespaces)
 					throws IOException {
 
 		// export JSON-LD namespace definitions
@@ -1312,6 +1312,12 @@ class NiemTools {
 			TreeSet<String> jsonDefinitions = new TreeSet<String>();
 			TreeSet<String> jsonProperties = new TreeSet<String>();
 
+			// get relative path
+			Path openapiPath = Paths.get(openapiDir, portName + OPENAPI_FILE_TYPE);
+			Path jsonPath = Paths.get(jsonDir);
+			String relativePath = openapiPath.getParent().relativize(jsonPath).toString().replaceAll("\\\\", "/") + "/";
+			trace("exportOpenAPI: relative path to json: " + relativePath);
+			
 			for (UmlItem item : port.children()) {
 				if (item.kind() == anItemKind.anOperation) {
 					TreeSet<String> openapiOperations = new TreeSet<String>();
@@ -1375,7 +1381,7 @@ class NiemTools {
 						mult = convertMultiplicity(mult);
 						//String maxOccurs = getMaxOccurs(mult);
 						if (!isExternalPrefix(getPrefix(inputMessage)))
-							jsonElementsInType.add(exportOpenAPIElementInTypeSchema(inputMessage, mult, null, false));
+							jsonElementsInType.add(exportOpenAPIElementInTypeSchema(relativePath, inputMessage, mult, null, false));
 						if (Integer.parseInt(getMinOccurs(mult)) > 0)
 							jsonRequiredElementsInType.add("\"" + inputMessage + "\"");
 						// for each input parameter
@@ -1430,7 +1436,7 @@ class NiemTools {
 						String outputTypeName = elementName + "Type";
 						String mult = "1";
 						if (!isExternalPrefix(getPrefix(message))) {
-							jsonElementsInType.add(exportOpenAPIElementInTypeSchema(message, mult, null, false));
+							jsonElementsInType.add(exportOpenAPIElementInTypeSchema(relativePath, message, mult, null, false));
 							jsonRequiredElementsInType.add("\"" + message + "\"");
 						}
 
@@ -1509,7 +1515,7 @@ class NiemTools {
 						// write OpenAPI file
 						jsonDefinitions.addAll(jsonProperties);
 						try {
-							FileWriter file = new FileWriter(Paths.get(jsonDir, portName + OPENAPI_FILE_TYPE).toFile());
+							FileWriter file = new FileWriter(openapiPath.toFile());
 							trace("OpenAPI: " + portName + OPENAPI_FILE_TYPE);
 							file.write("{\n" + 
 									//		jsonContext + ",\n" + 
@@ -1565,7 +1571,7 @@ class NiemTools {
 	 * return OpenAPI property description of an element with name elementName and
 	 * multiplicity
 	 */
-	private static String exportOpenAPIElementInTypeSchema(String elementName, String multiplicity, String localPrefix, boolean isAttribute) {
+	private static String exportOpenAPIElementInTypeSchema(String relativePath, String elementName, String multiplicity, String localPrefix, boolean isAttribute) {
 		String elementName2 = null;
 		String minOccurs = getMinOccurs(multiplicity);
 		String maxOccurs = getMaxOccurs(multiplicity);
@@ -1582,10 +1588,10 @@ class NiemTools {
 		String elementSchema = "";
 		elementSchema += "\"" + elementName2 + "\": {\n";
 		if (maxOccurs.equals("1"))
-			elementSchema += "\"$ref\": \"" + exportJsonPointer(elementName, localPrefix) + "\"\n";
+			elementSchema += "\"$ref\": \"" + relativePath + exportJsonPointer(elementName, localPrefix) + "\"\n";
 		else {
 			elementSchema += "\"items\": {\n" + "\"$ref\": \""
-					+ exportJsonPointer(elementName, localPrefix) + "\"\n" + "},\n" + "\n\"minItems\": "
+					+ relativePath + exportJsonPointer(elementName, localPrefix) + "\"\n" + "},\n" + "\n\"minItems\": "
 					+ minOccurs + ",\n";
 			if (!maxOccurs.equals("unbounded"))
 				elementSchema += "\n\"maxItems\": " + maxOccurs + ",\n";
@@ -1737,7 +1743,7 @@ class NiemTools {
 	}
 
 	/** exports a WSDL definitions file */
-	private static void exportWSDL(String xmlDir, Map<String, UmlClass> ports, Set<String> messageNamespaces)
+	private static void exportWSDL(String xmlDir, String wsdlDir, Map<String, UmlClass> ports, Set<String> messageNamespaces)
 			throws IOException {
 
 		String WSDLURI = getProperty(IEPD_URI_PROPERTY) + WSDL_SUFFIX;
@@ -1832,41 +1838,12 @@ class NiemTools {
 		messageNamespaces.add(WRAPPER_PREFIX);
 		String filename = Paths.get(xmlDir, MESSAGE_WRAPPERS_FILE_NAME + XSD_FILE_TYPE).toString();
 		exportXMLSchema(xmlDir, filename, WRAPPERURI, xmlTypes, xmlElements, messageNamespaces);
-		
-//		FileWriter file;
-//		try {
-//			file = new FileWriter(Paths.get(xmlDir, MESSAGE_WRAPPERS_FILE_NAME + XSD_FILE_TYPE).toFile());
-//			file.write("<xs:schema targetNamespace=\"" + WRAPPERURI + "\"");
-//			writeXmlNs(file, WRAPPER_PREFIX, WRAPPERURI);
-//			// export referenced namespaces
-//			for (String nsPrefix : messageNamespaces)
-//				file.write(" " + NAMESPACE_ATTRIBUTE + ":" + nsPrefix + "=\"" + Prefixes.get(nsPrefix) + "\"");
-//			file.write(" elementFormDefault=\"qualified\" attributeFormDefault=\"unqualified\">");
-//			for (String nsPrefix : messageNamespaces) {
-//				String nsSchemaURI = Prefixes.get(nsPrefix);
-//				if (isExternalPrefix(nsPrefix)) {
-//					if (nsSchemaURI != null)
-//						file.write("<xs:import namespace=\"" + nsSchemaURI + "\" schemaLocation=\""
-//								+ externalSchemaURL.get(nsSchemaURI) + "\"/>");
-//				} else if (!nsPrefix.equals(XSD_PREFIX) && !nsPrefix.equals(LOCAL_PREFIX)) {
-//					Namespace ns = Namespaces.get(nsSchemaURI);
-//					if (ns != null)
-//						file.write("<xs:import namespace=\"" + Prefixes.get(nsPrefix) + "\" schemaLocation=\"" + ns.filepath
-//								+ "\"/>");
-//					else
-//						file.write("<xs:import namespace=\"" + Prefixes.get(nsPrefix) + "/>");
-//				}
-//			}
-//			file.write(String.join("", xmlTypes) + String.join("", xmlElements) + "</xs:schema>");
-//			file.close();
-//		} catch (Exception e) {
-//			UmlCom.trace("exportWSDL: error exporting message wrapper file" + e.toString());
-//		}
 
 		UmlCom.trace("Generating WSDLs");
 		for (UmlClass port : ports.values()) {
 			String portName = port.name();
-			FileWriter file = new FileWriter(Paths.get(xmlDir, portName + WSDL_FILE_TYPE).toFile());
+			Path p1 = Paths.get(wsdlDir, portName + WSDL_FILE_TYPE);
+			FileWriter file = new FileWriter(p1.toFile());
 			trace("WSDL: " + portName + WSDL_FILE_TYPE);
 			file.write("<definitions targetNamespace=\"" + WSDLURI + "/" + portName + "\"");
 			writeXmlNs(file, WSDL_PREFIX, WSDLURI + "/" + portName);
@@ -1879,10 +1856,14 @@ class NiemTools {
 			writeXmlNs(file, WSRMP_PREFIX, WSRMP_URI);
 			writeXmlNs(file, WSU_PREFIX, WSU_URI);
 			file.write("><!-- " + port.description() + " -->");
-			file.write("<wsp:UsingPolicy wsdl:required=\"true\"/>" + "<wsp:Policy wsu:Id=\"" + WSP_POLICY + "\">"
-					+ "<wsrmp:RMAssertion/>" + "</wsp:Policy>" + "<wsdl:types>" + "<xsd:schema>"
-					+ "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + MESSAGE_WRAPPERS_FILE_NAME + XSD_FILE_TYPE
-					+ "\"/>" + "</xsd:schema>" + "</wsdl:types>");
+			Path p2 = Paths.get(xmlDir, MESSAGE_WRAPPERS_FILE_NAME + XSD_FILE_TYPE);
+			Path p3 = p1.getParent().relativize(p2);
+			file.write("<wsp:UsingPolicy wsdl:required=\"true\"/>" + 
+					"<wsp:Policy wsu:Id=\"" + WSP_POLICY + "\">" + "<wsrmp:RMAssertion/>" + "</wsp:Policy>" +
+					"<wsdl:types>" + 
+					"<xsd:schema>" + "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + p3.toString() + "\"/>" +
+					"</xsd:schema>" + 
+					"</wsdl:types>");
 
 			file.write("<!-- messages -->");
 			for (UmlItem item : port.children()) {
@@ -3909,7 +3890,7 @@ class NiemTools {
 
 	/** exports a NIEM IEPD including extension and exchange schema */
 	@SuppressWarnings("unchecked")
-	public void exportIEPD(String xmlDir, String jsonDir) {
+	public void exportIEPD(String xmlDir, String wsdlDir, String jsonDir, String openapiDir) {
 
 		/*
 		 * cacheExternalSchemas(); cacheModel(referencePackage);
@@ -3979,18 +3960,6 @@ class NiemTools {
 							continue;
 						trace("exportIEPD: input Message: " + inputMessage + " from operation " + operationName);
 						messageNamespaces.add(getPrefix(inputMessage));
-//						messages.add(inputMessage);
-//						String inputMessage2;
-//						if (param.multiplicity != null)
-//							inputMessage2 = inputMessage + "," + param.multiplicity;
-//						else
-//							inputMessage2 = inputMessage + ",1";
-//						ArrayList<String> inputs = inputMessages.get(operationName);
-//						if (inputs == null)
-//							inputs = new ArrayList<String>();
-//						if (!inputs.contains(inputMessage2))
-//							inputs.add(inputMessage2);
-//						inputMessages.put(operationName, inputs);
 						UmlClassInstance element = getElement(null, getSchemaURI(inputMessage), inputMessage);
 						if (element != null)
 							element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
@@ -4007,8 +3976,6 @@ class NiemTools {
 					continue;
 				trace("exportIEPD: output Message: " + outputMessage + " from operation " + operationName);
 				messageNamespaces.add(getPrefix(outputMessage));
-//				messages.add(outputMessage);
-//				outputMessages.put(operationName, outputMessage);
 				UmlClassInstance element = getElement(null, getSchemaURI(outputMessage), outputMessage);
 				if (element != null)
 					element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
@@ -4020,15 +3987,13 @@ class NiemTools {
 
 		if (exportXML) try {
 			exportMPDCatalog(xmlDir, CodeListNamespaces, messages);
-			exportWSDL(xmlDir, ports, messageNamespaces);
-			//exportWSDL(xmlDir, ports, operations, messages, outputMessages, inputMessages);
+			exportWSDL(xmlDir, wsdlDir, ports, messageNamespaces);
 		} catch (Exception e) {
 			UmlCom.trace("exportIEPD: error exporting MPD catalog or WSDL " + e.toString());
 		}
 
 		if (exportJSON) try {
-				exportOpenAPI(xmlDir, ports, messageNamespaces);
-				//exportOpenAPI(jsonDir, ports, operations, messages, outputMessages, inputMessages);
+				exportOpenAPI(jsonDir, openapiDir, ports, messageNamespaces);
 		} catch (Exception e) {
 			UmlCom.trace("exportIEPD: error exporting OpenAPI files " + e.toString());
 		}

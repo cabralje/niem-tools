@@ -49,7 +49,9 @@ public class Main
 		root.set_PropertyValue("html dir", htmlDir);
 		String xsdDir = properties.getProperty("xsdDir");
 		String jsonDir = properties.getProperty("jsonDir");
-		String niemDir = properties.getProperty("niemDir", homeDir);
+		String niemDir = properties.getProperty("niemDir");
+		String wsdlDir = properties.getProperty("wsdlDir");
+		String openapiDir = properties.getProperty("openapiDir", homeDir);
 		String extensionURI = properties.getProperty("extensionURI", "http://local/");
 		
 		try {
@@ -104,7 +106,7 @@ public class Main
 
 			// Generate extension schema
 			UmlCom.trace("Generating extension schema");
-			niemTools.exportIEPD(xsdDir, jsonDir);
+			niemTools.exportIEPD(xsdDir, wsdlDir, jsonDir, openapiDir);
 			
 			// store properties
 			try {

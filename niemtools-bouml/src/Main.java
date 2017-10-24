@@ -75,7 +75,9 @@ class Main
 				root.set_PropertyValue("html dir", htmlDir);
 				String xsdDir = properties.getProperty("xsdDir");
 				String jsonDir = properties.getProperty("jsonDir");
-				String niemDir = properties.getProperty("niemDir", homeDir);
+				String niemDir = properties.getProperty("niemDir");
+				String wsdlDir = properties.getProperty("wsdlDir");
+				String openapiDir = properties.getProperty("openapiDir");
 				
 				// int argc = argv.length-1;
 				switch (argv[0])
@@ -192,18 +194,38 @@ class Main
 						xsdDir = fc.getSelectedFile().getAbsolutePath();
 						properties.setProperty("xsdDir", xsdDir);
 					}
+					if (wsdlDir == null)
+					{
+						fc = new JFileChooser(htmlDir);
+						fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						fc.setDialogTitle("Directory of the WSDL to be exported");
+						if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
+							return;
+						wsdlDir = fc.getSelectedFile().getAbsolutePath();
+						properties.setProperty("wsdlDir", wsdlDir);
+					}
 					if (jsonDir == null)
 					{
 						fc = new JFileChooser(htmlDir);
 						fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-						fc.setDialogTitle("Directory of the JSON schema to be exported");
+						fc.setDialogTitle("Directory of the JSON to be exported");
 						if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
 							return;
 						jsonDir = fc.getSelectedFile().getAbsolutePath();
 						properties.setProperty("jsonDir", jsonDir);
 					}
+					if (openapiDir == null)
+					{
+						fc = new JFileChooser(htmlDir);
+						fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						fc.setDialogTitle("Directory of the OpenAPI to be exported");
+						if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
+							return;
+						openapiDir = fc.getSelectedFile().getAbsolutePath();
+						properties.setProperty("openapiDir", openapiDir);
+					}
 					niemTools.cacheModels(); // cache substitutions
-					niemTools.exportIEPD(xsdDir, jsonDir);
+					niemTools.exportIEPD(xsdDir, wsdlDir, jsonDir, openapiDir);
 					
 					// output UML objects
 					//NiemTools.outputUML();
