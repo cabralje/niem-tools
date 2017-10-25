@@ -1,5 +1,5 @@
 import java.awt.BorderLayout;
-import java.awt.Dimension;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.Properties;
 
 import javax.swing.JButton;
@@ -20,17 +21,44 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 // the program is called with the socket port number in argument
-
 class Main
 {
+
+	private static class LineWrapCellRenderer extends JTextArea implements TableCellRenderer {
+
+		private static final long serialVersionUID = 1L;
+		
+	    LineWrapCellRenderer() {
+	        setLineWrap(true);
+	        setWrapStyleWord(true);
+			setFont(new Font(Font.DIALOG, Font.PLAIN,25));
+	    }
+	    
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+				int row, int column) {
+			if (value != null)
+				setText(value.toString());
+	        setSize(table.getColumnModel().getColumn(column).getWidth(), getPreferredSize().height);
+	        if (table.getRowHeight(row) != getPreferredSize().height) {
+	            table.setRowHeight(row, getPreferredSize().height);
+	        }
+			return this;
+		}
+	}
+	
 	private static class ToggleBox extends JCheckBox {
 		
 		private static final long serialVersionUID = 1L;
@@ -235,43 +263,40 @@ class Main
 					fieldLayout.gridy = 4;
 					modelPanel.add(openapiPanel, fieldLayout);
 					
-					// add external schemas panel
-					JPanel externalSchemasPanel = new JPanel(new GridBagLayout());
-					GridBagConstraints prefixLayout = new GridBagConstraints();
-					prefixLayout.gridx = 0;
-					prefixLayout.ipadx = 80;
-					GridBagConstraints namespaceLayout = new GridBagConstraints();
-					namespaceLayout.gridx = 1;
-					namespaceLayout.weightx = 1.0;
-					namespaceLayout.weighty = 1.0;
-					GridBagConstraints urlLayout = new GridBagConstraints();
-					urlLayout.gridx = 3;
-					urlLayout.weightx = 1.0;
-					urlLayout.weighty = 1.0;
+					// Add external panel
+					JPanel externalPanel = new JPanel(new BorderLayout());
 					String[] externalNamespaces = NiemTools.getProperty(NiemTools.IEPD_EXTERNAL_SCHEMAS_PROPERTY).split(",");
-					externalSchemasPanel.add(new JLabel("Prefix"), prefixLayout);
-					externalSchemasPanel.add(new JLabel("Namespace"), namespaceLayout);
-					externalSchemasPanel.add(new JLabel("URL"), urlLayout);
-					for (String namespace : externalNamespaces) {						
-						String[] part = namespace.split("=");
-						externalSchemasPanel.add(new JTextField(part[0]), prefixLayout);
-						JTextArea namespaceArea = new JTextArea(part[1]);
-						namespaceArea.setMinimumSize(new Dimension(500,80));
-						namespaceArea.setFont(new Font(Font.DIALOG_INPUT, Font.PLAIN,25));
-						namespaceArea.setLineWrap(true);
-						externalSchemasPanel.add(namespaceArea, namespaceLayout);
-						JTextArea urlArea = new JTextArea(part[2]);
-						urlArea.setMinimumSize(new Dimension(500,80));
-						urlArea.setFont(new Font(Font.DIALOG_INPUT, Font.PLAIN,25));
-						urlArea.setLineWrap(true);
-						externalSchemasPanel.add(urlArea, urlLayout);
+					int row = 0;
+					String[][] data = new String[externalNamespaces.length][3];
+					for (String namespace : externalNamespaces) {
+						String[] parts = namespace.split("=");
+						if (parts.length == 3) {
+							data[row] = parts;
+							row++;
+						}
 					}
+					DefaultTableModel model = new DefaultTableModel(data, new String[]{"Prefix","Namespace","URL"});
+					JTable table = new JTable(model);
+					table.setFont(new Font(Font.DIALOG, Font.PLAIN,25));
+					table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+					table.getColumnModel().getColumn(0).setMaxWidth(80);
+					table.setDefaultRenderer(Object.class, new LineWrapCellRenderer());
+					JScrollPane scrollPanel = new JScrollPane(table);
+					JButton namespaceButton = new JButton("Add namespace");
+					namespaceButton.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e){
+							DefaultTableModel model = (DefaultTableModel)table.getModel();
+							model.addRow(new String[] {"", "", ""});
+					    }  
+					});
+					externalPanel.add(namespaceButton, BorderLayout.SOUTH);
+					externalPanel.add(scrollPanel, BorderLayout.CENTER);
 					
 					// add panels
 					JTabbedPane dialogPanel = new JTabbedPane();
 					dialogPanel.addTab("IEPD metadata", iepdPanel);
 					dialogPanel.addTab("Model generation", modelPanel);
-					dialogPanel.addTab("External Schemas", externalSchemasPanel);
+					dialogPanel.addTab("External Namespaces", externalPanel);
 					dialog.add(dialogPanel);
 					
 					// add frame button
@@ -298,15 +323,16 @@ class Main
 					properties.setProperty("wsdlDir", wsdlPanel.value);
 					properties.setProperty("jsonDir", jsonPanel.value);
 					properties.setProperty("openapiDir", openapiPanel.value);
-					String externalSchemas2 = "";
-					for (int i=3; i < externalSchemasPanel.getComponentCount(); i+=3) {
-						JTextField prefixField = (JTextField)(externalSchemasPanel.getComponent(i));
-						JTextArea namespaceArea = (JTextArea)(externalSchemasPanel.getComponent(i+1));
-						JTextArea urlArea = (JTextArea)(externalSchemasPanel.getComponent(i+2));
-						String namespace = prefixField.getText() + "=" + namespaceArea.getText() + "=" + urlArea.getText();
-						externalSchemas2 += namespace + ",";
+					LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<String>();
+					//DefaultTableModel model = table.getModel();
+					for (int i=0; i < model.getRowCount(); i++) {
+						String prefix = model.getValueAt(i, 0).toString();
+						String namespace = model.getValueAt(i, 1).toString();
+						String url = model.getValueAt(i, 2).toString();
+						if (prefix != null && !prefix.equals("") && namespace != null && !namespace.equals("") && url != null && !url.equals(""))
+							externalSchemas2.add(prefix + "=" + namespace + "=" + url);
 					}
-					root.set_PropertyValue(NiemTools.IEPD_EXTERNAL_SCHEMAS_PROPERTY, externalSchemas2);
+					root.set_PropertyValue(NiemTools.IEPD_EXTERNAL_SCHEMAS_PROPERTY, String.join(",", externalSchemas2));
 					
 					// save IEPD values
 					root.set_PropertyValue(NiemTools.IEPD_NAME_PROPERTY, nameField.getText());
