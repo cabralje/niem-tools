@@ -464,7 +464,7 @@ class NiemTools {
 		if (modelPackage == null)
 			return;
 
-		UmlCom.trace("cacheModel: caching model " + modelPackage.name());
+		trace("cacheModel: caching model " + modelPackage.name());
 		// Cache namespaces, types and elements
 		String schemaURI;
 		Map<String, UmlClassInstance> Elements = null;
@@ -3930,16 +3930,15 @@ class NiemTools {
 		 * cacheModel(subsetPackage); cacheModel(extensionPackage);
 		 */
 
-		Boolean exportXML = (xmlDir != null);
-		Boolean exportJSON = (jsonDir != null);
-
 		// export code lists for extension elements
 		CodeListNamespaces = new HashSet<String>();
-		exportCodeLists(extensionPackage, xmlDir);
-		exportCodeLists(subsetPackage, xmlDir);
+		if (xmlDir != null) {
+			exportCodeLists(extensionPackage, xmlDir);
+			exportCodeLists(subsetPackage, xmlDir);
+		}
 
 		try {
-			if (exportXML) {
+			if (xmlDir != null) {
 				// export catalog file
 				exportXMLCatalog(xmlDir, CodeListNamespaces);
 			}
@@ -3950,10 +3949,7 @@ class NiemTools {
 		// cache list of ports and message elements
 		trace("exportIEPD: cache ports and message elements");
 		Map<String, UmlClass> ports = new TreeMap<String, UmlClass>();
-//		Map<String, UmlOperation> operations = new TreeMap<String, UmlOperation>();
 		Set<String> messages = new TreeSet<String>();
-//		Map<String, String> outputMessages = new TreeMap<String, String>();
-//		Map<String, ArrayList<String>> inputMessages = new TreeMap<String, ArrayList<String>>();
 		Set<String> messageNamespaces = new TreeSet<String>();
 		messageNamespaces.add(XSD_PREFIX);
 		Iterator<UmlItem> it = (UmlClass.classes.iterator());
@@ -4015,17 +4011,20 @@ class NiemTools {
 			}
 		}
 
-		exportSchemas(subsetPackage, null, Paths.get(jsonDir, NIEM_DIR).toString());
+		if (jsonDir != null)
+			exportSchemas(subsetPackage, null, Paths.get(jsonDir, NIEM_DIR).toString());
 		exportSchemas(extensionPackage, xmlDir, jsonDir);
 
-		if (exportXML) try {
+		if (xmlDir != null) try {
 			exportMPDCatalog(xmlDir, CodeListNamespaces, messages);
-			exportWSDL(xmlDir, wsdlDir, ports, messageNamespaces);
+			if (wsdlDir != null)
+				exportWSDL(xmlDir, wsdlDir, ports, messageNamespaces);
 		} catch (Exception e) {
 			UmlCom.trace("exportIEPD: error exporting MPD catalog or WSDL " + e.toString());
 		}
 
-		if (exportJSON) try {
+		if (jsonDir != null) try {
+			if (openapiDir != null)
 				exportOpenAPI(jsonDir, openapiDir, ports, messageNamespaces);
 		} catch (Exception e) {
 			UmlCom.trace("exportIEPD: error exporting OpenAPI files " + e.toString());

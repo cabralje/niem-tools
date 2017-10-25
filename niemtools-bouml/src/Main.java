@@ -35,8 +35,8 @@ class Main
 		
 		private static final long serialVersionUID = 1L;
 		
-		ToggleBox(String name, JPanel panel) {
-			super(name, true);
+		ToggleBox(String name, String initialValue, JPanel panel) {
+			super(name, (initialValue == null || !initialValue.equals("false")));
 			panel.setVisible(this.isSelected());
 			addItemListener(new ItemListener() {    
 			     public void itemStateChanged(ItemEvent e) {
@@ -87,8 +87,6 @@ class Main
 
 	public static void main(String argv[])
 	{
-		Boolean genHtml = true;
-				
 		try
 		{
 			// Set System L&F
@@ -208,31 +206,31 @@ class Main
 					JPanel modelPanel = new JPanel(new GridBagLayout());
 					
 					FilePanel htmlPanel = new FilePanel("Directory", root.propertyValue("html dir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-					ToggleBox htmlBox = new ToggleBox("HTML", htmlPanel);
+					ToggleBox htmlBox = new ToggleBox("HTML", root.propertyValue("exportHTML"), htmlPanel);
 					modelPanel.add(htmlBox, labelLayout);
 					fieldLayout.gridy = 0;
 					modelPanel.add(htmlPanel, fieldLayout);
 					
 					FilePanel xsdPanel = new FilePanel("Directory", properties.getProperty("xsdDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-					ToggleBox xsdBox = new ToggleBox("XML", xsdPanel);
+					ToggleBox xsdBox = new ToggleBox("XML", root.propertyValue("exportXML"), xsdPanel);
 					modelPanel.add(xsdBox, labelLayout);
 					fieldLayout.gridy = 1;
 					modelPanel.add(xsdPanel, fieldLayout);
 					
 					FilePanel wsdlPanel = new FilePanel("Directory", properties.getProperty("wsdlDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-					ToggleBox wsdlBox = new ToggleBox("WSDL", wsdlPanel);
+					ToggleBox wsdlBox = new ToggleBox("WSDL", root.propertyValue("exportWSDL"), wsdlPanel);
 					modelPanel.add(wsdlBox, labelLayout);
 					fieldLayout.gridy = 2;
 					modelPanel.add(wsdlPanel, fieldLayout);
 					
 					FilePanel jsonPanel = new FilePanel("Directory", properties.getProperty("jsonDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-					ToggleBox jsonBox = new ToggleBox("JSON", jsonPanel);
+					ToggleBox jsonBox = new ToggleBox("JSON", root.propertyValue("exportJSON"), jsonPanel);
 					modelPanel.add(jsonBox, labelLayout);
 					fieldLayout.gridy = 3;
 					modelPanel.add(jsonPanel, fieldLayout);
 					
 					FilePanel openapiPanel = new FilePanel("Directory", properties.getProperty("openapiDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-					ToggleBox openapiBox = new ToggleBox("OpenAPI", openapiPanel);
+					ToggleBox openapiBox = new ToggleBox("OpenAPI", root.propertyValue("exportOpenAPI"), openapiPanel);
 					modelPanel.add(openapiBox, labelLayout);
 					fieldLayout.gridy = 4;
 					modelPanel.add(openapiPanel, fieldLayout);
@@ -291,6 +289,11 @@ class Main
 					
 					// save model values
 					root.set_PropertyValue("html dir", htmlPanel.value);
+					root.set_PropertyValue("exportHTML", String.valueOf(htmlBox.isSelected()));
+					root.set_PropertyValue("exportXML", String.valueOf(xsdBox.isSelected()));
+					root.set_PropertyValue("exportWSDL", String.valueOf(wsdlBox.isSelected()));
+					root.set_PropertyValue("exportJSON", String.valueOf(jsonBox.isSelected()));
+					root.set_PropertyValue("exportOpenAPI", String.valueOf(openapiBox.isSelected()));
 					properties.setProperty("xsdDir", xsdPanel.value);
 					properties.setProperty("wsdlDir", wsdlPanel.value);
 					properties.setProperty("jsonDir", jsonPanel.value);
@@ -303,7 +306,6 @@ class Main
 						String namespace = prefixField.getText() + "=" + namespaceArea.getText() + "=" + urlArea.getText();
 						externalSchemas2 += namespace + ",";
 					}
-					
 					root.set_PropertyValue(NiemTools.IEPD_EXTERNAL_SCHEMAS_PROPERTY, externalSchemas2);
 					
 					// save IEPD values
@@ -365,7 +367,7 @@ class Main
 						break;
 
 					// Generate UML Model HTML documentation
-					 if (genHtml)
+					if (root.propertyValue("exportHTML").equals("true"))
 					{
 						UmlCom.trace("Generating HTML documentation");
 						//	target.set_dir(argv.length - 1, argv);
@@ -414,10 +416,11 @@ class Main
 					UmlCom.message("Generating extension schema ...");
 					UmlCom.trace("Generating extension schema");
 					niemTools.cacheModels(); // cache substitutions
-					niemTools.exportIEPD(properties.getProperty("xsdDir"),
-										properties.getProperty("wsdlDir"),
-										properties.getProperty("jsonDir"),
-										properties.getProperty("openapiDir"));
+					String xsdDir = (root.propertyValue("exportXML").equals("true")) ? properties.getProperty("xsdDir") : null;
+					String wsdlDir = (root.propertyValue("exportWSDL").equals("true")) ? properties.getProperty("wsdlDir") : null;					
+					String jsonDir = (root.propertyValue("exportJSON").equals("true")) ? properties.getProperty("jsonDir") : null;
+					String openapiDir = (root.propertyValue("exportOpenAPI").equals("true")) ? properties.getProperty("openapiDir") : null;
+					niemTools.exportIEPD(xsdDir, wsdlDir, jsonDir, openapiDir);
 					break;
 				}
 				// store properties
