@@ -5,12 +5,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.Properties;
 
@@ -30,6 +34,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
 // the program is called with the socket port number in argument
@@ -88,8 +93,7 @@ class Main
 				add(new JLabel(name));
 			
 			// add text field
-			JTextField textField1 = new JTextField(columns);
-			textField1.setText(value);
+			JTextField textField1 = new JTextField(value, columns);
 			textField1.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e){
 					value = textField1.getText();
@@ -101,7 +105,7 @@ class Main
 			JButton button1 = new JButton("Browse...");
 			button1.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e){
-					JFileChooser fc = new JFileChooser(textField1.getText());
+					JFileChooser fc = new JFileChooser(value);
 					fc.setFileSelectionMode(fileType);
 					if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
 						return;
@@ -119,8 +123,9 @@ class Main
 		{
 			// Set System L&F
 			UIManager.setLookAndFeel(
-					UIManager.getSystemLookAndFeelClassName());
-			//            UIManager.getCrossPlatformLookAndFeelClassName());
+				UIManager.getSystemLookAndFeelClassName()
+				//UIManager.getCrossPlatformLookAndFeelClassName()
+			);
 		}
 		catch (Exception e)
 		{
@@ -216,10 +221,34 @@ class Main
 
 					iepdPanel.add(new JLabel("License URL"), labelLayout);
 					JTextField licenseField = new JTextField(NiemTools.getProperty(NiemTools.IEPD_LICENSE_URL_PROPERTY), fieldColumns);
+					licenseField.addFocusListener(new FocusAdapter(){
+					       @Override
+					       public void focusLost(final FocusEvent evt){
+								String value = licenseField.getText();
+								if (value.startsWith("http"))
+									try {
+										new URL(value);
+									} catch (MalformedURLException e1) {
+									    UmlCom.trace("main: URL " + value + " is malformed");
+									}
+					       } 
+					  });
 					iepdPanel.add(licenseField, fieldLayout);
 					
-					iepdPanel.add(new JLabel("Terms of Use"), labelLayout);
+					iepdPanel.add(new JLabel("Terms of Use URL"), labelLayout);
 					JTextField termsField = new JTextField(NiemTools.getProperty(NiemTools.IEPD_TERMS_URL_PROPERTY), fieldColumns);
+					termsField.addFocusListener(new FocusAdapter(){
+					       @Override
+					       public void focusLost(final FocusEvent evt){
+								String value = termsField.getText();
+								if (value.startsWith("http"))
+									try {
+										new URL(value);
+									} catch (MalformedURLException e1) {
+									    UmlCom.trace("URL " + value + " is malformed");
+									}
+					       } 
+					  });
 					iepdPanel.add(termsField, fieldLayout);
 					
 					iepdPanel.add(new JLabel("ChangeLog File"), labelLayout);
@@ -277,9 +306,14 @@ class Main
 					}
 					DefaultTableModel model = new DefaultTableModel(data, new String[]{"Prefix","Namespace","URL"});
 					JTable table = new JTable(model);
-					table.setFont(new Font(Font.DIALOG, Font.PLAIN,25));
+				    Font font = new Font(Font.DIALOG, Font.PLAIN, 25);
+					table.setFont(font);
+				    Font font2 = new Font(Font.DIALOG, Font.BOLD, 25);
+				    JTableHeader header = table.getTableHeader();
+				    header.setFont(font2);
 					table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-					table.getColumnModel().getColumn(0).setMaxWidth(80);
+					table.getColumnModel().getColumn(0).setMinWidth(100);
+					table.getColumnModel().getColumn(0).setMaxWidth(100);
 					table.setDefaultRenderer(Object.class, new LineWrapCellRenderer());
 					JScrollPane scrollPanel = new JScrollPane(table);
 					JButton namespaceButton = new JButton("Add namespace");
@@ -329,6 +363,12 @@ class Main
 						String prefix = model.getValueAt(i, 0).toString();
 						String namespace = model.getValueAt(i, 1).toString();
 						String url = model.getValueAt(i, 2).toString();
+						if (url != null && url.startsWith("http"))
+							try {
+								new URL(url);
+							} catch (MalformedURLException e1) {
+							    UmlCom.trace("URL " + url + " is malformed");
+							}
 						if (prefix != null && !prefix.equals("") && namespace != null && !namespace.equals("") && url != null && !url.equals(""))
 							externalSchemas2.add(prefix + "=" + namespace + "=" + url);
 					}
