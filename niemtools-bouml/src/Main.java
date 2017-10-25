@@ -1,6 +1,8 @@
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -11,7 +13,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -19,7 +20,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -30,89 +31,57 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 class Main
 {
-	private static class ModelPanel extends JPanel {
+	private static class ToggleBox extends JCheckBox {
 		
 		private static final long serialVersionUID = 1L;
-		String directory = null;
 		
-		ModelPanel(String modelName, String initialDirectory) {
-			
-			directory = initialDirectory;
-			
-			// add field panels
-			//JPanel panel1 = new JPanel();
-			setLayout(new FlowLayout());
-			JPanel panel2 = new JPanel();
-			panel2.setLayout(new FlowLayout());
-			
-			// add field label
-			JLabel label1 = new JLabel("Directory");
-			panel2.add(label1);
-			
-			// add text field
-			JTextField textField1 = new JTextField();
-			textField1.setText(directory);
-			textField1.setToolTipText("Select the directory for " + modelName + " models");
-			textField1.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e){
-					directory = textField1.getText();
-				}				
-			});
-			panel2.add(textField1);
-			
-			// add field button
-			JButton button1 = new JButton("Browse...");
-			button1.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e){
-					JFileChooser fc = new JFileChooser(textField1.getText());
-					fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-					fc.setDialogTitle(modelName + " directory");
-					if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
-						return;
-					directory = fc.getSelectedFile().getAbsolutePath();
-					textField1.setText(directory);
-			    }  
-			});     
-			panel2.add(button1);
-			
-			// add checkbox
-			JCheckBox checkBox1 = new JCheckBox(modelName, true);
-			setVisible(checkBox1.isSelected());
-			checkBox1.addItemListener(new ItemListener() {    
+		ToggleBox(String name, JPanel panel) {
+			super(name, true);
+			panel.setVisible(this.isSelected());
+			addItemListener(new ItemListener() {    
 			     public void itemStateChanged(ItemEvent e) {
-			       	panel2.setVisible(checkBox1.isSelected());
+			       	panel.setVisible(((JCheckBox)(e.getItem())).isSelected());
 			     }    
-			  });    
-			add(checkBox1);
-			add(panel2);
+			  }); 
 		}
 	}
-
-	private static class IEPDPanel extends JPanel {
+	
+	private static class FilePanel extends JPanel {
 		
 		private static final long serialVersionUID = 1L;
 		String value = null;
 		
-		IEPDPanel(String name, String initialValue) {
+		FilePanel(String name, String initialValue, int columns, int fileType) {
 			
 			value = initialValue;
 			
-			setLayout(new FlowLayout());
-			
 			// add field label
-			JLabel label1 = new JLabel(name);
-			add(label1);
+			if (name != null)
+				add(new JLabel(name));
 			
 			// add text field
-			JTextField textField1 = new JTextField();
+			JTextField textField1 = new JTextField(columns);
 			textField1.setText(value);
-			textField1.setToolTipText("Set the IEPD parameter " + name);
 			textField1.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e){
 					value = textField1.getText();
 				}				
 			});
 			add(textField1);
+			
+			// add field button
+			JButton button1 = new JButton("Browse...");
+			button1.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e){
+					JFileChooser fc = new JFileChooser(textField1.getText());
+					fc.setFileSelectionMode(fileType);
+					if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
+						return;
+					value = fc.getSelectedFile().getAbsolutePath();
+					textField1.setText(value);
+			    }  
+			});
+			add(button1);
 		}
 	}
 
@@ -158,6 +127,7 @@ class Main
 				niemTools.cacheModels();
 
 				//load properties
+				String command = argv[0];
 				Properties properties = new Properties();
 				FileReader in = null;
 				try {
@@ -168,80 +138,143 @@ class Main
 				catch (FileNotFoundException e) 
 				{
 					UmlCom.trace("Properties file " + propFile + " does not exist.");
-				}
-				// get local locations
-				String htmlDir = NiemTools.getProperty("html dir");
-				String xsdDir = properties.getProperty("xsdDir");
-				String jsonDir = properties.getProperty("jsonDir");
-				String niemDir = properties.getProperty("niemDir");
-				String wsdlDir = properties.getProperty("wsdlDir");
-				String openapiDir = properties.getProperty("openapiDir");
-				
-				String command = argv[0];
-				if (xsdDir == null || jsonDir == null || wsdlDir == null || openapiDir == null)
 					command = "configure";
+				}
 				
 				switch (command)
 				{
 				case "configure":
 					// create dialog
 					JDialog dialog = new JDialog(new JFrame(), "Niem-tools Configuration", true);
-					dialog.setSize(1000, 1300);
-
-					// add frame label
-					JLabel frameLabel = new JLabel("Set models to generate and IEPD parameters");
-					frameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-					dialog.add(frameLabel, BorderLayout.NORTH);
+					dialog.setSize(1400, 700);
+					int fieldColumns = 50;
 					
-					// add center content pane
-					JPanel panel0 = new JPanel();
-					panel0.setLayout(new BoxLayout(panel0, BoxLayout.Y_AXIS));
-					dialog.add(panel0, BorderLayout.CENTER);
+					// add IEPD panel
+					JPanel iepdPanel = new JPanel(new GridBagLayout());
+					GridBagConstraints labelLayout = new GridBagConstraints();
+					labelLayout.gridx = 0;
+					labelLayout.ipady = 20;
+					GridBagConstraints fieldLayout = new GridBagConstraints();
+					fieldLayout.gridx = 1;
+					fieldLayout.ipadx = 1000;
+					labelLayout.ipady = 20;
+					fieldLayout.weightx = 1.0;
 					
-					// add model panels
-					ModelPanel htmlPanel = new ModelPanel("HTML", htmlDir);
-					ModelPanel xsdPanel = new ModelPanel("XML", xsdDir);
-					ModelPanel wsdlPanel = new ModelPanel("WSDL", wsdlDir);
-					ModelPanel jsonPanel = new ModelPanel("JSON", jsonDir);
-					ModelPanel openapiPanel = new ModelPanel("OpenAPI", openapiDir);
-					panel0.add(htmlPanel);
-					panel0.add(xsdPanel);
-					panel0.add(wsdlPanel);
-					panel0.add(jsonPanel);
-					panel0.add(openapiPanel);
+					iepdPanel.add(new JLabel("Name"), labelLayout);
+					JTextField nameField = new JTextField(NiemTools.getProperty(NiemTools.IEPD_NAME_PROPERTY), fieldColumns);
+					iepdPanel.add(nameField, fieldLayout);
+					
+					iepdPanel.add(new JLabel("URI"), labelLayout);
+					JTextField uriField = new JTextField(NiemTools.getProperty(NiemTools.IEPD_URI_PROPERTY), fieldColumns);
+					iepdPanel.add(uriField, fieldLayout);					
+					
+					iepdPanel.add(new JLabel("Version"), labelLayout);
+					JTextField versionField = new JTextField(NiemTools.getProperty(NiemTools.IEPD_VERSION_PROPERTY), fieldColumns);
+					iepdPanel.add(versionField, fieldLayout);
+					
+					iepdPanel.add(new JLabel("Status"), labelLayout);
+					JTextField statusField = new JTextField(NiemTools.getProperty(NiemTools.IEPD_STATUS_PROPERTY), fieldColumns);
+					iepdPanel.add(statusField, fieldLayout);
+					
+					iepdPanel.add(new JLabel("Organization"), labelLayout);
+					JTextField organizationField = new JTextField(NiemTools.getProperty(NiemTools.IEPD_ORGANIZATION_PROPERTY), fieldColumns);
+					iepdPanel.add(organizationField, fieldLayout);
+					
+					iepdPanel.add(new JLabel("Contact"), labelLayout);
+					JTextField contactField = new JTextField(NiemTools.getProperty(NiemTools.IEPD_CONTACT_PROPERTY), fieldColumns);
+					iepdPanel.add(contactField, fieldLayout);
+					
+					iepdPanel.add(new JLabel("Email"), labelLayout);
+					JTextField emailField = new JTextField(NiemTools.getProperty(NiemTools.IEPD_EMAIL_PROPERTY), fieldColumns);
+					iepdPanel.add(emailField, fieldLayout);
 
-					// add IEPD panels
-					IEPDPanel namePanel = new IEPDPanel("IEPD Name", NiemTools.getProperty(NiemTools.IEPD_NAME_PROPERTY));
-					IEPDPanel uriPanel = new IEPDPanel("IEPD URI", NiemTools.getProperty(NiemTools.IEPD_URI_PROPERTY));
-					IEPDPanel versionPanel = new IEPDPanel("Version", NiemTools.getProperty(NiemTools.IEPD_VERSION_PROPERTY));
-					IEPDPanel statusPanel = new IEPDPanel("Status", NiemTools.getProperty(NiemTools.IEPD_STATUS_PROPERTY));
-					IEPDPanel organizationPanel = new IEPDPanel("Organization", NiemTools.getProperty(NiemTools.IEPD_ORGANIZATION_PROPERTY));
-					IEPDPanel contactPanel = new IEPDPanel("Contact", NiemTools.getProperty(NiemTools.IEPD_CONTACT_PROPERTY));
-					IEPDPanel emailPanel = new IEPDPanel("Email", NiemTools.getProperty(NiemTools.IEPD_EMAIL_PROPERTY));
-					IEPDPanel changelogPanel = new IEPDPanel("Change Log", NiemTools.getProperty(NiemTools.IEPD_CHANGE_LOG_FILE_PROPERTY));
-					IEPDPanel readMePanel = new IEPDPanel("ReadMe File", NiemTools.getProperty(NiemTools.IEPD_READ_ME_FILE_PROPERTY));
-					IEPDPanel licensePanel = new IEPDPanel("License URL", NiemTools.getProperty(NiemTools.IEPD_LICENSE_URL_PROPERTY));
-					IEPDPanel termsPanel = new IEPDPanel("Terms of Use URL", NiemTools.getProperty(NiemTools.IEPD_TERMS_URL_PROPERTY));
-					JLabel externalSchemasLabel = new JLabel("External Schemas", SwingConstants.CENTER);
-					JTextArea externalSchemasArea = new JTextArea(NiemTools.getProperty(NiemTools.IEPD_EXTERNAL_SCHEMAS_PROPERTY));
-					externalSchemasArea.setFont(new Font(Font.DIALOG_INPUT, Font.PLAIN,25));
-					externalSchemasArea.setLineWrap(true);
-					panel0.add(new JSeparator(SwingConstants.HORIZONTAL));
-					panel0.add(namePanel);
-					panel0.add(uriPanel);					
-					panel0.add(versionPanel);
-					panel0.add(statusPanel);
-					panel0.add(organizationPanel);					
-					panel0.add(contactPanel);
-					panel0.add(emailPanel);
-					panel0.add(changelogPanel);					
-					panel0.add(readMePanel);
-					panel0.add(licensePanel);
-					panel0.add(termsPanel);
-					panel0.add(new JSeparator(SwingConstants.HORIZONTAL));
-					panel0.add(externalSchemasLabel);
-					panel0.add(externalSchemasArea);
-					panel0.add(new JSeparator(SwingConstants.HORIZONTAL));
+					iepdPanel.add(new JLabel("License URL"), labelLayout);
+					JTextField licenseField = new JTextField(NiemTools.getProperty(NiemTools.IEPD_LICENSE_URL_PROPERTY), fieldColumns);
+					iepdPanel.add(licenseField, fieldLayout);
+					
+					iepdPanel.add(new JLabel("Terms of Use"), labelLayout);
+					JTextField termsField = new JTextField(NiemTools.getProperty(NiemTools.IEPD_TERMS_URL_PROPERTY), fieldColumns);
+					iepdPanel.add(termsField, fieldLayout);
+					
+					iepdPanel.add(new JLabel("ChangeLog File"), labelLayout);
+					FilePanel changelogPanel = new FilePanel(null, NiemTools.getProperty(NiemTools.IEPD_CHANGE_LOG_FILE_PROPERTY), fieldColumns, JFileChooser.FILES_ONLY);
+					iepdPanel.add(changelogPanel, fieldLayout);
+					
+					iepdPanel.add(new JLabel("ReadMe File"), labelLayout);
+					FilePanel readmePanel = new FilePanel(null, NiemTools.getProperty(NiemTools.IEPD_READ_ME_FILE_PROPERTY), fieldColumns, JFileChooser.FILES_ONLY);
+					iepdPanel.add(readmePanel, fieldLayout);
+					
+					// add model panel
+					JPanel modelPanel = new JPanel(new GridBagLayout());
+					
+					FilePanel htmlPanel = new FilePanel("Directory", root.propertyValue("html dir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+					ToggleBox htmlBox = new ToggleBox("HTML", htmlPanel);
+					modelPanel.add(htmlBox, labelLayout);
+					fieldLayout.gridy = 0;
+					modelPanel.add(htmlPanel, fieldLayout);
+					
+					FilePanel xsdPanel = new FilePanel("Directory", properties.getProperty("xsdDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+					ToggleBox xsdBox = new ToggleBox("XML", xsdPanel);
+					modelPanel.add(xsdBox, labelLayout);
+					fieldLayout.gridy = 1;
+					modelPanel.add(xsdPanel, fieldLayout);
+					
+					FilePanel wsdlPanel = new FilePanel("Directory", properties.getProperty("wsdlDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+					ToggleBox wsdlBox = new ToggleBox("WSDL", wsdlPanel);
+					modelPanel.add(wsdlBox, labelLayout);
+					fieldLayout.gridy = 2;
+					modelPanel.add(wsdlPanel, fieldLayout);
+					
+					FilePanel jsonPanel = new FilePanel("Directory", properties.getProperty("jsonDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+					ToggleBox jsonBox = new ToggleBox("JSON", jsonPanel);
+					modelPanel.add(jsonBox, labelLayout);
+					fieldLayout.gridy = 3;
+					modelPanel.add(jsonPanel, fieldLayout);
+					
+					FilePanel openapiPanel = new FilePanel("Directory", properties.getProperty("openapiDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+					ToggleBox openapiBox = new ToggleBox("OpenAPI", openapiPanel);
+					modelPanel.add(openapiBox, labelLayout);
+					fieldLayout.gridy = 4;
+					modelPanel.add(openapiPanel, fieldLayout);
+					
+					// add external schemas panel
+					JPanel externalSchemasPanel = new JPanel(new GridBagLayout());
+					GridBagConstraints prefixLayout = new GridBagConstraints();
+					prefixLayout.gridx = 0;
+					prefixLayout.ipadx = 80;
+					GridBagConstraints namespaceLayout = new GridBagConstraints();
+					namespaceLayout.gridx = 1;
+					namespaceLayout.weightx = 1.0;
+					namespaceLayout.weighty = 1.0;
+					GridBagConstraints urlLayout = new GridBagConstraints();
+					urlLayout.gridx = 3;
+					urlLayout.weightx = 1.0;
+					urlLayout.weighty = 1.0;
+					String[] externalNamespaces = NiemTools.getProperty(NiemTools.IEPD_EXTERNAL_SCHEMAS_PROPERTY).split(",");
+					externalSchemasPanel.add(new JLabel("Prefix"), prefixLayout);
+					externalSchemasPanel.add(new JLabel("Namespace"), namespaceLayout);
+					externalSchemasPanel.add(new JLabel("URL"), urlLayout);
+					for (String namespace : externalNamespaces) {						
+						String[] part = namespace.split("=");
+						externalSchemasPanel.add(new JTextField(part[0]), prefixLayout);
+						JTextArea namespaceArea = new JTextArea(part[1]);
+						namespaceArea.setMinimumSize(new Dimension(500,80));
+						namespaceArea.setFont(new Font(Font.DIALOG_INPUT, Font.PLAIN,25));
+						namespaceArea.setLineWrap(true);
+						externalSchemasPanel.add(namespaceArea, namespaceLayout);
+						JTextArea urlArea = new JTextArea(part[2]);
+						urlArea.setMinimumSize(new Dimension(500,80));
+						urlArea.setFont(new Font(Font.DIALOG_INPUT, Font.PLAIN,25));
+						urlArea.setLineWrap(true);
+						externalSchemasPanel.add(urlArea, urlLayout);
+					}
+					
+					// add panels
+					JTabbedPane dialogPanel = new JTabbedPane();
+					dialogPanel.addTab("IEPD metadata", iepdPanel);
+					dialogPanel.addTab("Model generation", modelPanel);
+					dialogPanel.addTab("External Schemas", externalSchemasPanel);
+					dialog.add(dialogPanel);
 					
 					// add frame button
 					JButton frameButton = new JButton("OK");
@@ -257,32 +290,35 @@ class Main
 					dialog.setVisible(true);
 					
 					// save model values
-					htmlDir = htmlPanel.directory;
-					properties.setProperty("html dir", htmlDir);
-					root.set_PropertyValue("html dir", htmlDir);
-					NiemTools.getProperty("html dir");
-					xsdDir = xsdPanel.directory;
-					properties.setProperty("xsdDir", xsdDir);
-					wsdlDir = wsdlPanel.directory;
-					properties.setProperty("wsdlDir", wsdlDir);
-					jsonDir = jsonPanel.directory;
-					properties.setProperty("jsonDir", jsonDir);
-					openapiDir = openapiPanel.directory;
-					properties.setProperty("openapiDir", openapiDir);
-
+					root.set_PropertyValue("html dir", htmlPanel.value);
+					properties.setProperty("xsdDir", xsdPanel.value);
+					properties.setProperty("wsdlDir", wsdlPanel.value);
+					properties.setProperty("jsonDir", jsonPanel.value);
+					properties.setProperty("openapiDir", openapiPanel.value);
+					String externalSchemas2 = "";
+					for (int i=3; i < externalSchemasPanel.getComponentCount(); i+=3) {
+						JTextField prefixField = (JTextField)(externalSchemasPanel.getComponent(i));
+						JTextArea namespaceArea = (JTextArea)(externalSchemasPanel.getComponent(i+1));
+						JTextArea urlArea = (JTextArea)(externalSchemasPanel.getComponent(i+2));
+						String namespace = prefixField.getText() + "=" + namespaceArea.getText() + "=" + urlArea.getText();
+						externalSchemas2 += namespace + ",";
+					}
+					
+					root.set_PropertyValue(NiemTools.IEPD_EXTERNAL_SCHEMAS_PROPERTY, externalSchemas2);
+					
 					// save IEPD values
-					root.set_PropertyValue(NiemTools.IEPD_NAME_PROPERTY, namePanel.value);
-					root.set_PropertyValue(NiemTools.IEPD_URI_PROPERTY, uriPanel.value);
-					root.set_PropertyValue(NiemTools.IEPD_VERSION_PROPERTY, versionPanel.value);
-					root.set_PropertyValue(NiemTools.IEPD_STATUS_PROPERTY, statusPanel.value);
-					root.set_PropertyValue(NiemTools.IEPD_ORGANIZATION_PROPERTY, organizationPanel.value);
-					root.set_PropertyValue(NiemTools.IEPD_CONTACT_PROPERTY, contactPanel.value);
-					root.set_PropertyValue(NiemTools.IEPD_EMAIL_PROPERTY, emailPanel.value);
+					root.set_PropertyValue(NiemTools.IEPD_NAME_PROPERTY, nameField.getText());
+					root.set_PropertyValue(NiemTools.IEPD_URI_PROPERTY, uriField.getText());
+					root.set_PropertyValue(NiemTools.IEPD_VERSION_PROPERTY, versionField.getText());
+					root.set_PropertyValue(NiemTools.IEPD_STATUS_PROPERTY, statusField.getText());
+					root.set_PropertyValue(NiemTools.IEPD_ORGANIZATION_PROPERTY, organizationField.getText());
+					root.set_PropertyValue(NiemTools.IEPD_CONTACT_PROPERTY, contactField.getText());
+					root.set_PropertyValue(NiemTools.IEPD_EMAIL_PROPERTY, emailField.getText());
+					root.set_PropertyValue(NiemTools.IEPD_LICENSE_URL_PROPERTY, licenseField.getText());
+					root.set_PropertyValue(NiemTools.IEPD_TERMS_URL_PROPERTY, termsField.getText());
 					root.set_PropertyValue(NiemTools.IEPD_CHANGE_LOG_FILE_PROPERTY, changelogPanel.value);
-					root.set_PropertyValue(NiemTools.IEPD_READ_ME_FILE_PROPERTY, readMePanel.value);
-					root.set_PropertyValue(NiemTools.IEPD_LICENSE_URL_PROPERTY, licensePanel.value);
-					root.set_PropertyValue(NiemTools.IEPD_TERMS_URL_PROPERTY, termsPanel.value);
-					root.set_PropertyValue(NiemTools.IEPD_EXTERNAL_SCHEMAS_PROPERTY, externalSchemasArea.getText());					
+					root.set_PropertyValue(NiemTools.IEPD_READ_ME_FILE_PROPERTY, readmePanel.value);
+				
 					break;
 				case "importSchema":
 					// Create PIM
@@ -293,7 +329,7 @@ class Main
 					// in java it is very complicated to select
 					// a directory through a dialog, and the dialog
 					// is very slow and ugly
-					fc = new JFileChooser(niemDir);
+					fc = new JFileChooser(properties.getProperty("niemDir"));
 					fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					fc.setDialogTitle("Directory of the schema to be imported");
 					if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
@@ -310,7 +346,7 @@ class Main
 					UmlCom.trace("Deleting NIEM Mapping");
 					niemTools.deleteMapping();
 					UmlCom.trace("Importing NIEM Mapping");
-					JFileChooser fc2 = new JFileChooser(htmlDir);
+					JFileChooser fc2 = new JFileChooser(root.propertyValue("html dir"));
 					fc2.setFileFilter(new FileNameExtensionFilter("CSV file","csv"));
 					fc2.setDialogTitle("NIEM Mapping CSV file");
 					if (fc2.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
@@ -333,7 +369,7 @@ class Main
 					{
 						UmlCom.trace("Generating HTML documentation");
 						//	target.set_dir(argv.length - 1, argv);
-						String[] params = {htmlDir};
+						String[] params = {root.propertyValue("html dir")};
 						target.set_dir(1, params);
 						//target.set_dir(0,null);
 						UmlItem.frame();
@@ -350,12 +386,12 @@ class Main
 					// Generate NIEM Mapping HTML
 					UmlCom.message ("Generating NIEM Mapping HTML ...");
 					UmlCom.trace("Generating NIEM Mapping HTML");
-					niemTools.exportHtml(htmlDir, "niem-mapping");
+					niemTools.exportHtml(root.propertyValue("html dir"), "niem-mapping");
 
 					// Generate NIEM Mapping CSV
 					UmlCom.message("Generating NIEM Mapping CSV ...");
 					UmlCom.trace("Generating NIEM Mapping CSV");
-					niemTools.exportCsv(htmlDir, "niem-mapping.csv"); 
+					niemTools.exportCsv(root.propertyValue("html dir"), "niem-mapping.csv"); 
 
 					// Clearing NIEM Models
 					UmlCom.message("Resetting NIEM models");
@@ -372,14 +408,16 @@ class Main
 					// Generate NIEM Wantlist instance
 					UmlCom.message("Generating NIEM Wantlist ...");
 					UmlCom.trace("Generating NIEM Wantlist");
-					niemTools.exportWantlist(htmlDir, "wantlist.xml");
+					niemTools.exportWantlist(root.propertyValue("html dir"), "wantlist.xml");
 
 					// Generate extension schema
 					UmlCom.message("Generating extension schema ...");
 					UmlCom.trace("Generating extension schema");
 					niemTools.cacheModels(); // cache substitutions
-					niemTools.exportIEPD(xsdDir, wsdlDir, jsonDir, openapiDir);
-
+					niemTools.exportIEPD(properties.getProperty("xsdDir"),
+										properties.getProperty("wsdlDir"),
+										properties.getProperty("jsonDir"),
+										properties.getProperty("openapiDir"));
 					break;
 				}
 				// store properties
