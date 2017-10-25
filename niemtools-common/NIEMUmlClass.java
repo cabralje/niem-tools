@@ -195,30 +195,30 @@ class NiemTools {
 	private static final String RESPONSE_MESSAGE_SUFFIX = "Response";
 	private static final String REQUEST_MESSAGE_SUFFIX = "Request";
 	// IEPD Properties
-	private static final String IEPD_EXTERNAL_SCHEMAS_PROPERTY = "externalSchemas";
-	private static final String IEPD_CHANGE_LOG_FILE_PROPERTY = "IEPDChangeLogFile";
-	private static final String IEPD_READ_ME_FILE_PROPERTY = "IEPDReadMeFile";
-	private static final String IEPD_CONTACT_PROPERTY = "IEPDContact";
-	private static final String IEPD_EMAIL_PROPERTY = "IEPDEmail";
-	private static final String IEPD_LICENSE_URL_PROPERTY = "IEPDLicense";
-	private static final String IEPD_TERMS_URL_PROPERTY = "IEPDTermsOfService";
-	private static final String IEPD_ORGANIZATION_PROPERTY = "IEPDOrganization";
-	private static final String IEPD_STATUS_PROPERTY = "IEPDStatus";
-	private static final String IEPD_VERSION_PROPERTY = "IEPDVersion";
-	private static final String IEPD_NAME_PROPERTY = "IEPDName";
-	private static final String IEPD_URI_PROPERTY = "IEPDURI";
-	private static final String IEPD_CHANGE_LOG_FILE_DEFAULT = "changelog.txt";
-	private static final String IEPD_READ_ME_FILE_DEFAULT = "readme.txt";
-	private static final String IEPD_CONTACT_DEFAULT = "Contact";
-	private static final String IEPD_EMAIL_DEFAULT = "email@example.com";
-	private static final String IEPD_LICENSE_URL_DEFAULT = "https://opensource.org/licenses/BSD-3-Clause";
-	private static final String IEPD_TERMS_URL_DEFAULT = "example.com/terms";
-	private static final String IEPD_ORGANIZATION_DEFAULT = "Organization";
-	private static final String IEPD_STATUS_DEFAULT = "Draft";
-	private static final String IEPD_VERSION_DEFAULT = "1.0";
-	private static final String IEPD_NAME_DEFAULT = "IEPD";
-	private static final String IEPD_URI_DEFAULT = "http://local";
-	private static final String IEPD_EXTERNAL_SCHEMAS_DEFAULT = "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,"
+	public static final String IEPD_EXTERNAL_SCHEMAS_PROPERTY = "externalSchemas";
+	public static final String IEPD_CHANGE_LOG_FILE_PROPERTY = "IEPDChangeLogFile";
+	public static final String IEPD_READ_ME_FILE_PROPERTY = "IEPDReadMeFile";
+	public static final String IEPD_CONTACT_PROPERTY = "IEPDContact";
+	public static final String IEPD_EMAIL_PROPERTY = "IEPDEmail";
+	public static final String IEPD_LICENSE_URL_PROPERTY = "IEPDLicense";
+	public static final String IEPD_TERMS_URL_PROPERTY = "IEPDTermsOfService";
+	public static final String IEPD_ORGANIZATION_PROPERTY = "IEPDOrganization";
+	public static final String IEPD_STATUS_PROPERTY = "IEPDStatus";
+	public static final String IEPD_VERSION_PROPERTY = "IEPDVersion";
+	public static final String IEPD_NAME_PROPERTY = "IEPDName";
+	public static final String IEPD_URI_PROPERTY = "IEPDURI";
+	public static final String IEPD_CHANGE_LOG_FILE_DEFAULT = "changelog.txt";
+	public static final String IEPD_READ_ME_FILE_DEFAULT = "readme.txt";
+	public static final String IEPD_CONTACT_DEFAULT = "Contact";
+	public static final String IEPD_EMAIL_DEFAULT = "email@example.com";
+	public static final String IEPD_LICENSE_URL_DEFAULT = "https://opensource.org/licenses/BSD-3-Clause";
+	public static final String IEPD_TERMS_URL_DEFAULT = "example.com/terms";
+	public static final String IEPD_ORGANIZATION_DEFAULT = "Organization";
+	public static final String IEPD_STATUS_DEFAULT = "Draft";
+	public static final String IEPD_VERSION_DEFAULT = "1.0";
+	public static final String IEPD_NAME_DEFAULT = "IEPD";
+	public static final String IEPD_URI_DEFAULT = "http://local";
+	public static final String IEPD_EXTERNAL_SCHEMAS_DEFAULT = "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,"
 			+ "cbc=urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonBasicComponents-2.1.xsd,"
 			+ "ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd";
 	// File locations
@@ -778,7 +778,11 @@ class NiemTools {
 				// export code list
 				trace("exportCodeList: exporting code list " + elementName + GC_FILE_TYPE);
 				try {
-					FileWriter fw = new FileWriter(Paths.get(dir, elementName + GC_FILE_TYPE).toFile());
+					File file = Paths.get(dir, elementName + GC_FILE_TYPE).toFile();
+					File parentFile = file.getParentFile();
+					if (parentFile != null)
+						parentFile.mkdirs();
+					FileWriter fw = new FileWriter(file);
 					fw.write(XML_HEADER + XML_ATTRIBUTION + "<gc:CodeList ");
 					writeXmlNs(fw, CT_PREFIX, CT_URI);
 					writeXmlNs(fw, GC_PREFIX, GC_URI);
@@ -1215,7 +1219,11 @@ class NiemTools {
 		String today = dateFormat.format(date);
 
 		UmlCom.trace("Generating MPD catalog");
-		FileWriter xml = new FileWriter(Paths.get(xmlDir, MPD_CATALOG_FILE).toFile());
+		File file = Paths.get(xmlDir, MPD_CATALOG_FILE).toFile();
+		File parentFile = file.getParentFile();
+		if (parentFile != null)
+			parentFile.mkdirs();
+		FileWriter xml = new FileWriter(file);
 		xml.write(XML_HEADER);
 		xml.write("<c:Catalog");
 		for (Entry<String, String> entry : Prefixes.entrySet()) {
@@ -1515,9 +1523,13 @@ class NiemTools {
 						// write OpenAPI file
 						jsonDefinitions.addAll(jsonProperties);
 						try {
-							FileWriter file = new FileWriter(openapiPath.toFile());
+							File file = openapiPath.toFile();
+							File parentFile = file.getParentFile();
+							if (parentFile != null)
+								parentFile.mkdirs();
+							FileWriter fw = new FileWriter(file);
 							trace("OpenAPI: " + portName + OPENAPI_FILE_TYPE);
-							file.write("{\n" + 
+							fw.write("{\n" + 
 									//		jsonContext + ",\n" + 
 									"  \"swagger\": \"2.0\",\n" + 
 									"  \"info\": {\n" + 
@@ -1551,7 +1563,7 @@ class NiemTools {
 									"      },\n" +
 									"  \"definitions\": {\n" + String.join(",\n", jsonDefinitions) + "\n}" + 
 									"}\n");
-							file.close();
+							fw.close();
 						} catch (Exception e1) {
 							UmlCom.trace("exportOpenAPI: error exporting OpenAPI JSON " + e1.toString());
 						}
@@ -1722,8 +1734,12 @@ class NiemTools {
 				
 				try {
 					// Open JSON schema file for each extension schema and write header
-					trace("exportSchemas: schema " + jsonDir + "/" + prefix + JSON_SCHEMA_FILE_TYPE);
-					FileWriter json = new FileWriter(Paths.get(jsonDir, prefix + JSON_SCHEMA_FILE_TYPE).toFile());
+					File file = Paths.get(jsonDir, prefix + JSON_SCHEMA_FILE_TYPE).toFile();
+					File parentFile = file.getParentFile();
+					if (parentFile != null)
+						parentFile.mkdirs();
+					trace("exportSchemas: schema " + file.toString());
+					FileWriter json = new FileWriter(file);
 					json.write("{\n" + 
 							getJsonPair("$id", nsSchemaURI) + ",\n" +
 							getJsonPair("$schema", JSON_SCHEMA_URI) + ",\n" +
@@ -1843,34 +1859,38 @@ class NiemTools {
 		for (UmlClass port : ports.values()) {
 			String portName = port.name();
 			Path p1 = Paths.get(wsdlDir, portName + WSDL_FILE_TYPE);
-			FileWriter file = new FileWriter(p1.toFile());
+			File file = p1.toFile();
+			File parentFile = file.getParentFile();
+			if (parentFile != null)
+				parentFile.mkdirs();
+			FileWriter wsdl = new FileWriter(file);
 			trace("WSDL: " + portName + WSDL_FILE_TYPE);
-			file.write("<definitions targetNamespace=\"" + WSDLURI + "/" + portName + "\"");
-			writeXmlNs(file, WSDL_PREFIX, WSDLURI + "/" + portName);
-			writeXmlNs(file, WRAPPER_PREFIX, WRAPPERURI);
-			writeXmlNs(file, "xsd", XSD_URI);
-			writeXmlNs(file, SOAP_PREFIX, SOAP_URI);
-			writeXmlNs(file, WSDL_SCHEMA_PREFIX, WSDL_SCHEMA_URI);
-			writeXmlNs(file, "", WSDL_SCHEMA_URI);
-			writeXmlNs(file, WSP_PREFIX, WSP_URI);
-			writeXmlNs(file, WSRMP_PREFIX, WSRMP_URI);
-			writeXmlNs(file, WSU_PREFIX, WSU_URI);
-			file.write("><!-- " + port.description() + " -->");
+			wsdl.write("<definitions targetNamespace=\"" + WSDLURI + "/" + portName + "\"");
+			writeXmlNs(wsdl, WSDL_PREFIX, WSDLURI + "/" + portName);
+			writeXmlNs(wsdl, WRAPPER_PREFIX, WRAPPERURI);
+			writeXmlNs(wsdl, "xsd", XSD_URI);
+			writeXmlNs(wsdl, SOAP_PREFIX, SOAP_URI);
+			writeXmlNs(wsdl, WSDL_SCHEMA_PREFIX, WSDL_SCHEMA_URI);
+			writeXmlNs(wsdl, "", WSDL_SCHEMA_URI);
+			writeXmlNs(wsdl, WSP_PREFIX, WSP_URI);
+			writeXmlNs(wsdl, WSRMP_PREFIX, WSRMP_URI);
+			writeXmlNs(wsdl, WSU_PREFIX, WSU_URI);
+			wsdl.write("><!-- " + port.description() + " -->");
 			Path p2 = Paths.get(xmlDir, MESSAGE_WRAPPERS_FILE_NAME + XSD_FILE_TYPE);
 			Path p3 = p1.getParent().relativize(p2);
-			file.write("<wsp:UsingPolicy wsdl:required=\"true\"/>" + 
+			wsdl.write("<wsp:UsingPolicy wsdl:required=\"true\"/>" + 
 					"<wsp:Policy wsu:Id=\"" + WSP_POLICY + "\">" + "<wsrmp:RMAssertion/>" + "</wsp:Policy>" +
 					"<wsdl:types>" + 
 					"<xsd:schema>" + "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + p3.toString() + "\"/>" +
 					"</xsd:schema>" + 
 					"</wsdl:types>");
 
-			file.write("<!-- messages -->");
+			wsdl.write("<!-- messages -->");
 			for (UmlItem item : port.children()) {
 				if (item.kind() == anItemKind.anOperation) {
 					UmlOperation operation = (UmlOperation) item;
 					String operationName = operation.name();
-					file.write("<message name=\"" + operationName + REQUEST_MESSAGE_SUFFIX + "\">"
+					wsdl.write("<message name=\"" + operationName + REQUEST_MESSAGE_SUFFIX + "\">"
 							+ "<part name=\"body\" element=\"" + getPrefixedName(WRAPPER_PREFIX, operationName)
 							+ REQUEST_MESSAGE_SUFFIX + "\"/>" + "</message>" + "<message name=\"" + operationName
 							+ RESPONSE_MESSAGE_SUFFIX + "\">" + "<part name=\"body\" element=\""
@@ -1879,41 +1899,41 @@ class NiemTools {
 				}
 			}
 
-			file.write("<!-- ports -->");
-			file.write("<portType name=\"" + portName + "\">");
+			wsdl.write("<!-- ports -->");
+			wsdl.write("<portType name=\"" + portName + "\">");
 			for (UmlItem item : port.children()) {
 				if (item.kind() == anItemKind.anOperation) {
 					UmlOperation operation = (UmlOperation) item;
 					String operationName = operation.name();
-					file.write("<operation name=\"" + operationName + "\">" + "<input message=\""
+					wsdl.write("<operation name=\"" + operationName + "\">" + "<input message=\""
 							+ getPrefixedName(WSDL_PREFIX, operationName) + REQUEST_MESSAGE_SUFFIX + "\"/>"
 							+ "<output message=\"" + getPrefixedName(WSDL_PREFIX, operationName)
 							+ RESPONSE_MESSAGE_SUFFIX + "\"/>" + "</operation>");
 				}
 			}
-			file.write("</portType>");
+			wsdl.write("</portType>");
 
-			file.write("<!-- bindings -->");
-			file.write("<binding name=\"" + portName + "Soap\" type=\"" + getPrefixedName(WSDL_PREFIX, portName) + "\">"
+			wsdl.write("<!-- bindings -->");
+			wsdl.write("<binding name=\"" + portName + "Soap\" type=\"" + getPrefixedName(WSDL_PREFIX, portName) + "\">"
 					+ "<wsp:PolicyReference URI=\"#" + WSP_POLICY + "\"/>"
 					+ "<soap:binding style=\"document\" transport=\"" + SOAP_HTTP_BINDING_URI + "\"/>");
 			for (UmlItem item : port.children()) {
 				if (item.kind() == anItemKind.anOperation) {
 					UmlOperation oper = (UmlOperation) item;
 					String operationName = oper.name();
-					file.write("<operation name=\"" + operationName + "\">");
-					file.write("<!-- " + item.description() + " -->");
-					file.write("<soap:operation soapAction=\"" + WSDLURI
+					wsdl.write("<operation name=\"" + operationName + "\">");
+					wsdl.write("<!-- " + item.description() + " -->");
+					wsdl.write("<soap:operation soapAction=\"" + WSDLURI
 							+ "/" + portName + "/" + operationName + "\"/>" + "<input>"
 							+ "	<soap:body use=\"literal\"/>" + "</input>" + "<output>"
 							+ "	<soap:body use=\"literal\"/>" + "</output>" + "</operation>");
 				}
 			}
-			file.write("</binding>");
-			file.write(
+			wsdl.write("</binding>");
+			wsdl.write(
 					"<!-- services not defined here...defined in an implementation-specific WSDL that imports this one -->"
 							+ "</definitions>");
-			file.close();
+			wsdl.close();
 		}
 	}
 
@@ -1921,7 +1941,11 @@ class NiemTools {
 	private static void exportXMLCatalog(String xmlDir, Set<String> CodeListNamespaces) throws IOException {
 		FileWriter xml;
 		UmlCom.trace("Generating XML catalog");
-		xml = new FileWriter(Paths.get(xmlDir, XML_CATALOG_FILE).toFile());
+		File file = Paths.get(xmlDir, XML_CATALOG_FILE).toFile();
+		File parentFile = file.getParentFile();
+		if (parentFile != null)
+			parentFile.mkdirs();
+		xml = new FileWriter(file);
 		xml.write(XML_HEADER + XML_ATTRIBUTION + XML_CATALOG_HEADER + "<catalog prefer=\"public\" "
 				+ NAMESPACE_ATTRIBUTE + "=\"" + XML_CATALOG_URI + "\">\n");
 		for (Entry<String, String> entry : Prefixes.entrySet()) {
@@ -3810,11 +3834,14 @@ class NiemTools {
 		cacheExternalSchemas();
 		
 		UmlItem.directory = dir;
-		String path = Paths.get(dir, filename).toString();
+		File file = Paths.get(dir, filename).toFile();
 
 		try {
-			FileWriter fw = new FileWriter(path);
-			trace("exportCsv: open CSV " + path);
+			File parentFile = file.getParentFile();
+			if (parentFile != null)
+				parentFile.mkdirs();
+			FileWriter fw = new FileWriter(file);
+			trace("exportCsv: open CSV " + file.toString());
 			CSVWriter writer = new CSVWriter(fw);
 			
 			// Write header
@@ -3843,7 +3870,7 @@ class NiemTools {
 				}
 			}
 			writer.close();
-			trace("exportCsv: CSV file created " + path);
+			trace("exportCsv: CSV file created " + file.toString());
 
 		} catch (Exception e) {
 			UmlCom.trace("exportCsv: error " + e.toString());
@@ -3859,7 +3886,11 @@ class NiemTools {
 		// cacheModel(referencePackage);
 		try {
 			// Write rest of header
-			FileWriter fw = new FileWriter(Paths.get(dir, filename + HTML_FILE_TYPE).toFile());
+			File file = Paths.get(dir, filename + HTML_FILE_TYPE).toFile();
+			File parentFile = file.getParentFile();
+			if (parentFile != null)
+				parentFile.mkdirs();
+			FileWriter fw = new FileWriter(file);
 			fw.write("<html>");
 			fw.write("<head><title>" + MAPPING_SPREADSHEET_TITLE
 					+ "</title><link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" /></head>"
@@ -4013,7 +4044,11 @@ class NiemTools {
 		try {
 			// Export schema
 			trace("exportWantlist: create header");
-			FileWriter fw = new FileWriter(Paths.get(dir, filename).toFile());
+			File file = Paths.get(dir, filename).toFile();
+			File parentFile = file.getParentFile();
+			if (parentFile != null)
+				parentFile.mkdirs();
+			FileWriter fw = new FileWriter(file);
 			fw.write(XML_HEADER);
 			fw.write(XML_ATTRIBUTION);
 			fw.write("<w:WantList w:release=\"" + getNiemVersion()
