@@ -21,7 +21,7 @@ package com.mtgmc.niemtools;
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -69,23 +69,23 @@ public class NamespaceResolver implements NamespaceContext {
 	 */
 	private void examineNode(Node node, boolean attributesOnly) {
 
-			if (node.hasAttributes())
-			{
-				NamedNodeMap attributes = node.getAttributes();
-				for (int i = 0; i < attributes.getLength(); i++) {
-					Node attribute = attributes.item(i);
-					storeAttribute((Attr) attribute);
-				}
+		if (node.hasAttributes())
+		{
+			NamedNodeMap attributes = node.getAttributes();
+			for (int i = 0; i < attributes.getLength(); i++) {
+				Node attribute = attributes.item(i);
+				storeAttribute((Attr) attribute);
 			}
+		}
 
-			if (!attributesOnly && node.hasChildNodes()) {
-				NodeList children = node.getChildNodes();
-				for (int i = 0; i < children.getLength(); i++) {
-					Node child = children.item(i);
-					if (child.getNodeType() == Node.ELEMENT_NODE)
-						examineNode(child, false);
-				}
+		if (!attributesOnly && node.hasChildNodes()) {
+			NodeList children = node.getChildNodes();
+			for (int i = 0; i < children.getLength(); i++) {
+				Node child = children.item(i);
+				if (child.getNodeType() == Node.ELEMENT_NODE)
+					examineNode(child, false);
 			}
+		}
 
 	}
 
@@ -127,7 +127,7 @@ public class NamespaceResolver implements NamespaceContext {
 	 */
 	public String getNamespaceURI(String prefix) {
 		if (prefix == null || prefix.equals(XMLConstants.DEFAULT_NS_PREFIX))	
-//			return prefix2Uri.get(DEFAULT_NS);
+			//			return prefix2Uri.get(DEFAULT_NS);
 			return XMLConstants.W3C_XML_SCHEMA_NS_URI;
 		else if (prefix.equals("xs")  || prefix.equals("xsd"))
 			return XMLConstants.W3C_XML_SCHEMA_NS_URI;

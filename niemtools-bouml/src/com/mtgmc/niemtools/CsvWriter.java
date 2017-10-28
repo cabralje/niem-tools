@@ -44,15 +44,15 @@ public class CsvWriter {
 		} catch (Exception e) {
 			Log.trace("itemCsv: error importing class, property multiplicity " + e.toString());
 		}
-	
+
 		// Export Description
 		nextLine[3] = item.description();
-	
+
 		// Export NIEM Mapping
 		if (item.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE_TYPE))
 			for (int column = 4; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length; column++)
 				nextLine[column] = item.propertyValue(NiemUmlClass.getNiemProperty(column));
-	
+
 		return nextLine;
 	}
 

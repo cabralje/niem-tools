@@ -54,10 +54,10 @@ public class JsonWriter {
 	}
 
 	String directory;
-	
+
 	static final String[] HTTP_METHODS = { "get", "put", "post", "update" };
 	static final String HTTP_METHODS_PROPERTY = NiemUmlClass.WEBSERVICE_STEREOTYPE_TYPE + NiemUmlClass.STEREOTYPE_DELIMITER
-	+ "HTTPMethods";
+			+ "HTTPMethods";
 	static final String JSON_SCHEMA_FILE_TYPE = ".schema.json";
 
 	// JSON
@@ -122,7 +122,7 @@ public class JsonWriter {
 				elementSchema += "{\n" + "\"$ref\": \"" + exportJsonPointer(elementName, localPrefix) + "\"\n" + "},\n";
 			}
 			elementSchema += "{\n" + "\"items\": {\n" + "\"$ref\": \"" + exportJsonPointer(elementName, localPrefix)
-					+ "\"\n" + "},\n" + "\n\"minItems\": " + minOccurs + ",\n";
+			+ "\"\n" + "},\n" + "\n\"minItems\": " + minOccurs + ",\n";
 			if (!maxOccurs.equals("unbounded"))
 				elementSchema += "\n\"maxItems\": " + maxOccurs + ",\n";
 			elementSchema += "\"type\": \"array\"\n" + "}\n" + "]\n";
@@ -139,7 +139,7 @@ public class JsonWriter {
 		if (description != null && description.equals(""))
 			jsonDefinition.add("\"description\": \"" + filterQuotes(description) + "\"");
 		UmlClass baseType = NiemModel.getBaseType(element);
-	
+
 		// if derived from XSD primitive, use the primitive as base type
 		UmlClass baseType2 = baseType;
 		UmlClass nextBaseType = NiemModel.getBaseType(baseType);
@@ -161,8 +161,8 @@ public class JsonWriter {
 		case "boolean":
 			jsonType += "\"type\": \"boolean\"\n";
 			break;
-	
-		// numeric types
+
+			// numeric types
 		case "decimal":
 		case "double":
 		case "float":
@@ -240,8 +240,8 @@ public class JsonWriter {
 			jsonType += "\"multipleOf\": 1.0,\n";
 			jsonType += "\"minimum\": 1\n";
 			break;
-	
-		// date/time types
+
+			// date/time types
 		case "date":
 		case "dateTime":
 			jsonType += "\"type\": \"string\",\n";
@@ -275,8 +275,8 @@ public class JsonWriter {
 			jsonType += "\"type\": \"string\",\n";
 			jsonType += "\"pattern\": \"^[0-9]{4}-[0-1][0-9]$\"\n";
 			break;
-	
-		// string types
+
+			// string types
 		case "token":
 			jsonType += "\"type\": \"string\",\n";
 			jsonType += "\"pattern\": \"^\\\\S*$\"\n";
@@ -309,8 +309,8 @@ public class JsonWriter {
 			jsonType += "\"type\": \"string\",\n";
 			jsonType += "\"pattern\": \"^[A-Za-z0-9+/=\\\\s]*$\"\n";
 			break;
-	
-		// reference types
+
+			// reference types
 		case "anyURI":
 			jsonType += "\"type\": \"string\",\n";
 			jsonType += "\"format\": \"uri\"\n";
@@ -332,7 +332,7 @@ public class JsonWriter {
 			jsonType += "\"type\": \"string\",\n";
 			jsonType += "\"pattern\": \"^[_A-Za-z][-._A-Za-z0-9]*:[_A-Za-z][-._A-Za-z0-9]*$\"\n";
 			break;
-	
+
 		default:
 			jsonType += "\"type\": \"string\"\n";
 		}
@@ -369,7 +369,7 @@ public class JsonWriter {
 					UmlClass elementBaseType = NiemModel.getBaseType(element);
 					// if (elementBaseType == null && elementName.endsWith(AUGMENTATION_TYPE_NAME))
 					// elementBaseType = SubsetModel.augmentationType;
-	
+
 					if (NiemModel.Substitutions.containsKey(elementName)) {
 						// relax minoccurs if substitutions
 						String multiplicity2 = "0," + NiemUmlClass.getMaxOccurs(multiplicity);
@@ -471,7 +471,7 @@ public class JsonWriter {
 	// CourtSchedulingMDE.openapi.json
 	/** exports OpenAPI/Swagger 2.0 service definition */
 	void exportOpenApi(String openapiDir, Map<String, UmlClass> ports, Set<String> messageNamespaces) throws IOException {
-	
+
 		// export JSON-LD namespace definitions
 		TreeSet<String> jsonNamespaces = new TreeSet<String>();
 		for (String nsPrefix : messageNamespaces)
@@ -480,25 +480,25 @@ public class JsonWriter {
 		jsonNamespaces.add("\n" + getJsonPair(NiemUmlClass.CODELIST_APPINFO_PREFIX, NiemUmlClass.CODELIST_APPINFO_URI + "#"));
 		jsonNamespaces.add("\n" + getJsonPair(NiemUmlClass.CT_PREFIX, NiemUmlClass.CT_URI + "#"));
 		jsonNamespaces.add("\n" + getJsonPair(NiemUmlClass.TERM_PREFIX, NiemUmlClass.TERM_URI + "#"));
-	
+
 		// generate OpenAPI definitions
 		Log.trace("Generating OpenAPIs");
 		for (UmlClass port : ports.values()) {
 			String portName = port.name();
 			// write OpenAPI paths
 			TreeSet<String> openapiPaths = new TreeSet<String>();
-	
+
 			// for each path
 			TreeSet<String> jsonDefinitions = new TreeSet<String>();
 			TreeSet<String> jsonProperties = new TreeSet<String>();
-	
+
 			// get relative path
 			Path openapiPath = Paths.get(openapiDir, portName + OPENAPI_FILE_TYPE);
 			Path jsonPath = Paths.get(directory);
 			String relativePath = "./" + openapiPath.getParent().relativize(jsonPath).toString().replaceAll("\\\\", "/")
 					+ "/";
 			Log.debug("exportOpenAPI: relative path to json: " + relativePath);
-	
+
 			for (UmlItem item : port.children()) {
 				if (item.kind() == anItemKind.anOperation) {
 					TreeSet<String> openapiOperations = new TreeSet<String>();
@@ -508,7 +508,7 @@ public class JsonWriter {
 					UmlOperation operation = (UmlOperation) item;
 					String operationName = operation.name();
 					String httpMethod = operation.propertyValue(JsonWriter.HTTP_METHODS_PROPERTY).toLowerCase();
-	
+
 					Log.trace("exportOpenAPI: generating document/literal input wrapper for " + portName + "/"
 							+ operationName);
 					UmlClass outputType = null, inputType = null;
@@ -558,7 +558,7 @@ public class JsonWriter {
 							Log.debug("exportOpenAPI: input Message: " + inputMessage + " from operation " + operationName);
 							messageNamespaces.add(NamespaceModel.getPrefix(inputMessage));
 							String mult = param.multiplicity;
-	
+
 							mult = convertMultiplicity(mult);
 							// String maxOccurs = getMaxOccurs(mult);
 							if (!NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(inputMessage)))
@@ -583,10 +583,10 @@ public class JsonWriter {
 							jsonDefinition.add("\"properties\": {\n" + String.join(",", jsonElementsInType) + "\n}");
 						if (jsonRequiredElementsInType != null)
 							jsonDefinition
-									.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
+							.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
 						String typeSchema = "\"" + inputTypeName + "\": {\n" + String.join(",", jsonDefinition)
-								+ "\n}\n";
-	
+						+ "\n}\n";
+
 						// export element wrapper
 						String elementSchema = "\"" + elementName + "\": {\n" + "\"$ref\": \"#/definitions/"
 								+ inputTypeName + "\"" + "\n}\n";
@@ -618,10 +618,10 @@ public class JsonWriter {
 						String mult = "1";
 						if (!NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(message))) {
 							jsonElementsInType
-									.add(exportOpenApiElementInTypeSchema(relativePath, message, mult, null, false));
+							.add(exportOpenApiElementInTypeSchema(relativePath, message, mult, null, false));
 							jsonRequiredElementsInType.add("\"" + message + "\"");
 						}
-	
+
 						// export type wrapper
 						TreeSet<String> jsonDefinition = new TreeSet<String>();
 						// String description = "";
@@ -632,16 +632,16 @@ public class JsonWriter {
 							jsonDefinition.add("\"properties\": {\n" + String.join(",", jsonElementsInType) + "\n}");
 						if (jsonRequiredElementsInType != null)
 							jsonDefinition
-									.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
+							.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
 						String typeSchema = "\"" + outputTypeName + "\": {\n" + String.join(",", jsonDefinition)
-								+ "\n}\n";
+						+ "\n}\n";
 						jsonDefinitions.add(typeSchema);
-	
+
 						// export element wrapper
 						String elementSchema = "\"" + elementName + "\": {\n" + "\"$ref\": \"#/definitions/"
 								+ outputTypeName + "\"" + "\n}\n";
 						jsonProperties.add(elementSchema);
-	
+
 						// add successful response
 						openapiResponses.add("\n" + "          \"200\": {\n" + "            \"description\": \""
 								+ operationName + " response\",\n" + "            \"schema\": {\n"
@@ -671,10 +671,10 @@ public class JsonWriter {
 							}
 						}
 					}
-	
+
 					openapiPaths.add("\n" + "    \"/" + operationName + "\": {" + String.join(",", openapiOperations)
-							+ "\n      }");
-	
+					+ "\n      }");
+
 					// write OpenAPI file
 					jsonDefinitions.addAll(jsonProperties);
 					try {
@@ -685,7 +685,7 @@ public class JsonWriter {
 						FileWriter fw = new FileWriter(file);
 						Log.debug("OpenAPI: " + portName + OPENAPI_FILE_TYPE);
 						fw.write("{\n" +
-						// jsonContext + ",\n" +
+								// jsonContext + ",\n" +
 								"  \"swagger\": \"2.0\",\n" + "  \"info\": {\n" + "    \"version\": \""
 								+ NiemUmlClass.getProperty(NiemUmlClass.IEPD_VERSION_PROPERTY) + "\",\n" + "    \"title\": \"" + portName
 								+ "\",\n" + "    \"description\": \"" + port.description() + "\",\n"

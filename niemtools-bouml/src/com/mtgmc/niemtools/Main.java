@@ -50,9 +50,9 @@ class Main
 		{
 			// Set System L&F
 			UIManager.setLookAndFeel(
-				UIManager.getSystemLookAndFeelClassName()
-				//UIManager.getCrossPlatformLookAndFeelClassName()
-			);
+					UIManager.getSystemLookAndFeelClassName()
+					//UIManager.getCrossPlatformLookAndFeelClassName()
+					);
 		}
 		catch (Exception e)
 		{
@@ -69,7 +69,7 @@ class Main
 				//UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
 				UmlPackage root = UmlBasePackage.getProject();
 				String propFile = System.getProperty("user.home") + "/" + root.name() + ".properties";
-				
+
 				UmlCom.message("Memorize references ...");
 				UmlItem target = UmlCom.targetItem();
 				target.memo_ref();
@@ -92,13 +92,13 @@ class Main
 					Log.trace("Properties file " + propFile + " does not exist.");
 					command = "configure";
 				}
-				
+
 				switch (command)
 				{
 				case "configure":
 					new ConfigurationDialog(root, properties);
 					break;
-					
+
 				case "importSchema":
 					importSchema(niemTools, properties);
 					break;
@@ -108,10 +108,10 @@ class Main
 					break;
 
 				case "sort":
-			        Log.trace("<b>Sort</b> release 5.0<br>");
-			        UmlCom.targetItem().sort();
+					Log.trace("<b>Sort</b> release 5.0<br>");
+					UmlCom.targetItem().sort();
 					break;
-				
+
 				case "export":
 				default:
 					if (!niemTools.verifyNIEM())
@@ -177,7 +177,7 @@ class Main
 			UmlItem.end_file();
 			UmlClass.generate(); 
 		}
-		
+
 		// Generate NIEM Mapping HTML
 		niemTools.exportHtml(root.propertyValue("html dir"), "niem-mapping");
 
@@ -188,7 +188,7 @@ class Main
 		niemTools.deleteNIEM(false);
 		niemTools.createNIEM();
 		niemTools.cacheModels();
-		
+
 		// Generating NIEM Models
 		niemTools.createSubsetAndExtension();
 
@@ -219,7 +219,7 @@ class Main
 		JFileChooser fc;
 		// Create PIM
 		//NiemTools.createPIM(root);
-		
+
 		// Import schema
 		// in java it is very complicated to select
 		// a directory through a dialog, and the dialog

@@ -190,12 +190,12 @@ public class NiemUmlClass {
 
 	public static int importPass;
 	public static String importPath;
-	
+
 	static NiemModel ReferenceModel = new NiemModel();
 	static NiemModel SubsetModel = new NiemModel();
 	static NiemModel ExtensionModel = new NiemModel();
-	
-	
+
+
 
 	/** filter whitespace */
 	// private static String filterToken(String string) {
@@ -361,7 +361,7 @@ public class NiemUmlClass {
 		setPropertyDefault(IEPD_READ_ME_FILE_PROPERTY, IEPD_READ_ME_FILE_DEFAULT);
 		setPropertyDefault(IEPD_CHANGE_LOG_FILE_PROPERTY, IEPD_CHANGE_LOG_FILE_DEFAULT);
 		setPropertyDefault(IEPD_EXTERNAL_SCHEMAS_PROPERTY, IEPD_EXTERNAL_SCHEMAS_DEFAULT);
-		
+
 	}
 
 	/** caches namespaces and prefixes for external schemas */
@@ -603,11 +603,11 @@ public class NiemUmlClass {
 	 * roundtripping is supported with importCsv()
 	 */
 	@SuppressWarnings("unchecked")
-	
+
 	public void exportCsv(String dir, String filename) {
 
 		CsvWriter csvWriter = new CsvWriter();
-		
+
 		UmlCom.message("Generating NIEM Mapping CSV ...");
 		Log.trace("Generating NIEM Mapping CSV");
 		NamespaceModel.cacheExternalSchemas();
@@ -661,7 +661,7 @@ public class NiemUmlClass {
 	public void exportHtml(String directory, String filename) {
 
 		HtmlWriter htmlWriter = new HtmlWriter();
-		
+
 		UmlCom.message ("Generating NIEM Mapping HTML ...");
 		Log.trace("Generating NIEM Mapping HTML");
 		NamespaceModel.cacheExternalSchemas();
@@ -828,7 +828,7 @@ public class NiemUmlClass {
 		UmlCom.message("Generating NIEM Wantlist ...");
 		Log.trace("Generating NIEM Wantlist");
 		XmlWriter xmlWriter = new XmlWriter(dir);
-		
+
 		// createSubset();
 		NamespaceModel.cacheExternalSchemas();
 
@@ -844,7 +844,7 @@ public class NiemUmlClass {
 			fw.write(XML_HEADER);
 			fw.write(XML_ATTRIBUTION);
 			fw.write("<w:WantList w:release=\"" + getNiemVersion()
-					+ "\" w:product=\"NIEM\" w:nillableDefault=\"true\" ");
+			+ "\" w:product=\"NIEM\" w:nillableDefault=\"true\" ");
 			for (UmlItem item : SubsetModel.modelPackage.children())
 				if (item.kind() == anItemKind.aClassView) {
 					String prefix = item.propertyValue(PREFIX_PROPERTY);

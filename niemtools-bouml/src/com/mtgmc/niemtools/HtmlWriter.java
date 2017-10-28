@@ -54,7 +54,7 @@ public class HtmlWriter {
 				fw.write("</td><td>");
 				fw.write("</td><td>");
 			}
-				break;
+			break;
 			case anItemKind._anAttribute: {
 				fw.write("<tr><td style=\"word-wrap: break-word\">");
 				writeItemHtml(fw, item.parent());
@@ -64,7 +64,7 @@ public class HtmlWriter {
 				UmlAttribute a = (UmlAttribute) item;
 				fw.write(a.multiplicity());
 			}
-				break;
+			break;
 			case anItemKind._aRelation: {
 				UmlRelation rel = (UmlRelation) item;
 				if ((rel.relationKind() == aRelationKind.aGeneralisation)
@@ -79,17 +79,17 @@ public class HtmlWriter {
 					fw.write(rel.multiplicity());
 				}
 			}
-				break;
+			break;
 			default:
 				return;
 			}
 			fw.write("</td><td>");
-	
+
 			// Export Description
 			if (item.description() != null)
 				fw.write(item.description());
 			fw.write("</td>");
-	
+
 			// Export NIEM Mapping
 			int columnIndex;
 			// String oldValue, container;
@@ -101,13 +101,13 @@ public class HtmlWriter {
 			// version are blue
 			String defaultFGColor = "#000000";
 			String fgcolor, bgcolor;
-	
+
 			if (item.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE_TYPE)) {
 				for (columnIndex = 4; columnIndex < NiemUmlClass.NIEM_STEREOTYPE_MAP.length; columnIndex++) {
 					column[columnIndex] = (item.propertyValue(NiemUmlClass.getNiemProperty(columnIndex)));
 					column[columnIndex] = (column[columnIndex] != null) ? column[columnIndex].trim() : "";
 				}
-	
+
 				// determine if this is an extension
 				/*
 				 * Boolean extension = false; String[] xPathElements = column[4].split("/"); for
@@ -116,7 +116,7 @@ public class HtmlWriter {
 				 * !isExternalPrefix(getPrefix(element.trim()))) { extension = true; continue; }
 				 * }
 				 */
-	
+
 				// export XPath
 				String XPath = column[4].trim();
 				String oldXPath = column[9].trim();
@@ -124,7 +124,7 @@ public class HtmlWriter {
 				bgcolor = defaultBGColor;
 				fgcolor = (XPath.equals(oldXPath)) ? defaultFGColor : changedFGColor;
 				fw.write(getColumnHtml(XPath, bgcolor, fgcolor, true));
-	
+
 				// export Type
 				String typeName = column[5].trim();
 				String typePrefix = NamespaceModel.getPrefix(typeName);
@@ -137,7 +137,7 @@ public class HtmlWriter {
 						bgcolor = extensionBGColor;
 				}
 				fw.write(getColumnHtml(typeName, bgcolor, fgcolor, true));
-	
+
 				// export Property
 				String elementLine = column[6];
 				fgcolor = defaultFGColor;
@@ -159,7 +159,7 @@ public class HtmlWriter {
 					}
 				}
 				fw.write(getColumnHtml(elementLine, bgcolor, fgcolor, true));
-	
+
 				// export BaseType
 				String baseType = column[7].trim();
 				String basePrefix = NamespaceModel.getPrefix(baseType);
@@ -172,7 +172,7 @@ public class HtmlWriter {
 						fgcolor = invalidFGColor;
 				}
 				fw.write(getColumnHtml(baseType, bgcolor, fgcolor, true));
-	
+
 				// export Multiplicity
 				bgcolor = defaultBGColor;
 				String multiplicity = column[8];
@@ -188,7 +188,7 @@ public class HtmlWriter {
 					fgcolor = invalidFGColor;
 				}
 				fw.write(getColumnHtml(column[8], bgcolor, fgcolor, false));
-	
+
 				// export Old XPath, Multiplicity, Mapping Notes, code list
 				fgcolor = defaultFGColor;
 				fw.write(getColumnHtml(column[9], bgcolor, fgcolor, true));

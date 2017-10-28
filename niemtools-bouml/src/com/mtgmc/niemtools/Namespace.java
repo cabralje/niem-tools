@@ -21,7 +21,7 @@ package com.mtgmc.niemtools;
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 import fr.bouml.UmlClassView;
 
@@ -30,7 +30,7 @@ public class Namespace {
 	public String schemaURI = null;
 	public UmlClassView nsClassView = null;
 	public UmlClassView referenceClassView = null;
-    public String filepath = null;
+	public String filepath = null;
 	public Namespace(String schemaURI2)
 	{
 		schemaURI = schemaURI2;

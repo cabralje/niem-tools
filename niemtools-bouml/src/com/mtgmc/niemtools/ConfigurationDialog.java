@@ -61,58 +61,58 @@ import fr.bouml.UmlPackage;
 class ConfigurationDialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	private static class LineWrapCellRenderer extends JTextArea implements TableCellRenderer {
 
 		private static final long serialVersionUID = 1L;
-		
-	    LineWrapCellRenderer() {
-	        setLineWrap(true);
-	        setWrapStyleWord(true);
+
+		LineWrapCellRenderer() {
+			setLineWrap(true);
+			setWrapStyleWord(true);
 			setFont(new Font(Font.DIALOG, Font.PLAIN,25));
-	    }
-	    
+		}
+
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column) {
 			if (value != null)
 				setText(value.toString());
-	        setSize(table.getColumnModel().getColumn(column).getWidth(), getPreferredSize().height);
-	        if (table.getRowHeight(row) != getPreferredSize().height) {
-	            table.setRowHeight(row, getPreferredSize().height);
-	        }
+			setSize(table.getColumnModel().getColumn(column).getWidth(), getPreferredSize().height);
+			if (table.getRowHeight(row) != getPreferredSize().height) {
+				table.setRowHeight(row, getPreferredSize().height);
+			}
 			return this;
 		}
 	}
-	
+
 	private static class ToggleBox extends JCheckBox {
-		
+
 		private static final long serialVersionUID = 1L;
-		
+
 		ToggleBox(String name, String initialValue, JPanel panel) {
 			super(name, (initialValue == null || !initialValue.equals("false")));
 			panel.setVisible(this.isSelected());
 			addItemListener(new ItemListener() {    
-			     public void itemStateChanged(ItemEvent e) {
-			       	panel.setVisible(((JCheckBox)(e.getItem())).isSelected());
-			     }    
-			  }); 
+				public void itemStateChanged(ItemEvent e) {
+					panel.setVisible(((JCheckBox)(e.getItem())).isSelected());
+				}    
+			}); 
 		}
 	}
-	
+
 	private static class FilePanel extends JPanel {
-		
+
 		private static final long serialVersionUID = 1L;
 		String value = null;
-		
+
 		FilePanel(String name, String initialValue, int columns, int fileType) {
-			
+
 			value = initialValue;
-			
+
 			// add field label
 			if (name != null)
 				add(new JLabel(name));
-			
+
 			// add text field
 			JTextField textField1 = new JTextField(value, columns);
 			textField1.addActionListener(new ActionListener() {
@@ -121,7 +121,7 @@ class ConfigurationDialog extends JDialog {
 				}				
 			});
 			add(textField1);
-			
+
 			// add field button
 			JButton button1 = new JButton("Browse...");
 			button1.addActionListener(new ActionListener() {
@@ -132,224 +132,224 @@ class ConfigurationDialog extends JDialog {
 						return;
 					value = fc.getSelectedFile().getAbsolutePath();
 					textField1.setText(value);
-			    }  
+				}  
 			});
 			add(button1);
 		}
 	}
 
-	
-	ConfigurationDialog(UmlPackage root, Properties properties) {
-	// create dialog
-	super(new JFrame(), "Niem-tools Configuration", true);
-	setSize(1400, 700);
-	int fieldColumns = 50;
-	
-	// add IEPD panel
-	JPanel iepdPanel = new JPanel(new GridBagLayout());
-	GridBagConstraints labelLayout = new GridBagConstraints();
-	labelLayout.gridx = 0;
-	labelLayout.ipady = 20;
-	GridBagConstraints fieldLayout = new GridBagConstraints();
-	fieldLayout.gridx = 1;
-	fieldLayout.ipadx = 1000;
-	labelLayout.ipady = 20;
-	fieldLayout.weightx = 1.0;
-	
-	iepdPanel.add(new JLabel("Name"), labelLayout);
-	JTextField nameField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_NAME_PROPERTY), fieldColumns);
-	iepdPanel.add(nameField, fieldLayout);
-	
-	iepdPanel.add(new JLabel("URI"), labelLayout);
-	JTextField uriField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_URI_PROPERTY), fieldColumns);
-	iepdPanel.add(uriField, fieldLayout);					
-	
-	iepdPanel.add(new JLabel("Version"), labelLayout);
-	JTextField versionField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_VERSION_PROPERTY), fieldColumns);
-	iepdPanel.add(versionField, fieldLayout);
-	
-	iepdPanel.add(new JLabel("Status"), labelLayout);
-	JTextField statusField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_STATUS_PROPERTY), fieldColumns);
-	iepdPanel.add(statusField, fieldLayout);
-	
-	iepdPanel.add(new JLabel("Organization"), labelLayout);
-	JTextField organizationField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_ORGANIZATION_PROPERTY), fieldColumns);
-	iepdPanel.add(organizationField, fieldLayout);
-	
-	iepdPanel.add(new JLabel("Contact"), labelLayout);
-	JTextField contactField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_CONTACT_PROPERTY), fieldColumns);
-	iepdPanel.add(contactField, fieldLayout);
-	
-	iepdPanel.add(new JLabel("Email"), labelLayout);
-	JTextField emailField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_EMAIL_PROPERTY), fieldColumns);
-	iepdPanel.add(emailField, fieldLayout);
 
-	iepdPanel.add(new JLabel("License URL"), labelLayout);
-	JTextField licenseField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_LICENSE_URL_PROPERTY), fieldColumns);
-	licenseField.addFocusListener(new FocusAdapter(){
-	       @Override
-	       public void focusLost(final FocusEvent evt){
+	ConfigurationDialog(UmlPackage root, Properties properties) {
+		// create dialog
+		super(new JFrame(), "Niem-tools Configuration", true);
+		setSize(1400, 700);
+		int fieldColumns = 50;
+
+		// add IEPD panel
+		JPanel iepdPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints labelLayout = new GridBagConstraints();
+		labelLayout.gridx = 0;
+		labelLayout.ipady = 20;
+		GridBagConstraints fieldLayout = new GridBagConstraints();
+		fieldLayout.gridx = 1;
+		fieldLayout.ipadx = 1000;
+		labelLayout.ipady = 20;
+		fieldLayout.weightx = 1.0;
+
+		iepdPanel.add(new JLabel("Name"), labelLayout);
+		JTextField nameField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_NAME_PROPERTY), fieldColumns);
+		iepdPanel.add(nameField, fieldLayout);
+
+		iepdPanel.add(new JLabel("URI"), labelLayout);
+		JTextField uriField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_URI_PROPERTY), fieldColumns);
+		iepdPanel.add(uriField, fieldLayout);					
+
+		iepdPanel.add(new JLabel("Version"), labelLayout);
+		JTextField versionField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_VERSION_PROPERTY), fieldColumns);
+		iepdPanel.add(versionField, fieldLayout);
+
+		iepdPanel.add(new JLabel("Status"), labelLayout);
+		JTextField statusField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_STATUS_PROPERTY), fieldColumns);
+		iepdPanel.add(statusField, fieldLayout);
+
+		iepdPanel.add(new JLabel("Organization"), labelLayout);
+		JTextField organizationField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_ORGANIZATION_PROPERTY), fieldColumns);
+		iepdPanel.add(organizationField, fieldLayout);
+
+		iepdPanel.add(new JLabel("Contact"), labelLayout);
+		JTextField contactField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_CONTACT_PROPERTY), fieldColumns);
+		iepdPanel.add(contactField, fieldLayout);
+
+		iepdPanel.add(new JLabel("Email"), labelLayout);
+		JTextField emailField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_EMAIL_PROPERTY), fieldColumns);
+		iepdPanel.add(emailField, fieldLayout);
+
+		iepdPanel.add(new JLabel("License URL"), labelLayout);
+		JTextField licenseField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_LICENSE_URL_PROPERTY), fieldColumns);
+		licenseField.addFocusListener(new FocusAdapter(){
+			@Override
+			public void focusLost(final FocusEvent evt){
 				String value = licenseField.getText();
 				if (value.startsWith("http"))
 					try {
 						new URL(value);
 					} catch (MalformedURLException e1) {
-					    Log.trace("main: URL " + value + " is malformed");
+						Log.trace("main: URL " + value + " is malformed");
 					}
-	       } 
-	  });
-	iepdPanel.add(licenseField, fieldLayout);
-	
-	iepdPanel.add(new JLabel("Terms of Use URL"), labelLayout);
-	JTextField termsField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_TERMS_URL_PROPERTY), fieldColumns);
-	termsField.addFocusListener(new FocusAdapter(){
-	       @Override
-	       public void focusLost(final FocusEvent evt){
+			} 
+		});
+		iepdPanel.add(licenseField, fieldLayout);
+
+		iepdPanel.add(new JLabel("Terms of Use URL"), labelLayout);
+		JTextField termsField = new JTextField(NiemUmlClass.getProperty(NiemUmlClass.IEPD_TERMS_URL_PROPERTY), fieldColumns);
+		termsField.addFocusListener(new FocusAdapter(){
+			@Override
+			public void focusLost(final FocusEvent evt){
 				String value = termsField.getText();
 				if (value.startsWith("http"))
 					try {
 						new URL(value);
 					} catch (MalformedURLException e1) {
-					    Log.trace("URL " + value + " is malformed");
+						Log.trace("URL " + value + " is malformed");
 					}
-	       } 
-	  });
-	iepdPanel.add(termsField, fieldLayout);
-	
-	iepdPanel.add(new JLabel("ChangeLog File"), labelLayout);
-	ConfigurationDialog.FilePanel changelogPanel = new FilePanel(null, NiemUmlClass.getProperty(NiemUmlClass.IEPD_CHANGE_LOG_FILE_PROPERTY), fieldColumns, JFileChooser.FILES_ONLY);
-	iepdPanel.add(changelogPanel, fieldLayout);
-	
-	iepdPanel.add(new JLabel("ReadMe File"), labelLayout);
-	ConfigurationDialog.FilePanel readmePanel = new FilePanel(null, NiemUmlClass.getProperty(NiemUmlClass.IEPD_READ_ME_FILE_PROPERTY), fieldColumns, JFileChooser.FILES_ONLY);
-	iepdPanel.add(readmePanel, fieldLayout);
-	
-	// add model panel
-	JPanel modelPanel = new JPanel(new GridBagLayout());
-	
-	ConfigurationDialog.FilePanel htmlPanel = new FilePanel("Directory", root.propertyValue("html dir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-	ConfigurationDialog.ToggleBox htmlBox = new ToggleBox("HTML", root.propertyValue("exportHTML"), htmlPanel);
-	modelPanel.add(htmlBox, labelLayout);
-	fieldLayout.gridy = 0;
-	modelPanel.add(htmlPanel, fieldLayout);
-	
-	ConfigurationDialog.FilePanel xsdPanel = new FilePanel("Directory", properties.getProperty("xsdDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-	ConfigurationDialog.ToggleBox xsdBox = new ToggleBox("XML", root.propertyValue("exportXML"), xsdPanel);
-	modelPanel.add(xsdBox, labelLayout);
-	fieldLayout.gridy = 1;
-	modelPanel.add(xsdPanel, fieldLayout);
-	
-	ConfigurationDialog.FilePanel wsdlPanel = new FilePanel("Directory", properties.getProperty("wsdlDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-	ConfigurationDialog.ToggleBox wsdlBox = new ToggleBox("WSDL", root.propertyValue("exportWSDL"), wsdlPanel);
-	modelPanel.add(wsdlBox, labelLayout);
-	fieldLayout.gridy = 2;
-	modelPanel.add(wsdlPanel, fieldLayout);
-	
-	ConfigurationDialog.FilePanel jsonPanel = new FilePanel("Directory", properties.getProperty("jsonDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-	ConfigurationDialog.ToggleBox jsonBox = new ToggleBox("JSON", root.propertyValue("exportJSON"), jsonPanel);
-	modelPanel.add(jsonBox, labelLayout);
-	fieldLayout.gridy = 3;
-	modelPanel.add(jsonPanel, fieldLayout);
-	
-	ConfigurationDialog.FilePanel openapiPanel = new FilePanel("Directory", properties.getProperty("openapiDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-	ConfigurationDialog.ToggleBox openapiBox = new ToggleBox("OpenAPI", root.propertyValue("exportOpenAPI"), openapiPanel);
-	modelPanel.add(openapiBox, labelLayout);
-	fieldLayout.gridy = 4;
-	modelPanel.add(openapiPanel, fieldLayout);
-	
-	// Add external panel
-	JPanel externalPanel = new JPanel(new BorderLayout());
-	String[] externalNamespaces = NiemUmlClass.getProperty(NiemUmlClass.IEPD_EXTERNAL_SCHEMAS_PROPERTY).split(",");
-	int row = 0;
-	String[][] data = new String[externalNamespaces.length][3];
-	for (String namespace : externalNamespaces) {
-		String[] parts = namespace.split("=");
-		if (parts.length == 3) {
-			data[row] = parts;
-			row++;
-		}
-	}
-	DefaultTableModel model = new DefaultTableModel(data, new String[]{"Prefix","Namespace","URL"});
-	JTable table = new JTable(model);
-	Font font = new Font(Font.DIALOG, Font.PLAIN, 25);
-	table.setFont(font);
-	Font font2 = new Font(Font.DIALOG, Font.BOLD, 25);
-	JTableHeader header = table.getTableHeader();
-	header.setFont(font2);
-	table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-	table.getColumnModel().getColumn(0).setMinWidth(100);
-	table.getColumnModel().getColumn(0).setMaxWidth(100);
-	table.setDefaultRenderer(Object.class, new LineWrapCellRenderer());
-	JScrollPane scrollPanel = new JScrollPane(table);
-	JButton namespaceButton = new JButton("Add namespace");
-	namespaceButton.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e){
-			DefaultTableModel model = (DefaultTableModel)table.getModel();
-			model.addRow(new String[] {"", "", ""});
-	    }  
-	});
-	externalPanel.add(namespaceButton, BorderLayout.SOUTH);
-	externalPanel.add(scrollPanel, BorderLayout.CENTER);
-	
-	// add panels
-	JTabbedPane dialogPanel = new JTabbedPane();
-	dialogPanel.addTab("IEPD metadata", iepdPanel);
-	dialogPanel.addTab("Model generation", modelPanel);
-	dialogPanel.addTab("External Namespaces", externalPanel);
-	add(dialogPanel);
-	
-	// add frame button
-	JButton frameButton = new JButton("OK");
-	frameButton.setHorizontalAlignment(SwingConstants.CENTER);
-	frameButton.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e){
-			setVisible(false);
-	    }  
-	});     
-	add(frameButton, BorderLayout.SOUTH);
-	
-	// show frame
-	setVisible(true);
-	
-	// save model values
-	root.set_PropertyValue("html dir", htmlPanel.value);
-	root.set_PropertyValue("exportHTML", String.valueOf(htmlBox.isSelected()));
-	root.set_PropertyValue("exportXML", String.valueOf(xsdBox.isSelected()));
-	root.set_PropertyValue("exportWSDL", String.valueOf(wsdlBox.isSelected()));
-	root.set_PropertyValue("exportJSON", String.valueOf(jsonBox.isSelected()));
-	root.set_PropertyValue("exportOpenAPI", String.valueOf(openapiBox.isSelected()));
-	properties.setProperty("xsdDir", xsdPanel.value);
-	properties.setProperty("wsdlDir", wsdlPanel.value);
-	properties.setProperty("jsonDir", jsonPanel.value);
-	properties.setProperty("openapiDir", openapiPanel.value);
-	LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<String>();
-	//DefaultTableModel model = table.getModel();
-	for (int i=0; i < model.getRowCount(); i++) {
-		String prefix = model.getValueAt(i, 0).toString();
-		String namespace = model.getValueAt(i, 1).toString();
-		String url = model.getValueAt(i, 2).toString();
-		if (url != null && url.startsWith("http"))
-			try {
-				new URL(url);
-			} catch (MalformedURLException e1) {
-			    Log.trace("URL " + url + " is malformed");
+			} 
+		});
+		iepdPanel.add(termsField, fieldLayout);
+
+		iepdPanel.add(new JLabel("ChangeLog File"), labelLayout);
+		ConfigurationDialog.FilePanel changelogPanel = new FilePanel(null, NiemUmlClass.getProperty(NiemUmlClass.IEPD_CHANGE_LOG_FILE_PROPERTY), fieldColumns, JFileChooser.FILES_ONLY);
+		iepdPanel.add(changelogPanel, fieldLayout);
+
+		iepdPanel.add(new JLabel("ReadMe File"), labelLayout);
+		ConfigurationDialog.FilePanel readmePanel = new FilePanel(null, NiemUmlClass.getProperty(NiemUmlClass.IEPD_READ_ME_FILE_PROPERTY), fieldColumns, JFileChooser.FILES_ONLY);
+		iepdPanel.add(readmePanel, fieldLayout);
+
+		// add model panel
+		JPanel modelPanel = new JPanel(new GridBagLayout());
+
+		ConfigurationDialog.FilePanel htmlPanel = new FilePanel("Directory", root.propertyValue("html dir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+		ConfigurationDialog.ToggleBox htmlBox = new ToggleBox("HTML", root.propertyValue("exportHTML"), htmlPanel);
+		modelPanel.add(htmlBox, labelLayout);
+		fieldLayout.gridy = 0;
+		modelPanel.add(htmlPanel, fieldLayout);
+
+		ConfigurationDialog.FilePanel xsdPanel = new FilePanel("Directory", properties.getProperty("xsdDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+		ConfigurationDialog.ToggleBox xsdBox = new ToggleBox("XML", root.propertyValue("exportXML"), xsdPanel);
+		modelPanel.add(xsdBox, labelLayout);
+		fieldLayout.gridy = 1;
+		modelPanel.add(xsdPanel, fieldLayout);
+
+		ConfigurationDialog.FilePanel wsdlPanel = new FilePanel("Directory", properties.getProperty("wsdlDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+		ConfigurationDialog.ToggleBox wsdlBox = new ToggleBox("WSDL", root.propertyValue("exportWSDL"), wsdlPanel);
+		modelPanel.add(wsdlBox, labelLayout);
+		fieldLayout.gridy = 2;
+		modelPanel.add(wsdlPanel, fieldLayout);
+
+		ConfigurationDialog.FilePanel jsonPanel = new FilePanel("Directory", properties.getProperty("jsonDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+		ConfigurationDialog.ToggleBox jsonBox = new ToggleBox("JSON", root.propertyValue("exportJSON"), jsonPanel);
+		modelPanel.add(jsonBox, labelLayout);
+		fieldLayout.gridy = 3;
+		modelPanel.add(jsonPanel, fieldLayout);
+
+		ConfigurationDialog.FilePanel openapiPanel = new FilePanel("Directory", properties.getProperty("openapiDir"), fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+		ConfigurationDialog.ToggleBox openapiBox = new ToggleBox("OpenAPI", root.propertyValue("exportOpenAPI"), openapiPanel);
+		modelPanel.add(openapiBox, labelLayout);
+		fieldLayout.gridy = 4;
+		modelPanel.add(openapiPanel, fieldLayout);
+
+		// Add external panel
+		JPanel externalPanel = new JPanel(new BorderLayout());
+		String[] externalNamespaces = NiemUmlClass.getProperty(NiemUmlClass.IEPD_EXTERNAL_SCHEMAS_PROPERTY).split(",");
+		int row = 0;
+		String[][] data = new String[externalNamespaces.length][3];
+		for (String namespace : externalNamespaces) {
+			String[] parts = namespace.split("=");
+			if (parts.length == 3) {
+				data[row] = parts;
+				row++;
 			}
-		if (prefix != null && !prefix.equals("") && namespace != null && !namespace.equals("") && url != null && !url.equals(""))
-			externalSchemas2.add(prefix + "=" + namespace + "=" + url);
+		}
+		DefaultTableModel model = new DefaultTableModel(data, new String[]{"Prefix","Namespace","URL"});
+		JTable table = new JTable(model);
+		Font font = new Font(Font.DIALOG, Font.PLAIN, 25);
+		table.setFont(font);
+		Font font2 = new Font(Font.DIALOG, Font.BOLD, 25);
+		JTableHeader header = table.getTableHeader();
+		header.setFont(font2);
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		table.getColumnModel().getColumn(0).setMinWidth(100);
+		table.getColumnModel().getColumn(0).setMaxWidth(100);
+		table.setDefaultRenderer(Object.class, new LineWrapCellRenderer());
+		JScrollPane scrollPanel = new JScrollPane(table);
+		JButton namespaceButton = new JButton("Add namespace");
+		namespaceButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				DefaultTableModel model = (DefaultTableModel)table.getModel();
+				model.addRow(new String[] {"", "", ""});
+			}  
+		});
+		externalPanel.add(namespaceButton, BorderLayout.SOUTH);
+		externalPanel.add(scrollPanel, BorderLayout.CENTER);
+
+		// add panels
+		JTabbedPane dialogPanel = new JTabbedPane();
+		dialogPanel.addTab("IEPD metadata", iepdPanel);
+		dialogPanel.addTab("Model generation", modelPanel);
+		dialogPanel.addTab("External Namespaces", externalPanel);
+		add(dialogPanel);
+
+		// add frame button
+		JButton frameButton = new JButton("OK");
+		frameButton.setHorizontalAlignment(SwingConstants.CENTER);
+		frameButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				setVisible(false);
+			}  
+		});     
+		add(frameButton, BorderLayout.SOUTH);
+
+		// show frame
+		setVisible(true);
+
+		// save model values
+		root.set_PropertyValue("html dir", htmlPanel.value);
+		root.set_PropertyValue("exportHTML", String.valueOf(htmlBox.isSelected()));
+		root.set_PropertyValue("exportXML", String.valueOf(xsdBox.isSelected()));
+		root.set_PropertyValue("exportWSDL", String.valueOf(wsdlBox.isSelected()));
+		root.set_PropertyValue("exportJSON", String.valueOf(jsonBox.isSelected()));
+		root.set_PropertyValue("exportOpenAPI", String.valueOf(openapiBox.isSelected()));
+		properties.setProperty("xsdDir", xsdPanel.value);
+		properties.setProperty("wsdlDir", wsdlPanel.value);
+		properties.setProperty("jsonDir", jsonPanel.value);
+		properties.setProperty("openapiDir", openapiPanel.value);
+		LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<String>();
+		//DefaultTableModel model = table.getModel();
+		for (int i=0; i < model.getRowCount(); i++) {
+			String prefix = model.getValueAt(i, 0).toString();
+			String namespace = model.getValueAt(i, 1).toString();
+			String url = model.getValueAt(i, 2).toString();
+			if (url != null && url.startsWith("http"))
+				try {
+					new URL(url);
+				} catch (MalformedURLException e1) {
+					Log.trace("URL " + url + " is malformed");
+				}
+			if (prefix != null && !prefix.equals("") && namespace != null && !namespace.equals("") && url != null && !url.equals(""))
+				externalSchemas2.add(prefix + "=" + namespace + "=" + url);
+		}
+		root.set_PropertyValue(NiemUmlClass.IEPD_EXTERNAL_SCHEMAS_PROPERTY, String.join(",", externalSchemas2));
+
+		// save IEPD values
+		root.set_PropertyValue(NiemUmlClass.IEPD_NAME_PROPERTY, nameField.getText());
+		root.set_PropertyValue(NiemUmlClass.IEPD_URI_PROPERTY, uriField.getText());
+		root.set_PropertyValue(NiemUmlClass.IEPD_VERSION_PROPERTY, versionField.getText());
+		root.set_PropertyValue(NiemUmlClass.IEPD_STATUS_PROPERTY, statusField.getText());
+		root.set_PropertyValue(NiemUmlClass.IEPD_ORGANIZATION_PROPERTY, organizationField.getText());
+		root.set_PropertyValue(NiemUmlClass.IEPD_CONTACT_PROPERTY, contactField.getText());
+		root.set_PropertyValue(NiemUmlClass.IEPD_EMAIL_PROPERTY, emailField.getText());
+		root.set_PropertyValue(NiemUmlClass.IEPD_LICENSE_URL_PROPERTY, licenseField.getText());
+		root.set_PropertyValue(NiemUmlClass.IEPD_TERMS_URL_PROPERTY, termsField.getText());
+		root.set_PropertyValue(NiemUmlClass.IEPD_CHANGE_LOG_FILE_PROPERTY, changelogPanel.value);
+		root.set_PropertyValue(NiemUmlClass.IEPD_READ_ME_FILE_PROPERTY, readmePanel.value);
 	}
-	root.set_PropertyValue(NiemUmlClass.IEPD_EXTERNAL_SCHEMAS_PROPERTY, String.join(",", externalSchemas2));
-	
-	// save IEPD values
-	root.set_PropertyValue(NiemUmlClass.IEPD_NAME_PROPERTY, nameField.getText());
-	root.set_PropertyValue(NiemUmlClass.IEPD_URI_PROPERTY, uriField.getText());
-	root.set_PropertyValue(NiemUmlClass.IEPD_VERSION_PROPERTY, versionField.getText());
-	root.set_PropertyValue(NiemUmlClass.IEPD_STATUS_PROPERTY, statusField.getText());
-	root.set_PropertyValue(NiemUmlClass.IEPD_ORGANIZATION_PROPERTY, organizationField.getText());
-	root.set_PropertyValue(NiemUmlClass.IEPD_CONTACT_PROPERTY, contactField.getText());
-	root.set_PropertyValue(NiemUmlClass.IEPD_EMAIL_PROPERTY, emailField.getText());
-	root.set_PropertyValue(NiemUmlClass.IEPD_LICENSE_URL_PROPERTY, licenseField.getText());
-	root.set_PropertyValue(NiemUmlClass.IEPD_TERMS_URL_PROPERTY, termsField.getText());
-	root.set_PropertyValue(NiemUmlClass.IEPD_CHANGE_LOG_FILE_PROPERTY, changelogPanel.value);
-	root.set_PropertyValue(NiemUmlClass.IEPD_READ_ME_FILE_PROPERTY, readmePanel.value);
-}
 }

@@ -21,7 +21,7 @@ package com.mtgmc.niemtools;
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 import java.io.File;
 import java.io.FileWriter;
@@ -49,14 +49,14 @@ import fr.bouml.aRelationKind;
 import fr.bouml.anItemKind;
 
 public class XmlWriter {
-	
+
 	public XmlWriter(String initialDirectory) {
 		super();
 		directory = initialDirectory;
 	}
 
 	String directory;
-	
+
 	static final String AUGMENTATION_POINT_NAME = "AugmentationPoint";
 
 	static final String CODELIST_CODE = "code";
@@ -122,15 +122,15 @@ public class XmlWriter {
 	static final String XML_CATALOG_URI = "urn:oasis:names:tc:entity:xmlns:xml:catalog";
 
 	static Set<String> CodeListNamespaces = new HashSet<String>();
-	
+
 	/** exports a Genericode code list */
 	void exportCodeLists(NiemModel model) {
-	
+
 		String version = NiemUmlClass.getProperty(NiemUmlClass.IEPD_VERSION_PROPERTY);
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = new Date();
 		String today = dateFormat.format(date);
-	
+
 		// export code lists for extension elements
 		for (UmlItem item : model.modelPackage.children()) {
 			if (item.kind() != anItemKind.aClassView)
@@ -147,7 +147,7 @@ public class XmlWriter {
 					continue;
 				String codeListURI = XmlWriter.getExtensionSchema(elementName);
 				CodeListNamespaces.add(elementName);
-	
+
 				// export code list
 				Log.debug("exportCodeList: exporting code list " + elementName + GC_FILE_TYPE);
 				try {
@@ -190,7 +190,7 @@ public class XmlWriter {
 					}
 					fw.write("</SimpleCodeList></gc:CodeList>");
 					fw.close();
-	
+
 				} catch (IOException e) {
 					Log.trace("exportCodeList: IO exception: " + e.toString());
 				} catch (RuntimeException e) {
@@ -199,14 +199,14 @@ public class XmlWriter {
 			}
 		}
 	}
-	
+
 	/** exports a NIEM MPD catalog */
 	void exportMpdCatalog(Set<String> messages)
 			throws IOException {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = new Date();
 		String today = dateFormat.format(date);
-	
+
 		Log.trace("Generating MPD catalog");
 		File file = Paths.get(directory, MPD_CATALOG_FILE).toFile();
 		File parentFile = file.getParentFile();
@@ -259,7 +259,7 @@ public class XmlWriter {
 				+ "<c:MPDChangeLog c:pathURI=\"" + NiemUmlClass.getProperty(NiemUmlClass.IEPD_CHANGE_LOG_FILE_PROPERTY) + "\"/>"
 				+ "<c:Wantlist c:pathURI=\"" + Paths.get(NiemUmlClass.NIEM_DIR, WANTLIST_FILE).toString() + "\"/>"
 				+ "<c:ConformanceAssertion c:pathURI=\"" + CONFORMANCE_ASSERTION_FILE + " \"/>");
-	
+
 		for (Entry<String, String> entry : NamespaceModel.Prefixes.entrySet()) {
 			String prefix = entry.getKey();
 			String schemaURI = NamespaceModel.Prefixes.get(prefix);
@@ -279,13 +279,13 @@ public class XmlWriter {
 		xml.close();
 		Log.debug("exportMPDCatalog: done generating MPD catalog");
 	}
-	
+
 	/** exports a WSDL definitions file */
 	void exportWsdl(String wsdlDir, Map<String, UmlClass> ports, Set<String> messageNamespaces) throws IOException {
-	
+
 		String WSDLURI = NiemUmlClass.getProperty(NiemUmlClass.IEPD_URI_PROPERTY) + WSDL_SUFFIX;
 		String WRAPPERURI = NiemUmlClass.getProperty(NiemUmlClass.IEPD_URI_PROPERTY) + MESSAGE_WRAPPERS_FILE_NAME;
-	
+
 		Log.trace("Generating document/literal wrapper schema");
 		TreeSet<String> xmlTypes = new TreeSet<String>();
 		TreeSet<String> xmlElements = new TreeSet<String>();
@@ -333,18 +333,18 @@ public class XmlWriter {
 							maxOccurs = "unbounded";
 						if (NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(inputMessage)))
 							inputTypeSchema += "<!--xs:element ref=\"" + inputMessage + "\" minOccurs=\"" + minOccurs
-									+ "\" maxOccurs=\"" + maxOccurs + "\"/-->\n";
+							+ "\" maxOccurs=\"" + maxOccurs + "\"/-->\n";
 						else
 							inputTypeSchema += "<xs:element ref=\"" + inputMessage + "\" minOccurs=\"" + minOccurs
-									+ "\" maxOccurs=\"" + maxOccurs + "\"/>\n";
+							+ "\" maxOccurs=\"" + maxOccurs + "\"/>\n";
 					}
 					inputTypeSchema += "</xs:sequence>" + "</xs:complexType>";
 					xmlTypes.add(inputTypeSchema);
 					xmlElements.add("<xs:element name=\"" + elementName + "\" type=\""
 							+ NamespaceModel.getPrefixedName(WRAPPER_PREFIX, inputTypeName) + "\"/>");
-	
+
 				}
-	
+
 				try {
 					outputType = operation.returnType().type;
 				} catch (Exception e) {
@@ -369,13 +369,13 @@ public class XmlWriter {
 						+ NamespaceModel.getPrefixedName(WRAPPER_PREFIX, outputTypeName) + "\"/>");
 			}
 		}
-	
+
 		// export message wrapper
 		NamespaceModel.Prefixes.put(WRAPPER_PREFIX, WRAPPERURI);
 		messageNamespaces.add(WRAPPER_PREFIX);
 		String filename = Paths.get(directory, MESSAGE_WRAPPERS_FILE_NAME + NiemUmlClass.XSD_FILE_TYPE).toString();
 		exportXmlSchema(filename, WRAPPERURI, xmlTypes, xmlElements, messageNamespaces);
-	
+
 		Log.trace("Generating WSDLs");
 		for (UmlClass port : ports.values()) {
 			String portName = port.name();
@@ -403,7 +403,7 @@ public class XmlWriter {
 					+ "<wsrmp:RMAssertion/>" + "</wsp:Policy>" + "<wsdl:types>" + "<xsd:schema>"
 					+ "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + p3.toString() + "\"/>"
 					+ "</xsd:schema>" + "</wsdl:types>");
-	
+
 			wsdl.write("<!-- messages -->");
 			for (UmlItem item : port.children()) {
 				if (item.kind() == anItemKind.anOperation) {
@@ -417,7 +417,7 @@ public class XmlWriter {
 							+ "</message>");
 				}
 			}
-	
+
 			wsdl.write("<!-- ports -->");
 			wsdl.write("<portType name=\"" + portName + "\">");
 			for (UmlItem item : port.children()) {
@@ -431,7 +431,7 @@ public class XmlWriter {
 				}
 			}
 			wsdl.write("</portType>");
-	
+
 			wsdl.write("<!-- bindings -->");
 			wsdl.write("<binding name=\"" + portName + "Soap\" type=\"" + NamespaceModel.getPrefixedName(WSDL_PREFIX, portName) + "\">"
 					+ "<wsp:PolicyReference URI=\"#" + WSP_POLICY + "\"/>"
@@ -454,7 +454,7 @@ public class XmlWriter {
 			wsdl.close();
 		}
 	}
-	
+
 	/** exports XML catalog file */
 	void exportXmlCatalog() throws IOException {
 		FileWriter xml;
@@ -481,7 +481,7 @@ public class XmlWriter {
 				"<nextCatalog  catalog=\"" + Paths.get(NiemUmlClass.NIEM_DIR, XML_CATALOG_FILE).toString() + "\" />\n</catalog>\n");
 		xml.close();
 	}
-	
+
 	/** return XML schema element in type definition */
 	String exportXmlElementInTypeSchema(UmlClassInstance element, String multiplicity,
 			String mappingNotes) {
@@ -493,7 +493,7 @@ public class XmlWriter {
 			elementSchema += "/>\n";
 		return elementSchema;
 	}
-	
+
 	/** return XML schema element definition */
 	String exportXmlElementSchema(UmlClassInstance element) {
 		String elementName = NamespaceModel.getName(element);
@@ -529,7 +529,7 @@ public class XmlWriter {
 		elementSchema += "</xs:element>\n";
 		return elementSchema;
 	}
-	
+
 	void exportXmlSchema(String filename, String nsSchemaURI, TreeSet<String> xmlTypes, TreeSet<String> xmlElements,
 			Set<String> schemaNamespaces) {
 		try {
@@ -540,7 +540,7 @@ public class XmlWriter {
 				parentFile.mkdirs();
 			FileWriter xml = new FileWriter(filename);
 			xml.write(NiemUmlClass.XML_HEADER + NiemUmlClass.XML_ATTRIBUTION + "<" + "xs:schema targetNamespace=\"" + nsSchemaURI + "\"\n");
-	
+
 			// export XML namespace definitions
 			writeXmlNs(xml, "", nsSchemaURI);
 			writeXmlNs(xml, NiemModel.XSI_PREFIX, NiemModel.XSI_URI);
@@ -586,13 +586,13 @@ public class XmlWriter {
 					if (!nsSchemaURI2.equals(nsSchemaURI) && !nsSchemaURI2.equals(NiemUmlClass.LOCAL_URI)
 							&& !nsSchemaURI2.equals(NiemUmlClass.XSD_URI))
 						xml.write("<xs:import namespace=\"" + nsSchemaURI2 + "\" schemaLocation=\"" + p3.toString()
-								+ "\"/>");
+						+ "\"/>");
 				}
 			}
 			// export attributes, types and element
 			xml.write(String.join("", xmlTypes));
 			xml.write(String.join("", xmlElements));
-	
+
 			// close schema
 			xml.write("</xs:schema>\n");
 			xml.close();
@@ -600,7 +600,7 @@ public class XmlWriter {
 			Log.trace("exportXMLSchema: error exporting XML schema " + e1.toString());
 		}
 	}
-	
+
 	/** return XML schema type definition */
 	String exportXmlTypeSchema(UmlClass type) {
 		String typeName = NamespaceModel.getName(type);
@@ -622,7 +622,7 @@ public class XmlWriter {
 			isComplexContent = false;
 		} else
 			Log.debug("exportXmlTypeSchema: exporting complex type " + typeName); // complexContent
-	
+
 		TreeSet<String> xmlEnumerations = new TreeSet<String>();
 		if (isComplexType == false && baseType != null)
 			if (codeList != null && codeList.equals("")) {
@@ -638,7 +638,7 @@ public class XmlWriter {
 					String enumeration = "<xs:enumeration value=\"" + codeValue + "\">\n";
 					if (!codeDescription.equals(""))
 						enumeration += "<xs:annotation>\n" + "<xs:documentation>" + codeDescription
-								+ "</xs:documentation>\n" + "</xs:annotation>\n";
+						+ "</xs:documentation>\n" + "</xs:annotation>\n";
 					enumeration += "</xs:enumeration>\n";
 					xmlEnumerations.add(enumeration);
 				}
@@ -695,7 +695,7 @@ public class XmlWriter {
 			UmlClassInstance element = model.getElementByURI(NiemModel.getURI(augmentationPoint));
 			xmlElementsInType.add(exportXmlElementInTypeSchema(element, augmentationPoint.multiplicity(), null));
 		}
-	
+
 		// write XML schema definition
 		typeSchema = (isComplexType) ? "<xs:complexType" : "<xs:simpleType";
 		typeSchema += " name=\"" + typeName + "\">\n";
@@ -724,7 +724,7 @@ public class XmlWriter {
 		}
 		return typeSchema;
 	}
-	
+
 	/** writes an XML name value pair to a file */
 	private void writeXmlAttribute(FileWriter fw, String name, String value) {
 		try {
@@ -733,7 +733,7 @@ public class XmlWriter {
 			Log.trace("xmlAttribute: error " + e.toString());
 		}
 	}
-	
+
 	/** writes an XML namespace attribute to a file */
 	void writeXmlNs(FileWriter fw, String prefix, String value) {
 		try {

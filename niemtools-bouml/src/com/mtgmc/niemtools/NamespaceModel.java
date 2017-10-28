@@ -21,7 +21,7 @@ package com.mtgmc.niemtools;
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,9 +41,9 @@ import fr.bouml.UmlItem;
 import fr.bouml.anItemKind;
 
 public class NamespaceModel {
-	
+
 	private static XPath xPath = XPathFactory.newInstance().newXPath();
-	
+
 	static Set<String> externalPrefixes = new HashSet<String>();
 	static Map<String, String> externalSchemaURL = new HashMap<String, String>();
 
@@ -114,19 +114,19 @@ public class NamespaceModel {
 		// select reference, subset or extension model
 		if (model == null)
 			model = isNiemPrefix(prefix) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
-	
+
 		// return classview if it exists
 		if (model == NiemUmlClass.ReferenceModel) {
 			if (ns.referenceClassView != null)
 				return ns.referenceClassView;
 		} else if (ns.nsClassView != null)
 			return ns.nsClassView;
-	
+
 		// create classview
 		String prefix3 = prefix2;
 		UmlClassView namespaceClassView = null;
 		int conflictCounter = 1;
-	
+
 		while (namespaceClassView == null) {
 			try {
 				namespaceClassView = UmlClassView.create(model.modelPackage, prefix3);
@@ -139,10 +139,10 @@ public class NamespaceModel {
 		}
 		namespaceClassView.set_PropertyValue(NiemUmlClass.URI_PROPERTY, schemaURI);
 		// trace("getNamespace: added class view " + namespaceClassView.name());
-	
+
 		if (prefix != null)
 			namespaceClassView.set_PropertyValue(NiemUmlClass.PREFIX_PROPERTY, prefix2);
-	
+
 		if (model == NiemUmlClass.ReferenceModel)
 			ns.referenceClassView = namespaceClassView;
 		else {
@@ -235,7 +235,7 @@ public class NamespaceModel {
 				getNamespace(NiemUmlClass.ReferenceModel, prefix, attributeNode.getNodeValue());
 			}
 		}
-	
+
 		String schemaURI = null;
 		Namespace ns = null;
 		try {
@@ -247,7 +247,7 @@ public class NamespaceModel {
 				return Namespaces.get(NiemUmlClass.LOCAL_PREFIX);
 			// set namespace description
 			ns.referenceClassView
-					.set_Description(xPath.evaluate("xs:schema/xs:annotation[1]/xs:documentation[1]", doc));
+			.set_Description(xPath.evaluate("xs:schema/xs:annotation[1]/xs:documentation[1]", doc));
 		} catch (Exception e) {
 			Log.trace("importNamespaces: error " + e.toString());
 		}
