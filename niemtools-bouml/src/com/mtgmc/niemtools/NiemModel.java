@@ -97,7 +97,7 @@ class NiemModel {
 			}
 	
 		// copy element properties
-		elementInType.set_PropertyValue(NiemUmlClass.URI_PROPERTY, NiemUmlClass.getURI(element));
+		elementInType.set_PropertyValue(NiemUmlClass.URI_PROPERTY, NiemModel.getURI(element));
 		if (element.description() != null)
 			elementInType.set_Description(element.description());
 		if (multiplicity != null)
@@ -108,7 +108,7 @@ class NiemModel {
 	
 		// insert element in type list
 		
-		List<UmlClassInstance> elementInTypeList = getModel(type).getElementsInType( NiemUmlClass.getURI(type));
+		List<UmlClassInstance> elementInTypeList = getModel(type).getElementsInType( NiemModel.getURI(type));
 		if (!elementInTypeList.contains(element)) {
 			elementInTypeList.add(element);
 			Log.debug("addElementInTypes: inserted " + elementInTypeName + " to " + typeName);
@@ -119,7 +119,7 @@ class NiemModel {
 	UmlClassInstance copyElement(String elementName) {
 	
 		// return subset element if it exists
-		String schemaURI = NiemUmlClass.getSchemaURI(elementName);
+		String schemaURI = NamespaceModel.getSchemaURI(elementName);
 		UmlClassInstance element = getElement(schemaURI, elementName);
 		if (element != null)
 			return element;
@@ -134,7 +134,7 @@ class NiemModel {
 		// copy base type if not already in subset
 		UmlClass sourceBaseType = getBaseType(sourceElement);
 		String baseTypeName = NamespaceModel.getPrefixedName(sourceBaseType);
-		UmlClass baseType = getType(NiemUmlClass.getSchemaURI(baseTypeName), baseTypeName);
+		UmlClass baseType = getType(NamespaceModel.getSchemaURI(baseTypeName), baseTypeName);
 		if (baseType == null)
 			baseType = copyType(baseTypeName);
 	
@@ -153,7 +153,7 @@ class NiemModel {
 			return null;
 		}
 		element.set_Description(sourceElement.description());
-		String uri = NiemUmlClass.getURI(schemaURI, elementName);
+		String uri = NiemModel.getURI(schemaURI, elementName);
 		element.set_PropertyValue(NiemUmlClass.URI_PROPERTY, uri);
 		elements.put(uri, element);
 		Log.debug("copyElement: element " + elementName + " copied to subset");
@@ -174,7 +174,7 @@ class NiemModel {
 			Log.trace("copyElementInType: error copying element " + elementInTypeName + " in " + typeName);
 		else {
 			attribute.set_Description(element.description());
-			attribute.set_PropertyValue(NiemUmlClass.URI_PROPERTY, NiemUmlClass.getURI(element));
+			attribute.set_PropertyValue(NiemUmlClass.URI_PROPERTY, NiemModel.getURI(element));
 			relateElementInType(attribute, element);
 			attribute.set_Multiplicity(multiplicity);
 		}
@@ -186,7 +186,7 @@ class NiemModel {
 	
 		if ((typeName == null) || (typeName.equals("")))
 			return null;
-		String schemaURI = NiemUmlClass.getSchemaURI(typeName);
+		String schemaURI = NamespaceModel.getSchemaURI(typeName);
 		if (schemaURI == null) {
 			Log.trace("copyType: error - schema for type " + typeName + " not in reference model");
 			return null;
@@ -224,11 +224,11 @@ class NiemModel {
 		// copy type properties
 		if (sourceType.description() != null)
 			type.set_Description(sourceType.description());
-		type.set_PropertyValue(NiemUmlClass.URI_PROPERTY, NiemUmlClass.getURI(sourceType));
+		type.set_PropertyValue(NiemUmlClass.URI_PROPERTY, NiemModel.getURI(sourceType));
 		String codeList = sourceType.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
 		if (codeList != null)
 			type.set_PropertyValue(NiemUmlClass.CODELIST_PROPERTY, codeList);
-		types.put(NiemUmlClass.getURI(type), type);
+		types.put(NiemModel.getURI(type), type);
 	
 		// copy and relate to base type
 		UmlClass sourceBaseType = getBaseType(sourceType);
@@ -242,9 +242,9 @@ class NiemModel {
 		// copy elements and attributes in type
 		for (UmlItem item : sourceType.children())
 			if (NiemUmlClass.isAttribute(item)) {
-				UmlClassInstance sourceElement = NiemUmlClass.ReferenceModel.getElementByURI(NiemUmlClass.getURI(item));
+				UmlClassInstance sourceElement = NiemUmlClass.ReferenceModel.getElementByURI(NiemModel.getURI(item));
 				if (sourceElement == null) {
-					Log.trace("copyType: error - no element for uri " + NiemUmlClass.getURI(item) + " in reference model");
+					Log.trace("copyType: error - no element for uri " + NiemModel.getURI(item) + " in reference model");
 					continue;
 				}
 				String attributeName = NamespaceModel.getPrefixedName(sourceElement);
@@ -450,7 +450,7 @@ class NiemModel {
 					baseTypeName = NamespaceModel.getPrefixedName(defaultPrefix, baseTypeName);
 				baseTypeSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(baseTypeName));
 				if (baseTypeSchemaURI == null)
-					baseTypeSchemaURI = NiemUmlClass.getSchemaURI(baseTypeName);
+					baseTypeSchemaURI = NamespaceModel.getSchemaURI(baseTypeName);
 				if (baseTypeName != null && baseTypeSchemaURI == null && NamespaceModel.getPrefix(baseTypeName) == null) {
 					baseTypeSchemaURI = NiemUmlClass.XSD_URI;
 					baseTypeName = NamespaceModel.getPrefixedName(NiemUmlClass.XSD_PREFIX, baseTypeName);
@@ -507,7 +507,7 @@ class NiemModel {
 					baseTypeName = NamespaceModel.getPrefixedName(defaultPrefix, baseTypeName);
 				baseTypeSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(baseTypeName));
 				if (baseTypeSchemaURI == null)
-					baseTypeSchemaURI = NiemUmlClass.getSchemaURI(baseTypeName);
+					baseTypeSchemaURI = NamespaceModel.getSchemaURI(baseTypeName);
 				if (baseTypeName != null && baseTypeSchemaURI == null && NamespaceModel.getPrefix(baseTypeName) == null) {
 					baseTypeSchemaURI = NiemUmlClass.XSD_URI;
 					baseTypeName = NamespaceModel.getPrefixedName(NiemUmlClass.XSD_PREFIX, baseTypeName);
@@ -593,7 +593,7 @@ class NiemModel {
 				String multiplicity = (attributeElement.getAttribute("use")).equals("required") ? "1,1" : "0,1";
 				String attributeSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(attributeName));
 				if (attributeSchemaURI == null)
-					attributeSchemaURI = NiemUmlClass.getSchemaURI(attributeName);
+					attributeSchemaURI = NamespaceModel.getSchemaURI(attributeName);
 				if (attributeSchemaURI == null) {
 					Log.trace("addElementInType: error - prefix for attribute " + attributeName + " not in model");
 					continue;
@@ -750,14 +750,14 @@ class NiemModel {
 					String multiplicity = minOccurs + "," + maxOccurs;
 					String elementSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(elementName));
 					if (elementSchemaURI == null)
-						elementSchemaURI = NiemUmlClass.getSchemaURI(elementName);
+						elementSchemaURI = NamespaceModel.getSchemaURI(elementName);
 					if (elementSchemaURI == null) {
 						Log.trace("importElementsInType: error - prefix for element " + elementName + " not in model");
 						continue;
 					}
 					UmlClassInstance element = getElement(elementSchemaURI, elementName);
 					if (element == null) {
-						Log.trace("importElementsInType: error - element " + NiemUmlClass.getURI(elementSchemaURI, elementName)
+						Log.trace("importElementsInType: error - element " + NiemModel.getURI(elementSchemaURI, elementName)
 								+ " not in reference model");
 						continue;
 					}
@@ -933,6 +933,7 @@ class NiemModel {
 	UmlClass simpleObjectAttributeGroup = null;
 
 	Map<String, UmlClass> types = new HashMap<String, UmlClass>();
+	static final String HASH_DELIMITER = ",";
 	static final String XSI_PREFIX = "xsi";
 	static final String XSI_URI = XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 	// XML
@@ -967,7 +968,7 @@ class NiemModel {
 				return null;
 			}
 			element.set_Description(description);
-			String uri = NiemUmlClass.getURI(elementSchemaURI, elementName);
+			String uri = NiemModel.getURI(elementSchemaURI, elementName);
 			element.set_PropertyValue(NiemUmlClass.URI_PROPERTY, uri);
 			elements.put(uri, element);
 			Log.debug("addElement: added " + elementName);
@@ -996,7 +997,7 @@ class NiemModel {
 				Log.trace("addType: error adding type " + typeName);
 				return null;
 			}
-			String uri = NiemUmlClass.getURI(typeSchemaURI, typeName);
+			String uri = NiemModel.getURI(typeSchemaURI, typeName);
 			type.set_PropertyValue(NiemUmlClass.URI_PROPERTY, uri);
 			types.put(uri, type);
 			Log.debug("addType: added " + typeName);
@@ -1023,7 +1024,7 @@ class NiemModel {
 		for (UmlItem classView : modelPackage.children()) {
 			if (classView.kind() != anItemKind.aClassView)
 				continue;
-			schemaURI = NiemUmlClass.getURI(classView);
+			schemaURI = NiemModel.getURI(classView);
 			String prefix = classView.propertyValue(NiemUmlClass.PREFIX_PROPERTY);
 			if (!NamespaceModel.Prefixes.containsKey(prefix))
 				NamespaceModel.Prefixes.put(prefix, schemaURI);
@@ -1043,7 +1044,7 @@ class NiemModel {
 	
 			// cache types and elements
 			for (UmlItem item : classView.children()) {
-				String uri = NiemUmlClass.getURI(item);
+				String uri = NiemModel.getURI(item);
 				if (uri != null) {
 					switch (item.kind().value()) {
 					case anItemKind._aClass:
@@ -1075,7 +1076,7 @@ class NiemModel {
 		// Cache elements in types
 		Log.debug("cacheModel: caching elements in types");
 		for (UmlClass type : types.values()) {
-			String typeURI = NiemUmlClass.getURI(type);
+			String typeURI = NiemModel.getURI(type);
 			List<UmlClassInstance> list = (elementsInType.get(typeURI));
 			if (list == null) {
 				list = new ArrayList<UmlClassInstance>();
@@ -1084,7 +1085,7 @@ class NiemModel {
 			for (UmlItem attribute : type.children())
 				if (attribute.kind() == anItemKind.anAttribute) {
 					// trace("cacheModel: caching " + getURI(attribute));
-					UmlClassInstance element = elements.get(NiemUmlClass.getURI(attribute));
+					UmlClassInstance element = elements.get(NiemModel.getURI(attribute));
 					if (!list.contains(element))
 						list.add(element);
 				}
@@ -1122,7 +1123,7 @@ class NiemModel {
 
 	/** return an element in schema schemaURI with name elementName */
 	UmlClassInstance getElement(String schemaURI, String elementName) {
-		return getElementByURI(NiemUmlClass.getURI(schemaURI, elementName));
+		return getElementByURI(NiemModel.getURI(schemaURI, elementName));
 	}
 
 	/** return an element in model with uri elementUri */
@@ -1145,7 +1146,7 @@ class NiemModel {
 	/** return type in model with schema schemaURI and name tagname */
 	UmlClass getType(String schemaURI, String typeName) {
 		// return cached type
-		String uri = NiemUmlClass.getURI(schemaURI, typeName);
+		String uri = NiemModel.getURI(schemaURI, typeName);
 		return types.get(uri);
 	}
 	/** filter illegal characters in UML elements */
@@ -1176,7 +1177,7 @@ class NiemModel {
 			}
 			if (NamespaceModel.isExternalPrefix(prefix))
 				continue;
-			String nsSchemaURI = NiemUmlClass.getURI(classView);
+			String nsSchemaURI = NiemModel.getURI(classView);
 			Log.debug("exportSchemas: exporting schema " + prefix);
 	
 			// build list of referenced namespaces
@@ -1204,8 +1205,8 @@ class NiemModel {
 						schemaNamespaces.add(NamespaceModel.getPrefix(baseType));
 					for (UmlItem item2 : type.children())
 						if (item2.kind() == anItemKind.anAttribute) {
-							NiemModel model2 = (NiemUmlClass.SubsetModel.elements.containsKey(NiemUmlClass.getURI(item2))) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
-							UmlClassInstance element = model2.getElementByURI(NiemUmlClass.getURI(item2));
+							NiemModel model2 = (NiemUmlClass.SubsetModel.elements.containsKey(NiemModel.getURI(item2))) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
+							UmlClassInstance element = model2.getElementByURI(NiemModel.getURI(item2));
 							if (element != null)
 								schemaNamespaces.add(NamespaceModel.getPrefix(element));
 						}
@@ -1297,5 +1298,14 @@ class NiemModel {
 				}
 			}
 		}
+	}
+	/** return URI of a item in schemaURI with name itemName */
+	static String getURI(String schemaURI, String itemName) {
+		itemName.replaceAll("[^-._:A-Za-z0-9]", "");
+		return schemaURI + NiemModel.HASH_DELIMITER + NamespaceModel.getName(itemName).replaceAll(NiemModel.HASH_DELIMITER, "");
+	}
+	/** return URI of an item */
+	static String getURI(UmlItem item) {
+		return item.propertyValue(NiemUmlClass.URI_PROPERTY);
 	}
 }

@@ -39,7 +39,6 @@ import java.util.TreeSet;
 import fr.bouml.UmlAttribute;
 import fr.bouml.UmlClass;
 import fr.bouml.UmlClassInstance;
-import fr.bouml.UmlCom;
 import fr.bouml.UmlItem;
 import fr.bouml.UmlOperation;
 import fr.bouml.UmlParameter;
@@ -108,7 +107,7 @@ public class JsonWriter {
 				elementName = "xs:NCName";
 				elementName2 = "@id";
 			} else {
-				elementName = NiemUmlClass.filterAttributePrefix(elementName);
+				elementName = NamespaceModel.filterAttributePrefix(elementName);
 				elementName2 = elementName;
 			}
 		} else
@@ -134,7 +133,7 @@ public class JsonWriter {
 
 	/** return JSON schema element definition */
 	String exportJsonElementSchema(UmlClassInstance element, String prefix) {
-		String elementName = NiemUmlClass.filterAttributePrefix(NamespaceModel.getPrefixedName(element));
+		String elementName = NamespaceModel.filterAttributePrefix(NamespaceModel.getPrefixedName(element));
 		TreeSet<String> jsonDefinition = new TreeSet<String>();
 		String description = element.description();
 		if (description != null && description.equals(""))
@@ -355,8 +354,8 @@ public class JsonWriter {
 			for (UmlItem item4 : type2.children()) {
 				if (item4.kind() == anItemKind.anAttribute) {
 					UmlAttribute attribute = (UmlAttribute) item4;
-					NiemModel model2 = (NiemUmlClass.SubsetModel.elements.containsKey(NiemUmlClass.getURI(attribute))) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
-					UmlClassInstance element = model2.getElementByURI(NiemUmlClass.getURI(attribute));
+					NiemModel model2 = (NiemUmlClass.SubsetModel.elements.containsKey(NiemModel.getURI(attribute))) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
+					UmlClassInstance element = model2.getElementByURI(NiemModel.getURI(attribute));
 					if (element == null)
 						continue;
 					String elementName = NamespaceModel.getPrefixedName(element);
@@ -410,8 +409,8 @@ public class JsonWriter {
 								// if (getName(item5).equals("@id") || getName(item5).equals("@ref"))
 								continue;
 							UmlAttribute attribute = (UmlAttribute) item5;
-							NiemModel model2 = (NiemUmlClass.SubsetModel.elements.containsKey(NiemUmlClass.getURI(attribute))) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
-							UmlClassInstance element = model2.getElementByURI(NiemUmlClass.getURI(attribute));
+							NiemModel model2 = (NiemUmlClass.SubsetModel.elements.containsKey(NiemModel.getURI(attribute))) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
+							UmlClassInstance element = model2.getElementByURI(NiemModel.getURI(attribute));
 							if (element == null || !NiemUmlClass.isAttribute(element))
 								continue;
 							String elementName = NamespaceModel.getPrefixedName(element);
@@ -728,7 +727,7 @@ public class JsonWriter {
 				elementName = "xs:NCName";
 				elementName2 = "@id";
 			} else {
-				elementName = NiemUmlClass.filterAttributePrefix(elementName);
+				elementName = NamespaceModel.filterAttributePrefix(elementName);
 				elementName2 = elementName;
 			}
 		} else

@@ -41,7 +41,6 @@ import fr.bouml.UmlAttribute;
 import fr.bouml.UmlClass;
 import fr.bouml.UmlClassInstance;
 import fr.bouml.UmlClassView;
-import fr.bouml.UmlCom;
 import fr.bouml.UmlItem;
 import fr.bouml.UmlOperation;
 import fr.bouml.UmlParameter;
@@ -146,7 +145,7 @@ public class XmlWriter {
 				String codeList = element.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
 				if (codeList == null || codeList.trim().equals(""))
 					continue;
-				String codeListURI = NiemUmlClass.getExtensionSchema(elementName);
+				String codeListURI = XmlWriter.getExtensionSchema(elementName);
 				CodeListNamespaces.add(elementName);
 	
 				// export code list
@@ -228,7 +227,7 @@ public class XmlWriter {
 		writeXmlNs(xml, "c", MPD_CATALOG_URI);
 		writeXmlAttribute(xml, NiemModel.XSI_PREFIX + ":schemaLocation", MPD_CATALOG_URI + " " + MPD_CATALOG_LOCATION);
 		xml.write(">");
-		xml.write("<c:MPD c:mpdURI=\"" + NiemUmlClass.getExtensionSchema("") + "\"");
+		xml.write("<c:MPD c:mpdURI=\"" + XmlWriter.getExtensionSchema("") + "\"");
 		writeXmlAttribute(xml, "c:mpdClassURIList", MPD_URI + "#MPD " + MPD_URI + "#IEPD");
 		xml.write(" c:mpdName=\"" + NiemUmlClass.getProperty(NiemUmlClass.IEPD_NAME_PROPERTY) + "\" c:mpdVersionID=\""
 				+ NiemUmlClass.getProperty(NiemUmlClass.IEPD_VERSION_PROPERTY) + "\">");
@@ -243,9 +242,9 @@ public class XmlWriter {
 		for (String message : messages) {
 			UmlClassInstance element = null;
 			if (NiemUmlClass.isNiemElement(message))
-				element = NiemUmlClass.SubsetModel.getElement(NiemUmlClass.getSchemaURI(message), message);
+				element = NiemUmlClass.SubsetModel.getElement(NamespaceModel.getSchemaURI(message), message);
 			else
-				element = NiemUmlClass.ExtensionModel.getElement(NiemUmlClass.getSchemaURI(message), message);
+				element = NiemUmlClass.ExtensionModel.getElement(NamespaceModel.getSchemaURI(message), message);
 			xml.write("<c:IEPConformanceTarget structures:id=\"" + NamespaceModel.getName(message) + "\">");
 			if (element == null)
 				Log.trace("exportMPDCatalog: error - no root element " + message);
@@ -477,7 +476,7 @@ public class XmlWriter {
 				xml.write("<uri name=\"" + schemaURI + "\" uri=\"" + ns.filepath + "\"/>\n");
 		}
 		for (String codeList : CodeListNamespaces)
-			xml.write("<uri name=\"" + NiemUmlClass.getExtensionSchema(codeList) + "\" uri=\"" + codeList + GC_FILE_TYPE + "\"/>\n");
+			xml.write("<uri name=\"" + XmlWriter.getExtensionSchema(codeList) + "\" uri=\"" + codeList + GC_FILE_TYPE + "\"/>\n");
 		xml.write(
 				"<nextCatalog  catalog=\"" + Paths.get(NiemUmlClass.NIEM_DIR, XML_CATALOG_FILE).toString() + "\" />\n</catalog>\n");
 		xml.close();
@@ -524,7 +523,7 @@ public class XmlWriter {
 			String codeList = element.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
 			if (codeList != null)
 				elementSchema += "<xs:appinfo>" + "<clsa:SimpleCodeListBinding codeListURI=\""
-						+ NiemUmlClass.getExtensionSchema(elementName) + "\"/>" + " </xs:appinfo>";
+						+ XmlWriter.getExtensionSchema(elementName) + "\"/>" + " </xs:appinfo>";
 			elementSchema += "</xs:annotation>\n";
 		}
 		elementSchema += "</xs:element>\n";
@@ -654,8 +653,8 @@ public class XmlWriter {
 		for (UmlItem item : type.children()) {
 			if (item.kind() == anItemKind.anAttribute) {
 				UmlAttribute attribute = (UmlAttribute) item;
-				NiemModel model = (NiemUmlClass.SubsetModel.elements.containsKey(NiemUmlClass.getURI(attribute))) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
-				UmlClassInstance element = model.getElementByURI(NiemUmlClass.getURI(attribute));
+				NiemModel model = (NiemUmlClass.SubsetModel.elements.containsKey(NiemModel.getURI(attribute))) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
+				UmlClassInstance element = model.getElementByURI(NiemModel.getURI(attribute));
 				if (element == null)
 					continue;
 				String elementName = NamespaceModel.getPrefixedName(element);
@@ -692,8 +691,8 @@ public class XmlWriter {
 		}
 		if (augmentationPoint != null) {
 			// if (complexContent) {
-			NiemModel model = (NiemUmlClass.SubsetModel.elements.containsKey(NiemUmlClass.getURI(augmentationPoint))) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
-			UmlClassInstance element = model.getElementByURI(NiemUmlClass.getURI(augmentationPoint));
+			NiemModel model = (NiemUmlClass.SubsetModel.elements.containsKey(NiemModel.getURI(augmentationPoint))) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
+			UmlClassInstance element = model.getElementByURI(NiemModel.getURI(augmentationPoint));
 			xmlElementsInType.add(exportXmlElementInTypeSchema(element, augmentationPoint.multiplicity(), null));
 		}
 	
@@ -745,6 +744,11 @@ public class XmlWriter {
 		} catch (Exception e) {
 			Log.trace("xmlNS: error " + e.toString());
 		}
+	}
+
+	/** returns an extension schema URI */
+	static String getExtensionSchema(String prefix) {
+		return NiemUmlClass.getProperty(NiemUmlClass.IEPD_URI_PROPERTY) + prefix;
 	}
 
 }

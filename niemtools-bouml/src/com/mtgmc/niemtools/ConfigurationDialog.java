@@ -56,7 +56,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
-import fr.bouml.UmlCom;
 import fr.bouml.UmlPackage;
 
 class ConfigurationDialog extends JDialog {

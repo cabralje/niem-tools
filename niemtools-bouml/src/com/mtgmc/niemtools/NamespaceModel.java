@@ -37,7 +37,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import fr.bouml.UmlClassView;
-import fr.bouml.UmlCom;
 import fr.bouml.UmlItem;
 import fr.bouml.anItemKind;
 
@@ -190,7 +189,7 @@ public class NamespaceModel {
 
 	/** return name with namespace prefix for an attribute with name tagName */
 	static String getPrefixedAttributeName(String prefix, String tagName) {
-		return prefix + NAMESPACE_DELIMITER + NiemUmlClass.ATTRIBUTE_PREFIX + NiemUmlClass.filterAttributePrefix(tagName);
+		return prefix + NAMESPACE_DELIMITER + NiemUmlClass.ATTRIBUTE_PREFIX + NamespaceModel.filterAttributePrefix(tagName);
 	}
 
 	/** return name with namespace prefix for type or element with name tagName */
@@ -253,6 +252,23 @@ public class NamespaceModel {
 			Log.trace("importNamespaces: error " + e.toString());
 		}
 		return ns;
+	}
+
+	/** return schemaURI for type or element with name tagname */
+	static String getSchemaURI(String tagName) {
+		String prefix = getPrefix(tagName);
+		if (prefix == null)
+			// prefix = LOCAL_PREFIX;
+			return null;
+		String schemaURI = Prefixes.get(prefix);
+		if (schemaURI == null)
+			schemaURI = XmlWriter.getExtensionSchema(prefix);
+		return schemaURI;
+	}
+
+	/** return attribute name with prefix filtered */
+	static String filterAttributePrefix(String attributeName) {
+		return attributeName.replaceAll(NiemUmlClass.ATTRIBUTE_PREFIX, "");
 	}
 
 }
