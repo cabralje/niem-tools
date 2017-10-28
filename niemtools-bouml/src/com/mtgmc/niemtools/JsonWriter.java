@@ -340,8 +340,7 @@ public class JsonWriter {
 		return jsonType;
 	}
 
-	/** return JSON schema type definition 
-	 * @param subsetModel TODO*/
+	/** return JSON schema type definition */
 	String exportJsonTypeSchema(NiemModel model, UmlClass type, String prefix) {
 		// add properties
 		// type.sortChildren();

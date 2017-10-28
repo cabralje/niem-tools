@@ -1153,10 +1153,7 @@ class NiemModel {
 	String filterUMLElement(String string) {
 		return string.replaceAll("[^A-Za-z0-9_@#$-`~,.<?;:'\"\\\\]", "");
 	}
-	/** exports NIEM extension and exchange schema 
-	 * @param xmlWriter TODO
-	 * @param xmlDir TODO
-	 * @param jsonDir TODO*/
+	/** exports NIEM extension and exchange schema */
 	void exportSchemas(String xmlDir, String jsonDir) {
 	
 		XmlWriter xmlWriter = new XmlWriter(xmlDir);
