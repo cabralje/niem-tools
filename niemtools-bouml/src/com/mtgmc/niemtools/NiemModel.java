@@ -1,10 +1,36 @@
 package com.mtgmc.niemtools;
 
+/*
+ *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
+ *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
+ *   UML Platform Specific Model (PSM), the NIEM reference/subset/extension model, and a UML Platform Specific Model (NIEM), NIEM XML Schema.
+ *
+ *   NOTE: This plug_out requires that the BOUML project include a simple NIEM profile that provides the stereotypes required for mapping.
+ *   
+ *   Copyright (C) 2017 James E. Cabral Jr., MTG Management Consultants LLC, jcabral@mtgmc.com, http://github.com/cabralje
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import java.io.File;
+import java.io.FileWriter;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -23,7 +49,6 @@ import fr.bouml.UmlAttribute;
 import fr.bouml.UmlClass;
 import fr.bouml.UmlClassInstance;
 import fr.bouml.UmlClassView;
-import fr.bouml.UmlCom;
 import fr.bouml.UmlItem;
 import fr.bouml.UmlPackage;
 import fr.bouml.UmlRelation;
@@ -46,6 +71,7 @@ class NiemModel {
 	"unsignedLong", "unsignedShort" };
 	static Boolean _IMPORT_CODE_DESCRIPTIONS = true;
 	// private static final Boolean _IMPORT_CODE_DESCRIPTIONS = false;
+	
 	/** returns an element in type added to reference model or extension */
 	UmlAttribute addElementInType(UmlClass type, UmlClassInstance element, String multiplicity) {
 	
@@ -85,7 +111,7 @@ class NiemModel {
 		List<UmlClassInstance> elementInTypeList = getModel(type).getElementsInType( NiemUmlClass.getURI(type));
 		if (!elementInTypeList.contains(element)) {
 			elementInTypeList.add(element);
-			NiemUmlClass.trace("addElementInTypes: inserted " + elementInTypeName + " to " + typeName);
+			Log.debug("addElementInTypes: inserted " + elementInTypeName + " to " + typeName);
 		}
 		return elementInType;
 	}
@@ -101,7 +127,7 @@ class NiemModel {
 		// if element doesn't exist in reference model, return error
 		UmlClassInstance sourceElement = NiemUmlClass.ReferenceModel.getElement(schemaURI, elementName);
 		if (sourceElement == null) {
-			UmlCom.trace("copyElement: error - element " + elementName + " not in reference model");
+			Log.trace("copyElement: error - element " + elementName + " not in reference model");
 			return null;
 		}
 	
@@ -115,7 +141,7 @@ class NiemModel {
 		// if namespace doesn't exist, create it
 		UmlClassView nsClassView = NamespaceModel.getNamespace(this, NamespaceModel.getPrefix(elementName), schemaURI);
 		if (nsClassView == null) {
-			UmlCom.trace("addElement: error - no prefix or schema for element " + elementName);
+			Log.trace("addElement: error - no prefix or schema for element " + elementName);
 			return null;
 		}
 	
@@ -123,14 +149,14 @@ class NiemModel {
 		try {
 			element = UmlClassInstance.create(nsClassView, filterUMLElement(NamespaceModel.getName(elementName)), baseType);
 		} catch (RuntimeException e) {
-			UmlCom.trace("copyElement: error copying element " + elementName + " to subset");
+			Log.trace("copyElement: error copying element " + elementName + " to subset");
 			return null;
 		}
 		element.set_Description(sourceElement.description());
 		String uri = NiemUmlClass.getURI(schemaURI, elementName);
 		element.set_PropertyValue(NiemUmlClass.URI_PROPERTY, uri);
 		elements.put(uri, element);
-		NiemUmlClass.trace("copyElement: element " + elementName + " copied to subset");
+		Log.debug("copyElement: element " + elementName + " copied to subset");
 		return element;
 	}
 	/** returns an element in type copied from reference model to subset */
@@ -142,17 +168,17 @@ class NiemModel {
 			try {
 				attribute = UmlAttribute.create(type, elementInTypeName);
 			} catch (RuntimeException re) {
-				NiemUmlClass.trace("copyElementInType: error - attribute already exists " + element + " " + re.toString());
+				Log.debug("copyElementInType: error - attribute already exists " + element + " " + re.toString());
 			}
 		if (attribute == null)
-			UmlCom.trace("copyElementInType: error copying element " + elementInTypeName + " in " + typeName);
+			Log.trace("copyElementInType: error copying element " + elementInTypeName + " in " + typeName);
 		else {
 			attribute.set_Description(element.description());
 			attribute.set_PropertyValue(NiemUmlClass.URI_PROPERTY, NiemUmlClass.getURI(element));
 			relateElementInType(attribute, element);
 			attribute.set_Multiplicity(multiplicity);
 		}
-		NiemUmlClass.trace("addElementInTypes: inserted " + elementInTypeName + " to " + typeName);
+		Log.debug("addElementInTypes: inserted " + elementInTypeName + " to " + typeName);
 		return attribute;
 	}
 	/** returns a type copied from the reference model to subset */
@@ -162,7 +188,7 @@ class NiemModel {
 			return null;
 		String schemaURI = NiemUmlClass.getSchemaURI(typeName);
 		if (schemaURI == null) {
-			UmlCom.trace("copyType: error - schema for type " + typeName + " not in reference model");
+			Log.trace("copyType: error - schema for type " + typeName + " not in reference model");
 			return null;
 		}
 	
@@ -174,14 +200,14 @@ class NiemModel {
 		// find reference type
 		UmlClass sourceType = NiemUmlClass.ReferenceModel.getType(schemaURI, typeName);
 		if (sourceType == null) {
-			UmlCom.trace("copyType: error - type " + typeName + " not in reference model");
+			Log.trace("copyType: error - type " + typeName + " not in reference model");
 			return null;
 		}
 	
 		// if subset namespace doesn't exist, create it
 		UmlClassView nsClassView = NamespaceModel.getNamespace(this, NamespaceModel.getPrefix(typeName), schemaURI);
 		if (nsClassView == null) {
-			UmlCom.trace("copyType: error - no prefix or schema for type " + typeName);
+			Log.trace("copyType: error - no prefix or schema for type " + typeName);
 			return null;
 		}
 	
@@ -191,7 +217,7 @@ class NiemModel {
 		try {
 			type = UmlClass.create(nsClassView, filterUMLType(NamespaceModel.getName(typeName)));
 		} catch (RuntimeException e) {
-			NiemUmlClass.trace("copyType: error - type already exists " + typeName + " " + e.toString());
+			Log.debug("copyType: error - type already exists " + typeName + " " + e.toString());
 			return null;
 		}
 	
@@ -218,13 +244,13 @@ class NiemModel {
 			if (NiemUmlClass.isAttribute(item)) {
 				UmlClassInstance sourceElement = NiemUmlClass.ReferenceModel.getElementByURI(NiemUmlClass.getURI(item));
 				if (sourceElement == null) {
-					UmlCom.trace("copyType: error - no element for uri " + NiemUmlClass.getURI(item) + " in reference model");
+					Log.trace("copyType: error - no element for uri " + NiemUmlClass.getURI(item) + " in reference model");
 					continue;
 				}
 				String attributeName = NamespaceModel.getPrefixedName(sourceElement);
 				UmlClassInstance element = copyElement(attributeName);
 				if (element == null)
-					UmlCom.trace("copyType: error - no attribute " + attributeName);
+					Log.trace("copyType: error - no attribute " + attributeName);
 				else
 					copyElementInType(type, element, ((UmlAttribute) item).multiplicity());
 			}
@@ -235,11 +261,11 @@ class NiemModel {
 			String attributeGroupName = NamespaceModel.getPrefixedName(attributeGroupType);
 			UmlClass attributeGroup = copyType(attributeGroupName);
 			if (attributeGroup == null)
-				UmlCom.trace("copyType: error - no attribute group " + attributeGroupName);
+				Log.trace("copyType: error - no attribute group " + attributeGroupName);
 			else
 				relateAttributeGroup(type, attributeGroupType);
 		}
-		NiemUmlClass.trace("copyType: type copied " + typeName);
+		Log.debug("copyType: type copied " + typeName);
 		return type;
 	}
 	/** filter non-ASCII characters */
@@ -320,7 +346,7 @@ class NiemModel {
 			if (item.kind() == anItemKind.anAttribute && item.name().equals(elementInTypeName)) {
 				String previousMultiplicity = ((UmlAttribute) item).multiplicity();
 				if (!previousMultiplicity.equals(multiplicity))
-					UmlCom.trace("getElementInType:  error - " + NamespaceModel.getPrefixedName(type) + "/" + elementInTypeName
+					Log.trace("getElementInType:  error - " + NamespaceModel.getPrefixedName(type) + "/" + elementInTypeName
 							+ " has conflicting multiplicities " + previousMultiplicity + " and " + multiplicity);
 				return (UmlAttribute) item;
 			}
@@ -341,7 +367,7 @@ class NiemModel {
 			return NiemUmlClass.SubsetModel;
 		else if (modelPackage == NiemUmlClass.ExtensionModel.modelPackage)
 			return NiemUmlClass.ExtensionModel;
-		UmlCom.trace("getPrefix - error - no prefix for " + item.name());
+		Log.trace("getPrefix - error - no prefix for " + item.name());
 	
 		return null;
 	}
@@ -354,7 +380,7 @@ class NiemModel {
 			try {
 				xe = xPath.compile("xs:annotation[1]/xs:documentation[1]");
 			} catch (XPathExpressionException e) {
-				UmlCom.trace("getCodeList: exception " + e.toString());
+				Log.trace("getCodeList: exception " + e.toString());
 			}
 	
 		for (int j = 0; j < elist.getLength(); j++) {
@@ -365,7 +391,7 @@ class NiemModel {
 				try {
 					codeDescription = filterEnum(filterASCII(xe.evaluate(enumElement)));
 				} catch (Exception e) {
-					UmlCom.trace("getCodeList: error - cannot import code descriptions " + e.toString());
+					Log.trace("getCodeList: error - cannot import code descriptions " + e.toString());
 				}
 			if (codeDescription != null && !codeDescription.equals("")) {
 				codeList += value + NiemUmlClass.CODELIST_DEFINITION_DELIMITER + codeDescription + NiemUmlClass.CODELIST_DELIMITER + " ";
@@ -390,7 +416,7 @@ class NiemModel {
 			// compile XPath queries
 			xe = xPath.compile("xs:annotation[1]/xs:documentation[1]");
 		} catch (Exception e) {
-			UmlCom.trace(filename2 + "importElements: error " + e.toString());
+			Log.trace(filename2 + "importElements: error " + e.toString());
 			filename2 = "";
 		}
 		// get target and default prefixes
@@ -405,7 +431,7 @@ class NiemModel {
 			elementList = (NodeList) xPath.evaluate("xs:element[@name]", doc.getDocumentElement(),
 					XPathConstants.NODESET);
 		} catch (Exception e) {
-			UmlCom.trace("importElements: error - cannot import element " + e.toString());
+			Log.trace("importElements: error - cannot import element " + e.toString());
 		}
 	
 		for (int elementIndex = 0; elementIndex < elementList.getLength(); elementIndex++) {
@@ -432,11 +458,11 @@ class NiemModel {
 			}
 			UmlClass baseType = getType(baseTypeSchemaURI, baseTypeName);
 			if (baseType == null && !baseTypeName.equals(""))
-				UmlCom.trace("importElements: error - base type " + baseTypeName + " not in model with URI "+ baseTypeSchemaURI);
+				Log.trace("importElements: error - base type " + baseTypeName + " not in model with URI "+ baseTypeSchemaURI);
 			try {
 				addElement(ns.schemaURI, elementName, baseType, xe.evaluate(elementElement), null);
 			} catch (Exception e) {
-				UmlCom.trace("importElements: error - cannot import element " + e.toString());
+				Log.trace("importElements: error - cannot import element " + e.toString());
 			}
 		}
 	
@@ -447,7 +473,7 @@ class NiemModel {
 			attributeList = (NodeList) xPath.evaluate("xs:attribute[@name]", doc.getDocumentElement(),
 					XPathConstants.NODESET);
 		} catch (Exception e) {
-			UmlCom.trace("importElements: error - cannot import attributes " + e.toString());
+			Log.trace("importElements: error - cannot import attributes " + e.toString());
 		}
 		for (int attributeIndex = 0; attributeIndex < attributeList.getLength(); attributeIndex++) {
 			Element attribute = (Element) attributeList.item(attributeIndex);
@@ -471,7 +497,7 @@ class NiemModel {
 						codeList = importCodeList(eList);
 					}
 				} catch (Exception e) {
-					UmlCom.trace(filename + "\nimportElements: error importing base types for attribute "
+					Log.trace(filename + "\nimportElements: error importing base types for attribute "
 							+ attributeName + " " + e.toString());
 				}
 			if (baseTypeName == null || baseTypeName.equals(""))
@@ -491,10 +517,10 @@ class NiemModel {
 			try {
 				UmlClass baseType2 = getType(baseTypeSchemaURI, baseTypeName);
 				if (baseType2 == null && !baseTypeName.equals(""))
-					UmlCom.trace("importElements: error - base type " + baseTypeName + " not in model with URI "+ baseTypeSchemaURI);
+					Log.trace("importElements: error - base type " + baseTypeName + " not in model with URI "+ baseTypeSchemaURI);
 				element = addElement(ns.schemaURI, attributeName, baseType2, xe.evaluate(attribute), null);
 			} catch (Exception e) {
-				UmlCom.trace(filename2 + "importElements: error - cannot add attribute " + attributeName + " of type "
+				Log.trace(filename2 + "importElements: error - cannot add attribute " + attributeName + " of type "
 						+ baseTypeName + " " + e.toString());
 				filename2 = "";
 			}
@@ -520,7 +546,7 @@ class NiemModel {
 			xPath.setNamespaceContext(new NamespaceResolver(doc, true));
 			ns = NamespaceModel.importNamespaces(doc);
 		} catch (Exception e) {
-			UmlCom.trace(filename + "\nimportElementsInTypes: error parsing the schema " + e.toString());
+			Log.trace(filename + "\nimportElementsInTypes: error parsing the schema " + e.toString());
 		}
 	
 		// get target and default prefixes
@@ -536,7 +562,7 @@ class NiemModel {
 			root = doc.getDocumentElement();
 			attributeGroupList = (NodeList) xPath.evaluate("xs:attributeGroup[@name]", root, XPathConstants.NODESET);
 		} catch (Exception e) {
-			UmlCom.trace(filename + "\nimportElementsInTypes: error parsing the schema " + e.toString());
+			Log.trace(filename + "\nimportElementsInTypes: error parsing the schema " + e.toString());
 		}
 	
 		for (int attributeGroupIndex = 0; attributeGroupIndex < attributeGroupList.getLength(); attributeGroupIndex++) {
@@ -546,7 +572,7 @@ class NiemModel {
 				attributeGroupName = NamespaceModel.getPrefixedAttributeName(targetPrefix, attributeGroupName);
 			UmlClass attributeGroup = getType(ns.schemaURI, attributeGroupName);
 			if (attributeGroup == null) {
-				UmlCom.trace("importElementsInType: error - attribute group " + attributeGroupName
+				Log.trace("importElementsInType: error - attribute group " + attributeGroupName
 						+ " not in reference model");
 				continue;
 			}
@@ -555,7 +581,7 @@ class NiemModel {
 				attributeList = (NodeList) xPath.evaluate(".//xs:attribute[@ref]", attributeGroupElement,
 						XPathConstants.NODESET);
 			} catch (Exception e) {
-				UmlCom.trace(filename + "\nimportElementsInTypes: error parsing the schema " + e.toString());
+				Log.trace(filename + "\nimportElementsInTypes: error parsing the schema " + e.toString());
 			}
 			for (int attributeIndex = 0; attributeIndex < attributeList.getLength(); attributeIndex++) {
 				Element attributeElement = (Element) attributeList.item(attributeIndex);
@@ -569,12 +595,12 @@ class NiemModel {
 				if (attributeSchemaURI == null)
 					attributeSchemaURI = NiemUmlClass.getSchemaURI(attributeName);
 				if (attributeSchemaURI == null) {
-					UmlCom.trace("addElementInType: error - prefix for attribute " + attributeName + " not in model");
+					Log.trace("addElementInType: error - prefix for attribute " + attributeName + " not in model");
 					continue;
 				}
 				UmlClassInstance element = getElement(attributeSchemaURI, NamespaceModel.getName(attributeName));
 				if (element == null) {
-					UmlCom.trace("importElementsInType: error - attribute " + attributeName + " not in model");
+					Log.trace("importElementsInType: error - attribute " + attributeName + " not in model");
 					continue;
 				}
 				addElementInType(attributeGroup, element, multiplicity);
@@ -588,8 +614,7 @@ class NiemModel {
 			simpleTypeNodeList = (NodeList) xPath.evaluate("xs:simpleType[@name]/xs:restriction[1][@base]", root,
 					XPathConstants.NODESET);
 		} catch (Exception e) {
-			UmlCom.trace(
-					filename + "\nimportElementsInTypes: error importing base types for simple types " + e.toString());
+			Log.trace(filename + "\nimportElementsInTypes: error importing base types for simple types " + e.toString());
 		}
 		for (int elementIndex = 0; elementIndex < simpleTypeNodeList.getLength(); elementIndex++) {
 			Element restrictionElement = (Element) simpleTypeNodeList.item(elementIndex);
@@ -616,7 +641,7 @@ class NiemModel {
 		try {
 			complexTypeNodeList = (NodeList) xPath.evaluate("xs:complexType[@name]", root, XPathConstants.NODESET);
 		} catch (Exception e) {
-			UmlCom.trace(filename + "\nimportElementsInTypes: error parsing types" + e.toString());
+			Log.trace(filename + "\nimportElementsInTypes: error parsing types" + e.toString());
 		}
 		for (int elementIndex = 0; elementIndex < complexTypeNodeList.getLength(); elementIndex++) {
 			Element typeElement = (Element) complexTypeNodeList.item(elementIndex);
@@ -637,7 +662,7 @@ class NiemModel {
 						"xs:simpleContent[1]/xs:extension[1][@base] | xs:complexContent[1]/xs:extension[1][@base]",
 						typeElement, XPathConstants.NODESET);
 			} catch (Exception e) {
-				UmlCom.trace(filename + "\nimportElementsInTypes: error importing base types for complex types"
+				Log.trace(filename + "\nimportElementsInTypes: error importing base types for complex types"
 						+ e.toString());
 			}
 			for (int baseTypeIndex = 0; baseTypeIndex < baseTypeList.getLength(); baseTypeIndex++) {
@@ -658,7 +683,7 @@ class NiemModel {
 				attributeGroupInTypeNodeList = (NodeList) xPath.evaluate(".//xs:attributeGroup[@ref]", typeElement,
 						XPathConstants.NODESET);
 			} catch (Exception e) {
-				UmlCom.trace(filename + "\nimportElementsInTypes:error importing attributeGroup in complex types"
+				Log.trace(filename + "\nimportElementsInTypes:error importing attributeGroup in complex types"
 						+ e.toString());
 			}
 			for (int attributeGroupIndex = 0; attributeGroupIndex < attributeGroupInTypeNodeList
@@ -682,7 +707,7 @@ class NiemModel {
 				attributeInTypeNodeList = (NodeList) xPath.evaluate(".//xs:attribute[@ref]", typeElement,
 						XPathConstants.NODESET);
 			} catch (Exception re) {
-				UmlCom.trace(filename + "\nimportElementsInTypes: error importing attributes in type " + re.toString());
+				Log.trace(filename + "\nimportElementsInTypes: error importing attributes in type " + re.toString());
 			}
 			for (int attributeIndex = 0; attributeIndex < attributeInTypeNodeList.getLength(); attributeIndex++) {
 				Element attributeElement = (Element) attributeInTypeNodeList.item(attributeIndex);
@@ -704,7 +729,7 @@ class NiemModel {
 				elementInTypeNodeList = (NodeList) xPath.evaluate(".//xs:sequence[1]/xs:element[@ref]", typeElement,
 						XPathConstants.NODESET);
 			} catch (Exception e) {
-				UmlCom.trace(filename + "\nimportElementsInTypes: error importing elements in type " + e.toString());
+				Log.trace(filename + "\nimportElementsInTypes: error importing elements in type " + e.toString());
 			}
 			String elementName = null;
 			try {
@@ -727,13 +752,12 @@ class NiemModel {
 					if (elementSchemaURI == null)
 						elementSchemaURI = NiemUmlClass.getSchemaURI(elementName);
 					if (elementSchemaURI == null) {
-						UmlCom.trace(
-								"importElementsInType: error - prefix for element " + elementName + " not in model");
+						Log.trace("importElementsInType: error - prefix for element " + elementName + " not in model");
 						continue;
 					}
 					UmlClassInstance element = getElement(elementSchemaURI, elementName);
 					if (element == null) {
-						UmlCom.trace("importElementsInType: error - element " + NiemUmlClass.getURI(elementSchemaURI, elementName)
+						Log.trace("importElementsInType: error - element " + NiemUmlClass.getURI(elementSchemaURI, elementName)
 								+ " not in reference model");
 						continue;
 					}
@@ -743,7 +767,7 @@ class NiemModel {
 	
 				}
 			} catch (Exception re) {
-				UmlCom.trace(filename + "\nimportElementsInTypes: error importing element " + elementName + " in type "
+				Log.trace(filename + "\nimportElementsInTypes: error importing element " + elementName + " in type "
 						+ typeName + " " + re.toString());
 			}
 		}
@@ -768,7 +792,7 @@ class NiemModel {
 			xe = xPath.compile("xs:annotation[1]/xs:documentation[1]");
 			xe1 = xPath.compile("xs:restriction[1]/xs:enumeration");
 		} catch (Exception re) {
-			UmlCom.trace(filename2 + "importTypes: error " + re.toString());
+			Log.trace(filename2 + "importTypes: error " + re.toString());
 			filename2 = "";
 		}
 		// get target and default prefixes
@@ -780,7 +804,7 @@ class NiemModel {
 			typeList = (NodeList) xPath.evaluate("xs:complexType|xs:simpleType[@name]", doc.getDocumentElement(),
 					XPathConstants.NODESET);
 		} catch (Exception e) {
-			UmlCom.trace(filename2 + "importTypes: error - cannot parse types " + e.toString());
+			Log.trace(filename2 + "importTypes: error - cannot parse types " + e.toString());
 		}
 	
 		for (int typeIndex = 0; typeIndex < typeList.getLength(); typeIndex++) {
@@ -793,7 +817,7 @@ class NiemModel {
 			try {
 				type = addType(ns.schemaURI, typeName, xe.evaluate(typeElement), null);
 			} catch (Exception e) {
-				UmlCom.trace(filename2 + "importTypes: cannot add type " + typeName + " to schema " + ns.schemaURI + " "
+				Log.trace(filename2 + "importTypes: cannot add type " + typeName + " to schema " + ns.schemaURI + " "
 						+ e.toString());
 			}
 			if (type == null)
@@ -805,7 +829,7 @@ class NiemModel {
 				try {
 					elist = (NodeList) xe1.evaluate(typeElement, XPathConstants.NODESET);
 				} catch (Exception e) {
-					UmlCom.trace(filename2 + "importTypes: error - cannot import enumerations " + e.toString());
+					Log.trace(filename2 + "importTypes: error - cannot import enumerations " + e.toString());
 				}
 				String codeList = importCodeList(elist);
 				if (!codeList.equals(""))
@@ -819,7 +843,7 @@ class NiemModel {
 			attributeGroupList = (NodeList) xPath.evaluate("xs:attributeGroup[@name]", doc.getDocumentElement(),
 					XPathConstants.NODESET);
 		} catch (XPathExpressionException e) {
-			UmlCom.trace(filename2 + "importTypes: error - cannot parse attribute groups " + e.toString());
+			Log.trace(filename2 + "importTypes: error - cannot parse attribute groups " + e.toString());
 		}
 		for (int attributeGroupIndex = 0; attributeGroupIndex < attributeGroupList.getLength(); attributeGroupIndex++) {
 			Element attributeGroupElement = (Element) attributeGroupList.item(attributeGroupIndex);
@@ -831,7 +855,7 @@ class NiemModel {
 			try {
 				addType(ns.schemaURI, attributeGroupName, xe.evaluate(attributeGroupElement), null);
 			} catch (Exception e) {
-				UmlCom.trace(filename2 + "importTypes: error - cannot add attribute group " + attributeGroupName + " "
+				Log.trace(filename2 + "importTypes: error - cannot add attribute group " + attributeGroupName + " "
 						+ e.toString());
 				filename2 = "";
 			}
@@ -869,7 +893,7 @@ class NiemModel {
 			try {
 				elementInType.set_Type(elementType);
 			} catch (Exception re) {
-				UmlCom.trace("relateElementInType: error relating element in type to " + NamespaceModel.getPrefixedName(element) + " "
+				Log.trace("relateElementInType: error relating element in type to " + NamespaceModel.getPrefixedName(element) + " "
 						+ re.toString());
 			}
 	}
@@ -933,20 +957,20 @@ class NiemModel {
 			// create element
 			UmlClassView nsClassView = NamespaceModel.getNamespace(this, NamespaceModel.getPrefix(elementName), elementSchemaURI);
 			if (nsClassView == null) {
-				UmlCom.trace("addElement: error - no prefix or schema for element " + elementName);
+				Log.trace("addElement: error - no prefix or schema for element " + elementName);
 				return null;
 			}
 			try {
 				element = UmlClassInstance.create(nsClassView, filterUMLElement(NamespaceModel.getName(elementName)), baseType);
 			} catch (RuntimeException e) {
-				UmlCom.trace("addElement: error adding element " + elementName + " of type " + baseType.name());
+				Log.trace("addElement: error adding element " + elementName + " of type " + baseType.name());
 				return null;
 			}
 			element.set_Description(description);
 			String uri = NiemUmlClass.getURI(elementSchemaURI, elementName);
 			element.set_PropertyValue(NiemUmlClass.URI_PROPERTY, uri);
 			elements.put(uri, element);
-			NiemUmlClass.trace("addElement: added " + elementName);
+			Log.debug("addElement: added " + elementName);
 		}
 	
 		// add notes
@@ -963,19 +987,19 @@ class NiemModel {
 			// create type
 			UmlClassView nsClassView = NamespaceModel.getNamespace(this, NamespaceModel.getPrefix(typeName), typeSchemaURI);
 			if (nsClassView == null) {
-				UmlCom.trace("addType: error - no prefix or schema for type " + typeName);
+				Log.trace("addType: error - no prefix or schema for type " + typeName);
 				return null;
 			}
 			try {
 				type = UmlClass.create(nsClassView, filterUMLType(NamespaceModel.getName(typeName)));
 			} catch (RuntimeException re) {
-				UmlCom.trace("addType: error adding type " + typeName);
+				Log.trace("addType: error adding type " + typeName);
 				return null;
 			}
 			String uri = NiemUmlClass.getURI(typeSchemaURI, typeName);
 			type.set_PropertyValue(NiemUmlClass.URI_PROPERTY, uri);
 			types.put(uri, type);
-			NiemUmlClass.trace("addType: added " + typeName);
+			Log.debug("addType: added " + typeName);
 		}
 		setDescription(type, description);
 		setNotes(type, notes);
@@ -991,11 +1015,11 @@ class NiemModel {
 		if (modelPackage == null)
 			return;
 		
-		NiemUmlClass.trace("cacheModel: caching model " + modelPackage.name());
+		Log.debug("cacheModel: caching model " + modelPackage.name());
 		// Cache namespaces, types and elements
 		String schemaURI;
 	
-		NiemUmlClass.trace("cacheModel: caching namespaces, types and elements");
+		Log.debug("cacheModel: caching namespaces, types and elements");
 		for (UmlItem classView : modelPackage.children()) {
 			if (classView.kind() != anItemKind.aClassView)
 				continue;
@@ -1049,7 +1073,7 @@ class NiemModel {
 		}
 	
 		// Cache elements in types
-		NiemUmlClass.trace("cacheModel: caching elements in types");
+		Log.debug("cacheModel: caching elements in types");
 		for (UmlClass type : types.values()) {
 			String typeURI = NiemUmlClass.getURI(type);
 			List<UmlClassInstance> list = (elementsInType.get(typeURI));
@@ -1066,7 +1090,7 @@ class NiemModel {
 				}
 		}
 	
-		NiemUmlClass.trace("cacheModel: store caches and add simple and abstract types");
+		Log.debug("cacheModel: store caches and add simple and abstract types");
 		if (this == NiemUmlClass.ReferenceModel) {
 			// add local namespace and abstract type
 			NamespaceModel.getNamespace(null, NiemUmlClass.LOCAL_PREFIX, NiemUmlClass.LOCAL_URI);
@@ -1093,7 +1117,7 @@ class NiemModel {
 			objectType = NiemUmlClass.SubsetModel.objectType;
 			simpleObjectAttributeGroup = NiemUmlClass.SubsetModel.simpleObjectAttributeGroup;
 		}
-		NiemUmlClass.trace("cacheModels: model " + modelPackage.name() + " cached");
+		Log.debug("cacheModels: model " + modelPackage.name() + " cached");
 	}
 
 	/** return an element in schema schemaURI with name elementName */
@@ -1127,5 +1151,151 @@ class NiemModel {
 	/** filter illegal characters in UML elements */
 	String filterUMLElement(String string) {
 		return string.replaceAll("[^A-Za-z0-9_@#$-`~,.<?;:'\"\\\\]", "");
+	}
+	/** exports NIEM extension and exchange schema 
+	 * @param xmlWriter TODO
+	 * @param xmlDir TODO
+	 * @param jsonDir TODO*/
+	void exportSchemas(String xmlDir, String jsonDir) {
+	
+		XmlWriter xmlWriter = new XmlWriter(xmlDir);
+		JsonWriter jsonWriter = new JsonWriter(jsonDir);
+		boolean exportXML = (xmlDir != null);
+		boolean exportJSON = (jsonDir != null);
+	
+		// export each schema
+		for (UmlItem thisPackage : modelPackage.children()) {
+			if (thisPackage.kind() != anItemKind.aClassView)
+				continue;
+			UmlClassView classView = (UmlClassView) thisPackage;
+			// classView.sort();
+			String prefix = classView.propertyValue(NiemUmlClass.PREFIX_PROPERTY);
+			if (prefix == null || prefix.equals("")) {
+				Log.trace("exportSchemas: prefix for " + thisPackage.name() + " is not set");
+				continue;
+			}
+			if (NamespaceModel.isExternalPrefix(prefix))
+				continue;
+			String nsSchemaURI = NiemUmlClass.getURI(classView);
+			Log.debug("exportSchemas: exporting schema " + prefix);
+	
+			// build list of referenced namespaces
+			TreeSet<String> schemaNamespaces = new TreeSet<String>();
+			schemaNamespaces.add(NiemUmlClass.XSD_PREFIX);
+	
+			TreeSet<String> xmlTypes = new TreeSet<String>();
+			TreeSet<String> jsonDefinitions = new TreeSet<String>();
+			TreeSet<String> xmlElements = new TreeSet<String>();
+			TreeSet<String> jsonProperties = new TreeSet<String>();
+			TreeSet<String> jsonRequired = new TreeSet<String>();
+	
+			Log.debug("exportSchemas: exporting types and elements");
+			String xmlType = null;
+			String jsonType = null;
+			for (UmlItem item : classView.children()) {
+				// add types and attribute groups
+				if (item.kind() == anItemKind.aClass) {
+					UmlClass type = (UmlClass) item;
+	
+					// add referenced namespaces
+					schemaNamespaces.add(NamespaceModel.getPrefix(type));
+					UmlClass baseType = NiemModel.getBaseType(type);
+					if (baseType != null)
+						schemaNamespaces.add(NamespaceModel.getPrefix(baseType));
+					for (UmlItem item2 : type.children())
+						if (item2.kind() == anItemKind.anAttribute) {
+							NiemModel model2 = (NiemUmlClass.SubsetModel.elements.containsKey(NiemUmlClass.getURI(item2))) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
+							UmlClassInstance element = model2.getElementByURI(NiemUmlClass.getURI(item2));
+							if (element != null)
+								schemaNamespaces.add(NamespaceModel.getPrefix(element));
+						}
+	
+					// get type schema
+					xmlType = xmlWriter.exportXmlTypeSchema(type);
+					if (xmlType != null)
+						xmlTypes.add(xmlType);
+					jsonType = (prefix.equals(NiemUmlClass.XSD_PREFIX)) ? jsonWriter.exportJsonPrimitiveSchema(type)
+							: jsonWriter.exportJsonTypeSchema(this, type, prefix);
+					if (jsonType != null)
+						jsonDefinitions.add(jsonType);
+				}
+				// add elements and attributes
+				String xmlElement = null;
+				String jsonElement = null;
+				if (item.kind() == anItemKind.aClassInstance) {
+					UmlClassInstance element = (UmlClassInstance) item;
+					UmlClass baseType = NiemModel.getBaseType(element);
+	
+					// add referenced namespaces
+					schemaNamespaces.add(NamespaceModel.getPrefix(element));
+					if (baseType != null)
+						schemaNamespaces.add(NamespaceModel.getPrefix(baseType));
+					String headElement = element.propertyValue(NiemUmlClass.SUBSTITUTION_PROPERTY);
+					if (headElement != null)
+						schemaNamespaces.add(NamespaceModel.getPrefix(headElement));
+	
+					// get element schema
+					xmlElement = xmlWriter.exportXmlElementSchema(element);
+					if (xmlElement != null)
+						xmlElements.add(xmlElement);
+					if (baseType != NiemUmlClass.SubsetModel.abstractType) {
+						schemaNamespaces.add(NamespaceModel.getPrefix(element));
+						jsonElement = jsonWriter.exportJsonElementSchema(element, prefix);
+						if (jsonElement != null)
+							jsonDefinitions.add(jsonElement);
+						String messageElement = element.propertyValue(NiemUmlClass.MESSAGE_ELEMENT_PROPERTY);
+						if (messageElement != null && !messageElement.equals("")) {
+							jsonProperties.add(jsonElement);
+							jsonRequired.add("\"" + NamespaceModel.getPrefixedName(element) + "\"");
+						}
+					}
+				}
+			}
+	
+			// export XML file
+			if (exportXML) {
+				// Open XSD file for each extension schema and write header
+				Log.debug("exportSchemas: schema " + xmlDir + "/" + prefix + NiemUmlClass.XSD_FILE_TYPE);
+				Namespace ns = NamespaceModel.Namespaces.get(nsSchemaURI);
+				if (ns.filepath == null) {
+					Log.trace("exportSchemas: error - no path for schema " + nsSchemaURI);
+					continue;
+				}
+				String filename = Paths.get(xmlDir, ns.filepath).toString();
+				Log.debug("exportSchemas: referenced namespaces in " + filename + ": " + schemaNamespaces.toString());
+				xmlWriter.exportXmlSchema(filename, nsSchemaURI, xmlTypes, xmlElements, schemaNamespaces);
+			}
+	
+			// export JSON file
+			if (exportJSON) {
+				// export JSON-LD namespace definitions
+				TreeSet<String> jsonNamespaces = new TreeSet<String>();
+				for (String nsPrefix : schemaNamespaces)
+					if (!nsPrefix.equals(NiemUmlClass.LOCAL_PREFIX))
+						jsonNamespaces.add("\n" + jsonWriter.getJsonPair(nsPrefix, NamespaceModel.Prefixes.get(nsPrefix) + "#"));
+				jsonNamespaces.add("\n" + jsonWriter.getJsonPair(NiemUmlClass.CODELIST_APPINFO_PREFIX, NiemUmlClass.CODELIST_APPINFO_URI + "#"));
+				jsonNamespaces.add("\n" + jsonWriter.getJsonPair(NiemUmlClass.CT_PREFIX, NiemUmlClass.CT_URI + "#"));
+				jsonNamespaces.add("\n" + jsonWriter.getJsonPair(NiemUmlClass.TERM_PREFIX, NiemUmlClass.TERM_URI + "#"));
+	
+				try {
+					// Open JSON schema file for each extension schema and write header
+					File file = Paths.get(jsonDir, prefix + JsonWriter.JSON_SCHEMA_FILE_TYPE).toFile();
+					File parentFile = file.getParentFile();
+					if (parentFile != null)
+						parentFile.mkdirs();
+					Log.debug("exportSchemas: schema " + file.toString());
+					FileWriter json = new FileWriter(file);
+					json.write("{\n" + jsonWriter.getJsonPair("$id", nsSchemaURI) + ",\n" + jsonWriter.getJsonPair("$schema", JsonWriter.JSON_SCHEMA_URI)
+							+ ",\n" + jsonWriter.getJsonPair("type", "object") + ",\n" + "\"additionalProperties\" : false" + ",\n"
+							+ "\"@context\" : {\n" + String.join(",\n", jsonNamespaces) + "},\n"
+							+ "\"definitions\": {\n" + String.join(",\n", jsonDefinitions) + "\n}" + ",\n"
+							+ "\"properties\" : {\n" + String.join(",\n", jsonProperties) + "\n}" + ",\n"
+							+ "\"required\" : [\n" + String.join(",\n", jsonRequired) + "]" + "\n" + "}");
+					json.close();
+				} catch (Exception e1) {
+					Log.trace("exportSchemas: error exporting JSON file " + e1.toString());
+				}
+			}
+		}
 	}
 }

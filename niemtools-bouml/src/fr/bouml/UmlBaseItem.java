@@ -20,6 +20,7 @@ import java.util.*;
  *  parts are declared 'private' rather than 'public' or 'protected'.
  */
 @SuppressWarnings("rawtypes")
+public
 abstract class UmlBaseItem {
   /**
    *  return a constant identifier, it is unique within a given

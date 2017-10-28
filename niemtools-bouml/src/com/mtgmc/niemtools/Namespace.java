@@ -1,7 +1,5 @@
 package com.mtgmc.niemtools;
 
-import fr.bouml.UmlClassView;
-
 /*
  *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
  *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
@@ -24,6 +22,8 @@ import fr.bouml.UmlClassView;
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+import fr.bouml.UmlClassView;
 
 public class Namespace {
 

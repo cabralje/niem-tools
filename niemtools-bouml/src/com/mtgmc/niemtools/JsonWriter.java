@@ -1,5 +1,28 @@
 package com.mtgmc.niemtools;
 
+/*
+ *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
+ *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
+ *   UML Platform Specific Model (PSM), the NIEM reference/subset/extension model, and a UML Platform Specific Model (NIEM), NIEM XML Schema.
+ *
+ *   NOTE: This plug_out requires that the BOUML project include a simple NIEM profile that provides the stereotypes required for mapping.
+ *   
+ *   Copyright (C) 2017 James E. Cabral Jr., MTG Management Consultants LLC, jcabral@mtgmc.com, http://github.com/cabralje
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -26,16 +49,55 @@ import fr.bouml.anItemKind;
 
 public class JsonWriter {
 
+	public JsonWriter(String initialDirectory) {
+		super();
+		directory = initialDirectory;
+	}
+
+	String directory;
+	
+	static final String[] HTTP_METHODS = { "get", "put", "post", "update" };
+	static final String HTTP_METHODS_PROPERTY = NiemUmlClass.WEBSERVICE_STEREOTYPE_TYPE + NiemUmlClass.STEREOTYPE_DELIMITER
+	+ "HTTPMethods";
 	static final String JSON_SCHEMA_FILE_TYPE = ".schema.json";
+
 	// JSON
 	static final String JSON_SCHEMA_URI = "http://json-schema.org/draft-04/schema#";
+
 	private static final String OPENAPI_FILE_TYPE = ".openapi.json";
+
+	// FIXME swagger-parser error: Unable to load RELATIVE ref:
+	// ./niem/nc.schema.json
+	/** return JSON Pointer to a type with name typeName */
+	static String exportJsonPointer(String tagName, String localPrefix) {
+		if (tagName == null)
+			return "";
+		String prefix = NamespaceModel.getPrefix(tagName);
+		if (prefix == null)
+			return "";
+		if (NamespaceModel.isExternalPrefix(prefix))
+			return "";
+		else if (localPrefix != null && prefix.equals(localPrefix))
+			return "#/definitions/" + tagName;
+		if (NamespaceModel.isNiemPrefix(prefix) && !NamespaceModel.isNiemPrefix(localPrefix))
+			return "./" + NiemUmlClass.NIEM_DIR + "/" + prefix + JSON_SCHEMA_FILE_TYPE + "#/definitions/" + tagName;
+		else if (!NamespaceModel.isNiemPrefix(prefix) && NamespaceModel.isNiemPrefix(localPrefix))
+			return "../" + prefix + JSON_SCHEMA_FILE_TYPE + "#/definitions/" + tagName;
+		else
+			return "./" + prefix + JSON_SCHEMA_FILE_TYPE + "#/definitions/" + tagName;
+	}
+
+	/** convert multiplicity from UML representation to XML representation */
+	String convertMultiplicity(String mult) {
+		mult = mult.replaceAll("\\.\\.", ",").replaceAll("\\*", "unbounded");
+		return mult;
+	}
 
 	/**
 	 * return JSON property description of an element with name elementName and
 	 * multiplicity
 	 */
-	static String exportJsonElementInTypeSchema(String elementName, String multiplicity, String localPrefix,
+	String exportJsonElementInTypeSchema(String elementName, String multiplicity, String localPrefix,
 			boolean isAttribute) {
 		String elementName2 = null;
 		String minOccurs = NiemUmlClass.getMinOccurs(multiplicity);
@@ -71,7 +133,7 @@ public class JsonWriter {
 	}
 
 	/** return JSON schema element definition */
-	static String exportJsonElementSchema(UmlClassInstance element, String prefix) {
+	String exportJsonElementSchema(UmlClassInstance element, String prefix) {
 		String elementName = NiemUmlClass.filterAttributePrefix(NamespaceModel.getPrefixedName(element));
 		TreeSet<String> jsonDefinition = new TreeSet<String>();
 		String description = element.description();
@@ -93,29 +155,8 @@ public class JsonWriter {
 		return elementSchema;
 	}
 
-	// FIXME swagger-parser error: Unable to load RELATIVE ref:
-	// ./niem/nc.schema.json
-	/** return JSON Pointer to a type with name typeName */
-	private static String exportJsonPointer(String tagName, String localPrefix) {
-		if (tagName == null)
-			return "";
-		String prefix = NamespaceModel.getPrefix(tagName);
-		if (prefix == null)
-			return "";
-		if (NamespaceModel.isExternalPrefix(prefix))
-			return "";
-		else if (localPrefix != null && prefix.equals(localPrefix))
-			return "#/definitions/" + tagName;
-		if (NamespaceModel.isNiemPrefix(prefix) && !NamespaceModel.isNiemPrefix(localPrefix))
-			return "./" + NiemUmlClass.NIEM_DIR + "/" + prefix + JSON_SCHEMA_FILE_TYPE + "#/definitions/" + tagName;
-		else if (!NamespaceModel.isNiemPrefix(prefix) && NamespaceModel.isNiemPrefix(localPrefix))
-			return "../" + prefix + JSON_SCHEMA_FILE_TYPE + "#/definitions/" + tagName;
-		else
-			return "./" + prefix + JSON_SCHEMA_FILE_TYPE + "#/definitions/" + tagName;
-	}
-
 	/** return JSON type definition corresponding to an XML Schema primitive type */
-	static String exportJsonPrimitiveSchema(UmlClass type) {
+	String exportJsonPrimitiveSchema(UmlClass type) {
 		String jsonType = "\"" + NamespaceModel.getPrefixedName(type) + "\": {\n";
 		switch (NamespaceModel.getName(type)) {
 		case "boolean":
@@ -302,7 +343,7 @@ public class JsonWriter {
 
 	/** return JSON schema type definition 
 	 * @param subsetModel TODO*/
-	static String exportJsonTypeSchema(NiemModel model, UmlClass type, String prefix) {
+	String exportJsonTypeSchema(NiemModel model, UmlClass type, String prefix) {
 		// add properties
 		// type.sortChildren();
 		TreeSet<String> jsonRequiredElementsInType = new TreeSet<String>();
@@ -320,7 +361,7 @@ public class JsonWriter {
 						continue;
 					String elementName = NamespaceModel.getPrefixedName(element);
 					boolean elementIsAttribute = NiemUmlClass.isAttribute(element);
-					NiemUmlClass.trace("exportSchema: exporting element in type " + elementName);
+					Log.debug("exportSchema: exporting element in type " + elementName);
 					if (elementName.equals(anyElement)) {
 						anyJSON = true;
 						continue;
@@ -431,8 +472,7 @@ public class JsonWriter {
 	// FIXME Generating duplicate "get" and "/GetCourtSchedule" in
 	// CourtSchedulingMDE.openapi.json
 	/** exports OpenAPI/Swagger 2.0 service definition */
-	static void exportOpenAPI(String jsonDir, String openapiDir, Map<String, UmlClass> ports,
-			Set<String> messageNamespaces) throws IOException {
+	void exportOpenApi(String openapiDir, Map<String, UmlClass> ports, Set<String> messageNamespaces) throws IOException {
 	
 		// export JSON-LD namespace definitions
 		TreeSet<String> jsonNamespaces = new TreeSet<String>();
@@ -444,7 +484,7 @@ public class JsonWriter {
 		jsonNamespaces.add("\n" + getJsonPair(NiemUmlClass.TERM_PREFIX, NiemUmlClass.TERM_URI + "#"));
 	
 		// generate OpenAPI definitions
-		UmlCom.trace("Generating OpenAPIs");
+		Log.trace("Generating OpenAPIs");
 		for (UmlClass port : ports.values()) {
 			String portName = port.name();
 			// write OpenAPI paths
@@ -456,10 +496,10 @@ public class JsonWriter {
 	
 			// get relative path
 			Path openapiPath = Paths.get(openapiDir, portName + OPENAPI_FILE_TYPE);
-			Path jsonPath = Paths.get(jsonDir);
+			Path jsonPath = Paths.get(directory);
 			String relativePath = "./" + openapiPath.getParent().relativize(jsonPath).toString().replaceAll("\\\\", "/")
 					+ "/";
-			NiemUmlClass.trace("exportOpenAPI: relative path to json: " + relativePath);
+			Log.debug("exportOpenAPI: relative path to json: " + relativePath);
 	
 			for (UmlItem item : port.children()) {
 				if (item.kind() == anItemKind.anOperation) {
@@ -471,7 +511,7 @@ public class JsonWriter {
 					String operationName = operation.name();
 					String httpMethod = operation.propertyValue(JsonWriter.HTTP_METHODS_PROPERTY).toLowerCase();
 	
-					UmlCom.trace("exportOpenAPI: generating document/literal input wrapper for " + portName + "/"
+					Log.trace("exportOpenAPI: generating document/literal input wrapper for " + portName + "/"
 							+ operationName);
 					UmlClass outputType = null, inputType = null;
 					UmlParameter[] params = operation.params();
@@ -493,7 +533,7 @@ public class JsonWriter {
 									paramType = "string";
 								}
 								String mult = param.multiplicity;
-								mult = JsonWriter.convertMultiplicity(mult);
+								mult = convertMultiplicity(mult);
 								// String minOccurs = getMinOccurs(mult);
 								String maxOccurs = NiemUmlClass.getMaxOccurs(mult);
 								String required = (maxOccurs.equals("0")) ? "false" : "true";
@@ -510,21 +550,21 @@ public class JsonWriter {
 							try {
 								inputType = param.type.type;
 							} catch (Exception e) {
-								UmlCom.trace("exportOpenAPI: error - no input message for " + operationName);
+								Log.trace("exportOpenAPI: error - no input message for " + operationName);
 							}
 							if (inputType == null || !inputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE_TYPE))
 								continue;
 							String inputMessage = inputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
 							if (inputMessage == null || inputMessage.equals(""))
 								continue;
-							NiemUmlClass.trace("exportOpenAPI: input Message: " + inputMessage + " from operation " + operationName);
+							Log.debug("exportOpenAPI: input Message: " + inputMessage + " from operation " + operationName);
 							messageNamespaces.add(NamespaceModel.getPrefix(inputMessage));
 							String mult = param.multiplicity;
 	
-							mult = JsonWriter.convertMultiplicity(mult);
+							mult = convertMultiplicity(mult);
 							// String maxOccurs = getMaxOccurs(mult);
 							if (!NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(inputMessage)))
-								jsonElementsInType.add(exportOpenAPIElementInTypeSchema(relativePath, inputMessage,
+								jsonElementsInType.add(exportOpenApiElementInTypeSchema(relativePath, inputMessage,
 										mult, null, false));
 							if (Integer.parseInt(NiemUmlClass.getMinOccurs(mult)) > 0)
 								jsonRequiredElementsInType.add("\"" + inputMessage + "\"");
@@ -555,19 +595,18 @@ public class JsonWriter {
 						jsonProperties.add(elementSchema);
 						jsonDefinitions.add(typeSchema);
 					}
-					NiemUmlClass.trace("exportOpenAPI: generating document/literal output wrappers for " + operationName);
+					Log.debug("exportOpenAPI: generating document/literal output wrappers for " + operationName);
 					try {
 						outputType = operation.returnType().type;
 					} catch (Exception e) {
-						UmlCom.trace(
-								"exportOpenAPI: error - no output message for " + operationName + " " + e.toString());
+						Log.trace("exportOpenAPI: error - no output message for " + operationName + " " + e.toString());
 					}
 					if (outputType == null || !outputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE_TYPE))
 						continue;
 					String outputMessage = outputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
 					if (outputMessage == null || outputMessage.equals(""))
 						continue;
-					NiemUmlClass.trace("exportOpenAPI: output Message: " + outputMessage + " from operation " + operationName);
+					Log.debug("exportOpenAPI: output Message: " + outputMessage + " from operation " + operationName);
 					ArrayList<String> outputs = new ArrayList<String>();
 					if (outputMessage != null)
 						outputs.add(outputMessage);
@@ -581,7 +620,7 @@ public class JsonWriter {
 						String mult = "1";
 						if (!NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(message))) {
 							jsonElementsInType
-									.add(exportOpenAPIElementInTypeSchema(relativePath, message, mult, null, false));
+									.add(exportOpenApiElementInTypeSchema(relativePath, message, mult, null, false));
 							jsonRequiredElementsInType.add("\"" + message + "\"");
 						}
 	
@@ -646,7 +685,7 @@ public class JsonWriter {
 						if (parentFile != null)
 							parentFile.mkdirs();
 						FileWriter fw = new FileWriter(file);
-						NiemUmlClass.trace("OpenAPI: " + portName + OPENAPI_FILE_TYPE);
+						Log.debug("OpenAPI: " + portName + OPENAPI_FILE_TYPE);
 						fw.write("{\n" +
 						// jsonContext + ",\n" +
 								"  \"swagger\": \"2.0\",\n" + "  \"info\": {\n" + "    \"version\": \""
@@ -667,7 +706,7 @@ public class JsonWriter {
 								+ String.join(",\n", jsonDefinitions) + "\n}" + "}\n");
 						fw.close();
 					} catch (Exception e1) {
-						UmlCom.trace("exportOpenAPI: error exporting OpenAPI JSON " + e1.toString());
+						Log.trace("exportOpenAPI: error exporting OpenAPI JSON " + e1.toString());
 					}
 				}
 			}
@@ -678,7 +717,7 @@ public class JsonWriter {
 	 * return OpenAPI property description of an element with name elementName and
 	 * multiplicity
 	 */
-	static String exportOpenAPIElementInTypeSchema(String relativePath, String elementName, String multiplicity,
+	String exportOpenApiElementInTypeSchema(String relativePath, String elementName, String multiplicity,
 			String localPrefix, boolean isAttribute) {
 		String elementName2 = null;
 		String minOccurs = NiemUmlClass.getMinOccurs(multiplicity);
@@ -711,23 +750,12 @@ public class JsonWriter {
 	}
 
 	/** filter illegal characters in XML strings */
-	static String filterQuotes(String string) {
+	String filterQuotes(String string) {
 		return string.replaceAll("&", "&amp;").replaceAll("\"", "&quot;").replaceAll("\r|\n", "");
 	}
-
 	/** output a JSON name value pair */
-	static String getJsonPair(String name, String value) {
+	String getJsonPair(String name, String value) {
 		return "\"" + name + "\" : \"" + value + "\"\n";
 	}
-
-	/** convert multiplicity from UML representation to XML representation */
-	static String convertMultiplicity(String mult) {
-		mult = mult.replaceAll("\\.\\.", ",").replaceAll("\\*", "unbounded");
-		return mult;
-	}
-
-	static final String[] HTTP_METHODS = { "get", "put", "post", "update" };
-	static final String HTTP_METHODS_PROPERTY = NiemUmlClass.WEBSERVICE_STEREOTYPE_TYPE + NiemUmlClass.STEREOTYPE_DELIMITER
-	+ "HTTPMethods";
 
 }

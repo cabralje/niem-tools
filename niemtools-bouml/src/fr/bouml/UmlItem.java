@@ -12,6 +12,7 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
+import com.mtgmc.niemtools.Log;
 import com.mtgmc.niemtools.NiemUmlClass;
 /**
  *  This class is a mother class for all the other Uml* classes, this
@@ -1060,7 +1061,7 @@ abstract class UmlItem extends UmlBaseItem implements Comparable {
 	//  added operations to support sorting
 
 	public void sort() {
-		UmlCom.trace("target not allowed, must be a <i>package</i>, any <i>view</i> or a <i>use case</i>");
+		Log.trace("target not allowed, must be a <i>package</i>, any <i>view</i> or a <i>use case</i>");
 	}
 
 	public int orderWeight() {

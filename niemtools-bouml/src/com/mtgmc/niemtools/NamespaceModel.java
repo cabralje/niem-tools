@@ -1,5 +1,28 @@
 package com.mtgmc.niemtools;
 
+/*
+ *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
+ *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
+ *   UML Platform Specific Model (PSM), the NIEM reference/subset/extension model, and a UML Platform Specific Model (NIEM), NIEM XML Schema.
+ *
+ *   NOTE: This plug_out requires that the BOUML project include a simple NIEM profile that provides the stereotypes required for mapping.
+ *   
+ *   Copyright (C) 2017 James E. Cabral Jr., MTG Management Consultants LLC, jcabral@mtgmc.com, http://github.com/cabralje
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -46,7 +69,7 @@ public class NamespaceModel {
 				externalSchemaURL.put(schemaURI, schemaLocation);
 			}
 		}
-		NiemUmlClass.trace("cacheExternalSchemas: external schemas cached");
+		Log.debug("cacheExternalSchemas: external schemas cached");
 	}
 
 	/** filter illegal characters in XML prefix */
@@ -81,13 +104,13 @@ public class NamespaceModel {
 			// create namespace
 			ns = new Namespace(schemaURI);
 			Namespaces.put(schemaURI, ns);
-			NiemUmlClass.trace("getNamespace: added namespace " + schemaURI);
+			Log.debug("getNamespace: added namespace " + schemaURI);
 		}
 		String prefix2 = filterPrefix(prefix);
 		if (!Prefixes.containsKey(prefix2)) {
 			// create prefix
 			Prefixes.put(prefix2, schemaURI);
-			NiemUmlClass.trace("getNamespace: added prefix " + prefix2 + " for " + schemaURI);
+			Log.debug("getNamespace: added prefix " + prefix2 + " for " + schemaURI);
 		}
 		// select reference, subset or extension model
 		if (model == null)
@@ -109,7 +132,7 @@ public class NamespaceModel {
 			try {
 				namespaceClassView = UmlClassView.create(model.modelPackage, prefix3);
 			} catch (Exception e) {
-				UmlCom.trace("getNamespace: multiple namespace URIs for prefix " + prefix3 + " " + schemaURI + " and "
+				Log.trace("getNamespace: multiple namespace URIs for prefix " + prefix3 + " " + schemaURI + " and "
 						+ Prefixes.get(prefix2));
 				prefix3 = prefix2 + conflictCounter;
 				conflictCounter++;
@@ -161,7 +184,7 @@ public class NamespaceModel {
 		default:
 			break;
 		}
-		UmlCom.trace("getPrefix - error - no prefix for " + item.name());
+		Log.trace("getPrefix - error - no prefix for " + item.name());
 		return null;
 	}
 
@@ -227,7 +250,7 @@ public class NamespaceModel {
 			ns.referenceClassView
 					.set_Description(xPath.evaluate("xs:schema/xs:annotation[1]/xs:documentation[1]", doc));
 		} catch (Exception e) {
-			UmlCom.trace("importNamespaces: error " + e.toString());
+			Log.trace("importNamespaces: error " + e.toString());
 		}
 		return ns;
 	}
