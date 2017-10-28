@@ -5,7 +5,7 @@ This is a [BOUML](http://bouml.fr "BOUML") "plugout" that supports mapping UML a
 
 The advantages relative to other tools include:
 
-<b>Standards-Based</b> – Conforms to UML 2.0 and NIEM Naming and Design Rules (NDR)
+<b>Standards-Based</b> – Conforms to UML 2.0, NIEM Naming and Design Rules (NDR), WSDL and OpenAPI.
 
 <b>Inexpensive</b> – An open source “plugout” module for BOUML, a low cost UML modeling program
 
