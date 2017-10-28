@@ -49,7 +49,7 @@ public class CsvWriter {
 		nextLine[3] = item.description();
 
 		// Export NIEM Mapping
-		if (item.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE_TYPE))
+		if (item.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE))
 			for (int column = 4; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length; column++)
 				nextLine[column] = item.propertyValue(NiemUmlClass.getNiemProperty(column));
 

@@ -1,11 +1,15 @@
 package com.mtgmc.niemtools;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import fr.bouml.UmlAttribute;
+import fr.bouml.UmlClass;
 import fr.bouml.UmlItem;
 import fr.bouml.UmlRelation;
 import fr.bouml.aRelationKind;
@@ -13,15 +17,56 @@ import fr.bouml.anItemKind;
 
 public class HtmlWriter {
 
+	private static final String HTML_FILE_TYPE = ".html";
+	
+	void exportHtml(String directory, String filename) {
+		try {
+			// Write rest of header
+			File file = Paths.get(directory, filename + HTML_FILE_TYPE).toFile();
+			File parentFile = file.getParentFile();
+			if (parentFile != null)
+				parentFile.mkdirs();
+			FileWriter fw = new FileWriter(file);
+			fw.write("<html>");
+			fw.write("<head><title>" + NiemUmlClass.MAPPING_SPREADSHEET_TITLE
+					+ "</title><link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" /></head>"
+					+ "<body><div class = \"title\">" + NiemUmlClass.MAPPING_SPREADSHEET_TITLE + "</div>"
+					+ "<table style=\"table-layout: fixed; width: 100%\"><tr bgcolor=\"#f0f0f0\">");
+			for (int column = 0; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length; column++)
+				fw.write("<td style=\"word-wrap: break-word\">" + NiemUmlClass.NIEM_STEREOTYPE_MAP[column][0] + "</td>");
+			fw.write("</tr>\n");
+	
+			// Show NIEM Mappings for Classes
+			@SuppressWarnings("unchecked")
+			Iterator<UmlItem> it = (UmlClass.classes.iterator());
+			while (it.hasNext()) {
+				UmlItem thisClass = it.next();
+				if (thisClass.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)) {
+					writeLineHtml(fw, thisClass);
+	
+					// Show NIEM Mapping for Attributes and Relations
+					for (UmlItem item : thisClass.children())
+						if (item.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE))
+							writeLineHtml(fw, item);
+				}
+			}
+			fw.write("</table>\n");
+			fw.write("</body></html>");
+			fw.close();
+		} catch (Exception e) {
+			Log.trace("exportHtml: error " + e.toString());
+		}
+	}
+
 	/** returns the html for a column */
-	static String getColumnHtml(String value, String bgcolor, String fgcolor, Boolean wordwrap) {
+	private String getColumnHtml(String value, String bgcolor, String fgcolor, Boolean wordwrap) {
 		String style = wordwrap ? "word-wrap: break-word" : "";
 		return "<td  style=\"" + style + "\" bgcolor=\"" + bgcolor + "\"><font color = \"" + fgcolor + "\">" + value
 				+ "</font></td>";
 	}
 
 	/** writes a column of the NIEM mapping spreadsheet in HTML format to a file */
-	static void writeItemHtml(FileWriter fw, UmlItem item) throws IOException {
+	private void writeItemHtml(FileWriter fw, UmlItem item) throws IOException {
 		if (item.known) {
 			fw.write("<a href=\"");
 			if (!UmlItem.flat && (item.parent() != null) && (item.parent().kind() == anItemKind.aClass)) {
@@ -29,7 +74,7 @@ public class HtmlWriter {
 				fw.write(String.valueOf(item.parent().getIdentifier()));
 			} else
 				fw.write("index");
-			fw.write(HtmlWriter.HTML_FILE_TYPE + "#ref");
+			fw.write(HTML_FILE_TYPE + "#ref");
 			fw.write(String.valueOf(item.kind().value()));
 			fw.write('_');
 			fw.write(String.valueOf(item.getIdentifier()));
@@ -40,10 +85,8 @@ public class HtmlWriter {
 			fw.write(item.name());
 	}
 
-	static final String HTML_FILE_TYPE = ".html";
-
 	/** writes a line of the NIEM mapping spreadsheet in HTML format to a file */
-	void writeLineHtml(FileWriter fw, UmlItem item) {
+	private void writeLineHtml(FileWriter fw, UmlItem item) {
 		try {
 			// Export Class, Property and Multiplicity
 			// trace("writeLineHtml: " + item.name());
@@ -102,7 +145,7 @@ public class HtmlWriter {
 			String defaultFGColor = "#000000";
 			String fgcolor, bgcolor;
 
-			if (item.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE_TYPE)) {
+			if (item.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)) {
 				for (columnIndex = 4; columnIndex < NiemUmlClass.NIEM_STEREOTYPE_MAP.length; columnIndex++) {
 					column[columnIndex] = (item.propertyValue(NiemUmlClass.getNiemProperty(columnIndex)));
 					column[columnIndex] = (column[columnIndex] != null) ? column[columnIndex].trim() : "";
@@ -165,7 +208,7 @@ public class HtmlWriter {
 				String basePrefix = NamespaceModel.getPrefix(baseType);
 				bgcolor = defaultBGColor;
 				fgcolor = defaultFGColor;
-				if (!baseType.equals("") && !baseType.equals(NiemUmlClass.ABSTRACT_TYPE_NAME)) {
+				if (!baseType.equals("") && !baseType.equals(NiemModel.ABSTRACT_TYPE_NAME)) {
 					if (!NamespaceModel.isNiemPrefix(basePrefix) && !NamespaceModel.isExternalPrefix(basePrefix))
 						bgcolor = extensionBGColor;
 					if (NamespaceModel.isNiemPrefix(basePrefix) && !NiemUmlClass.isNiemType(baseType))

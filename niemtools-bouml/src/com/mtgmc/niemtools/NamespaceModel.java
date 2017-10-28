@@ -42,20 +42,31 @@ import fr.bouml.anItemKind;
 
 public class NamespaceModel {
 
-	private static XPath xPath = XPathFactory.newInstance().newXPath();
-
-	static Set<String> externalPrefixes = new HashSet<String>();
-	static Map<String, String> externalSchemaURL = new HashMap<String, String>();
-
+	static final String ATTRIBUTE_PREFIX = "@";
+	private static Set<String> externalPrefixes = new HashSet<String>();
+	private static Map<String, String> externalSchemaURL = new HashMap<String, String>();
+	public static final String NAMESPACE_ATTRIBUTE = XMLConstants.XMLNS_ATTRIBUTE;
 	private static final String NAMESPACE_DELIMITER = ":";
+	private static Map<String, Namespace> Namespaces = new HashMap<String, Namespace>();
+	private static Map<String, String> Prefixes = new HashMap<String, String>();
+	private static XPath xPath = XPathFactory.newInstance().newXPath();
+	
+	/** adds a new namespace */
+	static Namespace addNamespace(String schemaURI) {
+		Namespace ns = new Namespace(schemaURI);
+		Namespaces.put(schemaURI, ns);
+		return ns;
+	}
 
-	static Map<String, Namespace> Namespaces = new HashMap<String, Namespace>();
-
-	static Map<String, String> Prefixes = new HashMap<String, String>();
+	/** adds a new prefix for a namespace */
+	static void addPrefix(String schemaURI, String prefix) {
+		if (!NamespaceModel.getPrefixes().containsKey(prefix))
+			NamespaceModel.Prefixes.put(prefix, schemaURI);
+	}
 
 	/** caches namespaces and prefixes for external schemas */
 	static void cacheExternalSchemas() {
-		String externalSchemas = NiemUmlClass.getProperty(NiemUmlClass.IEPD_EXTERNAL_SCHEMAS_PROPERTY);
+		String externalSchemas = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_EXTERNAL_SCHEMAS_PROPERTY);
 		String[] external = externalSchemas.split(",");
 		for (int schemaIndex = 0; schemaIndex < external.length; schemaIndex++) {
 			String[] part = external[schemaIndex].split("=");
@@ -71,11 +82,26 @@ public class NamespaceModel {
 		Log.debug("cacheExternalSchemas: external schemas cached");
 	}
 
+	/** return attribute name with prefix filtered */
+	static String filterAttributePrefix(String attributeName) {
+		return attributeName.replaceAll(NamespaceModel.ATTRIBUTE_PREFIX, "");
+	}
+
 	/** filter illegal characters in XML prefix */
 	static String filterPrefix(String prefix) {
 		return prefix.replaceAll("[^-._A-Za-z0-9]", "");
 	}
 
+	/** returns an extension schema URI */
+	static String getExtensionSchema(String prefix) {
+		return NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + prefix;
+	}
+	
+	/** return external schema URI for schemaURI */
+	static String getExternalSchemaURL(String schemaURI) {
+		return externalSchemaURL.get(schemaURI);
+	}
+	
 	/** return tagname from XML tag */
 	static String getName(String tagName) {
 		if (tagName == null)
@@ -91,11 +117,18 @@ public class NamespaceModel {
 		return getName(item.name());
 	}
 
+	/** return namespace for schemaURI */
+	static Namespace getNamespace(String schemaURI) {
+		if (schemaURI == null)
+			return null;
+		return Namespaces.get(schemaURI);
+	}
+
 	/**
-	 * return namespace for schema schemaURI in model modelPackage; create it with
+	 * return namespace classview for schema schemaURI in model modelPackage; create it with
 	 * prefix if doesn't exist
 	 */
-	static UmlClassView getNamespace(NiemModel model, String prefix, String schemaURI) {
+	static UmlClassView getNamespaceClassView(NiemModel model, String prefix, String schemaURI) {
 		if (schemaURI == null || prefix == null)
 			return null;
 		Namespace ns = Namespaces.get(schemaURI);
@@ -113,14 +146,14 @@ public class NamespaceModel {
 		}
 		// select reference, subset or extension model
 		if (model == null)
-			model = isNiemPrefix(prefix) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
+			model = isNiemPrefix(prefix) ? NiemUmlClass.getSubsetModel() : NiemUmlClass.getExtensionModel();
 
 		// return classview if it exists
-		if (model == NiemUmlClass.ReferenceModel) {
-			if (ns.referenceClassView != null)
-				return ns.referenceClassView;
-		} else if (ns.nsClassView != null)
-			return ns.nsClassView;
+		if (model == NiemUmlClass.getReferenceModel()) {
+			if (ns.getReferenceClassView() != null)
+				return ns.getReferenceClassView();
+		} else if (ns.getNsClassView() != null)
+			return ns.getNsClassView();
 
 		// create classview
 		String prefix3 = prefix2;
@@ -129,7 +162,7 @@ public class NamespaceModel {
 
 		while (namespaceClassView == null) {
 			try {
-				namespaceClassView = UmlClassView.create(model.modelPackage, prefix3);
+				namespaceClassView = UmlClassView.create(model.getModelPackage(), prefix3);
 			} catch (Exception e) {
 				Log.trace("getNamespace: multiple namespace URIs for prefix " + prefix3 + " " + schemaURI + " and "
 						+ Prefixes.get(prefix2));
@@ -137,25 +170,25 @@ public class NamespaceModel {
 				conflictCounter++;
 			}
 		}
-		namespaceClassView.set_PropertyValue(NiemUmlClass.URI_PROPERTY, schemaURI);
+		namespaceClassView.set_PropertyValue(NiemModel.URI_PROPERTY, schemaURI);
 		// trace("getNamespace: added class view " + namespaceClassView.name());
 
 		if (prefix != null)
 			namespaceClassView.set_PropertyValue(NiemUmlClass.PREFIX_PROPERTY, prefix2);
 
-		if (model == NiemUmlClass.ReferenceModel)
-			ns.referenceClassView = namespaceClassView;
+		if (model == NiemUmlClass.getReferenceModel())
+			ns.setReferenceClassView(namespaceClassView);
 		else {
-			ns.nsClassView = namespaceClassView;
-			if (model == NiemUmlClass.ExtensionModel) {
-				ns.nsClassView = namespaceClassView;
-				ns.filepath = prefix2 + NiemUmlClass.XSD_FILE_TYPE;
-				namespaceClassView.set_PropertyValue(NiemUmlClass.FILE_PATH_PROPERTY, ns.filepath);
+			ns.setNsClassView(namespaceClassView);
+			if (model == NiemUmlClass.getExtensionModel()) {
+				ns.setNsClassView(namespaceClassView);
+				ns.setFilepath(prefix2 + XmlWriter.XSD_FILE_TYPE);
+				namespaceClassView.set_PropertyValue(NiemUmlClass.FILE_PATH_PROPERTY, ns.getFilepath());
 			}
 		}
 		return namespaceClassView;
 	}
-
+	
 	/** return namespace prefix from XML tag */
 	static String getPrefix(String tagName) {
 		if (tagName == null) {
@@ -186,10 +219,10 @@ public class NamespaceModel {
 		Log.trace("getPrefix - error - no prefix for " + item.name());
 		return null;
 	}
-
+	
 	/** return name with namespace prefix for an attribute with name tagName */
 	static String getPrefixedAttributeName(String prefix, String tagName) {
-		return prefix + NAMESPACE_DELIMITER + NiemUmlClass.ATTRIBUTE_PREFIX + NamespaceModel.filterAttributePrefix(tagName);
+		return prefix + NAMESPACE_DELIMITER + NamespaceModel.ATTRIBUTE_PREFIX + NamespaceModel.filterAttributePrefix(tagName);
 	}
 
 	/** return name with namespace prefix for type or element with name tagName */
@@ -201,28 +234,31 @@ public class NamespaceModel {
 		return getPrefix(item) + NAMESPACE_DELIMITER + item.name();
 	}
 
-	/** return true if type or element has a prefix in an external schema */
-	static Boolean isExternalPrefix(String prefix) {
-		if (prefix == null)
-			return false;
-		return externalPrefixes.contains(prefix);
+	static Map<String, String> getPrefixes() {
+		return Prefixes;
 	}
 
-	/** return true if a prefix exists in reference model */
-	static Boolean isNiemPrefix(String prefix) {
+	/** return schemaURI for type or element with name tagname */
+	static String getSchemaURI(String tagName) {
+		String prefix = getPrefix(tagName);
 		if (prefix == null)
-			return false;
-		if (NamespaceModel.isExternalPrefix(prefix))
-			return false;
+			// prefix = LOCAL_PREFIX;
+			return null;
+		return getSchemaURIForPrefix(prefix);
+	}
+
+	/** return schemaURI for type or element with name tagname */
+	static String getSchemaURIForPrefix(String prefix) {
 		String schemaURI = Prefixes.get(prefix);
-		Namespace ns = Namespaces.get(schemaURI);
-		if (ns == null)
-			return false;
-		return ns.referenceClassView != null;
+		if (schemaURI == null)
+			schemaURI = getExtensionSchema(prefix);
+		return schemaURI;
 	}
 
-	public static final String NAMESPACE_ATTRIBUTE = XMLConstants.XMLNS_ATTRIBUTE;
-
+	static int getSize() {
+		return Namespaces.size();
+	}
+	
 	/** import namespaces and return target namespace */
 	static Namespace importNamespaces(Document doc) {
 		NamedNodeMap nslist = doc.getDocumentElement().getAttributes();
@@ -232,7 +268,7 @@ public class NamespaceModel {
 			if (attributeNodeName.startsWith(NAMESPACE_ATTRIBUTE)) {
 				String prefix = (attributeNodeName.equals(NAMESPACE_ATTRIBUTE)) ? attributeNode.getNodeValue()
 						: attributeNodeName.substring(6);
-				getNamespace(NiemUmlClass.ReferenceModel, prefix, attributeNode.getNodeValue());
+				getNamespaceClassView(NiemUmlClass.getReferenceModel(), prefix, attributeNode.getNodeValue());
 			}
 		}
 
@@ -244,9 +280,9 @@ public class NamespaceModel {
 			// schemaURI = doc.lookupNamespaceURI(null);
 			ns = Namespaces.get(schemaURI);
 			if (ns == null)
-				return Namespaces.get(NiemUmlClass.LOCAL_PREFIX);
+				return Namespaces.get(NiemModel.LOCAL_PREFIX);
 			// set namespace description
-			ns.referenceClassView
+			ns.getReferenceClassView()
 			.set_Description(xPath.evaluate("xs:schema/xs:annotation[1]/xs:documentation[1]", doc));
 		} catch (Exception e) {
 			Log.trace("importNamespaces: error " + e.toString());
@@ -254,21 +290,23 @@ public class NamespaceModel {
 		return ns;
 	}
 
-	/** return schemaURI for type or element with name tagname */
-	static String getSchemaURI(String tagName) {
-		String prefix = getPrefix(tagName);
+	/** return true if type or element has a prefix in an external schema */
+	static Boolean isExternalPrefix(String prefix) {
 		if (prefix == null)
-			// prefix = LOCAL_PREFIX;
-			return null;
+			return false;
+		return externalPrefixes.contains(prefix);
+	}
+	
+	/** return true if a prefix exists in reference model */
+	static Boolean isNiemPrefix(String prefix) {
+		if (prefix == null)
+			return false;
+		if (NamespaceModel.isExternalPrefix(prefix))
+			return false;
 		String schemaURI = Prefixes.get(prefix);
-		if (schemaURI == null)
-			schemaURI = XmlWriter.getExtensionSchema(prefix);
-		return schemaURI;
+		Namespace ns = Namespaces.get(schemaURI);
+		if (ns == null)
+			return false;
+		return ns.getReferenceClassView() != null;
 	}
-
-	/** return attribute name with prefix filtered */
-	static String filterAttributePrefix(String attributeName) {
-		return attributeName.replaceAll(NiemUmlClass.ATTRIBUTE_PREFIX, "");
-	}
-
 }

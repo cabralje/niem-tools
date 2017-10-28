@@ -6,7 +6,7 @@ public class Log {
 
 	// Debugging options
 	//private static Boolean _DEBUG = true;
-	static final Boolean _DEBUG = false;
+	private static final Boolean _DEBUG = false;
 
 	/** outputs debugging information */
 	static void debug(String output) {
