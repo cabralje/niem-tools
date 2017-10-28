@@ -14,13 +14,6 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>niemtools-common</name>
-			<type>2</type>
-			<locationURI>NIEMTOOLS_COMMON</locationURI>
-		</link>
-	</linkedResources>
 	<variableList>
 		<variable>
 			<name>NIEMTOOLS_COMMON</name>

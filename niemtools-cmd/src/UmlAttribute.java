@@ -6,7 +6,7 @@
  * @author Jim
  *
  */
-public class UmlAttribute extends UmlItem {
+public class UmlAttribute extends UmlBaseAttribute {
 
 	/**
 	 *
@@ -19,11 +19,6 @@ public class UmlAttribute extends UmlItem {
 	public UmlAttribute(UmlItem p, String n) {
 		super(p,anItemKind.anAttribute,n);
 	}
-	  
-	  public static UmlAttribute create(UmlClass parent, String s) throws RuntimeException
-	  {
-	    return (UmlAttribute) parent.create_(anItemKind.anAttribute, s);
-	  }
 	  
 	  /**
 	   *  returns the attribute UML type

@@ -9,7 +9,7 @@ import java.util.Vector;
  *
  */
 @SuppressWarnings("rawtypes")
-public class UmlClass extends UmlItem {
+public class UmlClass extends UmlBaseClass {
 
 	/**
 	 *
@@ -72,9 +72,4 @@ public class UmlClass extends UmlItem {
 	   }
 	   return null;
 	  }
-	  
-	public static UmlClass create(UmlItem parent, String s) throws RuntimeException
-	{
-		return (UmlClass) parent.create_(anItemKind.aClass, s);
-	}
 }

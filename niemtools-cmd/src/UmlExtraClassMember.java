@@ -1,7 +1,7 @@
 
 public class UmlExtraClassMember extends UmlItem {
 
-	public static UmlExtraClassMember create(UmlClass parent, String name) throws RuntimeException
+	public static UmlExtraClassMember create(UmlBaseClass parent, String name) throws RuntimeException
 	{
 		return (UmlExtraClassMember) parent.create_(anItemKind.anExtraClassMember, name);
 	}

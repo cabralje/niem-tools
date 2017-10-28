@@ -1,3 +1,4 @@
+package fr.bouml;
 
 /**
  *  Internal enum

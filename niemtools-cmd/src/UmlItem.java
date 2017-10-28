@@ -83,11 +83,11 @@ public class UmlItem implements Comparable {
 			children.add(c);
 			return c;
 		case anItemKind._aClass:
-			UmlClass cc = new UmlClass(this,s);
+			UmlBaseClass cc = new UmlClass(this,s);
 			children.add(cc);
 			return cc;
 		case anItemKind._aClassInstance:
-			UmlClassInstance ci = new UmlClassInstance(this,s);
+			UmlBaseClassInstance ci = new UmlClassInstance(this,s);
 			children.add(ci);
 			return ci;
 		case anItemKind._anExtraClassMember:
@@ -95,7 +95,7 @@ public class UmlItem implements Comparable {
 			children.add(e);
 			return e;
 		case anItemKind._anAttribute:
-			UmlAttribute a = new UmlAttribute(this,s);
+			UmlBaseAttribute a = new UmlAttribute(this,s);
 			children.add(a);
 			return a;	
 		case anItemKind._aRelation:

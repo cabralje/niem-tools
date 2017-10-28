@@ -7,7 +7,7 @@
  * @author Jim
  *
  */
-public class UmlPackage extends UmlItem {
+public class UmlPackage extends UmlBasePackage {
 
 	public UmlPackage() {
 		super();
@@ -16,11 +16,6 @@ public class UmlPackage extends UmlItem {
 
 	public UmlPackage(UmlItem p, String n) {
 		super(p,anItemKind.aPackage,n);
-	}
-
-	public static UmlPackage create(UmlPackage parent, String prefix)
-	{
-		return (UmlPackage)parent.create_(anItemKind.aPackage, prefix);
 	}
 
 	public String sKind() {
