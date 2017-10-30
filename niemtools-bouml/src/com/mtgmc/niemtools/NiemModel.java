@@ -517,12 +517,12 @@ class NiemModel {
 	}
 	/** exports NIEM extension and exchange schema */
 	void exportSchemas(String xmlDir, String jsonDir) {
-
+	
 		XmlWriter xmlWriter = new XmlWriter(xmlDir);
 		JsonWriter jsonWriter = new JsonWriter(jsonDir);
 		boolean exportXML = (xmlDir != null);
 		boolean exportJSON = (jsonDir != null);
-
+	
 		// export each schema
 		for (UmlItem thisPackage : modelPackage.children()) {
 			if (thisPackage.kind() != anItemKind.aClassView)
@@ -538,17 +538,17 @@ class NiemModel {
 				continue;
 			String nsSchemaURI = getURI(classView);
 			Log.debug("exportSchemas: exporting schema " + prefix);
-
+	
 			// build list of referenced namespaces
 			TreeSet<String> schemaNamespaces = new TreeSet<String>();
-			schemaNamespaces.add(XSD_PREFIX);
-
+			schemaNamespaces.add(NiemModel.XSD_PREFIX);
+	
 			TreeSet<String> xmlTypes = new TreeSet<String>();
 			TreeSet<String> jsonDefinitions = new TreeSet<String>();
 			TreeSet<String> xmlElements = new TreeSet<String>();
 			TreeSet<String> jsonProperties = new TreeSet<String>();
 			TreeSet<String> jsonRequired = new TreeSet<String>();
-
+	
 			Log.debug("exportSchemas: exporting types and elements");
 			String xmlType = null;
 			String jsonType = null;
@@ -556,7 +556,7 @@ class NiemModel {
 				// add types and attribute groups
 				if (item.kind() == anItemKind.aClass) {
 					UmlClass type = (UmlClass) item;
-
+	
 					// add referenced namespaces
 					schemaNamespaces.add(NamespaceModel.getPrefix(type));
 					UmlClass baseType = getBaseType(type);
@@ -569,12 +569,12 @@ class NiemModel {
 							if (element != null)
 								schemaNamespaces.add(NamespaceModel.getPrefix(element));
 						}
-
+	
 					// get type schema
 					xmlType = xmlWriter.exportXmlTypeSchema(type);
 					if (xmlType != null)
 						xmlTypes.add(xmlType);
-					jsonType = (prefix.equals(XSD_PREFIX)) ? jsonWriter.exportJsonPrimitiveSchema(type)
+					jsonType = (prefix.equals(NiemModel.XSD_PREFIX)) ? jsonWriter.exportJsonPrimitiveSchema(type)
 							: jsonWriter.exportJsonTypeSchema(this, type, prefix);
 					if (jsonType != null)
 						jsonDefinitions.add(jsonType);
@@ -585,7 +585,7 @@ class NiemModel {
 				if (item.kind() == anItemKind.aClassInstance) {
 					UmlClassInstance element = (UmlClassInstance) item;
 					UmlClass baseType = getBaseType(element);
-
+	
 					// add referenced namespaces
 					schemaNamespaces.add(NamespaceModel.getPrefix(element));
 					if (baseType != null)
@@ -593,12 +593,12 @@ class NiemModel {
 					String headElement = element.propertyValue(NiemUmlClass.SUBSTITUTION_PROPERTY);
 					if (headElement != null)
 						schemaNamespaces.add(NamespaceModel.getPrefix(headElement));
-
+	
 					// get element schema
 					xmlElement = xmlWriter.exportXmlElementSchema(element);
 					if (xmlElement != null)
 						xmlElements.add(xmlElement);
-					if (baseType != NiemUmlClass.getSubsetModel().abstractType) {
+					if (baseType != NiemUmlClass.getSubsetModel().getAbstractType()) {
 						schemaNamespaces.add(NamespaceModel.getPrefix(element));
 						jsonElement = jsonWriter.exportJsonElementSchema(element, prefix);
 						if (jsonElement != null)
@@ -611,7 +611,7 @@ class NiemModel {
 					}
 				}
 			}
-
+	
 			// export XML file
 			if (exportXML) {
 				// Open XSD file for each extension schema and write header
@@ -625,7 +625,7 @@ class NiemModel {
 				Log.debug("exportSchemas: referenced namespaces in " + filename + ": " + schemaNamespaces.toString());
 				xmlWriter.exportXmlSchema(filename, nsSchemaURI, xmlTypes, xmlElements, schemaNamespaces);
 			}
-
+	
 			// export JSON file
 			if (exportJSON) {
 				jsonWriter.exportJsonSchema(prefix, nsSchemaURI, schemaNamespaces, jsonDefinitions,
@@ -645,12 +645,13 @@ class NiemModel {
 	private String filterUMLElement(String string) {
 		return string.replaceAll("[^A-Za-z0-9_@#$-`~,.<?;:'\"\\\\]", "");
 	}
+
+
+
 	/** filter illegal characters in UML types */
 	private String filterUMLType(String string) {
 		return string.replaceAll("[^A-Za-z0-9_@#$`~,.<?;:'\"\\\\]", "");
 	}
-
-
 
 	UmlClass getAbstractType() {
 		return abstractType;
@@ -672,7 +673,6 @@ class NiemModel {
 	UmlClass getAugmentationType() {
 		return augmentationType;
 	}
-
 	/** return the default schema URI for the current file */
 	private String getDefaultSchemaURI(String filename, Document doc) {
 		String defaultSchemaURI = doc.lookupNamespaceURI(null);
@@ -690,6 +690,7 @@ class NiemModel {
 	UmlClassInstance getElementByURI(String elementUri) {
 		return elements.get(elementUri);
 	}
+
 	/** returns an element in type and checks the multiplicity */
 	private UmlAttribute getElementInType(UmlClass type, String elementInTypeName, String multiplicity) {
 		for (UmlItem item : type.children())
@@ -724,23 +725,23 @@ class NiemModel {
 	UmlClass getSimpleObjectAttributeGroup() {
 		return simpleObjectAttributeGroup;
 	}
-
+	
 	int getSize() {
 		return elements.size();
 	}
-	
+
 	/** return type in model with schema schemaURI and name tagname */
 	UmlClass getType(String schemaURI, String typeName) {
 		// return cached type
 		String uri = getURI(schemaURI, typeName);
 		return types.get(uri);
 	}
-
+	
 	/** return an element in model with uri elementUri */
 	UmlClass getTypeByURI(String uri) {
 		return types.get(uri);
 	}
-	
+
 	/** return code values and descriptions from enumerations in schema */
 	private String importCodeList(NodeList elist) {
 		String codeList = "";
@@ -1244,7 +1245,6 @@ class NiemModel {
 				// attribute group " + baseTypeName);
 			}
 	}
-
 	/** create a relationship between a type and a base type */
 	void relateBaseType(UmlClass type, UmlClass baseType) {
 		if (type != null && baseType != null)

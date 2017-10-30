@@ -25,8 +25,6 @@ package com.mtgmc.niemtools;
  */
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -36,7 +34,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -51,10 +48,6 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-//OpenCSV library
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
 
 import fr.bouml.UmlAttribute;
 import fr.bouml.UmlClass;
@@ -542,58 +535,14 @@ public class NiemUmlClass {
 	 * 
 	 * roundtripping is supported with importCsv()
 	 */
-	@SuppressWarnings("unchecked")
-
-	public void exportCsv(String dir, String filename) {
-
-		CsvWriter csvWriter = new CsvWriter();
+	public void exportCsv(String directory, String filename) {
 
 		UmlCom.message("Generating NIEM Mapping CSV ...");
 		Log.trace("Generating NIEM Mapping CSV");
 		NamespaceModel.cacheExternalSchemas();
 
-		UmlItem.directory = dir;
-		File file = Paths.get(dir, filename).toFile();
-
-		try {
-			File parentFile = file.getParentFile();
-			if (parentFile != null)
-				parentFile.mkdirs();
-			FileWriter fw = new FileWriter(file);
-			Log.debug("exportCsv: open CSV " + file.toString());
-			CSVWriter writer = new CSVWriter(fw);
-
-			// Write header
-			String[] nextLine = new String[NIEM_STEREOTYPE_MAP.length];
-			for (int column = 0; column < NIEM_STEREOTYPE_MAP.length; column++)
-				nextLine[column] = NIEM_STEREOTYPE_MAP[column][0];
-			writer.writeNext(nextLine);
-
-			// Export NIEM Mappings for Classes
-			Iterator<UmlItem> it = (UmlClass.classes.iterator());
-			while (it.hasNext()) {
-				UmlItem thisClass = it.next();
-				Log.debug("exportCsv: " + thisClass.name());
-				if (!thisClass.stereotype().equals(NIEM_STEREOTYPE))
-					continue;
-				nextLine = csvWriter.getItemCsv(thisClass);
-				writer.writeNext(nextLine);
-
-				// Export NIEM Mapping for Attributes and Relations
-				for (UmlItem item : thisClass.children()) {
-					if (!item.stereotype().equals(NIEM_STEREOTYPE))
-						continue;
-					nextLine = csvWriter.getItemCsv(item);
-					if (nextLine != null)
-						writer.writeNext(nextLine);
-				}
-			}
-			writer.close();
-			Log.debug("exportCsv: CSV file created " + file.toString());
-
-		} catch (Exception e) {
-			Log.trace("exportCsv: error " + e.toString());
-		}
+		UmlItem.directory = directory;
+		new CsvWriter().exportCsv(directory, filename);
 	}
 
 	/** exports a NIEM mapping spreadsheet in HTML format */
@@ -899,76 +848,12 @@ public class NiemUmlClass {
 	}
 
 	/** import NIEM mapping spreadsheet in CSV format */
-	@SuppressWarnings("unchecked")
 	public void importCsv(String filename) {
 
 		Log.trace("Importing NIEM Mapping");
 		NamespaceModel.cacheExternalSchemas();
-		// cache UML classes
-		Map<String, UmlClass> UMLClasses = new HashMap<String, UmlClass>();
-		Map<String, UmlClassInstance> UMLInstances = new HashMap<String, UmlClassInstance>();
-		Iterator<UmlItem> it = UmlItem.all.iterator();
-		while (it.hasNext()) {
-			UmlItem item = it.next();
-			if (item.stereotype().equals(NIEM_STEREOTYPE))
-				if (item.kind() == anItemKind.aClass) {
-					UmlClass c = (UmlClass) item;
-					if (!UMLClasses.containsKey(c.name()))
-						UMLClasses.put(c.name(), c);
-				} else if (item.kind() == anItemKind.aClassInstance) {
-					UmlClassInstance ci = (UmlClassInstance) item;
-					if (!UMLInstances.containsKey(ci.name()))
-						UMLInstances.put(ci.name(), ci);
-				}
-		}
-		try {
+		new CsvReader().importCsv(filename);
 
-			CSVReader reader = new CSVReader(new FileReader(filename));
-			String[] nextLine;
-
-			// read header
-			reader.readNext();
-
-			// read mappings
-			while ((nextLine = reader.readNext()) != null) {
-				String className = nextLine[0].trim();
-				String attributeName = nextLine[1].trim();
-
-				if (!className.equals("")) {
-					UmlClass type = UMLClasses.get(className);
-					if (type != null) {
-						if (attributeName.equals("")) {
-							// import NIEM mapping to class
-							Log.debug("importCsv: importing NIEM mapping for " + className);
-							for (int column = 4; column < NIEM_STEREOTYPE_MAP.length
-									&& column < nextLine.length; column++)
-								type.set_PropertyValue(getNiemProperty(column), nextLine[column]);
-						} else {
-							// import NIEM Mapping to attribute
-							for (UmlItem item : type.children())
-								if (item.stereotype().equals(NIEM_STEREOTYPE)
-										&& (item.name().equals(attributeName)))
-									for (int column = 4; column < NIEM_STEREOTYPE_MAP.length
-											&& column < nextLine.length; column++)
-										item.set_PropertyValue(getNiemProperty(column), nextLine[column]);
-						}
-					}
-				} else if (!attributeName.equals("")) {
-					UmlClassInstance element = UMLInstances.get(attributeName);
-					if (element != null) {
-						// import NIEM mapping to class
-						Log.debug("importCsv: importing NIEM mapping for " + attributeName);
-						for (int column = 4; column < NIEM_STEREOTYPE_MAP.length && column < nextLine.length; column++)
-							element.set_PropertyValue(getNiemProperty(column), nextLine[column]);
-					}
-				}
-			}
-			reader.close();
-		} catch (FileNotFoundException e) {
-			Log.trace("importCsv: error - file not found" + e.toString());
-		} catch (IOException e) {
-			Log.trace("importCsv: error - IO exception" + e.toString());
-		}
 	}
 
 	/**
