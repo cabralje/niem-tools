@@ -284,6 +284,17 @@ public class NiemUmlClass {
 		return ReferenceModel.getTypeByURI(NiemModel.getURI(schemaURI, typeName)) != null;
 	}
 
+	/** returns true if item exists in reference model */
+	static Boolean isNiem(UmlItem item) {
+		String prefixedName = NamespaceModel.getPrefixedName(item);
+		if (item.kind() == anItemKind.aClass)
+			return isNiemType(prefixedName);
+		else if (item.kind() == anItemKind.aClassInstance)
+			return isNiemElement(prefixedName);
+		else
+			return false;
+	}
+	
 	/** initialize NiemTools project */
 	public NiemUmlClass() {
 		super();
@@ -373,7 +384,7 @@ public class NiemUmlClass {
 			String baseTypeName = item.propertyValue(NIEM_STEREOTYPE_BASE_TYPE).trim();
 			if (typeName.equals("") || isNiemType(typeName))
 				continue;
-			NiemModel model = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName)) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
+			NiemModel model = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName)) ? SubsetModel : ExtensionModel;
 			UmlClass type = model.getType(NamespaceModel.getSchemaURI(typeName), typeName);
 			if (type == null)
 				continue;
@@ -388,7 +399,7 @@ public class NiemUmlClass {
 							+ "; using default base type.");
 					baseType = SubsetModel.getObjectType();
 				} else {
-					NiemModel baseModel = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(baseTypeName)) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
+					NiemModel baseModel = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(baseTypeName)) ? SubsetModel : ExtensionModel;
 					baseType = baseModel.getType(NamespaceModel.getSchemaURI(baseTypeName), baseTypeName);
 				}
 				if (baseType == null) {
@@ -447,7 +458,7 @@ public class NiemUmlClass {
 					baseTypeName2 = NamespaceModel.getPrefixedName(NiemModel.LOCAL_PREFIX, NiemModel.ABSTRACT_TYPE_NAME);
 
 				// copy NIEM element or add extension element
-				NiemModel model = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(baseTypeName2)) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
+				NiemModel model = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(baseTypeName2)) ? SubsetModel : ExtensionModel;
 				UmlClass baseType = model.getType(NamespaceModel.getSchemaURI(baseTypeName2), baseTypeName2);
 				if (baseType == null && !baseTypeName.equals(""))
 					Log.trace("createSubsetAndExtension: error - base type " + baseTypeName2 + " not in model with URI "+ NamespaceModel.getSchemaURI(baseTypeName2));
@@ -458,7 +469,7 @@ public class NiemUmlClass {
 
 				// copy element in type
 				if ((!substitution || !representation) && !typeName.equals("")) {
-					NiemModel model2 = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName)) ? NiemUmlClass.SubsetModel : NiemUmlClass.ExtensionModel;
+					NiemModel model2 = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName)) ? SubsetModel : ExtensionModel;
 					UmlClass type = model2.getType(NamespaceModel.getSchemaURI(typeName), typeName);
 					if (type != null)
 						if (isNiemType(typeName))
@@ -628,7 +639,7 @@ public class NiemUmlClass {
 							continue;
 						Log.debug("exportIEPD: input Message: " + inputMessage + " from operation " + operationName);
 						messageNamespaces.add(NamespaceModel.getPrefix(inputMessage));
-						NiemModel model = NiemUmlClass.getModel(NiemModel.getURI(NamespaceModel.getSchemaURI(inputMessage), inputMessage));
+						NiemModel model = getModel(NiemModel.getURI(NamespaceModel.getSchemaURI(inputMessage), inputMessage));
 						UmlClassInstance element = model.getElementByURI(NiemModel.getURI(NamespaceModel.getSchemaURI(inputMessage), inputMessage));
 						if (element != null)
 							element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
@@ -645,7 +656,7 @@ public class NiemUmlClass {
 					continue;
 				Log.debug("exportIEPD: output Message: " + outputMessage + " from operation " + operationName);
 				messageNamespaces.add(NamespaceModel.getPrefix(outputMessage));
-				NiemModel model = NiemUmlClass.getModel(NiemModel.getURI(NamespaceModel.getSchemaURI(outputMessage), outputMessage));
+				NiemModel model = getModel(NiemModel.getURI(NamespaceModel.getSchemaURI(outputMessage), outputMessage));
 				UmlClassInstance element = model.getElementByURI(NiemModel.getURI(NamespaceModel.getSchemaURI(outputMessage), outputMessage));
 				if (element != null)
 					element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
@@ -653,7 +664,7 @@ public class NiemUmlClass {
 		}
 
 		if (jsonDir != null)
-			SubsetModel.exportSchemas(null, Paths.get(jsonDir, NIEM_DIR).toString());
+			SubsetModel.exportSchemas(null, jsonDir);
 		ExtensionModel.exportSchemas(xmlDir, jsonDir);
 
 		if (xmlDir != null)
@@ -873,7 +884,7 @@ public class NiemUmlClass {
 		// Walk directory to import in passes (0: types, 1: elements, 2:
 		// elements in types, 3: enumerations
 		for (importPass = 0; importPass < passes; importPass++) {
-			switch (NiemUmlClass.importPass) {
+			switch (importPass) {
 			case 0:
 				Log.trace("\nImporting types");
 				break;

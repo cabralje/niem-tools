@@ -633,6 +633,7 @@ class NiemModel {
 			}
 		}
 	}
+	
 	/** filter non-ASCII characters */
 	private String filterASCII(String string) {
 		return string.replaceAll("[^\\p{ASCII}]", "");

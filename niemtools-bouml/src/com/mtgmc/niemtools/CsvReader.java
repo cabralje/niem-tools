@@ -36,13 +36,11 @@ public class CsvReader {
 				}
 		}
 		try {
-	
 			CSVReader reader = new CSVReader(new FileReader(filename));
 			String[] nextLine;
 	
 			// read header
 			reader.readNext();
-	
 			// read mappings
 			while ((nextLine = reader.readNext()) != null) {
 				String className = nextLine[0].trim();

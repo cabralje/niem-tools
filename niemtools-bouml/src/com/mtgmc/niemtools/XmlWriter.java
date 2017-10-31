@@ -70,7 +70,7 @@ public class XmlWriter {
 	private static final String GC_LOCATION = "https://docs.oasis-open.org/codelist/cs-genericode-1.0/xsd/genericode.xsd";
 	private static final String GC_PREFIX = "gc";
 	private static final String GC_URI = "http://docs.oasis-open.org/codelist/ns/genericode/1.0/";
-	private static final String MESSAGE_WRAPPERS_FILE_NAME = "MessageWrappers";
+	private static final String MESSAGE_WRAPPERS_FILE_NAME = "wrappers";
 	private static final String MPD_CATALOG_FILE = "mpd-catalog.xml";
 	private static final String MPD_CATALOG_LOCATION = "https://tools.niem.gov/IEPD/mpd-catalog-3.0.xsd";
 	private static final String MPD_CATALOG_URI = "http://reference.niem.gov/niem/resource/mpd/catalog/3.0/";
@@ -94,7 +94,7 @@ public class XmlWriter {
 	static final String TERM_PREFIX = "term";
 	static final String TERM_URI = "http://release.niem.gov/niem/localTerminology/3.0/";
 	private static final String WANTLIST_FILE = "wantlist.xml";
-	private static final String WRAPPER_PREFIX = "wrapper";
+	private static final String WRAPPER_PREFIX = "wrappers";
 	private static final String WSDL_FILE_TYPE = ".wsdl";
 	private static final String WSDL_PREFIX = "tns";
 	private static final String WSDL_SCHEMA_PREFIX = "wsdl";

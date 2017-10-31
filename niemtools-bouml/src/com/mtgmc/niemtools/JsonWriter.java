@@ -52,7 +52,7 @@ public class JsonWriter {
 	private static final String[] HTTP_METHODS = { "get", "put", "post", "update" };
 	private static final String HTTP_METHODS_PROPERTY = JsonWriter.WEBSERVICE_STEREOTYPE + NiemUmlClass.STEREOTYPE_DELIMITER
 			+ "HTTPMethods";
-	private static final String JSON_SCHEMA_FILE_TYPE = ".schema.json";
+	static final String JSON_SCHEMA_FILE_TYPE = ".schema.json";
 	private static final String JSON_SCHEMA_URI = "http://json-schema.org/draft-04/schema#";
 	private static final String OPENAPI_FILE_TYPE = ".openapi.json";
 	public static final String WEBSERVICE_STEREOTYPE = "niem-profile:webservice";
@@ -72,35 +72,38 @@ public class JsonWriter {
 
 	/**
 	 * return JSON property description of an element with name elementName and
-	 * multiplicity
-	 */
-	private String exportJsonElementInTypeSchema(String elementName, String multiplicity, String localPrefix,
-			boolean isAttribute) {
+	 * multiplicity */
+	private String exportJsonElementInTypeSchema(UmlClass type, UmlClassInstance element, String multiplicity,
+			String localPrefix, boolean isAttribute) {
+		String elementName = NamespaceModel.getPrefixedName(element);
 		String elementName2 = null;
 		String minOccurs = NiemUmlClass.getMinOccurs(multiplicity);
 		String maxOccurs = NiemUmlClass.getMaxOccurs(multiplicity);
+		Path typePath = getJsonPath(type);
+		String elementRef = exportJsonPointer(typePath, element);
 		if (isAttribute) {
-			if (elementName.equals(NamespaceModel.getPrefixedName(NiemUmlClass.STRUCTURES_PREFIX, "@id"))
-					|| elementName.equals(NamespaceModel.getPrefixedName(NiemUmlClass.STRUCTURES_PREFIX, "@ref"))) {
-				elementName = "xs:NCName";
+			if (elementName.equals("@id") || elementName.equals("@ref") || elementName.equals("structures:@id") || elementName.equals("structures:@ref")) {
 				elementName2 = "@id";
+				element = NiemUmlClass.getSubsetModel().getElement(NiemModel.XSD_URI, "xs:NCName");
+				UmlClass baseType = NiemUmlClass.getSubsetModel().getType(NiemModel.XSD_URI, "xs:NCName");
+				elementRef = exportJsonPointer(typePath, baseType);
 			} else {
 				elementName = NamespaceModel.filterAttributePrefix(elementName);
 				elementName2 = elementName;
 			}
 		} else
 			elementName2 = elementName;
+
 		String elementSchema = "";
 		elementSchema += "\"" + elementName2 + "\": {\n";
 		if (maxOccurs.equals("1"))
-			elementSchema += "\"$ref\": \"" + exportJsonPointer(elementName, localPrefix) + "\"\n";
+			elementSchema += "\"$ref\": \"" + elementRef + "\"\n";
 		else {
 			elementSchema += "\"oneOf\": [";
 			if (minOccurs.equals("0") || minOccurs.equals("1")) {
-				elementSchema += "{\n" + "\"$ref\": \"" + exportJsonPointer(elementName, localPrefix) + "\"\n" + "},\n";
+				elementSchema += "{\n" + "\"$ref\": \"" + elementRef + "\"\n" + "},\n";
 			}
-			elementSchema += "{\n" + "\"items\": {\n" + "\"$ref\": \"" + exportJsonPointer(elementName, localPrefix)
-			+ "\"\n" + "},\n" + "\n\"minItems\": " + minOccurs + ",\n";
+			elementSchema += "{\n" + "\"items\": {\n" + "\"$ref\": \"" + elementRef + "\"\n" + "},\n" + "\n\"minItems\": " + minOccurs + ",\n";
 			if (!maxOccurs.equals("unbounded"))
 				elementSchema += "\n\"maxItems\": " + maxOccurs + ",\n";
 			elementSchema += "\"type\": \"array\"\n" + "}\n" + "]\n";
@@ -127,30 +130,26 @@ public class JsonWriter {
 		}
 		if (NamespaceModel.getPrefix(baseType2).equals(NiemModel.XSD_PREFIX))
 			baseType = baseType2;
-		jsonDefinition.add("\"$ref\": \"" + exportJsonPointer(NamespaceModel.getPrefixedName(baseType), prefix) + "\"");
+		Path elementPath = getJsonPath(element);
+		jsonDefinition.add("\"$ref\": \"" + exportJsonPointer(elementPath, baseType2) + "\"");
 		String elementSchema = "\"" + elementName + "\": {\n" + String.join(",", jsonDefinition) + "\n}\n";
 		return elementSchema;
 	}
 
-	// FIXME swagger-parser error: Unable to load RELATIVE ref:
-	// ./niem/nc.schema.json
-	/** return JSON Pointer to a type with name typeName */
-	private String exportJsonPointer(String tagName, String localPrefix) {
-		if (tagName == null)
+	/** return JSON Pointer to a type/element with name tagName from file sourceFileNAme to targetFileName */
+	private String exportJsonPointer(Path sourcePath, UmlItem targetItem) {
+		if (targetItem == null)
 			return "";
-		String prefix = NamespaceModel.getPrefix(tagName);
-		if (prefix == null)
+		String targetPrefix = NamespaceModel.getPrefix(targetItem);
+		if (targetPrefix == null || NamespaceModel.isExternalPrefix(targetPrefix))
 			return "";
-		if (NamespaceModel.isExternalPrefix(prefix))
-			return "";
-		else if (localPrefix != null && prefix.equals(localPrefix))
-			return "#/definitions/" + tagName;
-		if (NamespaceModel.isNiemPrefix(prefix) && !NamespaceModel.isNiemPrefix(localPrefix))
-			return "./" + NiemUmlClass.NIEM_DIR + "/" + prefix + JSON_SCHEMA_FILE_TYPE + "#/definitions/" + tagName;
-		else if (!NamespaceModel.isNiemPrefix(prefix) && NamespaceModel.isNiemPrefix(localPrefix))
-			return "../" + prefix + JSON_SCHEMA_FILE_TYPE + "#/definitions/" + tagName;
-		else
-			return "./" + prefix + JSON_SCHEMA_FILE_TYPE + "#/definitions/" + tagName;
+		Path targetPath = getJsonPath(targetItem);
+		
+		// different file
+		String path = (sourcePath.equals(targetPath)) ? "" : sourcePath.getParent().relativize(targetPath).toString().replaceAll("\\\\", "/");
+		path += "#/definitions/" + NamespaceModel.getPrefixedName(targetItem);
+		//Log.trace("exportJsonPointer: " + sourcePath.toString() + " " + targetPath.toString() + " " + path);
+		return path;
 	}
 
 	/** return JSON type definition corresponding to an XML Schema primitive type */
@@ -351,12 +350,13 @@ public class JsonWriter {
 
 		try {
 			// Open JSON schema file for each extension schema and write header
-			File file = Paths.get(directory, prefix + JsonWriter.JSON_SCHEMA_FILE_TYPE).toFile();
-			File parentFile = file.getParentFile();
+			Path path = getJsonPath(prefix);
+			File parentFile = path.getParent().toFile();
 			if (parentFile != null)
 				parentFile.mkdirs();
-			Log.debug("exportSchemas: schema " + file.toString());
-			FileWriter json = new FileWriter(file);
+			
+			Log.debug("exportSchemas: schema " + path.toString());
+			FileWriter json = new FileWriter(path.toFile());
 			json.write("{\n" + getJsonPair("$id", nsSchemaURI) + ",\n" + getJsonPair("$schema", JsonWriter.JSON_SCHEMA_URI)
 			+ ",\n" + getJsonPair("type", "object") + ",\n" + "\"additionalProperties\" : false" + ",\n"
 			+ "\"@context\" : {\n" + String.join(",\n", jsonNamespaces) + "},\n"
@@ -404,22 +404,22 @@ public class JsonWriter {
 						String multiplicity2 = "0," + NiemUmlClass.getMaxOccurs(multiplicity);
 						// add head element if not abstract
 						if ((elementBaseType != model.getAbstractType())) {
-							String jsonElementInType = exportJsonElementInTypeSchema(elementName, multiplicity2, prefix,
-									elementIsAttribute);
+							String jsonElementInType = exportJsonElementInTypeSchema(type, element, multiplicity2,
+									prefix, elementIsAttribute);
 							if (jsonElementInType != null)
 								jsonElementsInType.add(jsonElementInType);
 						}
 						List<UmlClassInstance> enlist = (NiemModel.Substitutions.get(elementName));
 						// add substitution elements
 						for (UmlClassInstance element2 : enlist) {
-							String jsonElementInType = exportJsonElementInTypeSchema(NamespaceModel.getPrefixedName(element2),
-									multiplicity2, prefix, NiemUmlClass.isAttribute(element2));
+							String jsonElementInType = exportJsonElementInTypeSchema(type,
+									element, multiplicity2, prefix, NiemUmlClass.isAttribute(element2));
 							if (jsonElementInType != null)
 								jsonElementsInType.add(jsonElementInType);
 						}
 					} else if ((elementBaseType != model.getAbstractType())) {
-						String jsonElementInType = exportJsonElementInTypeSchema(elementName, multiplicity, prefix,
-								elementIsAttribute);
+						String jsonElementInType = exportJsonElementInTypeSchema(type, element, multiplicity,
+								prefix, elementIsAttribute);
 						if (jsonElementInType != null)
 							jsonElementsInType.add(jsonElementInType);
 						if (Integer.parseInt(NiemUmlClass.getMinOccurs(multiplicity)) > 0)
@@ -446,8 +446,8 @@ public class JsonWriter {
 							String multiplicity = attribute.multiplicity();
 							String minOccurs = NiemUmlClass.getMinOccurs(multiplicity);
 							if (elementBaseType != model.getAbstractType()) {
-								String jsonElementInType = exportJsonElementInTypeSchema(elementName, multiplicity,
-										prefix, NiemUmlClass.isAttribute(element));
+								String jsonElementInType = exportJsonElementInTypeSchema(type, element,
+										multiplicity, prefix, NiemUmlClass.isAttribute(element));
 								if (jsonElementInType != null)
 									jsonElementsInType.add(jsonElementInType);
 								if (Integer.parseInt(minOccurs) > 0)
@@ -513,16 +513,12 @@ public class JsonWriter {
 			// write OpenAPI paths
 			TreeSet<String> openapiPaths = new TreeSet<String>();
 
-			// for each path
+			// for each OpenAPI path
 			TreeSet<String> jsonDefinitions = new TreeSet<String>();
 			TreeSet<String> jsonProperties = new TreeSet<String>();
 
-			// get relative path
+			// get directory path
 			Path openapiPath = Paths.get(openapiDir, portName + OPENAPI_FILE_TYPE);
-			Path jsonPath = Paths.get(directory);
-			String relativePath = "./" + openapiPath.getParent().relativize(jsonPath).toString().replaceAll("\\\\", "/")
-					+ "/";
-			Log.debug("exportOpenAPI: relative path to json: " + relativePath);
 
 			for (UmlItem item : port.children()) {
 				if (item.kind() == anItemKind.anOperation) {
@@ -534,7 +530,7 @@ public class JsonWriter {
 					String operationName = operation.name();
 					String httpMethod = operation.propertyValue(JsonWriter.HTTP_METHODS_PROPERTY).toLowerCase();
 
-					Log.trace("exportOpenAPI: generating document/literal input wrapper for " + portName + "/"
+					Log.debug("exportOpenAPI: generating document/literal input wrapper for " + portName + "/"
 							+ operationName);
 					UmlClass outputType = null, inputType = null;
 					UmlParameter[] params = operation.params();
@@ -586,9 +582,14 @@ public class JsonWriter {
 
 							mult = convertMultiplicity(mult);
 							// String maxOccurs = getMaxOccurs(mult);
-							if (!NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(inputMessage)))
-								jsonElementsInType.add(exportOpenApiElementInTypeSchema(relativePath, inputMessage,
-										mult, null, false));
+							String prefix = NamespaceModel.getPrefix(inputMessage);
+							if (!NamespaceModel.isExternalPrefix(prefix)) {
+								String schemaURI = NamespaceModel.getSchemaURI(inputMessage);
+								UmlClassInstance messageElement = (NamespaceModel.isNiemPrefix(prefix)) ? 
+									NiemUmlClass.getSubsetModel().getElement(schemaURI, inputMessage) : 
+									NiemUmlClass.getExtensionModel().getElement(schemaURI, inputMessage);
+								jsonElementsInType.add(exportOpenApiElementInTypeSchema(openapiPath, messageElement, mult, false));
+							}
 							if (Integer.parseInt(NiemUmlClass.getMinOccurs(mult)) > 0)
 								jsonRequiredElementsInType.add("\"" + inputMessage + "\"");
 							// for each input parameter
@@ -641,9 +642,14 @@ public class JsonWriter {
 						String elementName = (message.equals(JsonWriter.ERROR_RESPONSE) ? "Error" : operationName) + "Response";
 						String outputTypeName = elementName + "Type";
 						String mult = "1";
-						if (!NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(message))) {
+						String prefix = NamespaceModel.getPrefix(message);
+						if (!NamespaceModel.isExternalPrefix(prefix)) {
+							String schemaURI = NamespaceModel.getSchemaURI(message);
+							UmlClassInstance messageElement = (NamespaceModel.isNiemPrefix(prefix)) ? 
+								NiemUmlClass.getSubsetModel().getElement(schemaURI, message) : 
+								NiemUmlClass.getExtensionModel().getElement(schemaURI, message);
 							jsonElementsInType
-							.add(exportOpenApiElementInTypeSchema(relativePath, message, mult, null, false));
+							.add(exportOpenApiElementInTypeSchema(openapiPath, messageElement, mult, false));
 							jsonRequiredElementsInType.add("\"" + message + "\"");
 						}
 
@@ -738,32 +744,33 @@ public class JsonWriter {
 
 	/**
 	 * return OpenAPI property description of an element with name elementName and
-	 * multiplicity
-	 */
-	private String exportOpenApiElementInTypeSchema(String relativePath, String elementName, String multiplicity,
-			String localPrefix, boolean isAttribute) {
+	 * multiplicity */
+	private String exportOpenApiElementInTypeSchema(Path openapiPath, UmlItem element, String multiplicity,
+			boolean isAttribute) {
+		String elementName = NamespaceModel.getPrefixedName(element);
+		Log.debug("exportOpenApiElementInTypeSchema: " + elementName);
 		String elementName2 = null;
 		String minOccurs = NiemUmlClass.getMinOccurs(multiplicity);
 		String maxOccurs = NiemUmlClass.getMaxOccurs(multiplicity);
+		String elementRef = exportJsonPointer(openapiPath, element);
 		if (isAttribute) {
-			if (elementName.equals(NamespaceModel.getPrefixedName(NiemUmlClass.STRUCTURES_PREFIX, "@id"))
-					|| elementName.equals(NamespaceModel.getPrefixedName(NiemUmlClass.STRUCTURES_PREFIX, "@ref"))) {
+			if (elementName.equals("@id") || elementName.equals("@ref")) {
 				elementName = "xs:NCName";
 				elementName2 = "@id";
+				UmlClass baseType = NiemUmlClass.getSubsetModel().getType(NiemModel.XSD_URI, "xs:NCName");
+				elementRef = exportJsonPointer(openapiPath, baseType);
 			} else {
 				elementName = NamespaceModel.filterAttributePrefix(elementName);
 				elementName2 = elementName;
 			}
-		} else
+		} else 
 			elementName2 = elementName;
 		String elementSchema = "";
 		elementSchema += "\"" + elementName2 + "\": {\n";
 		if (maxOccurs.equals("1"))
-			elementSchema += "\"$ref\": \"" + relativePath + exportJsonPointer(elementName, localPrefix) + "\"\n";
+			elementSchema += "\"$ref\": \"" + elementRef + "\"\n";
 		else {
-			elementSchema += "\"items\": {\n" + "\"$ref\": \"" + relativePath
-					+ exportJsonPointer(elementName, localPrefix) + "\"\n" + "},\n" + "\n\"minItems\": " + minOccurs
-					+ ",\n";
+			elementSchema += "\"items\": {\n" + "\"$ref\": \"" + elementRef + "\"\n" + "},\n" + "\n\"minItems\": " + minOccurs + ",\n";
 			if (!maxOccurs.equals("unbounded"))
 				elementSchema += "\n\"maxItems\": " + maxOccurs + ",\n";
 			elementSchema += "\"type\": \"array\"\n";
@@ -782,4 +789,16 @@ public class JsonWriter {
 		return "\"" + name + "\" : \"" + value + "\"\n";
 	}
 
+	/** return JSON filename */
+	Path getJsonPath(UmlItem item) {
+		return Paths.get(directory, (NiemUmlClass.isNiem(item)) ? NiemUmlClass.NIEM_DIR + "/" : "", NamespaceModel.getPrefix(item) + JsonWriter.JSON_SCHEMA_FILE_TYPE);
+	}
+
+	/** return JSON filename */
+	Path getJsonPath(String prefix) {
+		String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
+		boolean isNiem = NamespaceModel.getNamespace(schemaURI).getReferenceClassView() != null;
+		return Paths.get(directory, (isNiem) ? NiemUmlClass.NIEM_DIR + "/" : "", prefix + JsonWriter.JSON_SCHEMA_FILE_TYPE);
+	}
+	
 }

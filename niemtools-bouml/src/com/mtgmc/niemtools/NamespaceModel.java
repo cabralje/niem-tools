@@ -60,8 +60,8 @@ public class NamespaceModel {
 
 	/** adds a new prefix for a namespace */
 	static void addPrefix(String schemaURI, String prefix) {
-		if (!NamespaceModel.getPrefixes().containsKey(prefix))
-			NamespaceModel.Prefixes.put(prefix, schemaURI);
+		if (!getPrefixes().containsKey(prefix))
+			Prefixes.put(prefix, schemaURI);
 	}
 
 	/** caches namespaces and prefixes for external schemas */
@@ -84,7 +84,7 @@ public class NamespaceModel {
 
 	/** return attribute name with prefix filtered */
 	static String filterAttributePrefix(String attributeName) {
-		return attributeName.replaceAll(NamespaceModel.ATTRIBUTE_PREFIX, "");
+		return attributeName.replaceAll(ATTRIBUTE_PREFIX, "");
 	}
 
 	/** filter illegal characters in XML prefix */
@@ -222,7 +222,7 @@ public class NamespaceModel {
 	
 	/** return name with namespace prefix for an attribute with name tagName */
 	static String getPrefixedAttributeName(String prefix, String tagName) {
-		return prefix + NAMESPACE_DELIMITER + NamespaceModel.ATTRIBUTE_PREFIX + NamespaceModel.filterAttributePrefix(tagName);
+		return prefix + NAMESPACE_DELIMITER + ATTRIBUTE_PREFIX + filterAttributePrefix(tagName);
 	}
 
 	/** return name with namespace prefix for type or element with name tagName */
@@ -301,7 +301,7 @@ public class NamespaceModel {
 	static Boolean isNiemPrefix(String prefix) {
 		if (prefix == null)
 			return false;
-		if (NamespaceModel.isExternalPrefix(prefix))
+		if (isExternalPrefix(prefix))
 			return false;
 		String schemaURI = Prefixes.get(prefix);
 		Namespace ns = Namespaces.get(schemaURI);

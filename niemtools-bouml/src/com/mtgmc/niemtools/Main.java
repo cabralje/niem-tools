@@ -64,6 +64,7 @@ class Main
 			int boumlPort = Integer.valueOf(argv[argv.length - 1]).intValue();
 			UmlCom.connect(boumlPort);
 
+			UmlCom.trace("Port: " + boumlPort);
 			try
 			{	
 				//UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
