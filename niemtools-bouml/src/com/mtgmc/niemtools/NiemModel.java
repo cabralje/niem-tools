@@ -63,6 +63,7 @@ class NiemModel {
 	static final String ABSTRACT_TYPE_NAME = "abstract";
 	static final String ANY_ELEMENT_NAME = "any";
 	static final String AUGMENTATION_TYPE_NAME = "AugmentationType";
+	//static final String AUGMENTATION_POINT_NAME = "AugmentationPoint";
 	static final String CODELIST_DEFINITION_DELIMITER = "=";
 	static final String CODELIST_DELIMITER = ";";
 	private static final String HASH_DELIMITER = ",";
@@ -516,13 +517,14 @@ class NiemModel {
 		return type;
 	}
 	/** exports NIEM extension and exchange schema */
-	void exportSchemas(String xmlDir, String jsonDir) {
+	TreeSet<String> exportSchemas(String xmlDir, String jsonDir) {
 	
 		XmlWriter xmlWriter = new XmlWriter(xmlDir);
 		JsonWriter jsonWriter = new JsonWriter(jsonDir);
 		boolean exportXML = (xmlDir != null);
 		boolean exportJSON = (jsonDir != null);
-	
+		TreeSet<String> openapiDefinitions = new TreeSet<String>();
+		
 		// export each schema
 		for (UmlItem thisPackage : modelPackage.children()) {
 			if (thisPackage.kind() != anItemKind.aClassView)
@@ -631,7 +633,12 @@ class NiemModel {
 				jsonWriter.exportJsonSchema(prefix, nsSchemaURI, schemaNamespaces, jsonDefinitions,
 						jsonProperties, jsonRequired);
 			}
+			
+			openapiDefinitions.addAll(jsonProperties);
+			openapiDefinitions.addAll(jsonDefinitions);
 		}
+		
+		return openapiDefinitions;
 	}
 	
 	/** filter non-ASCII characters */

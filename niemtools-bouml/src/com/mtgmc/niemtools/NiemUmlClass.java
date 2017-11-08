@@ -575,6 +575,8 @@ public class NiemUmlClass {
 
 		XmlWriter xmlWriter = new XmlWriter(xmlDir);
 		JsonWriter jsonWriter = new JsonWriter(jsonDir);
+		TreeSet<String> jsonDefinitions = new TreeSet<String>();
+		TreeSet<String> jsonDefinitions2 = new TreeSet<String>();
 		/*
 		 * cacheExternalSchemas(); cacheModel(referencePackage);
 		 * cacheModel(subsetPackage); cacheModel(extensionPackage);
@@ -664,9 +666,19 @@ public class NiemUmlClass {
 		}
 
 		if (jsonDir != null)
-			SubsetModel.exportSchemas(null, jsonDir);
-		ExtensionModel.exportSchemas(xmlDir, jsonDir);
-
+			jsonDefinitions.addAll(SubsetModel.exportSchemas(null, jsonDir));
+		jsonDefinitions.addAll(ExtensionModel.exportSchemas(xmlDir, jsonDir));
+		
+		// swagger code generation tools do not support relative references, rename them to local references
+		Iterator<String> it2 = jsonDefinitions.iterator();
+		while (it2.hasNext()) {
+			String definition = it2.next();
+			String definition2 = definition.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
+			Log.debug("exportIEPD: definition " + definition2);
+			if (definition2 != null && jsonDefinitions2 != null)
+				jsonDefinitions2.add(definition2);
+		}
+			
 		if (xmlDir != null)
 			try {
 				xmlWriter.exportMpdCatalog(messages);
@@ -679,7 +691,7 @@ public class NiemUmlClass {
 		if (jsonDir != null)
 			try {
 				if (openapiDir != null)
-					jsonWriter.exportOpenApi(openapiDir, ports, messageNamespaces);
+					jsonWriter.exportOpenApi(openapiDir, ports, messageNamespaces, jsonDefinitions2);
 			} catch (Exception e) {
 				Log.trace("exportIEPD: error exporting OpenAPI files " + e.toString());
 			}
