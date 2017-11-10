@@ -304,14 +304,16 @@ public class NiemUmlClass {
 	}
 
 	/** caches namespaces and prefixes for external schemas */
-	public void cacheModels() {
-		UmlCom.message("Generating extension schema ...");
-		Log.trace("Generating extension schema");
+	public void cacheModels(boolean referenceOnly) {
+		UmlCom.message("Cahcing models ...");
+		Log.trace("Caching models");
 		NamespaceModel.cacheExternalSchemas();
 		ReferenceModel.cacheModel();
-		SubsetModel.cacheModel();
-		ExtensionModel.cacheModel();
-		Log.debug("Done generating extension schemas");
+		if (!referenceOnly) {
+			SubsetModel.cacheModel();
+			ExtensionModel.cacheModel();
+		}
+		Log.debug("Done caching models");
 	}
 
 	/** creates Platform Independent Model (NIEM) */
@@ -928,7 +930,11 @@ public class NiemUmlClass {
 						switch (importPass) {
 						case 0:
 							Namespace ns = ReferenceModel.importTypes(db, filename);
-							ns.getReferenceClassView().set_PropertyValue(FILE_PATH_PROPERTY, NIEM_DIR + filepath);
+							if (ns != null) {
+								UmlClassView classView = ns.getReferenceClassView();
+								if (classView != null)
+									classView.set_PropertyValue(FILE_PATH_PROPERTY, NIEM_DIR + filepath);
+							}
 							break;
 						case 1:
 							ReferenceModel.importElements(db, filename);

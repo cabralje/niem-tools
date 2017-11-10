@@ -64,7 +64,7 @@ class Main
 			int boumlPort = Integer.valueOf(argv[argv.length - 1]).intValue();
 			UmlCom.connect(boumlPort);
 
-			UmlCom.trace("Port: " + boumlPort);
+			//Log.debug("Port: " + boumlPort);
 			try
 			{	
 				//UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
@@ -77,7 +77,6 @@ class Main
 
 				// create PIM and PSM
 				NiemUmlClass niemTools = new NiemUmlClass();
-				niemTools.cacheModels();
 
 				//load properties
 				String command = argv[0];
@@ -101,15 +100,18 @@ class Main
 					break;
 
 				case "importSchema":
+					//niemTools.cacheModels();
 					importSchema(niemTools, properties);
 					break;
 
 				case "import":
+					niemTools.cacheModels(false);
 					importMapping(root, niemTools);
 					break;
 
 				case "sort":
 					Log.trace("<b>Sort</b> release 5.0<br>");
+					niemTools.cacheModels(false);
 					UmlCom.targetItem().sort();
 					break;
 
@@ -117,7 +119,7 @@ class Main
 				default:
 					if (!niemTools.verifyNIEM())
 						break;
-
+					niemTools.cacheModels(false);
 					generateModels(root, target, niemTools, properties);
 					break;
 				}
@@ -188,7 +190,7 @@ class Main
 		// Clearing NIEM Models
 		niemTools.deleteNIEM(false);
 		niemTools.createNIEM();
-		niemTools.cacheModels();
+		niemTools.cacheModels(false);
 
 		// Generating NIEM Models
 		niemTools.createSubsetAndExtension();
@@ -197,7 +199,7 @@ class Main
 		niemTools.exportWantlist(root.propertyValue("html dir"), "wantlist.xml");
 
 		// Generate extension schema
-		niemTools.cacheModels(); // cache substitutions
+		niemTools.cacheModels(false); // cache substitutions
 		String xsdDir = (root.propertyValue("exportXML").equals("true")) ? properties.getProperty("xsdDir") : null;
 		String wsdlDir = (root.propertyValue("exportWSDL").equals("true")) ? properties.getProperty("wsdlDir") : null;					
 		String jsonDir = (root.propertyValue("exportJSON").equals("true")) ? properties.getProperty("jsonDir") : null;
@@ -234,7 +236,7 @@ class Main
 		properties.setProperty("niemDir", directory);
 		niemTools.deleteNIEM(true);
 		niemTools.createNIEM();
-		niemTools.cacheModels();
+		niemTools.cacheModels(true);
 		niemTools.importSchemaDir(directory,false);
 	}
 }

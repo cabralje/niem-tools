@@ -59,15 +59,48 @@ import javax.swing.table.TableCellRenderer;
 import fr.bouml.UmlPackage;
 
 class ConfigurationDialog extends JDialog {
+	
+	public static final String IEPD_CHANGE_LOG_FILE_DEFAULT = "changelog.txt";
+	public static final String IEPD_CHANGE_LOG_FILE_PROPERTY = "IEPDChangeLogFile";
+	public static final String IEPD_CONTACT_DEFAULT = "Contact";
+	public static final String IEPD_CONTACT_PROPERTY = "IEPDContact";
+	public static final String IEPD_EMAIL_DEFAULT = "email@example.com";
+	public static final String IEPD_EMAIL_PROPERTY = "IEPDEmail";
+	public static final String IEPD_EXTERNAL_SCHEMAS_DEFAULT = "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,"
+			+ "cbc=urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonBasicComponents-2.1.xsd,"
+			+ "ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd";
+	// IEPD Properties
+	public static final String IEPD_EXTERNAL_SCHEMAS_PROPERTY = "externalSchemas";
+	public static final String IEPD_LICENSE_URL_DEFAULT = "https://opensource.org/licenses/BSD-3-Clause";
+	public static final String IEPD_LICENSE_URL_PROPERTY = "IEPDLicense";
+	public static final String IEPD_NAME_DEFAULT = "IEPD";
+	public static final String IEPD_NAME_PROPERTY = "IEPDName";
+	public static final String IEPD_ORGANIZATION_DEFAULT = "Organization";
+	public static final String IEPD_ORGANIZATION_PROPERTY = "IEPDOrganization";
+	public static final String IEPD_READ_ME_FILE_DEFAULT = "readme.txt";
+	public static final String IEPD_READ_ME_FILE_PROPERTY = "IEPDReadMeFile";
+	public static final String IEPD_STATUS_DEFAULT = "Draft";
+	public static final String IEPD_STATUS_PROPERTY = "IEPDStatus";
+	public static final String IEPD_TERMS_URL_DEFAULT = "example.com/terms";
+	public static final String IEPD_TERMS_URL_PROPERTY = "IEPDTermsOfService";
+	public static final String IEPD_URI_DEFAULT = "http://local";
+	public static final String IEPD_URI_PROPERTY = "IEPDURI";
+
+	public static final String IEPD_VERSION_DEFAULT = "1.0";
+
+	public static final String IEPD_VERSION_PROPERTY = "IEPDVersion";
+
+	private static final long serialVersionUID = 1L;
 
 	private static class FilePanel extends JPanel {
 
 		private static final long serialVersionUID = 1L;
-		String value = null;
+		String value = "";
 
 		FilePanel(String name, String initialValue, int columns, int fileType) {
 
-			value = initialValue;
+			if (initialValue != null)
+				value = initialValue;
 
 			// add field label
 			if (name != null)
@@ -135,38 +168,6 @@ class ConfigurationDialog extends JDialog {
 			});
 		}
 	}
-
-	public static final String IEPD_CHANGE_LOG_FILE_DEFAULT = "changelog.txt";
-	public static final String IEPD_CHANGE_LOG_FILE_PROPERTY = "IEPDChangeLogFile";
-	public static final String IEPD_CONTACT_DEFAULT = "Contact";
-	public static final String IEPD_CONTACT_PROPERTY = "IEPDContact";
-	public static final String IEPD_EMAIL_DEFAULT = "email@example.com";
-	public static final String IEPD_EMAIL_PROPERTY = "IEPDEmail";
-	public static final String IEPD_EXTERNAL_SCHEMAS_DEFAULT = "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,"
-			+ "cbc=urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonBasicComponents-2.1.xsd,"
-			+ "ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd";
-	// IEPD Properties
-	public static final String IEPD_EXTERNAL_SCHEMAS_PROPERTY = "externalSchemas";
-	public static final String IEPD_LICENSE_URL_DEFAULT = "https://opensource.org/licenses/BSD-3-Clause";
-	public static final String IEPD_LICENSE_URL_PROPERTY = "IEPDLicense";
-	public static final String IEPD_NAME_DEFAULT = "IEPD";
-	public static final String IEPD_NAME_PROPERTY = "IEPDName";
-	public static final String IEPD_ORGANIZATION_DEFAULT = "Organization";
-	public static final String IEPD_ORGANIZATION_PROPERTY = "IEPDOrganization";
-	public static final String IEPD_READ_ME_FILE_DEFAULT = "readme.txt";
-	public static final String IEPD_READ_ME_FILE_PROPERTY = "IEPDReadMeFile";
-	public static final String IEPD_STATUS_DEFAULT = "Draft";
-	public static final String IEPD_STATUS_PROPERTY = "IEPDStatus";
-	public static final String IEPD_TERMS_URL_DEFAULT = "example.com/terms";
-	public static final String IEPD_TERMS_URL_PROPERTY = "IEPDTermsOfService";
-	public static final String IEPD_URI_DEFAULT = "http://local";
-	public static final String IEPD_URI_PROPERTY = "IEPDURI";
-
-	public static final String IEPD_VERSION_DEFAULT = "1.0";
-
-	public static final String IEPD_VERSION_PROPERTY = "IEPDVersion";
-
-	private static final long serialVersionUID = 1L;
 
 	/**
 	 * initialize IEPD properties
@@ -304,28 +305,28 @@ class ConfigurationDialog extends JDialog {
 		fieldLayout.gridy = 0;
 		modelPanel.add(htmlPanel, fieldLayout);
 
-		ConfigurationDialog.FilePanel xsdPanel = new FilePanel("Directory", properties.getProperty("xsdDir"),
+		ConfigurationDialog.FilePanel xsdPanel = new FilePanel("Directory", properties.getProperty("xsdDir", root.propertyValue("html dir")),
 				fieldColumns, JFileChooser.DIRECTORIES_ONLY);
 		ConfigurationDialog.ToggleBox xsdBox = new ToggleBox("XML", root.propertyValue("exportXML"), xsdPanel);
 		modelPanel.add(xsdBox, labelLayout);
 		fieldLayout.gridy = 1;
 		modelPanel.add(xsdPanel, fieldLayout);
 
-		ConfigurationDialog.FilePanel wsdlPanel = new FilePanel("Directory", properties.getProperty("wsdlDir"),
+		ConfigurationDialog.FilePanel wsdlPanel = new FilePanel("Directory", properties.getProperty("wsdlDir", root.propertyValue("html dir")),
 				fieldColumns, JFileChooser.DIRECTORIES_ONLY);
 		ConfigurationDialog.ToggleBox wsdlBox = new ToggleBox("WSDL", root.propertyValue("exportWSDL"), wsdlPanel);
 		modelPanel.add(wsdlBox, labelLayout);
 		fieldLayout.gridy = 2;
 		modelPanel.add(wsdlPanel, fieldLayout);
 
-		ConfigurationDialog.FilePanel jsonPanel = new FilePanel("Directory", properties.getProperty("jsonDir"),
+		ConfigurationDialog.FilePanel jsonPanel = new FilePanel("Directory", properties.getProperty("jsonDir", root.propertyValue("html dir")),
 				fieldColumns, JFileChooser.DIRECTORIES_ONLY);
 		ConfigurationDialog.ToggleBox jsonBox = new ToggleBox("JSON", root.propertyValue("exportJSON"), jsonPanel);
 		modelPanel.add(jsonBox, labelLayout);
 		fieldLayout.gridy = 3;
 		modelPanel.add(jsonPanel, fieldLayout);
 
-		ConfigurationDialog.FilePanel openapiPanel = new FilePanel("Directory", properties.getProperty("openapiDir"),
+		ConfigurationDialog.FilePanel openapiPanel = new FilePanel("Directory", properties.getProperty("openapiDir", root.propertyValue("html dir")),
 				fieldColumns, JFileChooser.DIRECTORIES_ONLY);
 		ConfigurationDialog.ToggleBox openapiBox = new ToggleBox("OpenAPI", root.propertyValue("exportOpenAPI"),
 				openapiPanel);
@@ -388,46 +389,58 @@ class ConfigurationDialog extends JDialog {
 		// show frame
 		setVisible(true);
 
-		// save model values
-		root.set_PropertyValue("html dir", htmlPanel.value);
-		root.set_PropertyValue("exportHTML", String.valueOf(htmlBox.isSelected()));
-		root.set_PropertyValue("exportXML", String.valueOf(xsdBox.isSelected()));
-		root.set_PropertyValue("exportWSDL", String.valueOf(wsdlBox.isSelected()));
-		root.set_PropertyValue("exportJSON", String.valueOf(jsonBox.isSelected()));
-		root.set_PropertyValue("exportOpenAPI", String.valueOf(openapiBox.isSelected()));
-		properties.setProperty("xsdDir", xsdPanel.value);
-		properties.setProperty("wsdlDir", wsdlPanel.value);
-		properties.setProperty("jsonDir", jsonPanel.value);
-		properties.setProperty("openapiDir", openapiPanel.value);
-		LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<String>();
-		// DefaultTableModel model = table.getModel();
-		for (int i = 0; i < model.getRowCount(); i++) {
-			String prefix = model.getValueAt(i, 0).toString();
-			String namespace = model.getValueAt(i, 1).toString();
-			String url = model.getValueAt(i, 2).toString();
-			if (url != null && url.startsWith("http"))
-				try {
-					new URL(url);
-				} catch (MalformedURLException e1) {
-					Log.trace("URL " + url + " is malformed");
+		try {
+			// save model values
+			root.set_PropertyValue("html dir", htmlPanel.value);
+			root.set_PropertyValue("exportHTML", String.valueOf(htmlBox.isSelected()));
+			root.set_PropertyValue("exportXML", String.valueOf(xsdBox.isSelected()));
+			root.set_PropertyValue("exportWSDL", String.valueOf(wsdlBox.isSelected()));
+			root.set_PropertyValue("exportJSON", String.valueOf(jsonBox.isSelected()));
+			root.set_PropertyValue("exportOpenAPI", String.valueOf(openapiBox.isSelected()));
+			properties.setProperty("xsdDir", xsdPanel.value);
+			properties.setProperty("wsdlDir", wsdlPanel.value);
+			properties.setProperty("jsonDir", jsonPanel.value);
+			properties.setProperty("openapiDir", openapiPanel.value);
+			LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<String>();
+			// DefaultTableModel model = table.getModel();
+			if (model != null)
+				for (int i = 0; i < model.getRowCount(); i++) {
+					String prefix = "", namespace = "", url = "";
+					Object prefixValue = model.getValueAt(i, 0);
+					if (prefixValue != null)
+						prefix = prefixValue.toString();
+					Object namespaceValue = model.getValueAt(i, 1);
+					if (namespaceValue != null)
+						namespace = namespaceValue.toString();
+					Object urlValue = model.getValueAt(i,2);
+					if (urlValue != null)
+						url = urlValue.toString();
+					if (url.startsWith("http"))
+						try {
+							new URL(url);
+						} catch (MalformedURLException e1) {
+							Log.trace("URL " + url + " is malformed");
+						}
+					if (prefix != null && !prefix.equals("") && namespace != null && !namespace.equals("") && url != null
+							&& !url.equals(""))
+						externalSchemas2.add(prefix + "=" + namespace + "=" + url);
 				}
-			if (prefix != null && !prefix.equals("") && namespace != null && !namespace.equals("") && url != null
-					&& !url.equals(""))
-				externalSchemas2.add(prefix + "=" + namespace + "=" + url);
-		}
-		root.set_PropertyValue(ConfigurationDialog.IEPD_EXTERNAL_SCHEMAS_PROPERTY, String.join(",", externalSchemas2));
+			root.set_PropertyValue(ConfigurationDialog.IEPD_EXTERNAL_SCHEMAS_PROPERTY, String.join(",", externalSchemas2));
 
-		// save IEPD values
-		root.set_PropertyValue(ConfigurationDialog.IEPD_NAME_PROPERTY, nameField.getText());
-		root.set_PropertyValue(ConfigurationDialog.IEPD_URI_PROPERTY, uriField.getText());
-		root.set_PropertyValue(ConfigurationDialog.IEPD_VERSION_PROPERTY, versionField.getText());
-		root.set_PropertyValue(ConfigurationDialog.IEPD_STATUS_PROPERTY, statusField.getText());
-		root.set_PropertyValue(ConfigurationDialog.IEPD_ORGANIZATION_PROPERTY, organizationField.getText());
-		root.set_PropertyValue(ConfigurationDialog.IEPD_CONTACT_PROPERTY, contactField.getText());
-		root.set_PropertyValue(ConfigurationDialog.IEPD_EMAIL_PROPERTY, emailField.getText());
-		root.set_PropertyValue(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY, licenseField.getText());
-		root.set_PropertyValue(ConfigurationDialog.IEPD_TERMS_URL_PROPERTY, termsField.getText());
-		root.set_PropertyValue(ConfigurationDialog.IEPD_CHANGE_LOG_FILE_PROPERTY, changelogPanel.value);
-		root.set_PropertyValue(ConfigurationDialog.IEPD_READ_ME_FILE_PROPERTY, readmePanel.value);
+			// save IEPD values
+			root.set_PropertyValue(ConfigurationDialog.IEPD_NAME_PROPERTY, nameField.getText());
+			root.set_PropertyValue(ConfigurationDialog.IEPD_URI_PROPERTY, uriField.getText());
+			root.set_PropertyValue(ConfigurationDialog.IEPD_VERSION_PROPERTY, versionField.getText());
+			root.set_PropertyValue(ConfigurationDialog.IEPD_STATUS_PROPERTY, statusField.getText());
+			root.set_PropertyValue(ConfigurationDialog.IEPD_ORGANIZATION_PROPERTY, organizationField.getText());
+			root.set_PropertyValue(ConfigurationDialog.IEPD_CONTACT_PROPERTY, contactField.getText());
+			root.set_PropertyValue(ConfigurationDialog.IEPD_EMAIL_PROPERTY, emailField.getText());
+			root.set_PropertyValue(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY, licenseField.getText());
+			root.set_PropertyValue(ConfigurationDialog.IEPD_TERMS_URL_PROPERTY, termsField.getText());
+			root.set_PropertyValue(ConfigurationDialog.IEPD_CHANGE_LOG_FILE_PROPERTY, changelogPanel.value);
+			root.set_PropertyValue(ConfigurationDialog.IEPD_READ_ME_FILE_PROPERTY, readmePanel.value);
+		} catch (RuntimeException e1) {
+			Log.trace("ConfigurationDialog: exception " + e1.toString());
+		}
 	}
 }

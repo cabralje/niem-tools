@@ -55,6 +55,7 @@ public class NamespaceModel {
 	static Namespace addNamespace(String schemaURI) {
 		Namespace ns = new Namespace(schemaURI);
 		Namespaces.put(schemaURI, ns);
+		Log.debug("getNamespaceClassView: added namespace " + schemaURI);
 		return ns;
 	}
 
@@ -129,49 +130,48 @@ public class NamespaceModel {
 	 * prefix if doesn't exist
 	 */
 	static UmlClassView getNamespaceClassView(NiemModel model, String prefix, String schemaURI) {
-		if (schemaURI == null || prefix == null)
+		if (schemaURI == null || prefix == null) {
+			Log.trace("getNamespaceClassView: error - prefix is " + prefix + " and schemaURI is " + schemaURI);
 			return null;
-		Namespace ns = Namespaces.get(schemaURI);
-		if (ns == null) {
-			// create namespace
-			ns = new Namespace(schemaURI);
-			Namespaces.put(schemaURI, ns);
-			Log.debug("getNamespace: added namespace " + schemaURI);
 		}
+		Namespace ns = Namespaces.get(schemaURI);
+		if (ns == null)
+			// create namespace
+			ns = addNamespace(schemaURI);
+
 		String prefix2 = filterPrefix(prefix);
 		if (!Prefixes.containsKey(prefix2)) {
 			// create prefix
 			Prefixes.put(prefix2, schemaURI);
-			Log.debug("getNamespace: added prefix " + prefix2 + " for " + schemaURI);
+			Log.debug("getNamespaceClassView: added prefix " + prefix2 + " for " + schemaURI);
 		}
 		// select reference, subset or extension model
 		if (model == null)
 			model = isNiemPrefix(prefix) ? NiemUmlClass.getSubsetModel() : NiemUmlClass.getExtensionModel();
 
 		// return classview if it exists
-		if (model == NiemUmlClass.getReferenceModel()) {
-			if (ns.getReferenceClassView() != null)
-				return ns.getReferenceClassView();
-		} else if (ns.getNsClassView() != null)
-			return ns.getNsClassView();
+		UmlClassView namespaceClassView = (model == NiemUmlClass.getReferenceModel()) ? ns.getReferenceClassView() : ns.getNsClassView();	
+		if (namespaceClassView != null)
+			return namespaceClassView;
 
 		// create classview
+		Log.debug("getNamespaceClassView: adding classview for prefix " + prefix2 + " and schema " + schemaURI);
 		String prefix3 = prefix2;
-		UmlClassView namespaceClassView = null;
+
 		int conflictCounter = 1;
 
 		while (namespaceClassView == null) {
 			try {
 				namespaceClassView = UmlClassView.create(model.getModelPackage(), prefix3);
 			} catch (Exception e) {
-				Log.trace("getNamespace: multiple namespace URIs for prefix " + prefix3 + " " + schemaURI + " and "
+				Log.trace("getNamespaceClassView: multiple namespace URIs for prefix " + prefix3 + " " + schemaURI + " and "
 						+ Prefixes.get(prefix2));
 				prefix3 = prefix2 + conflictCounter;
 				conflictCounter++;
 			}
 		}
 		namespaceClassView.set_PropertyValue(NiemModel.URI_PROPERTY, schemaURI);
-		// trace("getNamespace: added class view " + namespaceClassView.name());
+		Log.debug("getNamespaceClassView: added class view " + namespaceClassView.name());
 
 		if (prefix != null)
 			namespaceClassView.set_PropertyValue(NiemUmlClass.PREFIX_PROPERTY, prefix2);
@@ -261,32 +261,48 @@ public class NamespaceModel {
 	
 	/** import namespaces and return target namespace */
 	static Namespace importNamespaces(Document doc) {
-		NamedNodeMap nslist = doc.getDocumentElement().getAttributes();
-		for (int nsIndex = 0; nsIndex < nslist.getLength(); nsIndex++) {
-			Node attributeNode = nslist.item(nsIndex);
-			String attributeNodeName = attributeNode.getNodeName();
-			if (attributeNodeName.startsWith(NAMESPACE_ATTRIBUTE)) {
-				String prefix = (attributeNodeName.equals(NAMESPACE_ATTRIBUTE)) ? attributeNode.getNodeValue()
-						: attributeNodeName.substring(6);
-				getNamespaceClassView(NiemUmlClass.getReferenceModel(), prefix, attributeNode.getNodeValue());
-			}
-		}
-
-		String schemaURI = null;
+		
+		// get target namespace
 		Namespace ns = null;
+		String targetSchemaURI=null;
 		try {
-			// get target namespace
-			schemaURI = xPath.evaluate("xs:schema/@targetNamespace", doc);
-			// schemaURI = doc.lookupNamespaceURI(null);
-			ns = Namespaces.get(schemaURI);
-			if (ns == null)
-				return Namespaces.get(NiemModel.LOCAL_PREFIX);
-			// set namespace description
-			ns.getReferenceClassView()
-			.set_Description(xPath.evaluate("xs:schema/xs:annotation[1]/xs:documentation[1]", doc));
+			xPath.setNamespaceContext(new NamespaceResolver(doc, true));
+			targetSchemaURI = xPath.evaluate("xs:schema/@targetNamespace", doc);
+			if (targetSchemaURI == null)
+				targetSchemaURI = NiemModel.LOCAL_URI;
+			Log.debug("importNamespaces: target schema URI " + targetSchemaURI);
+			
+			// create namespaces and classviews
+			NamedNodeMap nslist = doc.getDocumentElement().getAttributes();
+			for (int nsIndex = 0; nsIndex < nslist.getLength(); nsIndex++) {
+				Node attributeNode = nslist.item(nsIndex);
+				String attributeNodeName = attributeNode.getNodeName();
+				String schemaURI = attributeNode.getNodeValue();
+				// parser filters "xml" namespace definition so it is hardcoded
+				if (schemaURI.equals(NiemModel.XML_URI))
+					attributeNodeName = NAMESPACE_ATTRIBUTE + NAMESPACE_DELIMITER + NiemModel.XML_PREFIX;
+				Log.debug("importNamespaces: processing attribute " + attributeNodeName);
+				if (attributeNodeName.startsWith(NAMESPACE_ATTRIBUTE) && !attributeNodeName.equals(NAMESPACE_ATTRIBUTE)) {
+
+					String prefix = attributeNodeName.substring(6);
+					UmlClassView classView = getNamespaceClassView(NiemUmlClass.getReferenceModel(), prefix, schemaURI);
+					
+					// get target namespace description
+					if (schemaURI.equals(targetSchemaURI) && classView != null)
+						classView.set_Description(xPath.evaluate("xs:schema/xs:annotation[1]/xs:documentation[1]", doc));
+				}
+			}
+			ns = getNamespace(targetSchemaURI);
+			if (ns == null) {
+				UmlClassView classView = getNamespaceClassView(NiemUmlClass.getReferenceModel(), targetSchemaURI, targetSchemaURI);
+				ns = getNamespace(targetSchemaURI);
+				if (classView != null)
+					classView.set_Description(xPath.evaluate("xs:schema/xs:annotation[1]/xs:documentation[1]", doc));
+			}
 		} catch (Exception e) {
-			Log.trace("importNamespaces: error " + e.toString());
-		}
+			Log.trace("importNamespaces: error - could not create namespace for schema " + targetSchemaURI);
+		} 
+		
 		return ns;
 	}
 

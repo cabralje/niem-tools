@@ -508,8 +508,7 @@ public class JsonWriter {
 		return typeSchema;
 	}
 
-	/** exports OpenAPI/Swagger 2.0 service definition 
-	 * @param jsonDefinitions TODO*/
+	/** exports OpenAPI/Swagger 2.0 service definition */
 	void exportOpenApi(String openapiDir, Map<String, UmlClass> ports, Set<String> messageNamespaces, TreeSet<String> jsonDefinitions) throws IOException {
 
 		// export JSON-LD namespace definitions
