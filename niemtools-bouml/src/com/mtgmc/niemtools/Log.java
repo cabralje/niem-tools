@@ -5,8 +5,8 @@ import fr.bouml.UmlCom;
 public class Log {
 
 	// Debugging options
-	private static Boolean _DEBUG = true;
-	//private static final Boolean _DEBUG = false;
+	//private static Boolean _DEBUG = true;
+	private static final Boolean _DEBUG = false;
 
 	/** outputs debugging information */
 	static void debug(String output) {
