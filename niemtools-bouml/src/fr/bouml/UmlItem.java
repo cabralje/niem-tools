@@ -1,11 +1,21 @@
 package fr.bouml;
 
-import java.util.*;
-import java.io.*;
-import javax.swing.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
-import com.mtgmc.niemtools.Log;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+
 import com.mtgmc.niemtools.NiemUmlClass;
+
+
+
 /**
  *  This class is a mother class for all the other Uml* classes, this
  *  allows to generalize their management, declare virtual operations etc ...
@@ -333,7 +343,7 @@ public void memo_ref() {
   }
 
   public static void generate_indexes() throws IOException
-  {
+  {		
 	NiemUmlClass.hideReferenceModel();
 		
     UmlClass.generate_index();
@@ -1045,7 +1055,7 @@ private static void sort(Vector v, int low, int high)
 	//  added operations to support sorting
 
 	public void sort() {
-		Log.trace("target not allowed, must be a <i>package</i>, any <i>view</i> or a <i>use case</i>");
+		UmlCom.trace("target not allowed, must be a <i>package</i>, any <i>view</i> or a <i>use case</i>");
 	}
 
 	public int orderWeight() {

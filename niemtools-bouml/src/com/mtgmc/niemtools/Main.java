@@ -46,6 +46,7 @@ class Main
 
 	public static void main(String argv[])
 	{
+		Log.start("main");
 		try
 		{
 			// Set System L&F
@@ -71,10 +72,12 @@ class Main
 				UmlPackage root = UmlBasePackage.getProject();
 				String propFile = System.getProperty("user.home") + "/" + root.name() + ".properties";
 
+				Log.start("memo_ref");
 				UmlCom.message("Memorize references ...");
 				UmlItem target = UmlCom.targetItem();
 				target.memo_ref();
-
+				Log.stop("memo_ref");
+				
 				// create PIM and PSM
 				NiemUmlClass niemTools = new NiemUmlClass();
 
@@ -121,7 +124,6 @@ class Main
 						break;
 					niemTools.cacheModels(false);
 					generateModels(root, target, niemTools, properties);
-					break;
 				}
 				// store properties
 				try {
@@ -134,24 +136,20 @@ class Main
 				{
 					Log.trace("Unable to write properties to " + propFile);
 				}
-				Log.trace("Done");
-				UmlCom.message("");
+
 			}
 			catch (IOException e)
 			{
 				Log.trace("IOException: " + e.getMessage());
-				UmlCom.bye(0);
-				UmlCom.close();
-				return;
 			}
 			catch (RuntimeException re)
 			{
 				Log.trace("RuntimeException: " + re.getMessage());
-				UmlCom.bye(0);
-				UmlCom.close();
-				return;
 			}
 			finally {
+				Log.trace("Done");
+				UmlCom.message("");
+				Log.stop("main");
 				// must be called to cleanly inform that all is done
 				UmlCom.bye(0);
 				UmlCom.close();
@@ -162,6 +160,7 @@ class Main
 
 	private static void generateModels(UmlPackage root, UmlItem target, NiemUmlClass niemTools, Properties properties)
 			throws IOException {
+		Log.start("generateModels");
 		// Generate UML Model HTML documentation
 		if (root.propertyValue("exportHTML").equals("true"))
 		{
@@ -172,13 +171,17 @@ class Main
 			//target.set_dir(0,null);
 			UmlItem.frame();
 			UmlCom.message("Indexes ...");
+			Log.start("generate_indexes");
 			UmlItem.generate_indexes();
+			Log.stop("generate_indexes");
 			UmlItem.start_file("index", target.name() + "\nDocumentation", false);
 			target.html(null, 0, 0);
 			UmlItem.end_file();
 			UmlItem.start_file("navig", null, true);
 			UmlItem.end_file();
-			UmlClass.generate(); 
+			Log.start("generate");
+			UmlClass.generate();
+			Log.stop("generate");
 		}
 
 		// Generate NIEM Mapping HTML
@@ -205,9 +208,11 @@ class Main
 		String jsonDir = (root.propertyValue("exportJSON").equals("true")) ? properties.getProperty("jsonDir") : null;
 		String openapiDir = (root.propertyValue("exportOpenAPI").equals("true")) ? properties.getProperty("openapiDir") : null;
 		niemTools.exportIEPD(xsdDir, wsdlDir, jsonDir, openapiDir);
+		Log.stop("generateModels");
 	}
 
 	private static void importMapping(UmlPackage root, NiemUmlClass niemTools) {
+		Log.start("importMapping");
 		niemTools.deleteMapping();
 		JFileChooser fc2 = new JFileChooser(root.propertyValue("html dir"));
 		fc2.setFileFilter(new FileNameExtensionFilter("CSV file","csv"));
@@ -216,9 +221,11 @@ class Main
 			return;
 		String filename = fc2.getSelectedFile().getAbsolutePath();
 		niemTools.importCsv(filename);
+		Log.stop("importMapping");
 	}
 
 	private static void importSchema(NiemUmlClass niemTools, Properties properties) throws IOException {
+		Log.start("importSchema");
 		JFileChooser fc;
 		// Create PIM
 		//NiemTools.createPIM(root);
@@ -238,5 +245,6 @@ class Main
 		niemTools.createNIEM();
 		niemTools.cacheModels(true);
 		niemTools.importSchemaDir(directory,false);
+		Log.stop("impoirtSchema");
 	}
 }

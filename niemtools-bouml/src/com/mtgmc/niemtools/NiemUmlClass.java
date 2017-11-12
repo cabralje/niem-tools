@@ -305,7 +305,8 @@ public class NiemUmlClass {
 
 	/** caches namespaces and prefixes for external schemas */
 	public void cacheModels(boolean referenceOnly) {
-		UmlCom.message("Cahcing models ...");
+		Log.start("cacheModels");
+		UmlCom.message("Caching models ...");
 		Log.trace("Caching models");
 		NamespaceModel.cacheExternalSchemas();
 		ReferenceModel.cacheModel();
@@ -314,6 +315,7 @@ public class NiemUmlClass {
 			ExtensionModel.cacheModel();
 		}
 		Log.debug("Done caching models");
+		Log.stop("cacheModels");
 	}
 
 	/** creates Platform Independent Model (NIEM) */
@@ -333,10 +335,12 @@ public class NiemUmlClass {
 	@SuppressWarnings("unchecked")
 	public void createSubsetAndExtension() {
 
+		Log.start("createSubsetAndExtension");
 		UmlCom.message("Generating NIEM subset and extension models");
 		Log.trace("Generating NIEM subset and extension models");
 
 		Iterator<UmlItem> it = (UmlItem.all.iterator());
+		Log.start("createSubsetAndExtension - add types");
 		// add types to subset and extension
 		Log.debug("createSubsetAndExtension: copy subset types and create extension types");
 		it = UmlItem.all.iterator();
@@ -373,7 +377,8 @@ public class NiemUmlClass {
 				else
 					ExtensionModel.addType(NamespaceModel.getSchemaURI(typeName), typeName, description, notes);
 		}
-
+		Log.stop("createSubsetAndExtension - add types");
+		Log.start("createSubsetAndExtension - add base types");
 		// relate extension types to base types and attribute groups
 		Log.debug("createSubsetAndExtension: copy subset base types and create extension base types");
 		it = UmlItem.all.iterator();
@@ -418,7 +423,8 @@ public class NiemUmlClass {
 			if (baseTypePrefix != null && baseTypePrefix.equals(NiemModel.XSD_PREFIX))
 				ExtensionModel.relateAttributeGroup(type, SubsetModel.getSimpleObjectAttributeGroup());
 		}
-
+		Log.stop("createSubsetAndExtension - add base types");
+		Log.start("createSubsetAndExtension - add elements");
 		// Copy subset elements and create extension elements
 		Log.debug("createSubsetAndExtension: copy subset elements and create extension elements");
 		it = UmlItem.all.iterator();
@@ -488,11 +494,13 @@ public class NiemUmlClass {
 					element.set_PropertyValue(CODELIST_PROPERTY, codeList);
 			}
 		}
-
+		Log.stop("createSubsetAndExtension - add elements");
+		
 		// Sorting
 		Log.debug("createSubsetAndExtension: sorting namespaces");
 		SubsetModel.getModelPackage().sort();
 		ExtensionModel.getModelPackage().sort();
+		Log.stop("createSubsetAndExtension");
 	}
 
 	/** deletes NIEM mappings */
@@ -549,17 +557,19 @@ public class NiemUmlClass {
 	 * roundtripping is supported with importCsv()
 	 */
 	public void exportCsv(String directory, String filename) {
-
+		Log.start("exportCsv");
 		UmlCom.message("Generating NIEM Mapping CSV ...");
 		Log.trace("Generating NIEM Mapping CSV");
 		NamespaceModel.cacheExternalSchemas();
 
 		UmlItem.directory = directory;
 		new CsvWriter().exportCsv(directory, filename);
+		Log.stop("exportCsv");
 	}
 
 	/** exports a NIEM mapping spreadsheet in HTML format */
 	public void exportHtml(String directory, String filename) {
+		Log.start("exportHtml");
 
 		HtmlWriter htmlWriter = new HtmlWriter();
 
@@ -569,12 +579,15 @@ public class NiemUmlClass {
 		// cache NIEM namespaces, elements and types
 		// cacheModel(referencePackage);
 		htmlWriter.exportHtml(directory, filename);
+		Log.stop("exportHtml");
 	}
 
 	/** exports a NIEM IEPD including extension and exchange schema */
 	@SuppressWarnings("unchecked")
 	public void exportIEPD(String xmlDir, String wsdlDir, String jsonDir, String openapiDir) {
 
+		Log.start("exportIEPD");
+		
 		XmlWriter xmlWriter = new XmlWriter(xmlDir);
 		JsonWriter jsonWriter = new JsonWriter(jsonDir);
 		TreeSet<String> jsonDefinitions = new TreeSet<String>();
@@ -697,6 +710,7 @@ public class NiemUmlClass {
 			} catch (Exception e) {
 				Log.trace("exportIEPD: error exporting OpenAPI files " + e.toString());
 			}
+		Log.stop("exportIEPD");
 	}
 
 	/**
@@ -704,6 +718,7 @@ public class NiemUmlClass {
 	 */
 	public void exportWantlist(String dir, String filename) {
 
+		Log.start("exportWantlist");
 		UmlCom.message("Generating NIEM Wantlist ...");
 		Log.trace("Generating NIEM Wantlist");
 		XmlWriter xmlWriter = new XmlWriter(dir);
@@ -840,6 +855,7 @@ public class NiemUmlClass {
 		} catch (IOException e) {
 			Log.trace("exportWantlist: IO exception: " + e.toString());
 		}
+		Log.stop("exportWantlist");
 	}
 
 	/** return NIEM version */
