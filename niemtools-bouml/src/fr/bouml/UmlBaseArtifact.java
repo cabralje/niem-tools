@@ -46,18 +46,19 @@ abstract class UmlBaseArtifact extends UmlItem {
   }
 
   /**
-   *  returns (in Java a copy of) the optional associated classes
+   *  returns (in Java a copy of) the optional associated elements
+   *  (classes or UmlExtraDefinition)
    *  significant when the artifact is stereotyped <<source>>
    */
-  public UmlClass[] associatedClasses() {
+  public UmlItem[] associatedElements() {
     read_if_needed_();
-    
-    return (UmlClass[]) _assoc_classes.clone();
+  
+    return (UmlItem[]) _assoc_elems.clone();
   }
 
   /**
-   *  adds 'cl' at the end of the associated classes list, returns false
-   *  if 'cl' is already an associate class.
+   *  adds 'cl' at the end of the associated element list,
+   *  returns false if 'cl' is already an associate class
    *  significant when the artifact is stereotyped <<source>>
    * 
    *  On error return FALSE in C++, produce a RuntimeException in Java
@@ -68,15 +69,15 @@ abstract class UmlBaseArtifact extends UmlItem {
     
     if (defined_()) {
       // code compatible with old Java versions
-      int n = _assoc_classes.length;
-      UmlClass[] a = new UmlClass[n + 1];
+      int n = _assoc_elems.length;
+      UmlItem[] a = new UmlItem[n + 1];
       
       a[n] = cl;
       
       while (n-- != 0)
-        a[n] = _assoc_classes[n];
+        a[n] = _assoc_elems[n];
       
-      _assoc_classes = a;
+      _assoc_elems = a;
     }
   }
 
@@ -92,17 +93,17 @@ abstract class UmlBaseArtifact extends UmlItem {
     
     if (defined_()) {
       // code compatible with old Java versions
-      int n = _assoc_classes.length;
-      UmlClass[] a = new UmlClass[n - 1];
+      int n = _assoc_elems.length;
+      UmlItem[] a = new UmlItem[n - 1];
       int i;
       
-      for (i = 0; _assoc_classes[i] != cl; i += 1)
-        a[i] = _assoc_classes[i];
+      for (i = 0; _assoc_elems[i] != cl; i += 1)
+        a[i] = _assoc_elems[i];
       
       while (++i != n)
-        a[i - 1] = _assoc_classes[i];
+        a[i - 1] = _assoc_elems[i];
       
-      _assoc_classes = a;
+      _assoc_elems = a;
     }
   }
 
@@ -112,11 +113,21 @@ abstract class UmlBaseArtifact extends UmlItem {
    * 
    *  On error return FALSE in C++, produce a RuntimeException in Java
    */
-  public void set_AssociatedClasses(UmlClass[] l) throws RuntimeException {
+  public void set_AssociatedElements(UmlItem[] l) throws RuntimeException {
+    for (int i = 0; i != l.length; i += 1) {
+      switch (l[i].kind().value()) {
+      case anItemKind._aClass:
+      case anItemKind._anExtraArtifactDefinition:
+        break;
+      default:
+        throw new RuntimeException("elements must be a class or an extra artifact definition");
+      }
+    }
+  
     UmlCom.send_cmd(identifier_(), OnInstanceCmd.setAssocClassesCmd, l);
     UmlCom.check();
     
-    _assoc_classes = (UmlClass[]) l.clone();
+    _assoc_elems = (UmlItem[]) l.clone();
   }
 
   /**
@@ -346,7 +357,7 @@ abstract class UmlBaseArtifact extends UmlItem {
    *  automatically if needed. args unused
    */
   public void unload(boolean rec, boolean del) {
-    _assoc_classes = null;
+    _assoc_elems = null;
     _associated = null;
     _cpp_h = null;
     _cpp_src = null;
@@ -359,7 +370,7 @@ abstract class UmlBaseArtifact extends UmlItem {
   }
 
   private UmlDeploymentDiagram _assoc_diagram;
-  private UmlClass[] _assoc_classes;
+  private UmlItem[] _assoc_elems;
   private UmlArtifact[] _associated;
 
   private String _cpp_h;
@@ -379,10 +390,10 @@ abstract class UmlBaseArtifact extends UmlItem {
     int index;
     
     n = UmlCom.read_unsigned();
-    _assoc_classes = new UmlClass[n];
+    _assoc_elems = new UmlClass[n];
     
     for (index = 0; index != n; index += 1)
-      _assoc_classes[index] = (UmlClass) UmlBaseItem.read_();
+      _assoc_elems[index] = UmlBaseItem.read_();
     
     n = UmlCom.read_unsigned();
     _associated = new UmlArtifact[n];

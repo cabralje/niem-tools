@@ -92,7 +92,7 @@ public void memo_ref() {
 	  
 	if (!known)
 		return;
-	
+		
     UmlCom.message(name());
     
     if (stereotype().equals("stereotype"))
@@ -441,9 +441,9 @@ private void add_inherited_opers(Vector ops) {
     unload(true, false);
   }
 
-protected Vector inherited_opers;
+  protected Vector inherited_opers;
 
-public static Vector classes;
+  public static Vector classes;
 
   static { classes = new Vector(); }
   /**

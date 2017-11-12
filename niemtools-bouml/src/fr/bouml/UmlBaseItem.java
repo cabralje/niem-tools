@@ -20,7 +20,6 @@ import java.util.*;
  *  parts are declared 'private' rather than 'public' or 'protected'.
  */
 @SuppressWarnings("rawtypes")
-public
 abstract class UmlBaseItem {
   /**
    *  return a constant identifier, it is unique within a given
@@ -650,6 +649,8 @@ protected void read_uml_() {
         return new UmlRaiseExceptionAction(id, name);
       case anItemKind._aReduceAction:
         return new UmlReduceAction(id, name);
+      case anItemKind._anExtraArtifactDefinition:
+        return new UmlExtraArtifactDefinition(id, name);
       default:
         UmlCom.bye(-1);
         UmlCom.fatal_error(new String("unknown item type ") + String.valueOf(kind));

@@ -160,6 +160,8 @@ public final class anItemKind {
   public static final anItemKind aJoinActivityNode = new anItemKind(_aJoinActivityNode);
   public static final int _aClassInstance = 77;
   public static final anItemKind aClassInstance = new anItemKind(_aClassInstance);
+  public static final int _anExtraArtifactDefinition = 78;
+  public static final anItemKind anExtraArtifactDefinition = new anItemKind(_anExtraArtifactDefinition);
 
   private int value;
 
@@ -247,6 +249,7 @@ public final class anItemKind {
     case _aForkActivityNode: return aForkActivityNode;
     case _aJoinActivityNode: return aJoinActivityNode;
     case _aClassInstance: return aClassInstance;
+    case _anExtraArtifactDefinition: return anExtraArtifactDefinition;
     default: throw new Error();
     }
   }

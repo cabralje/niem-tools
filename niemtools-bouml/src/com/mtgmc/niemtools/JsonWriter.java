@@ -542,7 +542,10 @@ public class JsonWriter {
 					LinkedHashSet<String> openapiResponses = new LinkedHashSet<String>();
 					UmlOperation operation = (UmlOperation) item;
 					String operationName = operation.name();
-					String httpMethod = operation.propertyValue(JsonWriter.HTTP_METHODS_PROPERTY).toLowerCase();
+					String httpMethod = operation.propertyValue(JsonWriter.HTTP_METHODS_PROPERTY);
+					if (httpMethod == null)
+						continue;
+					httpMethod = httpMethod.toLowerCase();
 
 					Log.debug("exportOpenAPI: generating document/literal input wrapper for " + portName + "/"
 							+ operationName);

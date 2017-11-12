@@ -33,7 +33,7 @@ public void memo_ref() {
    generate_index(diagrams, "State Diagram", "statediagrams");
   }
 
-  protected static Vector diagrams;
+protected static Vector diagrams;
 
   static { diagrams = new Vector(); }  /**
    *   the constructor, do not call it yourself !!!!!!!!!!

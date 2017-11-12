@@ -1,6 +1,5 @@
 package fr.bouml;
 
-// import java.util.*;
 /**
  *  this class manages use case references
  */

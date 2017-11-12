@@ -38,7 +38,15 @@ class UmlExtraClassMember extends UmlBaseExtraClassMember {
       s = cppDecl();
       
       if (s.length() != 0) {
-        fw.write("<li>C++ : <pre>\n");
+        fw.write("<li>C++  (decl): <pre>\n");
+        writeq(s);
+        fw.write("</pre></li>");
+      }
+      
+      s = cppDef();
+      
+      if (s.length() != 0) {
+        fw.write("<li>C++  (def): <pre>\n");
         writeq(s);
         fw.write("</pre></li>");
       }
@@ -47,6 +55,22 @@ class UmlExtraClassMember extends UmlBaseExtraClassMember {
       
       if (s.length() != 0) {
         fw.write("<li>Java : <pre>\n");
+        writeq(s);
+        fw.write("</pre></li>");
+      }
+      
+      s = phpDecl();
+      
+      if (s.length() != 0) {
+        fw.write("<li>Php : <pre>\n");
+        writeq(s);
+        fw.write("</pre></li>");
+      }
+      
+      s = pythonDecl();
+      
+      if (s.length() != 0) {
+        fw.write("<li>Python : <pre>\n");
         writeq(s);
         fw.write("</pre></li>");
       }

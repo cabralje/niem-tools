@@ -1,6 +1,5 @@
 package fr.bouml;
-import java.io.*;
-// import java.util.*;
+import java.io.IOException;
 
 
 class UmlActivityPartition extends UmlBaseActivityPartition implements UmlActivityItem {

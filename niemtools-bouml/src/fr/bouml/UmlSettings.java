@@ -196,7 +196,7 @@ protected static Hashtable _map_relation_attribute_stereotypes;
   @SuppressWarnings("rawtypes")
 protected static Hashtable _map_class_stereotypes;
   protected static UmlStereotype[] _class_stereotypes;
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({ "rawtypes", "unchecked" })
 protected static void read_()
   {
     int n;

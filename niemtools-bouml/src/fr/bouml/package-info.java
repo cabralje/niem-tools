@@ -2,7 +2,7 @@
  * 
  */
 /**
- * @author Bruno Pagès
+ * @author Bruno Pages
  *
  */
 package fr.bouml;

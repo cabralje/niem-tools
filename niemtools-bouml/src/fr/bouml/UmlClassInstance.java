@@ -1,6 +1,5 @@
 package fr.bouml;
-import java.io.*;
-// import java.util.*;
+import java.io.IOException;
 
 
 public class UmlClassInstance extends UmlBaseClassInstance {

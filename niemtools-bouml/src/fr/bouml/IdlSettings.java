@@ -818,7 +818,7 @@ public static void set_Include(String s, String v) throws RuntimeException
   private static String _ext;
   @SuppressWarnings("rawtypes")
 private static Hashtable _map_includes;
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({ "unchecked", "rawtypes" })
 protected static void read_()
   {
     _root = UmlCom.read_string();

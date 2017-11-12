@@ -52,7 +52,7 @@ public class UmlCom {
       p_buffer_out = 4/*bytes for length*/;
   
       // send API version
-      write_unsigned(62);
+      write_unsigned(64);
       flush();
     }
     catch (Exception e) {

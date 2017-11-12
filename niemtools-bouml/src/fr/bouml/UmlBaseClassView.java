@@ -3,7 +3,7 @@ package fr.bouml;
 /**
  *  Manage the class views
  */
-public abstract class UmlBaseClassView extends UmlView {
+abstract class UmlBaseClassView extends UmlView {
   /**
    *  returns a new class view named 'name' created under 'parent'
    * 

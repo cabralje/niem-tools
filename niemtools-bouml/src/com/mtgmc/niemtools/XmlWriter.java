@@ -375,6 +375,8 @@ public class XmlWriter {
 		}
 
 		// export message wrapper
+		Namespace ns = NamespaceModel.addNamespace(WRAPPERURI);
+		ns.setFilepath(WRAPPER_PREFIX + XSD_FILE_TYPE);
 		NamespaceModel.addPrefix(WRAPPER_PREFIX, WRAPPERURI);
 		messageNamespaces.add(WRAPPER_PREFIX);
 		String filename = Paths.get(directory, MESSAGE_WRAPPERS_FILE_NAME + XmlWriter.XSD_FILE_TYPE).toString();

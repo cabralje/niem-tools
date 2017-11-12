@@ -29,7 +29,7 @@ class UmlBaseCollaborationDiagramDefinition {
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
 public void read_() {
-	Hashtable instances;
+    Hashtable instances;
     int n;
     int rank;
   

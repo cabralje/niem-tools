@@ -7,9 +7,10 @@ import java.awt.event.*;
  * Java doesn't define a simple Dialog just to ask to a question :-((
  * this one is defined here
  */
-@SuppressWarnings({ "serial" , "deprecation"})
+@SuppressWarnings("serial")
 class ConfirmBox extends Dialog implements ActionListener{
-  public ConfirmBox(String msg) {
+  @SuppressWarnings("deprecation")
+public ConfirmBox(String msg) {
     super(new Frame(), "Html generator", true);
     setLayout(new BorderLayout());
     add("Center", new Label(msg));

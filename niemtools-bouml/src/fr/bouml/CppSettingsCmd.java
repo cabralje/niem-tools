@@ -118,6 +118,10 @@ final class CppSettingsCmd {
   public static final CppSettingsCmd setCppOperationForceNoexceptCmd = new CppSettingsCmd(_setCppOperationForceNoexceptCmd);
   public static final int _setCppTypeUsedByValueForceItsIncludesInHeaderCmd = 56;
   public static final CppSettingsCmd setCppTypeUsedByValueForceItsIncludesInHeaderCmd = new CppSettingsCmd(_setCppTypeUsedByValueForceItsIncludesInHeaderCmd);
+  public static final int _setCppHeaderAdditionalExtensionsCmd = 57;
+  public static final CppSettingsCmd setCppHeaderAdditionalExtensionsCmd = new CppSettingsCmd(_setCppHeaderAdditionalExtensionsCmd);
+  public static final int _setCppSourceAdditionalExtensionsCmd = 58;
+  public static final CppSettingsCmd setCppSourceAdditionalExtensionsCmd = new CppSettingsCmd(_setCppSourceAdditionalExtensionsCmd);
 
   private int value;
 
@@ -184,6 +188,8 @@ final class CppSettingsCmd {
     case _setCppTemplateTypedefDeclCmd: return setCppTemplateTypedefDeclCmd;
     case _setCppOperationForceNoexceptCmd: return setCppOperationForceNoexceptCmd;
     case _setCppTypeUsedByValueForceItsIncludesInHeaderCmd: return setCppTypeUsedByValueForceItsIncludesInHeaderCmd;
+    case _setCppHeaderAdditionalExtensionsCmd: return setCppHeaderAdditionalExtensionsCmd;
+    case _setCppSourceAdditionalExtensionsCmd: return setCppSourceAdditionalExtensionsCmd;
     default: throw new Error();
     }
   }

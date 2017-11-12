@@ -1,7 +1,5 @@
 package fr.bouml;
 
-// import java.util.*;
-
 /**
  *   Manage the class's attributs
  */

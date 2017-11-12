@@ -1,7 +1,6 @@
 package fr.bouml;
 
-import java.io.*;
-// import java.util.*;
+import java.io.IOException;
 
 class UmlActivityObject extends UmlBaseActivityObject {
   /**

@@ -26,7 +26,8 @@ class UmlBaseCollaborationMessage extends UmlMessage {
   /**
    *  internal, don't call it
    */
-  public void read_(@SuppressWarnings("rawtypes") Hashtable instances) {
+  @SuppressWarnings("rawtypes")
+public void read_(Hashtable instances) {
     super.read_(instances);
     _rank = UmlCom.read_unsigned();
     _hrank = UmlCom.read_string();

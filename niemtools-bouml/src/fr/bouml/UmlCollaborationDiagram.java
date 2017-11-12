@@ -43,6 +43,6 @@ public void memo_ref() {
     generate_index(diagrams, "Collaboration Diagram", "collaborationdiagrams");
   }
 
-protected static Vector diagrams;
+  protected static Vector diagrams;
 
   static { diagrams = new Vector(); }};

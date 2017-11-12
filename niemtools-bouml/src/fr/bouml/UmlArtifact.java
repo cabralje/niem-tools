@@ -23,11 +23,11 @@ class UmlArtifact extends UmlBaseArtifact {
     
     if (stereotype().equals("source")) {
       fw.write("<p>Artifact <i>source</i>");
-      l = associatedClasses();
+      l = associatedElements();
     }
     else if (stereotype().equals("database")) {
       fw.write("<p>Artifact <i>database</i>");
-      l = associatedClasses();
+      l = associatedElements();
     }
     else {
       fw.write("<p><i>");
@@ -45,6 +45,26 @@ class UmlArtifact extends UmlBaseArtifact {
     }
   
     fw.write("</p>\n");
+    
+    UmlItem[] ch = children();
+    
+    if (ch.length != 0) {
+      String spfix = (rank == 0)
+        ? ""
+        : (pfix + String.valueOf(rank) + ".");
+      
+      level += 1;
+      rank = 1;
+      fw.write("<div class=\"sub\">\n");    
+      for (int i = 0; i != ch.length; i += 1) {
+        if (ch[i].kind() == anItemKind.anExtraArtifactDefinition) {
+  	ch[i].html(spfix, rank, level);
+  	if (ch[i].chapterp())
+  	  rank += 1;
+        }
+      }
+      fw.write("</div>\n");
+    }
   
     unload(false, false);
   }

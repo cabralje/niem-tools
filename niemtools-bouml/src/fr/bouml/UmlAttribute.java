@@ -755,6 +755,6 @@ public void memo_ref() {
       fw.write("()");
   }
 
-public static Vector attrs;
+  public static Vector attrs;
 
   static { attrs = new Vector(); }};

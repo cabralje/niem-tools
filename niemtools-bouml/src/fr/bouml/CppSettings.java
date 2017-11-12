@@ -314,6 +314,31 @@ public static void set_Include(String s, String v) throws RuntimeException
   }
 
   /**
+   *  returns the additional extensions of the header files
+   *  reversed in C++
+   */
+  public static String headerAdditionalExtensions()
+  {
+    read_if_needed_();
+  
+    return _h_add_ext;
+  }
+
+  /**
+   *  set the additional extensions of the header files
+   *  reversed in C++
+   * 
+   *  On error : return FALSE in C++, produce a RuntimeException in Java
+   */
+  public static void set_HeaderAdditionalExtensions(String v) throws RuntimeException
+  {
+    UmlCom.send_cmd(CmdFamily.cppSettingsCmd, CppSettingsCmd._setCppHeaderAdditionalExtensionsCmd, v);
+    UmlCom.check();
+  
+    _h_add_ext = v;
+  }
+
+  /**
    *  returns the extension of the source files produced by the
    *  C++ code generator
    */
@@ -337,6 +362,31 @@ public static void set_Include(String s, String v) throws RuntimeException
     
     _src_ext = v;
   
+  }
+
+  /**
+   *  returns the additional extensions of the source files
+   *  reversed in C++
+   */
+  public static String sourceAdditionalExtensions()
+  {
+    read_if_needed_();
+  
+    return _h_add_ext;
+  }
+
+  /**
+   *  set the additional extensions of the source files
+   *  reversed in C++
+   * 
+   *  On error : return FALSE in C++, produce a RuntimeException in Java
+   */
+  public static void set_SourceAdditionalExtensions(String v) throws RuntimeException
+  {
+    UmlCom.send_cmd(CmdFamily.cppSettingsCmd, CppSettingsCmd._setCppSourceAdditionalExtensionsCmd, v);
+    UmlCom.check();
+  
+    _h_add_ext = v;
   }
 
   /**
@@ -1689,7 +1739,12 @@ public static void set_Include(String s, String v) throws RuntimeException
   private static String _h_content;
   private static String _src_content;
   private static String _h_ext;
+  private static String _h_add_ext;
+
   private static String _src_ext;
+  @SuppressWarnings("unused")
+private static String _src_add_ext;
+
   private static String _dir_regexp;
 
   private static boolean _dir_regexp_case_sensitive;
@@ -1761,6 +1816,8 @@ protected static void read_()
     _src_content = UmlCom.read_string();
     _h_ext = UmlCom.read_string();
     _src_ext = UmlCom.read_string();
+    UmlCom.read_string(); // cpp_h_add_extensions
+    UmlCom.read_string(); // cpp_src_add_extensions
     _incl_with_path = UmlCom.read_bool();
   
     _in = UmlCom.read_string();
