@@ -97,6 +97,12 @@ class ConfigurationDialog extends JDialog {
 		private static final long serialVersionUID = 1L;
 		String value = "";
 
+		/**
+		 * @param name
+		 * @param initialValue
+		 * @param columns
+		 * @param fileType
+		 */
 		FilePanel(String name, String initialValue, int columns, int fileType) {
 
 			if (initialValue != null)
@@ -135,13 +141,18 @@ class ConfigurationDialog extends JDialog {
 
 		private static final long serialVersionUID = 1L;
 
+		/**
+		 * 
+		 */
 		LineWrapCellRenderer() {
 			setLineWrap(true);
 			setWrapStyleWord(true);
 			setFont(new Font(Font.DIALOG, Font.PLAIN, 25));
 		}
 
-		@Override
+		/* (non-Javadoc)
+		 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
+		 */
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column) {
 			if (value != null)
@@ -158,6 +169,11 @@ class ConfigurationDialog extends JDialog {
 
 		private static final long serialVersionUID = 1L;
 
+		/**
+		 * @param name
+		 * @param initialValue
+		 * @param panel
+		 */
 		ToggleBox(String name, String initialValue, JPanel panel) {
 			super(name, (initialValue == null || !initialValue.equals("false")));
 			panel.setVisible(this.isSelected());
@@ -191,12 +207,20 @@ class ConfigurationDialog extends JDialog {
 	}
 
 	/** sets a project property */
+	/**
+	 * @param propertyName
+	 * @param propertyValue
+	 */
 	static void setPropertyDefault(String propertyName, String propertyValue) {
 		UmlPackage root = UmlPackage.getProject();
 		if (root.propertyValue(propertyName) == null)
 			root.set_PropertyValue(propertyName, propertyValue);
 	}
 
+	/**
+	 * @param root
+	 * @param properties
+	 */
 	ConfigurationDialog(UmlPackage root, Properties properties) {
 		// create dialog
 		super(new JFrame(), "Niem-tools Configuration", true);

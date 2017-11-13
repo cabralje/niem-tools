@@ -122,12 +122,17 @@ public class XmlWriter {
 
 	private String directory;
 
+	/**
+	 * @param initialDirectory
+	 */
 	public XmlWriter(String initialDirectory) {
 		super();
 		directory = initialDirectory;
 	}
 
-	/** exports a Genericode code list */
+	/** exports a Genericode code list
+	 * @param model
+	 */
 	void exportCodeLists(NiemModel model) {
 
 		String version = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_VERSION_PROPERTY);
@@ -204,7 +209,10 @@ public class XmlWriter {
 		}
 	}
 
-	/** exports a NIEM MPD catalog */
+	/** exports a NIEM MPD catalog
+	 * @param messages
+	 * @throws IOException
+	 */
 	void exportMpdCatalog(Set<String> messages)
 			throws IOException {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -284,7 +292,12 @@ public class XmlWriter {
 		Log.debug("exportMPDCatalog: done generating MPD catalog");
 	}
 
-	/** exports a WSDL definitions file */
+	/** exports a WSDL definitions file
+	 * @param wsdlDir
+	 * @param ports
+	 * @param messageNamespaces
+	 * @throws IOException
+	 */
 	void exportWsdl(String wsdlDir, Map<String, UmlClass> ports, Set<String> messageNamespaces) throws IOException {
 
 		String WSDLURI = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + WSDL_SUFFIX;
@@ -461,7 +474,9 @@ public class XmlWriter {
 		}
 	}
 
-	/** exports XML catalog file */
+	/** exports XML catalog file 
+	 * @throws IOException
+	 */
 	void exportXmlCatalog() throws IOException {
 		FileWriter xml;
 		Log.trace("Generating XML catalog");
@@ -488,7 +503,12 @@ public class XmlWriter {
 		xml.close();
 	}
 
-	/** return XML schema element in type definition */
+	/**
+	 * @param element
+	 * @param multiplicity
+	 * @param mappingNotes
+	 * @return XML schema element in type definition as a String
+	 */
 	String exportXmlElementInTypeSchema(UmlClassInstance element, String multiplicity,
 			String mappingNotes) {
 		String elementSchema = "<xs:element ref=\"" + NamespaceModel.getPrefixedName(element) + "\" minOccurs=\""
@@ -500,7 +520,10 @@ public class XmlWriter {
 		return elementSchema;
 	}
 
-	/** return XML schema element definition */
+	/**
+	 * @param element
+	 * @return XML schema element definition as a String
+	 */
 	String exportXmlElementSchema(UmlClassInstance element) {
 		String elementName = NamespaceModel.getName(element);
 		String elementSchema = "<xs:element name=\"" + elementName + "\"";
@@ -536,6 +559,13 @@ public class XmlWriter {
 		return elementSchema;
 	}
 
+	/**
+	 * @param filename
+	 * @param nsSchemaURI
+	 * @param xmlTypes
+	 * @param xmlElements
+	 * @param schemaNamespaces
+	 */
 	void exportXmlSchema(String filename, String nsSchemaURI, TreeSet<String> xmlTypes, TreeSet<String> xmlElements,
 			Set<String> schemaNamespaces) {
 		try {
@@ -607,7 +637,10 @@ public class XmlWriter {
 		}
 	}
 
-	/** return XML schema type definition */
+	/**
+	 * @param type
+	 * @return XML schema type definition as a String
+	 */
 	String exportXmlTypeSchema(UmlClass type) {
 		String typeName = NamespaceModel.getName(type);
 		String typeSchema = null;
@@ -731,7 +764,11 @@ public class XmlWriter {
 		return typeSchema;
 	}
 
-	/** writes an XML name value pair to a file */
+	/** writes an XML name value pair to a file
+	 * @param fw
+	 * @param name
+	 * @param value
+	 */
 	private void writeXmlAttribute(FileWriter fw, String name, String value) {
 		try {
 			fw.write(" " + name + "=\"" + value + "\"");
@@ -740,7 +777,11 @@ public class XmlWriter {
 		}
 	}
 
-	/** writes an XML namespace attribute to a file */
+	/** writes an XML namespace attribute to a file
+	 * @param fw
+	 * @param prefix
+	 * @param value
+	 */
 	void writeXmlNs(FileWriter fw, String prefix, String value) {
 		try {
 			if (prefix.equals(""))

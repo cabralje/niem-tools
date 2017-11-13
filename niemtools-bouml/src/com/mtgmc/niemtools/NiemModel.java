@@ -86,7 +86,19 @@ class NiemModel {
 	static final String XSD_PREFIX = "xs";
 	static final String XSD_URI = XMLConstants.W3C_XML_SCHEMA_NS_URI;
 	
-	/** return base type related to a type or element */
+	private UmlClass abstractType = null;
+	private UmlClass augmentationType = null;
+	private Map<String, UmlClassInstance> elements = new HashMap<String, UmlClassInstance>();
+	private Map<String, List<UmlClassInstance>> elementsInType = new HashMap<String, List<UmlClassInstance>>();
+	private UmlPackage modelPackage = null;
+	private UmlClass objectType = null;
+	private UmlClass simpleObjectAttributeGroup = null;
+	private Map<String, UmlClass> types = new HashMap<String, UmlClass>();
+	
+	/**
+	 * @param item
+	 * @return base type related to a type or element as a UmlClass
+	 */
 	static UmlClass getBaseType(UmlItem item) {
 		UmlClass baseType = null;
 		switch (item.kind().value()) {
@@ -122,28 +134,31 @@ class NiemModel {
 		// trace("getBaseType: base type found " + baseType.name());
 		return baseType;
 	}
-	/** return URI of a item in schemaURI with name itemName */
+	/**
+	 * @param schemaURI
+	 * @param itemName
+	 * @return URI of a item in schemaURI with name itemName as a String
+	 */
 	static String getURI(String schemaURI, String itemName) {
 		itemName.replaceAll("[^-._:A-Za-z0-9]", "");
 		return schemaURI + HASH_DELIMITER + NamespaceModel.getName(itemName).replaceAll(HASH_DELIMITER, "");
 	}
-	/** return URI of an item */
+	/**
+	 * @param item
+	 * @return URI of an item as a String
+	 */
 	static String getURI(UmlItem item) {
 		return item.propertyValue(URI_PROPERTY);
 	}
-	private UmlClass abstractType = null;
-	private UmlClass augmentationType = null;
-	private Map<String, UmlClassInstance> elements = new HashMap<String, UmlClassInstance>();
-	private Map<String, List<UmlClassInstance>> elementsInType = new HashMap<String, List<UmlClassInstance>>();
-	private UmlPackage modelPackage = null;
 
-
-
-	private UmlClass objectType = null;
-	private UmlClass simpleObjectAttributeGroup = null;
-	private Map<String, UmlClass> types = new HashMap<String, UmlClass>();
-
-	/** returns an element added to reference or extension model */
+	/**
+	 * @param elementSchemaURI
+	 * @param elementName
+	 * @param baseType
+	 * @param description
+	 * @param notes
+	 * @return an element added to reference or extension model as a UmlClassInstance
+	 */
 	UmlClassInstance addElement(String elementSchemaURI, String elementName, UmlClass baseType, String description, String notes) {
 
 		if (elementName.equals("") || elementName.equals("??"))
@@ -187,7 +202,12 @@ class NiemModel {
 		setNotes(element, notes);
 		return element;
 	}
-	/** returns an element in type added to reference model or extension */
+	/**
+	 * @param type
+	 * @param element
+	 * @param multiplicity
+	 * @return an element in type added to reference model or extension as a UmlAttribute
+	 */
 	UmlAttribute addElementInType(UmlClass type, UmlClassInstance element, String multiplicity) {
 
 		// return null if element or type do not exist
@@ -231,7 +251,13 @@ class NiemModel {
 		}
 		return elementInType;
 	}
-	/** returns a type added to the reference or extension models */
+	/**
+	 * @param typeSchemaURI
+	 * @param typeName
+	 * @param description
+	 * @param notes
+	 * @return a type added to the reference or extension models as a UmlClass
+	 */
 	UmlClass addType(String typeSchemaURI, String typeName, String description,
 			String notes) {
 
@@ -375,7 +401,10 @@ class NiemModel {
 		Log.debug("cacheModels: model " + modelPackage.name() + " cached");
 	}
 
-	/** returns an element copied from reference model to subset */
+	/**
+	 * @param elementName
+	 * @return an element copied from reference model to subset as a UmlClassInstance
+	 */
 	UmlClassInstance copyElement(String elementName) {
 
 		// return subset element if it exists
@@ -419,7 +448,12 @@ class NiemModel {
 		Log.debug("copyElement: element " + elementName + " copied to subset");
 		return element;
 	}
-	/** returns an element in type copied from reference model to subset */
+	/**
+	 * @param type
+	 * @param element
+	 * @param multiplicity
+	 * @return an element in type copied from reference model to subset as a UmlAttribute
+	 */
 	UmlAttribute copyElementInType(UmlClass type, UmlClassInstance element, String multiplicity) {
 		String elementInTypeName = NamespaceModel.getPrefixedName(element);
 		String typeName = NamespaceModel.getPrefixedName(type);
@@ -441,7 +475,10 @@ class NiemModel {
 		Log.debug("addElementInTypes: inserted " + elementInTypeName + " to " + typeName);
 		return attribute;
 	}
-	/** returns a type copied from the reference model to subset */
+	/**
+	 * @param typeName
+	 * @return a type copied from the reference model to subset as a UmlClass
+	 */
 	UmlClass copyType(String typeName) {
 
 		if ((typeName == null) || (typeName.equals("")))
@@ -528,7 +565,11 @@ class NiemModel {
 		Log.debug("copyType: type copied " + typeName);
 		return type;
 	}
-	/** exports NIEM extension and exchange schema */
+	/** exports NIEM extension and exchange schema 
+	 * @param xmlDir
+	 * @param jsonDir
+	 * @return JSON definitions as a Set
+	 */
 	TreeSet<String> exportSchemas(String xmlDir, String jsonDir) {
 	
 		XmlWriter xmlWriter = new XmlWriter(xmlDir);
@@ -653,31 +694,47 @@ class NiemModel {
 		return openapiDefinitions;
 	}
 	
-	/** filter non-ASCII characters */
+	/** filter non-ASCII characters
+	 * @param string
+	 * @return filtered String
+	 */
 	private String filterASCII(String string) {
 		return string.replaceAll("[^\\p{ASCII}]", "");
 	}
-	/** filter illegal characters in enumerations */
+	/** filter illegal characters in enumerations 
+	 * @param string
+	 * @return filtered String
+	 */
 	private String filterEnum(String string) {
 		return string.replaceAll(CODELIST_DELIMITER + CODELIST_DEFINITION_DELIMITER, "");
 	}
-	/** filter illegal characters in UML elements */
+	/** filter illegal characters in UML elements
+	 * @param string
+	 * @return filtered String
+	 */
 	private String filterUMLElement(String string) {
 		return string.replaceAll("[^A-Za-z0-9_@#$-`~,.<?;:'\"\\\\]", "");
 	}
 
-
-
-	/** filter illegal characters in UML types */
+	/** filter illegal characters in UML types
+	 * @param string
+	 * @return filtered String
+	 */
 	private String filterUMLType(String string) {
 		return string.replaceAll("[^A-Za-z0-9_@#$`~,.<?;:'\"\\\\]", "");
 	}
 
+	/**
+	 * @return abstract type as a UmlClass
+	 */
 	UmlClass getAbstractType() {
 		return abstractType;
 	}
 
-	/** return attribute group related to a type */
+	/**
+	 * @param type
+	 * @return attribute group related to a type as a UmlClass
+	 */
 	private UmlClass getAttributeGroup(UmlClass type) {
 		for (UmlItem item : type.children())
 			if (item.kind() == anItemKind.aRelation) {
@@ -690,10 +747,17 @@ class NiemModel {
 		return null;
 	}
 
+	/**
+	 * @return augmentation type as a UmlClass
+	 */
 	UmlClass getAugmentationType() {
 		return augmentationType;
 	}
-	/** return the default schema URI for the current file */
+	/**
+	 * @param filename
+	 * @param doc
+	 * @return the default schema URI for the current file as a String
+	 */
 	private String getDefaultSchemaURI(String filename, Document doc) {
 		String defaultSchemaURI = doc.lookupNamespaceURI(null);
 		if (defaultSchemaURI == null) {
@@ -702,16 +766,28 @@ class NiemModel {
 		}
 		return defaultSchemaURI;
 	}
-	/** return an element in schema schemaURI with name elementName */
+	/**
+	 * @param schemaURI
+	 * @param elementName
+	 * @return an element in schema schemaURI with name elementName as a UmlClassInstance
+	 */
 	UmlClassInstance getElement(String schemaURI, String elementName) {
 		return getElementByURI(getURI(schemaURI, elementName));
 	}
-	/** return an element in model with uri elementUri */
+	/**
+	 * @param elementUri
+	 * @return an element in model with uri elementUri as a String
+	 */
 	UmlClassInstance getElementByURI(String elementUri) {
 		return elements.get(elementUri);
 	}
 
-	/** returns an element in type and checks the multiplicity */
+	/** get an element in type and check the multiplicity
+	 * @param type
+	 * @param elementInTypeName
+	 * @param multiplicity
+	 * @return an element in type as a UmlAttribute
+	 */
 	private UmlAttribute getElementInType(UmlClass type, String elementInTypeName, String multiplicity) {
 		for (UmlItem item : type.children())
 			if (item.kind() == anItemKind.anAttribute && item.name().equals(elementInTypeName)) {
@@ -724,7 +800,10 @@ class NiemModel {
 		return null;
 	}
 
-	/** return an element in type in model with uri typeURI */
+	/**
+	 * @param typeURI
+	 * @return a list of elements in a type with uri typeURI as a List
+	 */
 	List<UmlClassInstance> getElementsInType( String typeURI) {
 		List<UmlClassInstance> elementInTypeList = elementsInType.get(typeURI);
 		if (elementInTypeList == null) {
@@ -734,35 +813,57 @@ class NiemModel {
 		return elementInTypeList;
 	}
 
+	/**
+	 * @return model as a UmlPackage
+	 */
 	UmlPackage getModelPackage() {
 		return modelPackage;
 	}
 
+	/**
+	 * @return object type as a UmlClass
+	 */
 	UmlClass getObjectType() {
 		return objectType;
 	}
 
+	/**
+	 * @return simple object attribute group as a UmlClass
+	 */
 	UmlClass getSimpleObjectAttributeGroup() {
 		return simpleObjectAttributeGroup;
 	}
 	
+	/**
+	 * @return number of elements in the model as an int
+	 */
 	int getSize() {
 		return elements.size();
 	}
 
-	/** return type in model with schema schemaURI and name tagname */
+	/**
+	 * @param schemaURI
+	 * @param typeName
+	 * @return type in model with schema schemaURI and name tagname as a String
+	 */
 	UmlClass getType(String schemaURI, String typeName) {
 		// return cached type
 		String uri = getURI(schemaURI, typeName);
 		return types.get(uri);
 	}
 	
-	/** return an element in model with uri elementUri */
+	/**
+	 * @param uri
+	 * @return an element in model with uri elementUri as a UmlClass
+	 */
 	UmlClass getTypeByURI(String uri) {
 		return types.get(uri);
 	}
 
-	/** return code values and descriptions from enumerations in schema */
+	/**
+	 * @param elist
+	 * @return code values and descriptions from enumerations in schema as a String
+	 */
 	private String importCodeList(NodeList elist) {
 		String codeList = "";
 		XPathExpression xe = null;
@@ -791,7 +892,11 @@ class NiemModel {
 		return codeList;
 	}
 
-	/** import NIEM reference model elements into HashMaps and return namespace */
+	/** import NIEM reference model elements
+	 * @param db
+	 * @param filename
+	 * @return namespace of imported elements as a Namespace
+	 */
 	Namespace importElements(DocumentBuilder db, String filename) {
 		// trace("importElements: importing elements from schema " + filename);
 		String filename2 = "\n" + filename + "\n";
@@ -937,9 +1042,10 @@ class NiemModel {
 		return ns;
 	}
 
-	/**
-	 * import NIEM reference model elements in Types into HashMaps and return
-	 * namespace
+	/** import NIEM reference model elements in types
+	 * @param db
+	 * @param filename
+	 * @return namespace of imported elements in types as a Namespace
 	 */
 	Namespace importElementsInTypes(DocumentBuilder db, String filename) {
 		// trace("importElementsInTypes: importing elements in types from schema " +
@@ -1192,7 +1298,11 @@ class NiemModel {
 		return ns;
 	}
 
-	/** import NIEM reference model types into HashMaps and return namespace */
+	/** import NIEM reference model types
+	 * @param db
+	 * @param filename
+	 * @return namespace of imported types as a Namespace
+	 */
 	Namespace importTypes(DocumentBuilder db, String filename) {
 		Log.debug("importTypes: importing types from schema " + filename);
 		String filename2 = "\n" + filename + "\n";
@@ -1298,7 +1408,10 @@ class NiemModel {
 		return ns;
 	}
 
-	/** create a relationship between a type and an attribute group */
+	/** create a relationship between a type and an attribute group
+	 * @param type
+	 * @param attributeGroupType
+	 */
 	void relateAttributeGroup(UmlClass type, UmlClass attributeGroupType) {
 		if (type != null && attributeGroupType != null)
 			try {
@@ -1308,7 +1421,10 @@ class NiemModel {
 				// attribute group " + baseTypeName);
 			}
 	}
-	/** create a relationship between a type and a base type */
+	/** create a relationship between a type and a base type
+	 * @param type
+	 * @param baseType
+	 */
 	void relateBaseType(UmlClass type, UmlClass baseType) {
 		if (type != null && baseType != null)
 			try {
@@ -1318,7 +1434,10 @@ class NiemModel {
 				// type " + sourceBaseTypeName);
 			}
 	}
-	/** relate element in type to element */
+	/** relate element in type to element
+	 * @param elementInType
+	 * @param element
+	 */
 	private void relateElementInType(UmlAttribute elementInType, UmlClassInstance element) {
 		UmlTypeSpec elementType = new UmlTypeSpec();
 		elementType.type = getBaseType(element);
@@ -1330,16 +1449,25 @@ class NiemModel {
 						+ re.toString());
 			}
 	}
-	/** add a description to type or element */
+	/** add a description to type or element
+	 * @param item
+	 * @param description
+	 */
 	private void setDescription(UmlItem item, String description) {
 		String currentDescription = item.description();
 		if ((currentDescription.equals("")) && (description != null) && (!description.equals("")))
 			item.set_Description(description);
 	}
+	/**
+	 * @param modelPackage
+	 */
 	void setModelPackage(UmlPackage modelPackage) {
 		this.modelPackage = modelPackage;
 	}
-	/** add NIEM mapping notes to a type or element */
+	/** add NIEM mapping notes to a type or element
+	 * @param item
+	 * @param notes
+	 */
 	private void setNotes(UmlItem item, String notes) {
 		if ((item != null) && (notes != null) && (!notes.equals(""))) {
 			String currentNotes = item.propertyValue(NiemUmlClass.NOTES_PROPERTY);

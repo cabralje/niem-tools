@@ -19,6 +19,10 @@ public class HtmlWriter {
 
 	private static final String HTML_FILE_TYPE = ".html";
 	
+	/**
+	 * @param directory
+	 * @param filename
+	 */
 	void exportHtml(String directory, String filename) {
 		try {
 			// Write rest of header
@@ -59,6 +63,13 @@ public class HtmlWriter {
 	}
 
 	/** returns the html for a column */
+	/**
+	 * @param value
+	 * @param bgcolor
+	 * @param fgcolor
+	 * @param wordwrap
+	 * @return
+	 */
 	private String getColumnHtml(String value, String bgcolor, String fgcolor, Boolean wordwrap) {
 		String style = wordwrap ? "word-wrap: break-word" : "";
 		return "<td  style=\"" + style + "\" bgcolor=\"" + bgcolor + "\"><font color = \"" + fgcolor + "\">" + value
@@ -66,6 +77,11 @@ public class HtmlWriter {
 	}
 
 	/** writes a column of the NIEM mapping spreadsheet in HTML format to a file */
+	/**
+	 * @param fw
+	 * @param item
+	 * @throws IOException
+	 */
 	private void writeItemHtml(FileWriter fw, UmlItem item) throws IOException {
 		if (item.known) {
 			fw.write("<a href=\"");
@@ -86,6 +102,10 @@ public class HtmlWriter {
 	}
 
 	/** writes a line of the NIEM mapping spreadsheet in HTML format to a file */
+	/**
+	 * @param fw
+	 * @param item
+	 */
 	private void writeLineHtml(FileWriter fw, UmlItem item) {
 		try {
 			// Export Class, Property and Multiplicity

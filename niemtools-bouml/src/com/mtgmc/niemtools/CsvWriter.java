@@ -16,6 +16,10 @@ import fr.bouml.anItemKind;
 public class CsvWriter {
 
 	/** returns a line of the NIEM mapping spreadsheet in CSV format */
+	/**
+	 * @param item
+	 * @return
+	 */
 	String[] getItemCsv(UmlItem item) {
 		String[] nextLine = new String[NiemUmlClass.NIEM_STEREOTYPE_MAP.length];
 		try {
@@ -65,6 +69,10 @@ public class CsvWriter {
 	}
 
 	/**export CSV file */
+	/**
+	 * @param directory
+	 * @param filename
+	 */
 	void exportCsv(String directory, String filename) {
 		File file = Paths.get(directory, filename).toFile();
 	

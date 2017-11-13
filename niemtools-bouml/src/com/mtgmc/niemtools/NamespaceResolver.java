@@ -44,11 +44,8 @@ public class NamespaceResolver implements NamespaceContext {
 	/**
 	 * This constructor parses the document and stores all namespaces it can
 	 * find. If toplevelOnly is true, only namespaces in the root are used.
-	 * 
-	 * @param document
-	 *            source document
-	 * @param toplevelOnly
-	 *            restriction of the search to enhance performance
+	 * @param document - source document
+	 * @param toplevelOnly - restriction of the search to enhance performance
 	 */
 	public NamespaceResolver(Document document, boolean toplevelOnly) {
 		examineNode(document.getFirstChild(), toplevelOnly);
@@ -64,7 +61,7 @@ public class NamespaceResolver implements NamespaceContext {
 	 * 
 	 * @param node
 	 *            to examine
-	 * @param attributesOnly,
+	 * @param attributesOnly
 	 *            if true no recursion happens
 	 */
 	private void examineNode(Node node, boolean attributesOnly) {
@@ -112,6 +109,10 @@ public class NamespaceResolver implements NamespaceContext {
 
 	}
 
+	/** 
+	 * @param prefix
+	 * @param uri
+	 */
 	private void putInCache(String prefix, String uri) {
 		prefix2Uri.put(prefix, uri);
 		uri2Prefix.put(uri, prefix);
@@ -124,6 +125,9 @@ public class NamespaceResolver implements NamespaceContext {
 	 * @param prefix
 	 *            to search for
 	 * @return uri
+	 */
+	/* (non-Javadoc)
+	 * @see javax.xml.namespace.NamespaceContext#getNamespaceURI(java.lang.String)
 	 */
 	public String getNamespaceURI(String prefix) {
 		if (prefix == null || prefix.equals(XMLConstants.DEFAULT_NS_PREFIX))	
@@ -141,10 +145,16 @@ public class NamespaceResolver implements NamespaceContext {
 	 * This method is not needed in this context, but can be implemented in a
 	 * similar way.
 	 */
+	/* (non-Javadoc)
+	 * @see javax.xml.namespace.NamespaceContext#getPrefix(java.lang.String)
+	 */
 	public String getPrefix(String namespaceURI) {
 		return uri2Prefix.get(namespaceURI);
 	}
 
+	/* (non-Javadoc)
+	 * @see javax.xml.namespace.NamespaceContext#getPrefixes(java.lang.String)
+	 */
 	@SuppressWarnings("rawtypes")
 	public Iterator getPrefixes(String namespaceURI) {
 		// Not implemented

@@ -61,20 +61,32 @@ public class JsonWriter {
 
 	private String directory;
 
+	/**
+	 * @param initialDirectory
+	 */
 	public JsonWriter(String initialDirectory) {
 		super();
 		directory = initialDirectory;
 	}
 
-	/** convert multiplicity from UML representation to XML representation */
+	/**
+	 * @param mult
+	 * @return converted multiplicity from UML representation to XML representation as a String
+	 */
 	private String convertMultiplicity(String mult) {
 		mult = mult.replaceAll("\\.\\.", ",").replaceAll("\\*", "unbounded");
 		return mult;
 	}
 
 	/**
-	 * return JSON property description of an element with name elementName and
-	 * multiplicity */
+	 * @param type
+	 * @param element
+	 * @param multiplicity
+	 * @param localPrefix
+	 * @param isAttribute
+	 * @return JSON property description of an element with name elementName and
+	 * multiplicity
+	 */
 	private String exportJsonElementInTypeSchema(UmlClass type, UmlClassInstance element, String multiplicity,
 			String localPrefix, boolean isAttribute) {
 		String elementName = NamespaceModel.getPrefixedName(element);
@@ -119,7 +131,11 @@ public class JsonWriter {
 		return elementSchema;
 	}
 
-	/** return JSON schema element definition */
+	/**
+	 * @param element
+	 * @param prefix
+	 * @return JSON schema definition as a String
+	 */
 	String exportJsonElementSchema(UmlClassInstance element, String prefix) {
 		String elementName = NamespaceModel.filterAttributePrefix(NamespaceModel.getPrefixedName(element));
 		TreeSet<String> jsonDefinition = new TreeSet<String>();
@@ -142,7 +158,11 @@ public class JsonWriter {
 		return elementSchema;
 	}
 
-	/** return JSON Pointer to a type/element with name tagName from file sourceFileNAme to targetFileName */
+	/**
+	 * @param sourcePath
+	 * @param targetItem
+	 * @return JSON Pointer to a type/element with name tagName from file sourceFileNAme to targetFileName or "" if unknown prefix or namespace
+	 */
 	private String exportJsonPointer(Path sourcePath, UmlItem targetItem) {
 		if (targetItem == null)
 			return "";
@@ -166,7 +186,10 @@ public class JsonWriter {
 		return path;
 	}
 
-	/** return JSON type definition corresponding to an XML Schema primitive type */
+	/**
+	 * @param type
+	 * @return JSON type definition corresponding to an XML Schema primitive type as a String
+	 */
 	String exportJsonPrimitiveSchema(UmlClass type) {
 		String jsonType = "\"" + NamespaceModel.getPrefixedName(type) + "\": {\n";
 		switch (NamespaceModel.getName(type)) {
@@ -352,6 +375,14 @@ public class JsonWriter {
 		return jsonType;
 	}
 
+	/**
+	 * @param prefix
+	 * @param nsSchemaURI
+	 * @param schemaNamespaces
+	 * @param jsonDefinitions
+	 * @param jsonProperties
+	 * @param jsonRequired
+	 */
 	void exportJsonSchema(String prefix, String nsSchemaURI, TreeSet<String> schemaNamespaces, TreeSet<String> jsonDefinitions, TreeSet<String> jsonProperties, TreeSet<String> jsonRequired) {
 		// export JSON-LD namespace definitions
 		TreeSet<String> jsonNamespaces = new TreeSet<String>();
@@ -383,7 +414,12 @@ public class JsonWriter {
 		}
 	}
 
-	/** return JSON schema type definition */
+	/**
+	 * @param model
+	 * @param type
+	 * @param prefix
+	 * @return JSON schema type definition as a String
+	 */
 	String exportJsonTypeSchema(NiemModel model, UmlClass type, String prefix) {
 		// add properties
 		// type.sortChildren();
@@ -508,7 +544,13 @@ public class JsonWriter {
 		return typeSchema;
 	}
 
-	/** exports OpenAPI/Swagger 2.0 service definition */
+	/** exports OpenAPI/Swagger 2.0 service definition
+	 * @param openapiDir
+	 * @param ports
+	 * @param messageNamespaces
+	 * @param jsonDefinitions
+	 * @throws IOException
+	 */
 	void exportOpenApi(String openapiDir, Map<String, UmlClass> ports, Set<String> messageNamespaces, TreeSet<String> jsonDefinitions) throws IOException {
 
 		// export JSON-LD namespace definitions
@@ -771,8 +813,13 @@ public class JsonWriter {
 	}
 
 	/**
-	 * return OpenAPI property description of an element with name elementName and
-	 * multiplicity */
+	 * @param openapiPath
+	 * @param element
+	 * @param multiplicity
+	 * @param isAttribute
+	 * @return OpenAPI property description of an element with name elementName and
+	 * multiplicity as a String
+	 */
 	private String exportOpenApiElementInTypeSchema(Path openapiPath, UmlItem element, String multiplicity,
 			boolean isAttribute) {
 		String elementName = NamespaceModel.getPrefixedName(element);
@@ -809,22 +856,35 @@ public class JsonWriter {
 		return elementSchema;
 	}
 
-	/** filter illegal characters in XML strings */
+	/** filter illegal characters in XML strings
+	 * @param string
+	 * @return filtered String
+	 */
 	private String filterQuotes(String string) {
 		return string.replaceAll("&", "&amp;").replaceAll("\"", "&quot;").replaceAll("\r|\n", "");
 	}
 
-	/** output a JSON name value pair */
+	/**
+	 * @param name
+	 * @param value
+	 * @returna JSON name value pair as a String
+	 */
 	private String getJsonPair(String name, String value) {
 		return "\"" + name + "\" : \"" + value + "\"\n";
 	}
 
-	/** return JSON filename */
+	/**
+	 * @param item
+	 * @return JSON filename as a Path
+	 */
 	Path getJsonPath(UmlItem item) {
 		return Paths.get(directory, (NiemUmlClass.isNiem(item)) ? NiemUmlClass.NIEM_DIR + "/" : "", NamespaceModel.getPrefix(item) + JsonWriter.JSON_SCHEMA_FILE_TYPE);
 	}
 
-	/** return JSON filename */
+	/**
+	 * @param prefix
+	 * @return JSON filename as a Path
+	 */
 	Path getJsonPath(String prefix) {
 		String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
 		boolean isNiem = NamespaceModel.getNamespace(schemaURI).getReferenceClassView() != null;

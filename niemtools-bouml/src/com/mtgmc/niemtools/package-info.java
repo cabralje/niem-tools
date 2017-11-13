@@ -2,7 +2,7 @@
  * 
  */
 /**
- * @author JamesECabral
+ * @author James Cabral
  *
  */
 package com.mtgmc.niemtools;

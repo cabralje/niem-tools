@@ -51,7 +51,10 @@ public class NamespaceModel {
 	private static Map<String, String> Prefixes = new HashMap<String, String>();
 	private static XPath xPath = XPathFactory.newInstance().newXPath();
 	
-	/** adds a new namespace */
+	/** adds a new namespace
+	 * @param schemaURI
+	 * @return
+	 */
 	static Namespace addNamespace(String schemaURI) {
 		Namespace ns = new Namespace(schemaURI);
 		Namespaces.put(schemaURI, ns);
@@ -59,13 +62,18 @@ public class NamespaceModel {
 		return ns;
 	}
 
-	/** adds a new prefix for a namespace */
+	/** adds a new prefix for a namespace
+	 * @param schemaURI
+	 * @param prefix
+	 */
 	static void addPrefix(String schemaURI, String prefix) {
 		if (!getPrefixes().containsKey(prefix))
 			Prefixes.put(prefix, schemaURI);
 	}
 
-	/** caches namespaces and prefixes for external schemas */
+	/** caches namespaces and prefixes for external schemas
+	 * 
+	 */
 	static void cacheExternalSchemas() {
 		String externalSchemas = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_EXTERNAL_SCHEMAS_PROPERTY);
 		String[] external = externalSchemas.split(",");
@@ -83,27 +91,42 @@ public class NamespaceModel {
 		Log.debug("cacheExternalSchemas: external schemas cached");
 	}
 
-	/** return attribute name with prefix filtered */
+	/**
+	 * @param attributeName
+	 * @return attribute name with prefix filtered as a String
+	 */
 	static String filterAttributePrefix(String attributeName) {
 		return attributeName.replaceAll(ATTRIBUTE_PREFIX, "");
 	}
 
-	/** filter illegal characters in XML prefix */
+	/** filter illegal characters in XML prefix
+	 * @param prefix
+	 * @return filtered prefix as a String
+	 */
 	static String filterPrefix(String prefix) {
 		return prefix.replaceAll("[^-._A-Za-z0-9]", "");
 	}
 
-	/** returns an extension schema URI */
+	/**
+	 * @param prefix
+	 * @return an extension schema URI as a String
+	 */
 	static String getExtensionSchema(String prefix) {
 		return NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + prefix;
 	}
 	
-	/** return external schema URI for schemaURI */
+	/**
+	 * @param schemaURI
+	 * @return external schema URI for schemaURI as a String
+	 */
 	static String getExternalSchemaURL(String schemaURI) {
 		return externalSchemaURL.get(schemaURI);
 	}
 	
-	/** return tagname from XML tag */
+	/**
+	 * @param tagName
+	 * @return tagname from XML tag as a String
+	 */
 	static String getName(String tagName) {
 		if (tagName == null)
 			return "";
@@ -113,12 +136,18 @@ public class NamespaceModel {
 		return name.replaceAll("[^-._:A-Za-z0-9@]", "");
 	}
 
-	/** return tagname for UmlItem item */
+	/**
+	 * @param item
+	 * @return tagname for UmlItem item as a String
+	 */
 	static String getName(UmlItem item) {
 		return getName(item.name());
 	}
 
-	/** return namespace for schemaURI */
+	/**
+	 * @param schemaURI
+	 * @return namespace for schemaURI as a Namespace
+	 */
 	static Namespace getNamespace(String schemaURI) {
 		if (schemaURI == null)
 			return null;
@@ -126,7 +155,10 @@ public class NamespaceModel {
 	}
 
 	/**
-	 * return namespace classview for schema schemaURI in model modelPackage; create it with
+	 * @param model
+	 * @param prefix
+	 * @param schemaURI
+	 * @return namespace class view for schema schemaURI in model modelPackage as a UmlClassView; create it with
 	 * prefix if doesn't exist
 	 */
 	static UmlClassView getNamespaceClassView(NiemModel model, String prefix, String schemaURI) {
@@ -189,7 +221,10 @@ public class NamespaceModel {
 		return namespaceClassView;
 	}
 	
-	/** return namespace prefix from XML tag */
+	/**
+	 * @param tagName
+	 * @return namespace prefix from XML tag as a String
+	 */
 	static String getPrefix(String tagName) {
 		if (tagName == null) {
 			// trace("getPrefix: error - tagName is null");
@@ -203,7 +238,10 @@ public class NamespaceModel {
 			return null;
 	}
 
-	/** return namespace prefix for UmlItem item */
+	/**
+	 * @param item
+	 * @return namespace prefix for UmlItem item as a String
+	 */
 	static String getPrefix(UmlItem item) {
 		switch (item.kind().value()) {
 		case anItemKind._aClass:
@@ -220,25 +258,42 @@ public class NamespaceModel {
 		return null;
 	}
 	
-	/** return name with namespace prefix for an attribute with name tagName */
+	/**
+	 * @param prefix
+	 * @param tagName
+	 * @return name with namespace prefix for an attribute with name tagName as a String
+	 */
 	static String getPrefixedAttributeName(String prefix, String tagName) {
 		return prefix + NAMESPACE_DELIMITER + ATTRIBUTE_PREFIX + filterAttributePrefix(tagName);
 	}
 
-	/** return name with namespace prefix for type or element with name tagName */
+	/**
+	 * @param prefix
+	 * @param tagName
+	 * @return name with namespace prefix for type or element with name tagName as a String
+	 */
 	static String getPrefixedName(String prefix, String tagName) {
 		return prefix + NAMESPACE_DELIMITER + tagName;
 	}
-	/** return name with namespace prefix for UmlItem item */
+	/**
+	 * @param item
+	 * @return name with namespace prefix for UmlItem item as a String
+	 */
 	static String getPrefixedName(UmlItem item) {
 		return getPrefix(item) + NAMESPACE_DELIMITER + item.name();
 	}
 
+	/**
+	 * @return Map of prefixes to Namespaces
+	 */
 	static Map<String, String> getPrefixes() {
 		return Prefixes;
 	}
 
-	/** return schemaURI for type or element with name tagname */
+	/**
+	 * @param tagName
+	 * @return schemaURI for type or element with name tagname as a String
+	 */
 	static String getSchemaURI(String tagName) {
 		String prefix = getPrefix(tagName);
 		if (prefix == null)
@@ -247,7 +302,10 @@ public class NamespaceModel {
 		return getSchemaURIForPrefix(prefix);
 	}
 
-	/** return schemaURI for type or element with name tagname */
+	/**
+	 * @param prefix
+	 * @return schemaURI for type or element with name tagname as a String
+	 */
 	static String getSchemaURIForPrefix(String prefix) {
 		String schemaURI = Prefixes.get(prefix);
 		if (schemaURI == null)
@@ -255,11 +313,17 @@ public class NamespaceModel {
 		return schemaURI;
 	}
 
+	/**
+	 * @return number of namespaces as an int
+	 */
 	static int getSize() {
 		return Namespaces.size();
 	}
 	
-	/** import namespaces and return target namespace */
+	/** import namespaces and return target namespace
+	 * @param doc
+	 * @return target namespace
+	 */
 	static Namespace importNamespaces(Document doc) {
 		
 		// get target namespace
@@ -306,14 +370,20 @@ public class NamespaceModel {
 		return ns;
 	}
 
-	/** return true if type or element has a prefix in an external schema */
+	/**
+	 * @param prefix
+	 * @return true if type or element has a prefix in an external schema
+	 */
 	static Boolean isExternalPrefix(String prefix) {
 		if (prefix == null)
 			return false;
 		return externalPrefixes.contains(prefix);
 	}
 	
-	/** return true if a prefix exists in reference model */
+	/**
+	 * @param prefix
+	 * @return true if a prefix exists in reference model
+	 */
 	static Boolean isNiemPrefix(String prefix) {
 		if (prefix == null)
 			return false;

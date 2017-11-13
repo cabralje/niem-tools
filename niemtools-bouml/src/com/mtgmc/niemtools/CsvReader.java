@@ -16,6 +16,9 @@ import fr.bouml.anItemKind;
 
 public class CsvReader {
 
+	/**
+	 * @param filename
+	 */
 	void importCsv(String filename) {
 		// cache UML classes
 		Map<String, UmlClass> UMLClasses = new HashMap<String, UmlClass>();

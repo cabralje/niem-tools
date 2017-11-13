@@ -145,12 +145,17 @@ public class NiemUmlClass {
 	// return string.replaceAll("[^-._:A-Za-z0-9]", "");
 	// }
 
-	/** return the NIEM Extension Model */
+	/**
+	 * @return the NIEM Extension Model as a NiemModel
+	 */
 	static NiemModel getExtensionModel() {
 		return ExtensionModel;
 	}
 
-	/** return XML maxOccurs from multiplicity */
+	/**
+	 * @param multiplicity
+	 * @return XML maxOccurs from multiplicity as a String
+	 */
 	static String getMaxOccurs(String multiplicity) {
 		String maxOccurs = null;
 		if (multiplicity.equals(""))
@@ -168,7 +173,10 @@ public class NiemUmlClass {
 		return maxOccurs;
 	}
 	
-	/** return XML minOccurs from multiplicity */
+	/**
+	 * @param multiplicity
+	 * @return XML minOccurs from multiplicity as a String
+	 */
 	static String getMinOccurs(String multiplicity) {
 		String minOccurs = null;
 		if (multiplicity.equals(""))
@@ -186,12 +194,18 @@ public class NiemUmlClass {
 		return minOccurs;
 	}
 
-	/** return model for element uri */
+	/**
+	 * @param uri
+	 * @return model for element uri as a NiemModel
+	 */
 	static NiemModel getModel(String uri) {
 		return (SubsetModel.getElementByURI(uri) != null) ? SubsetModel : ExtensionModel;
 	}
 
-	/** return model for Umlitem item */
+	/**
+	 * @param item
+	 * @return model for Umlitem item as a NiemModel
+	 */
 	static NiemModel getModel(UmlItem item) {
 		UmlPackage modelPackage = null;
 		anItemKind kind = item.kind();
@@ -209,48 +223,64 @@ public class NiemUmlClass {
 	
 		return null;
 	}
-
 	/**
-	 * return the NIEM stereotype associated with a column in the NIEM mapping
-	 * spreadsheet
+	 * @param p
+	 * @return the NIEM stereotype associated with a column in the NIEM mapping spreadsheet as a String
 	 */
 	static String getNiemProperty(int p) {
 		return NIEM_STEREOTYPE + STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[p][1];
 	}
 
-	/** return project property with name propertyName */
+	/**
+	 * @param propertyName
+	 * @return return project property with name propertyName as a String
+	 */
 	static String getProperty(String propertyName) {
 		return UmlPackage.getProject().propertyValue(propertyName);
 	}
 
-	/** return the NIEM Reference Model */
+	/**
+	 * @return the NIEM Reference Model as a NiemModel
+	 */
 	static NiemModel getReferenceModel() {
 		return ReferenceModel;
 	}
 
-	/** return the NIEM Subset Model */
+	/**
+	 * @return the NIEM Subset Model as a NiemModel
+	 */
 	static NiemModel getSubsetModel() {
 		return SubsetModel;
 	}
 
-	/** hide item from documentation */
+	/** hide item from documentation
+	 * @param item
+	 */
 	private static void hideItem(UmlItem item) {
 		item.known = false;
 		for (UmlItem child : item.children())
 			hideItem(child);
 	}
 
-	/** hide reference model from documentation */
+	/** hide reference model from documentation
+	 * 
+	 */
 	public static void hideReferenceModel() {
 		hideItem(ReferenceModel.getModelPackage());
 	}
 
-	/** returns true if the UML item is an attribute or attribute group */
+	/**
+	 * @param item
+	 * @return true if the UML item is an attribute or attribute group
+	 */
 	static boolean isAttribute(UmlItem item) {
 		return NamespaceModel.getName(item).startsWith(NamespaceModel.ATTRIBUTE_PREFIX);
 	}
 
-	/** return true if an element exists in reference model */
+	/**
+	 * @param elementName
+	 * @return true if an element exists in reference model 
+	 */
 	static Boolean isNiemElement(String elementName) {
 		if ((elementName == null) || elementName.equals("") || elementName.equals("??")
 				|| NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(elementName)))
@@ -261,7 +291,11 @@ public class NiemUmlClass {
 		return ReferenceModel.getElementByURI(NiemModel.getURI(schemaURI, elementName)) != null;
 	}
 
-	/** return true if an element in type exists in reference model */
+	/**
+	 * @param typeName
+	 * @param elementName
+	 * @return true if an element in type exists in reference model
+	 */
 	static Boolean isNiemElementInType(String typeName, String elementName) {
 		if (!isNiemType(typeName) || !isNiemElement(elementName))
 			return false;
@@ -274,7 +308,10 @@ public class NiemUmlClass {
 		return false;
 	}
 
-	/** returns true if type exists in reference model */
+	/**
+	 * @param typeName
+	 * @return true if type exists in reference model
+	 */
 	static Boolean isNiemType(String typeName) {
 		if ((typeName == null) || typeName.equals("") || typeName.equals("??") || NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(typeName)))
 			return false;
@@ -284,7 +321,10 @@ public class NiemUmlClass {
 		return ReferenceModel.getTypeByURI(NiemModel.getURI(schemaURI, typeName)) != null;
 	}
 
-	/** returns true if item exists in reference model */
+	/**
+	 * @param item
+	 * @return true if item exists in reference model 
+	 */
 	static Boolean isNiem(UmlItem item) {
 		String prefixedName = NamespaceModel.getPrefixedName(item);
 		if (item.kind() == anItemKind.aClass)
@@ -295,7 +335,9 @@ public class NiemUmlClass {
 			return false;
 	}
 	
-	/** initialize NiemTools project */
+	/** initialize NiemTools project
+	 * 
+	 */
 	public NiemUmlClass() {
 		super();
 
@@ -303,7 +345,9 @@ public class NiemUmlClass {
 		ConfigurationDialog.init();
 	}
 
-	/** caches namespaces and prefixes for external schemas */
+	/** caches namespaces and prefixes for external schemas
+	 * @param referenceOnly
+	 */
 	public void cacheModels(boolean referenceOnly) {
 		Log.start("cacheModels");
 		UmlCom.message("Caching models ...");
@@ -318,7 +362,9 @@ public class NiemUmlClass {
 		Log.stop("cacheModels");
 	}
 
-	/** creates Platform Independent Model (NIEM) */
+	/** creates Platform Independent Model (NIEM)
+	 * 
+	 */
 	public void createNIEM() {
 		UmlCom.message("Resetting NIEM models");
 		Log.trace("Resetting NIEM models");
@@ -331,7 +377,9 @@ public class NiemUmlClass {
 		ReferenceModel.getModelPackage().set_Stereotype("framework");
 	}
 
-	/** creates NIEM subset and extension models */
+	/** creates NIEM subset and extension models
+	 * 
+	 */
 	@SuppressWarnings("unchecked")
 	public void createSubsetAndExtension() {
 
@@ -503,7 +551,9 @@ public class NiemUmlClass {
 		Log.stop("createSubsetAndExtension");
 	}
 
-	/** deletes NIEM mappings */
+	/** deletes NIEM mappings
+	 * 
+	 */
 	@SuppressWarnings("unchecked")
 	public void deleteMapping() {
 		Log.trace("Deleting NIEM Mapping");
@@ -516,7 +566,9 @@ public class NiemUmlClass {
 		}
 	}
 
-	/** deletes NIEM models */
+	/** deletes NIEM models
+	 * @param deleteReferenceModel
+	 */
 	public void deleteNIEM(boolean deleteReferenceModel) {
 
 		// Find NIEM package
@@ -551,10 +603,10 @@ public class NiemUmlClass {
 		}
 	}
 
-	/**
-	 * exports a NIEM mapping spreadsheet in CSV format
-	 * 
+	/** exports a NIEM mapping spreadsheet in CSV format
 	 * roundtripping is supported with importCsv()
+	 * @param directory
+	 * @param filename
 	 */
 	public void exportCsv(String directory, String filename) {
 		Log.start("exportCsv");
@@ -567,7 +619,10 @@ public class NiemUmlClass {
 		Log.stop("exportCsv");
 	}
 
-	/** exports a NIEM mapping spreadsheet in HTML format */
+	/** exports a NIEM mapping spreadsheet in HTML format
+	 * @param directory
+	 * @param filename
+	 */
 	public void exportHtml(String directory, String filename) {
 		Log.start("exportHtml");
 
@@ -582,7 +637,12 @@ public class NiemUmlClass {
 		Log.stop("exportHtml");
 	}
 
-	/** exports a NIEM IEPD including extension and exchange schema */
+	/** exports a NIEM IEPD including extension and exchange schema
+	 * @param xmlDir
+	 * @param wsdlDir
+	 * @param jsonDir
+	 * @param openapiDir
+	 */
 	@SuppressWarnings("unchecked")
 	public void exportIEPD(String xmlDir, String wsdlDir, String jsonDir, String openapiDir) {
 
@@ -713,8 +773,9 @@ public class NiemUmlClass {
 		Log.stop("exportIEPD");
 	}
 
-	/**
-	 * exports a NIEM wantlist for import into Subset Schema Generator Tool (SSGT)
+	/** exports a NIEM wantlist for import into Subset Schema Generator Tool (SSGT)
+	 * @param dir
+	 * @param filename
 	 */
 	public void exportWantlist(String dir, String filename) {
 
@@ -858,7 +919,9 @@ public class NiemUmlClass {
 		Log.stop("exportWantlist");
 	}
 
-	/** return NIEM version */
+	/**
+	 * @return NIEM version as a String
+	 */
 	private String getNiemVersion() {
 		String niemVersion = NIEM_VERSION_DEFAULT;
 
@@ -871,9 +934,11 @@ public class NiemUmlClass {
 		return niemVersion;
 	}
 
-	/**
-	 * return child package with name packageName in parentPackage; if it doesn't
-	 * exist and create is true, create it
+	/** get child package with name packageName in parentPackage; if it doesn't exist and create is true, create it
+	 * @param parentPackage
+	 * @param packageName
+	 * @param create
+	 * @return return child package as a UmlPackage
 	 */
 	private UmlPackage getPackage(UmlPackage parentPackage, String packageName, boolean create) {
 		for (UmlItem item : parentPackage.children()) {
@@ -888,7 +953,9 @@ public class NiemUmlClass {
 		return null;
 	}
 
-	/** import NIEM mapping spreadsheet in CSV format */
+	/** import NIEM mapping spreadsheet in CSV format
+	 * @param filename
+	 */
 	public void importCsv(String filename) {
 
 		Log.trace("Importing NIEM Mapping");
@@ -897,9 +964,10 @@ public class NiemUmlClass {
 
 	}
 
-	/**
-	 * import NIEM reference model into HashMaps to support validation of NIEM
-	 * elements and types
+	/** import NIEM reference model into HashMaps to support validation of NIEM elements and types
+	 * @param dir
+	 * @param includeEnums
+	 * @throws IOException
 	 */
 	public void importSchemaDir(String dir, Boolean includeEnums) throws IOException {
 
@@ -973,7 +1041,9 @@ public class NiemUmlClass {
 		Log.trace("Elements: " + ReferenceModel.getSize());
 	}
 
-	/** verifies NIEM reference model exists */
+	/**
+	 * @return true if NIEM reference model exists
+	 */
 	public boolean verifyNIEM() {
 		Log.debug("verifyNIEM: verifying NIEM folders");
 		UmlPackage pimPackage = getPackage(UmlPackage.getProject(), NIEM_PACKAGE, false);

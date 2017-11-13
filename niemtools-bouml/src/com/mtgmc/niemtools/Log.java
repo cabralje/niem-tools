@@ -16,15 +16,24 @@ public class Log {
 	private static HashMap<String, Long> timer = new HashMap<String, Long>();
 	
 	/** outputs debugging information */
+	/**
+	 * @param output
+	 */
 	static void debug(String output) {
 		if (_DEBUG)
 			Log.trace(output);
 	}
 
+	/**
+	 * @param s
+	 */
 	public static void trace(String s) {
 		UmlCom.trace(s);
 	}
 
+	/**
+	 * @param s
+	 */
 	public static void start(String s) {
 		if (_PROFILE) {
 			trace("ELAPSED TIME (" + s + "): starting timer");
@@ -32,6 +41,9 @@ public class Log {
 		}
 	}
 	
+	/**
+	 * @param s
+	 */
 	public static void stop(String s) {
 		if (_PROFILE) {
 			if (!timer.containsKey(s)) {

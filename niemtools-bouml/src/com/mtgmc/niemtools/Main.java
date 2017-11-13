@@ -158,6 +158,13 @@ class Main
 		System.exit(0);
 	}
 
+	/**
+	 * @param root
+	 * @param target
+	 * @param niemTools
+	 * @param properties
+	 * @throws IOException
+	 */
 	private static void generateModels(UmlPackage root, UmlItem target, NiemUmlClass niemTools, Properties properties)
 			throws IOException {
 		Log.start("generateModels");
@@ -211,6 +218,10 @@ class Main
 		Log.stop("generateModels");
 	}
 
+	/**
+	 * @param root
+	 * @param niemTools
+	 */
 	private static void importMapping(UmlPackage root, NiemUmlClass niemTools) {
 		Log.start("importMapping");
 		niemTools.deleteMapping();
@@ -224,6 +235,11 @@ class Main
 		Log.stop("importMapping");
 	}
 
+	/**
+	 * @param niemTools
+	 * @param properties
+	 * @throws IOException
+	 */
 	private static void importSchema(NiemUmlClass niemTools, Properties properties) throws IOException {
 		Log.start("importSchema");
 		JFileChooser fc;
