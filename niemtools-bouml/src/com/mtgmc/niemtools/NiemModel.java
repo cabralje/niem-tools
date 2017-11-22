@@ -629,7 +629,7 @@ class NiemModel {
 					xmlType = xmlWriter.exportXmlTypeSchema(type);
 					if (xmlType != null)
 						xmlTypes.add(xmlType);
-					jsonType = (prefix.equals(NiemModel.XSD_PREFIX)) ? jsonWriter.exportJsonPrimitiveSchema(type)
+					jsonType = (prefix.equals(NiemModel.XSD_PREFIX)) ? jsonWriter.exportJsonPrimitiveSchemafromXML(type)
 							: jsonWriter.exportJsonTypeSchema(this, type, prefix);
 					if (jsonType != null)
 						jsonDefinitions.add(jsonType);

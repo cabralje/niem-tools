@@ -58,6 +58,7 @@ import fr.bouml.UmlItem;
 import fr.bouml.UmlOperation;
 import fr.bouml.UmlPackage;
 import fr.bouml.UmlParameter;
+import fr.bouml.UmlTypeSpec;
 import fr.bouml.anItemKind;
 
 public class NiemUmlClass {
@@ -636,7 +637,7 @@ public class NiemUmlClass {
 		htmlWriter.exportHtml(directory, filename);
 		Log.stop("exportHtml");
 	}
-
+	
 	/** exports a NIEM IEPD including extension and exchange schema
 	 * @param xmlDir
 	 * @param wsdlDir
@@ -682,7 +683,7 @@ public class NiemUmlClass {
 		Iterator<UmlItem> it = (UmlClass.classes.iterator());
 		while (it.hasNext()) {
 			UmlItem item = it.next();
-			if (!item.stereotype().equals("interface"))
+			if (!item.stereotype().equals("interface") && !item.stereotype().equals("niem-profile:interface"))
 				continue;
 			UmlClass port = (UmlClass) item;
 			String portName = port.name();
@@ -699,12 +700,14 @@ public class NiemUmlClass {
 				UmlParameter[] params = operation.params();
 				if (params != null)
 					for (UmlParameter param : params) {
-						// ignore RESTful parameters
+						// ignore RESTful path, query, header or cookie parameters
 						if (!param.name.equals("") && !param.name.equals("body"))
 							continue;
 						Log.debug("exportIEPD: param " + param.name);
 						try {
-							inputType = param.type.type;
+							UmlTypeSpec inputType2 = param.type;
+							if (inputType2 != null)
+								inputType = inputType2.type;
 							// String mult = param.multiplicity;
 						} catch (Exception e) {
 							Log.trace("exportIEPD: error - no input message for " + operationName);
@@ -721,22 +724,30 @@ public class NiemUmlClass {
 						if (element != null)
 							element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
 					}
+				String outputMessage = null;
 				try {
-					outputType = operation.returnType().type;
+					UmlTypeSpec returnType = operation.returnType();
+					if (returnType != null) {
+						outputType = returnType.type;
+						if (outputType != null)
+							outputMessage = outputType.name();
+					}
 				} catch (Exception e) {
 					Log.trace("exportIEPD: error - no output message for " + operationName + " " + e.toString());
 				}
-				if (outputType == null || !outputType.stereotype().equals(NIEM_STEREOTYPE))
-					continue;
-				String outputMessage = outputType.propertyValue(NIEM_STEREOTYPE_XPATH);
+				if (outputType != null && outputType.stereotype().equals(NIEM_STEREOTYPE))
+					outputMessage = outputType.propertyValue(NIEM_STEREOTYPE_XPATH);
 				if (outputMessage == null || outputMessage.equals(""))
 					continue;
 				Log.debug("exportIEPD: output Message: " + outputMessage + " from operation " + operationName);
-				messageNamespaces.add(NamespaceModel.getPrefix(outputMessage));
-				NiemModel model = getModel(NiemModel.getURI(NamespaceModel.getSchemaURI(outputMessage), outputMessage));
-				UmlClassInstance element = model.getElementByURI(NiemModel.getURI(NamespaceModel.getSchemaURI(outputMessage), outputMessage));
-				if (element != null)
-					element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
+				String outputPrefix = NamespaceModel.getPrefix(outputMessage);
+				if (NamespaceModel.isNiemPrefix(outputPrefix)) {
+					messageNamespaces.add(outputPrefix);
+					NiemModel model = getModel(NiemModel.getURI(NamespaceModel.getSchemaURI(outputMessage), outputMessage));
+					UmlClassInstance element = model.getElementByURI(NiemModel.getURI(NamespaceModel.getSchemaURI(outputMessage), outputMessage));
+					if (element != null)
+						element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
+				}
 			}
 		}
 

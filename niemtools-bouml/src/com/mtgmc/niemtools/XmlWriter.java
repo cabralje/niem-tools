@@ -373,6 +373,7 @@ public class XmlWriter {
 				if (outputMessage == null || outputMessage.equals(""))
 					continue;
 				Log.debug("exportWSDL: output Message: " + outputMessage + " from operation " + operationName);
+				messageNamespaces.add(NamespaceModel.getPrefix(outputMessage));
 				String elementName = operationName + "Response";
 				String outputTypeName = elementName + "Type";
 				String outputTypeSchema = "<xs:complexType name=\"" + outputTypeName + "\">" + "<xs:sequence>";

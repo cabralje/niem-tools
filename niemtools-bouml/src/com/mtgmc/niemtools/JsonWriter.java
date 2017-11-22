@@ -28,7 +28,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -43,6 +42,7 @@ import fr.bouml.UmlItem;
 import fr.bouml.UmlOperation;
 import fr.bouml.UmlParameter;
 import fr.bouml.UmlRelation;
+import fr.bouml.UmlTypeSpec;
 import fr.bouml.aRelationKind;
 import fr.bouml.anItemKind;
 
@@ -188,9 +188,91 @@ public class JsonWriter {
 
 	/**
 	 * @param type
+	 * @return JSON type definition corresponding to an UML primitive type as a String
+	 */
+	String exportJsonPrimitiveSchemafromUml(UmlTypeSpec type) {
+		String name = type.toString();
+		String jsonType = "";
+		switch (name) {
+		case "bool":
+			jsonType += "\"type\": \"boolean\"\n";
+			break;
+
+			// numeric types
+		case "double":
+		case "float":
+			jsonType += "\"type\": \"number\"\n";
+			break;
+		case "int":
+			jsonType += "\"type\": \"number\",\n";
+			jsonType += "\"multipleOf\": 1.0,\n";
+			jsonType += "\"minimum\": –2147483648,\n";
+			jsonType += "\"maximum\": 2147483647\n";
+			break;
+		case "long":
+			jsonType += "\"type\": \"number\",\n";
+			jsonType += "\"multipleOf\": 1.0,\n";
+			jsonType += "\"minimum\": -9223372036854775808,\n";
+			jsonType += "\"maximum\": 9223372036854775807\n";
+			break;
+		case "uLong":
+			jsonType += "\"type\": \"number\",\n";
+			jsonType += "\"multipleOf\": 1.0,\n";
+			jsonType += "\"minimum\": 0,\n";
+			jsonType += "\"maximum\": 18446744073709551615\n";
+			break;
+		case "uint":
+			jsonType += "\"type\": \"number\",\n";
+			jsonType += "\"multipleOf\": 1.0,\n";
+			jsonType += "\"minimum\": 0,\n";
+			jsonType += "\"maximum\": 4294967295\n";
+			break;
+		case "short":
+			jsonType += "\"type\": \"number\",\n";
+			jsonType += "\"multipleOf\": 1.0,\n";
+			jsonType += "\"minimum\": -32768,\n";
+			jsonType += "\"maximum\": 32767\n";
+			break;
+		case "ushort":
+			jsonType += "\"type\": \"number\",\n";
+			jsonType += "\"multipleOf\": 1.0,\n";
+			jsonType += "\"minimum\": 0,\n";
+			jsonType += "\"maximum\": 65535\n";
+			break;
+		case "char":
+		case "byte":
+			jsonType += "\"type\": \"number\",\n";
+			jsonType += "\"multipleOf\": 1.0,\n";
+			jsonType += "\"minimum\": -128,\n";
+			jsonType += "\"maximum\": 127\n";
+			break;
+		case "uchar":
+			jsonType += "\"type\": \"number\",\n";
+			jsonType += "\"multipleOf\": 1.0,\n";
+			jsonType += "\"minimum\": 0,\n";
+			jsonType += "\"maximum\": 255\n";
+			break;
+			
+		// String types
+		case "string":
+			jsonType += "\"type\": \"string\"\n";
+			break;
+		// Other types
+		case "any":
+		case "void":
+			return null;
+		default:
+			Log.trace("exportJsonPrimitiveSchemafromUml: error - type not recognized " + name);
+		}
+		return jsonType;
+	}
+
+
+	/**
+	 * @param type
 	 * @return JSON type definition corresponding to an XML Schema primitive type as a String
 	 */
-	String exportJsonPrimitiveSchema(UmlClass type) {
+	String exportJsonPrimitiveSchemafromXML(UmlClass type) {
 		String jsonType = "\"" + NamespaceModel.getPrefixedName(type) + "\": {\n";
 		switch (NamespaceModel.getName(type)) {
 		case "boolean":
@@ -584,6 +666,7 @@ public class JsonWriter {
 					LinkedHashSet<String> openapiResponses = new LinkedHashSet<String>();
 					UmlOperation operation = (UmlOperation) item;
 					String operationName = operation.name();
+					String operationPath = "/" + operationName;
 					String httpMethod = operation.propertyValue(JsonWriter.HTTP_METHODS_PROPERTY);
 					if (httpMethod == null)
 						continue;
@@ -599,64 +682,109 @@ public class JsonWriter {
 						String elementName = operationName + "Request";
 						String inputTypeName = elementName + "Type";
 						for (UmlParameter param : params) {
-							String paramName = param.name;
-							if (!paramName.equals("") && !paramName.equals("body")) {
-								// URL parameters
-								String paramType = param.type.toString();
-								switch (paramType) {
-								case "string":
-								case "int":
+							//String paramName = param.name;
+							if (!param.name.equals("") && !param.name.equals("body")) {
+								String[] paramNames = param.name.split(":");
+								if (paramNames.length < 2) {
+									Log.trace("exportOpenAPI: error - illegal parameter " + param.name + " in " + portName);
+									continue;
+								}
+								String paramKind = paramNames[0].trim();
+								String paramName = paramNames[1].trim();
+								switch (paramKind) {
+								case "path":
+									operationPath += "/{" + paramName + "}";
+								case "query":
+								case "header":
+								case "cookie":
 									break;
 								default:
-									paramType = "string";
+									Log.trace("exportOpenAPI: unreognized parameter type " + param.name + " in " + portName);
+									continue;
 								}
+								
+								// URL parameters
+								UmlTypeSpec paramType2 = param.type;
+								if (paramType2 == null)
+									continue;
+								//UmlClass paramType = paramType2.type;
+								//if (paramType == null)
+								//	continue;
+								String paramSchema = exportJsonPrimitiveSchemafromUml(paramType2);
+								if (paramSchema == null)
+									continue;
 								String mult = param.multiplicity;
 								mult = convertMultiplicity(mult);
 								// String minOccurs = getMinOccurs(mult);
 								String maxOccurs = NiemUmlClass.getMaxOccurs(mult);
 								String required = (maxOccurs.equals("0")) ? "false" : "true";
-								openapiPathParameters.add("           {\n" + "            \"name\": \"" + paramName
-										+ "\",\n" + "            \"in\": \"path\",\n" +
-										// " \"description\": \"" + param.type.toString() + "\",\n" +
-										"            \"required\": " + required + ",\n" + "            \"type\": \""
-										+ paramType + "\"\n" +
+								openapiPathParameters.add("           {\n"
+										+ "            \"name\": \"" + paramName + "\",\n" 
+										+ "            \"in\": \"" + paramKind + "\",\n" 
+										// + " \"description\": \"" + param.type.toString() + "\",\n"
+										+ "            \"required\": " + required + ",\n" 
+										+ paramSchema + "\n" +
 										// " \"format\": \"int64\"\n" +
 										"          }");
+
 								continue;
 							}
 							// body parameters
+							UmlTypeSpec inputType2 = null;
 							try {
-								inputType = param.type.type;
+								inputType2 = param.type;
+								if (inputType2 == null) {
+									Log.trace("exportOpenAPI: error - no input message for " + operationName);
+									continue;
+								}
+								inputType = inputType2.type;
 							} catch (Exception e) {
-								Log.trace("exportOpenAPI: error - no input message for " + operationName);
+								Log.trace("exportOpenAPI: error - no input message for " + operationName + " " + e.toString());
 							}
-							if (inputType == null || !inputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE))
-								continue;
-							String inputMessage = inputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
-							if (inputMessage == null || inputMessage.equals(""))
-								continue;
-							Log.debug("exportOpenAPI: input Message: " + inputMessage + " from operation " + operationName);
-							messageNamespaces.add(NamespaceModel.getPrefix(inputMessage));
-							String mult = param.multiplicity;
-
-							mult = convertMultiplicity(mult);
-							// String maxOccurs = getMaxOccurs(mult);
-							String prefix = NamespaceModel.getPrefix(inputMessage);
-							if (!NamespaceModel.isExternalPrefix(prefix)) {
-								String schemaURI = NamespaceModel.getSchemaURI(inputMessage);
-								UmlClassInstance messageElement = (NamespaceModel.isNiemPrefix(prefix)) ? 
-									NiemUmlClass.getSubsetModel().getElement(schemaURI, inputMessage) : 
-									NiemUmlClass.getExtensionModel().getElement(schemaURI, inputMessage);
-								jsonElementsInType.add(exportOpenApiElementInTypeSchema(openapiPath, messageElement, mult, false));
+							if (inputType == null) {
+								String inputTypeSchema = exportJsonPrimitiveSchemafromUml(inputType2);
+								if (inputTypeSchema != null)
+									openapiBodyParameters.add("{\n" 
+											+ "            \"name\": \"" + elementName + "\",\n"
+											+ "            \"in\": \"body\",\n" 
+											//+ "            \"description\": \"" + operationName + " request\",\n" 
+											+ "            \"required\": true,\n"
+											+ inputTypeSchema + "\n" 
+											+ "          }");
+							} else {
+								if (!inputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)) {
+									Log.trace("exportOpenAPI: error - no NIEM input message for " + operationName);
+									continue;
+								}
+								String inputMessage = inputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
+								if (inputMessage == null || inputMessage.equals("")) {
+									Log.trace("exportOpenAPI: error - NIEM XPath not defined for input message for " + operationName);
+									continue;
+								}
+								
+								Log.debug("exportOpenAPI: input Message: " + inputMessage + " from operation " + operationName);
+								messageNamespaces.add(NamespaceModel.getPrefix(inputMessage));
+								String mult = param.multiplicity;
+	
+								mult = convertMultiplicity(mult);
+								// String maxOccurs = getMaxOccurs(mult);
+								String prefix = NamespaceModel.getPrefix(inputMessage);
+								if (!NamespaceModel.isExternalPrefix(prefix)) {
+									String schemaURI = NamespaceModel.getSchemaURI(inputMessage);
+									UmlClassInstance messageElement = (NamespaceModel.isNiemPrefix(prefix)) ? 
+										NiemUmlClass.getSubsetModel().getElement(schemaURI, inputMessage) : 
+										NiemUmlClass.getExtensionModel().getElement(schemaURI, inputMessage);
+									jsonElementsInType.add(exportOpenApiElementInTypeSchema(openapiPath, messageElement, mult, false));
+								}
+								if (Integer.parseInt(NiemUmlClass.getMinOccurs(mult)) > 0)
+									jsonRequiredElementsInType.add("\"" + inputMessage + "\"");
+								// for each input parameter
+								openapiBodyParameters.add("{\n" + "            \"name\": \"" + elementName + "\",\n"
+										+ "            \"in\": \"body\",\n" + "            \"description\": \""
+										+ operationName + " request\",\n" + "            \"required\": true,\n"
+										+ "            \"schema\": {\n" + "              \"$ref\": \"#/definitions/"
+										+ elementName + "\"\n" + "            }\r\n" + "          }");
 							}
-							if (Integer.parseInt(NiemUmlClass.getMinOccurs(mult)) > 0)
-								jsonRequiredElementsInType.add("\"" + inputMessage + "\"");
-							// for each input parameter
-							openapiBodyParameters.add("{\n" + "            \"name\": \"" + elementName + "\",\n"
-									+ "            \"in\": \"body\",\n" + "            \"description\": \""
-									+ operationName + " request\",\n" + "            \"required\": true,\n"
-									+ "            \"schema\": {\n" + "              \"$ref\": \"#/definitions/"
-									+ elementName + "\"\n" + "            }\r\n" + "          }");
 						}
 						// export type wrapper
 						TreeSet<String> jsonDefinition = new TreeSet<String>();
@@ -664,9 +792,9 @@ public class JsonWriter {
 						// if (description != null && !description.equals(""))
 						// jsonDefinition.add("\"description\": \"" + filterQuotes(description) + "\"");
 						jsonDefinition.add("\"type\": \"object\"");
-						if (jsonElementsInType != null)
+						if (jsonElementsInType != null && jsonElementsInType.size()>0)
 							jsonDefinition.add("\"properties\": {\n" + String.join(",", jsonElementsInType) + "\n}");
-						if (jsonRequiredElementsInType != null)
+						if (jsonRequiredElementsInType != null && jsonRequiredElementsInType.size()>0)
 							jsonDefinition
 							.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
 						String typeSchema = "\"" + inputTypeName + "\": {\n" + String.join(",", jsonDefinition)
@@ -685,77 +813,104 @@ public class JsonWriter {
 						jsonDefinitions.add(typeSchema);
 					}
 					Log.debug("exportOpenAPI: generating document/literal output wrappers for " + operationName);
+					UmlTypeSpec outputType2 = null;
 					try {
-						outputType = operation.returnType().type;
+						outputType2 = operation.returnType();
+						if (outputType2 == null) {
+							Log.trace("exportOpenAPI: error - no output message for " + operationName);
+							continue;
+						}
+						outputType = outputType2.type;
 					} catch (Exception e) {
 						Log.trace("exportOpenAPI: error - no output message for " + operationName + " " + e.toString());
 					}
-					if (outputType == null || !outputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE))
-						continue;
-					String outputMessage = outputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
-					if (outputMessage == null || outputMessage.equals(""))
-						continue;
-					Log.debug("exportOpenAPI: output Message: " + outputMessage + " from operation " + operationName);
-					ArrayList<String> outputs = new ArrayList<String>();
-					if (outputMessage != null)
-						outputs.add(outputMessage);
-					if (JsonWriter.ERROR_RESPONSE != null)
-						outputs.add(JsonWriter.ERROR_RESPONSE);
-					for (String message : outputs) {
-						TreeSet<String> jsonRequiredElementsInType = new TreeSet<String>();
-						TreeSet<String> jsonElementsInType = new TreeSet<String>();
-						String elementName = (message.equals(JsonWriter.ERROR_RESPONSE) ? "Error" : operationName) + "Response";
-						String outputTypeName = elementName + "Type";
-						String mult = "1";
-						String prefix = NamespaceModel.getPrefix(message);
-						if (!NamespaceModel.isExternalPrefix(prefix)) {
-							String schemaURI = NamespaceModel.getSchemaURI(message);
-							UmlClassInstance messageElement = (NamespaceModel.isNiemPrefix(prefix)) ? 
-								NiemUmlClass.getSubsetModel().getElement(schemaURI, message) : 
-								NiemUmlClass.getExtensionModel().getElement(schemaURI, message);
-							jsonElementsInType
-							.add(exportOpenApiElementInTypeSchema(openapiPath, messageElement, mult, false));
-							jsonRequiredElementsInType.add("\"" + message + "\"");
+					if (outputType == null) {
+						String outputTypeSchema = exportJsonPrimitiveSchemafromUml(outputType2);
+						if (outputTypeSchema == null)
+							openapiResponses.add("\n" 
+									+ "          \"200\": {\n" 
+									+ "            \"description\": \"" + operationName + " response\"\n" 
+									+ "            }");
+						else 
+							openapiResponses.add("\n" 
+									+ "          \"200\": {\n" 
+									+ "            \"description\": \"" + operationName + " response\",\n" 
+									+ "\"schema\": {" + outputTypeSchema + "}\n" 
+									+ "            }");
+					} else {
+						if (!outputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)) {
+							Log.trace("exportOpenAPI: error - no NIEM output message for " + operationName);
+							continue;
 						}
-
-						// export type wrapper
-						TreeSet<String> jsonDefinition = new TreeSet<String>();
-						// String description = "";
-						// if (description != null && !description.equals(""))
-						// jsonDefinition.add("\"description\": \"" + filterQuotes(description) + "\"");
-						jsonDefinition.add("\"type\": \"object\"");
-						if (jsonElementsInType != null)
-							jsonDefinition.add("\"properties\": {\n" + String.join(",", jsonElementsInType) + "\n}");
-						if (jsonRequiredElementsInType != null)
-							jsonDefinition
-							.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
-						String typeSchema = "\"" + outputTypeName + "\": {\n" + String.join(",", jsonDefinition)
-						+ "\n}\n";
-
-						// export element wrapper
-						String elementSchema = "\"" + elementName + "\": {\n";
-						elementSchema += "\"description\": \"An output message\",";
-						elementSchema += "\"$ref\": \"#/definitions/" + outputTypeName + "\"" + "\n}\n";
-						
-						// swagger code generation tools do not support relative references, rename them to local references
-						elementSchema = elementSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
-						typeSchema = typeSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
-
-						jsonProperties.add(elementSchema);
-						jsonDefinitions.add(typeSchema);
-						
-						// add successful response
-						openapiResponses.add("\n" + "          \"200\": {\n" + "            \"description\": \""
-								+ operationName + " response\",\n" + "            \"schema\": {\n"
-								+ "                \"$ref\": \"#/definitions/" + operationName + "Response" + "\"\n"
-								+ "            }\n" + "          }");
-						// add error response
-						if (JsonWriter.ERROR_RESPONSE != null)
-							openapiResponses.add("\n" + "          \"default\": {\n"
-									+ "            \"description\": \"unexpected error\",\n"
-									+ "            \"schema\": {\n" + "              \"$ref\": \"#/definitions/"
-									+ JsonWriter.ERROR_RESPONSE + "\"\n" + "            }\n" + "          }\n");
-					}
+						String outputMessage = outputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
+						if (outputMessage == null || outputMessage.equals("")) {
+							Log.trace("exportOpenAPI: error - NIEM XPath not defined for output message for " + operationName);
+							continue;
+						}
+						Log.debug("exportOpenAPI: output Message: " + outputMessage + " from operation " + operationName);
+						//ArrayList<String> outputs = new ArrayList<String>();
+						//if (outputMessage != null)
+						//	outputs.add(outputMessage);
+						//if (JsonWriter.ERROR_RESPONSE != null)
+						//	outputs.add(JsonWriter.ERROR_RESPONSE);
+						//for (String message : outputs) {
+							String message = outputMessage;
+							TreeSet<String> jsonRequiredElementsInType = new TreeSet<String>();
+							TreeSet<String> jsonElementsInType = new TreeSet<String>();
+							//String elementName = (message.equals(JsonWriter.ERROR_RESPONSE) ? "Error" : operationName) + "Response";
+							String elementName = operationName + "Response";
+							String outputTypeName = elementName + "Type";
+							String mult = "1";
+							String prefix = NamespaceModel.getPrefix(message);
+							if (!NamespaceModel.isExternalPrefix(prefix)) {
+								String schemaURI = NamespaceModel.getSchemaURI(message);
+								UmlClassInstance messageElement = (NamespaceModel.isNiemPrefix(prefix)) ? 
+									NiemUmlClass.getSubsetModel().getElement(schemaURI, message) : 
+									NiemUmlClass.getExtensionModel().getElement(schemaURI, message);
+								jsonElementsInType
+								.add(exportOpenApiElementInTypeSchema(openapiPath, messageElement, mult, false));
+								jsonRequiredElementsInType.add("\"" + message + "\"");
+							}
+	
+							// export type wrapper
+							TreeSet<String> jsonDefinition = new TreeSet<String>();
+							// String description = "";
+							// if (description != null && !description.equals(""))
+							// jsonDefinition.add("\"description\": \"" + filterQuotes(description) + "\"");
+							jsonDefinition.add("\"type\": \"object\"");
+							if (jsonElementsInType != null && jsonElementsInType.size()>0)
+								jsonDefinition.add("\"properties\": {\n" + String.join(",", jsonElementsInType) + "\n}");
+							if (jsonRequiredElementsInType != null && jsonRequiredElementsInType.size()>0)
+								jsonDefinition
+								.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
+							String typeSchema = "\"" + outputTypeName + "\": {\n" + String.join(",", jsonDefinition)
+							+ "\n}\n";
+	
+							// export element wrapper
+							String elementSchema = "\"" + elementName + "\": {\n";
+							elementSchema += "\"description\": \"An output message\",";
+							elementSchema += "\"$ref\": \"#/definitions/" + outputTypeName + "\"" + "\n}\n";
+							
+							// swagger code generation tools do not support relative references, rename them to local references
+							elementSchema = elementSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
+							typeSchema = typeSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
+	
+							jsonProperties.add(elementSchema);
+							jsonDefinitions.add(typeSchema);
+							Log.debug("exportOpenAPI: exported element " + elementName + " and type " + outputTypeName);
+							// add successful response
+							openapiResponses.add("\n" + "          \"200\": {\n" + "            \"description\": \""
+									+ operationName + " response\",\n" + "            \"schema\": {\n"
+									+ "                \"$ref\": \"#/definitions/" + operationName + "Response" + "\"\n"
+									+ "            }\n" + "          }");
+							// add error response
+							if (JsonWriter.ERROR_RESPONSE != null)
+								openapiResponses.add("\n" + "          \"default\": {\n"
+										+ "            \"description\": \"unexpected error\",\n"
+										+ "            \"schema\": {\n" + "              \"$ref\": \"#/definitions/"
+										+ JsonWriter.ERROR_RESPONSE + "\"\n" + "            }\n" + "          }\n");
+						//}
+						}
 					for (String method : JsonWriter.HTTP_METHODS) {
 						if (httpMethod.contains(method)) {
 							LinkedHashSet<String> openapiParameters = openapiPathParameters;
@@ -774,7 +929,7 @@ public class JsonWriter {
 						}
 					}
 
-					openapiPaths.add("\n" + "    \"/" + operationName + "\": {" + String.join(",", openapiOperations)
+					openapiPaths.add("\n" + "    \"" + operationPath + "\": {" + String.join(",", openapiOperations)
 					+ "\n      }");
 				}
 			}
@@ -867,7 +1022,7 @@ public class JsonWriter {
 	/**
 	 * @param name
 	 * @param value
-	 * @returna JSON name value pair as a String
+	 * @return a JSON name value pair as a String
 	 */
 	private String getJsonPair(String name, String value) {
 		return "\"" + name + "\" : \"" + value + "\"\n";
