@@ -55,7 +55,7 @@ public class CsvReader {
 						if (attributeName.equals("")) {
 							// import NIEM mapping to class
 							Log.debug("importCsv: importing NIEM mapping for " + className);
-							for (int column = 4; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length
+							for (int column = 5; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length
 									&& column < nextLine.length; column++)
 								type.set_PropertyValue(NiemUmlClass.getNiemProperty(column), nextLine[column]);
 						} else {
@@ -63,7 +63,7 @@ public class CsvReader {
 							for (UmlItem item : type.children())
 								if (item.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)
 										&& (item.name().equals(attributeName)))
-									for (int column = 4; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length
+									for (int column = 5; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length
 											&& column < nextLine.length; column++)
 										item.set_PropertyValue(NiemUmlClass.getNiemProperty(column), nextLine[column]);
 						}
@@ -73,7 +73,7 @@ public class CsvReader {
 					if (element != null) {
 						// import NIEM mapping to class
 						Log.debug("importCsv: importing NIEM mapping for " + attributeName);
-						for (int column = 4; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length && column < nextLine.length; column++)
+						for (int column = 5; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length && column < nextLine.length; column++)
 							element.set_PropertyValue(NiemUmlClass.getNiemProperty(column), nextLine[column]);
 					}
 				}

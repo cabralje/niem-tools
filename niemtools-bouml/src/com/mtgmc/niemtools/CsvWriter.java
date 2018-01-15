@@ -9,8 +9,10 @@ import com.opencsv.CSVWriter;
 
 import fr.bouml.UmlAttribute;
 import fr.bouml.UmlClass;
+import fr.bouml.UmlClassInstance;
 import fr.bouml.UmlItem;
 import fr.bouml.UmlRelation;
+import fr.bouml.UmlTypeSpec;
 import fr.bouml.anItemKind;
 
 public class CsvWriter {
@@ -29,28 +31,40 @@ public class CsvWriter {
 				nextLine[0] = item.name();
 				nextLine[1] = "";
 				nextLine[2] = "";
+				nextLine[3] = "";
 				break;
 			case anItemKind._anAttribute:
+				UmlAttribute a = (UmlAttribute) item;
 				nextLine[0] = item.parent().name();
 				nextLine[1] = item.name();
-				UmlAttribute a = (UmlAttribute) item;
-				nextLine[2] = a.multiplicity();
+				UmlTypeSpec t = a.type();
+				if (t != null)
+					nextLine[2] = t.toString();
+				else
+					nextLine[2] = "";
+				nextLine[3] = a.multiplicity();
 				break;
 			case anItemKind._aRelation:
-				nextLine[0] = item.parent().name();
 				UmlRelation r = (UmlRelation) item;
+				nextLine[0] = item.parent().name();
 				nextLine[1] = r.name();
-				nextLine[2] = r.multiplicity();
+				nextLine[3] = r.multiplicity();
 				break;
 			case anItemKind._aClassInstance:
+				UmlClassInstance ci = (UmlClassInstance) item;
 				nextLine[0] = "";
 				nextLine[1] = item.name();
-				nextLine[2] = "";
+				UmlClass c = ci.type();
+				if (c != null)
+					nextLine[2] = c.name();
+				else
+					nextLine[2] = "";
+				nextLine[3] = "";
 				break;
 			default:
 				nextLine[0] = item.parent().name();
 				nextLine[1] = item.name();
-				nextLine[2] = "";
+				nextLine[3] = "";
 				break;
 			}
 		} catch (Exception e) {
@@ -58,11 +72,11 @@ public class CsvWriter {
 		}
 
 		// Export Description
-		nextLine[3] = item.description();
+		nextLine[4] = item.description();
 
 		// Export NIEM Mapping
 		if (item.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE))
-			for (int column = 4; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length; column++)
+			for (int column = 5; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length; column++)
 				nextLine[column] = item.propertyValue(NiemUmlClass.getNiemProperty(column));
 
 		return nextLine;

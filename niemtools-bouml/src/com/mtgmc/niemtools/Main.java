@@ -118,6 +118,18 @@ class Main
 					UmlCom.targetItem().sort();
 					break;
 
+				case "addStereotype":
+					Log.trace("<b>Add Stereotype<br>");
+					niemTools.cacheModels(false);
+					niemTools.addStereotype(UmlCom.targetItem());
+					break;
+					
+				case "removeStereotype":
+					Log.trace("<b>Remove Stereotype<br>");
+					niemTools.cacheModels(false);
+					niemTools.removeStereotype(UmlCom.targetItem());
+					break;
+					
 				case "export":
 				default:
 					if (!niemTools.verifyNIEM())

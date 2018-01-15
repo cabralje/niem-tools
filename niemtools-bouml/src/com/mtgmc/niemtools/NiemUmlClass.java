@@ -58,7 +58,9 @@ import fr.bouml.UmlItem;
 import fr.bouml.UmlOperation;
 import fr.bouml.UmlPackage;
 import fr.bouml.UmlParameter;
+import fr.bouml.UmlRelation;
 import fr.bouml.UmlTypeSpec;
+import fr.bouml.aRelationKind;
 import fr.bouml.anItemKind;
 
 public class NiemUmlClass {
@@ -90,44 +92,47 @@ public class NiemUmlClass {
 	// NIEM mapping spreadsheet column headings, NIEM profile profile stereotype
 	static final String[][] NIEM_STEREOTYPE_MAP = { { "Model Class", "", }, // 0
 			{ "Model Attribute", "", }, // 1
-			{ "Model Multiplicity", "", }, // 2
-			{ "Model Definition", "", }, // 3
-			{ "NIEM XPath", "XPath" }, // 4
-			{ "NIEM Type", "Type" }, // 5
-			{ "NIEM Property, " + REFERENCE_PREFIX + "Reference, (Representation)", "Property" }, // 6
-			{ "NIEM Base Type", "BaseType" }, // 7
-			{ "NIEM Multiplicity", "Multiplicity" }, // 8
-			{ "Old XPath", "OldXPath" }, // 9
-			{ "Old Multiplicity", "OldMultiplicity" }, // 10
-			{ "NIEM Mapping Notes", "Notes" }, // 11
-			{ "Code List Code=Definition;", "CodeList" } }; // 12
+			{ "Model Type", "", }, // 2
+			{ "Model Multiplicity", "", }, // 3
+			{ "Model Definition", "", }, // 4
+			{ "NIEM XPath", "XPath" }, // 5
+			{ "NIEM Type", "Type" }, // 6
+			{ "NIEM Property, " + REFERENCE_PREFIX + "Reference, (Representation)", "Property" }, // 7
+			{ "NIEM Base Type", "BaseType" }, // 8
+			{ "NIEM Multiplicity", "Multiplicity" }, // 9
+			{ "Old XPath", "OldXPath" }, // 10
+			{ "Old Multiplicity", "OldMultiplicity" }, // 11
+			{ "NIEM Mapping Notes", "Notes" }, // 12
+			{ "Code List Code=Definition;", "CodeList" } }; // 13
 
 	// private static final String NIEM_STEREOTYPE_CLASS = NIEM_STEREOTYPE_TYPE +
 	// STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[0][1];
 	// private static final String NIEM_STEREOTYPE_ATTRIBUTE = NIEM_STEREOTYPE_TYPE
 	// + STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[1][1];
+	// private static final String NIEM_STEREOTYPE_ATTRIBUTETYPE = NIEM_STEREOTYPE_TYPE
+	// + STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[2][1];
 	// private static final String NIEM_STEREOTYPE_MODEL_MULTIPLICITY =
-	// NIEM_STEREOTYPE_TYPE + STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[2][1];
+	// NIEM_STEREOTYPE_TYPE + STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[3][1];
 	// private static final String NIEM_STEREOTYPE_DEFINITION = NIEM_STEREOTYPE_TYPE
-	// + STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[3][1];
+	// + STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[4][1];
 	static final String NIEM_STEREOTYPE_XPATH = NIEM_STEREOTYPE + STEREOTYPE_DELIMITER
-			+ NIEM_STEREOTYPE_MAP[4][1];
-	private static final String NIEM_STEREOTYPE_TYPENAME = NIEM_STEREOTYPE + STEREOTYPE_DELIMITER
 			+ NIEM_STEREOTYPE_MAP[5][1];
-	private static final String NIEM_STEREOTYPE_PROPERTY = NIEM_STEREOTYPE + STEREOTYPE_DELIMITER
+	private static final String NIEM_STEREOTYPE_TYPENAME = NIEM_STEREOTYPE + STEREOTYPE_DELIMITER
 			+ NIEM_STEREOTYPE_MAP[6][1];
-	private static final String NIEM_STEREOTYPE_BASE_TYPE = NIEM_STEREOTYPE + STEREOTYPE_DELIMITER
+	private static final String NIEM_STEREOTYPE_PROPERTY = NIEM_STEREOTYPE + STEREOTYPE_DELIMITER
 			+ NIEM_STEREOTYPE_MAP[7][1];
-	private static final String NIEM_STEREOTYPE_MULTIPLICITY = NIEM_STEREOTYPE + STEREOTYPE_DELIMITER
+	private static final String NIEM_STEREOTYPE_BASE_TYPE = NIEM_STEREOTYPE + STEREOTYPE_DELIMITER
 			+ NIEM_STEREOTYPE_MAP[8][1];
+	private static final String NIEM_STEREOTYPE_MULTIPLICITY = NIEM_STEREOTYPE + STEREOTYPE_DELIMITER
+			+ NIEM_STEREOTYPE_MAP[9][1];
 	// private static final String NIEM_STEREOTYPE_OLD_XPATH = NIEM_STEREOTYPE_TYPE
-	// + STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[9][1];
+	// + STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[10][1];
 	// private static final String NIEM_STEREOTYPE_OLD_MULTIPLICITY =
-	// NIEM_STEREOTYPE_TYPE + STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[10][1];
+	// NIEM_STEREOTYPE_TYPE + STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[11][1];
 	private static final String NIEM_STEREOTYPE_NOTES = NIEM_STEREOTYPE + STEREOTYPE_DELIMITER
-			+ NIEM_STEREOTYPE_MAP[11][1];
-	private static final String NIEM_STEREOTYPE_CODE_LIST = NIEM_STEREOTYPE + STEREOTYPE_DELIMITER
 			+ NIEM_STEREOTYPE_MAP[12][1];
+	private static final String NIEM_STEREOTYPE_CODE_LIST = NIEM_STEREOTYPE + STEREOTYPE_DELIMITER
+			+ NIEM_STEREOTYPE_MAP[13][1];
 
 	private static int importPass;
 	//static String importPath;
@@ -397,14 +402,14 @@ public class NiemUmlClass {
 			UmlItem item = it.next();
 			if (!item.stereotype().equals(NIEM_STEREOTYPE))
 				continue;
+			Log.debug("creatSubsetAndExtension: " + item.name());
 			String typeName = item.propertyValue(NIEM_STEREOTYPE_TYPENAME).trim();
 			String elementName = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
 			String notes = item.propertyValue(NIEM_STEREOTYPE_NOTES).trim();
 			String baseTypeName = item.propertyValue(NIEM_STEREOTYPE_BASE_TYPE).trim();
 			if (baseTypeName.equals(NiemModel.ABSTRACT_TYPE_NAME))
 				continue;
-			// trace("createSubsetAndExtension: adding type " + typeName + " and base type "
-			// + baseTypeName);
+			Log.debug("createSubsetAndExtension: adding type " + typeName + " and base type " + baseTypeName);
 			String description = null;
 			if (elementName.equals(""))
 				if (typeName.endsWith(NiemModel.AUGMENTATION_TYPE_NAME))
@@ -1067,4 +1072,42 @@ public class NiemUmlClass {
 		Log.trace("NIEM reference model does not exist.  Import NIEM reference schemas first.");
 		return false;
 	}
+	
+	public void addStereotype(UmlItem item) {		
+		if (item.kind() == anItemKind.aClass || 
+			item.kind() == anItemKind.aClassInstance ||
+			item.kind() == anItemKind.anAttribute) {
+				item.set_Stereotype(NIEM_STEREOTYPE);
+				item.applyStereotype();
+		}
+		else if (item.kind() == anItemKind.aRelation) {
+			UmlRelation r = (UmlRelation)item;
+			if (r.relationKind() != aRelationKind.aGeneralisation) {
+				item.set_Stereotype(NIEM_STEREOTYPE);
+				item.applyStereotype();
+			}
+		}
+		UmlItem[] ch = item.children();
+		for(UmlItem c : ch)
+			addStereotype(c);
+	}
+	
+	public void removeStereotype(UmlItem item) {
+		if (item.kind() == anItemKind.aClass || 
+				item.kind() == anItemKind.aClassInstance ||
+				item.kind() == anItemKind.anAttribute) {
+					item.set_Stereotype(null);
+					item.applyStereotype();
+				}
+			else if (item.kind() == anItemKind.aRelation) {
+				UmlRelation r = (UmlRelation)item;
+				if (r.relationKind() != aRelationKind.aGeneralisation) {
+					item.set_Stereotype(null);
+					item.applyStereotype();
+				}
+			}
+			UmlItem[] ch = item.children();
+			for(UmlItem c : ch)
+				removeStereotype(c);
+	}	
 }
