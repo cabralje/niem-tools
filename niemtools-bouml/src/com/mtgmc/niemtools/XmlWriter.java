@@ -301,7 +301,7 @@ public class XmlWriter {
 	void exportWsdl(String wsdlDir, Map<String, UmlClass> ports, Set<String> messageNamespaces) throws IOException {
 
 		String WSDLURI = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + WSDL_SUFFIX;
-		String WRAPPERURI = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + MESSAGE_WRAPPERS_FILE_NAME;
+		String WRAPPERURI = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + "/" + MESSAGE_WRAPPERS_FILE_NAME;
 
 		Log.trace("Generating document/literal wrapper schema");
 		TreeSet<String> xmlTypes = new TreeSet<String>();

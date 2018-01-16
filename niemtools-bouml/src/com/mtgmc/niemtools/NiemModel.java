@@ -597,6 +597,9 @@ class NiemModel {
 			// build list of referenced namespaces
 			TreeSet<String> schemaNamespaces = new TreeSet<String>();
 			schemaNamespaces.add(NiemModel.XSD_PREFIX);
+			
+			// add structures namespaces (for base types)
+			schemaNamespaces.add(NiemUmlClass.STRUCTURES_PREFIX);
 	
 			TreeSet<String> xmlTypes = new TreeSet<String>();
 			TreeSet<String> jsonDefinitions = new TreeSet<String>();
