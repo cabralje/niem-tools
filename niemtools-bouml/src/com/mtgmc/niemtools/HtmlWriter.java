@@ -12,6 +12,7 @@ import fr.bouml.UmlAttribute;
 import fr.bouml.UmlClass;
 import fr.bouml.UmlItem;
 import fr.bouml.UmlRelation;
+import fr.bouml.UmlTypeSpec;
 import fr.bouml.aRelationKind;
 import fr.bouml.anItemKind;
 
@@ -116,6 +117,7 @@ public class HtmlWriter {
 				writeItemHtml(fw, item);
 				fw.write("</td><td>");
 				fw.write("</td><td>");
+				fw.write("</td><td>");
 			}
 			break;
 			case anItemKind._anAttribute: {
@@ -125,6 +127,10 @@ public class HtmlWriter {
 				writeItemHtml(fw, item);
 				fw.write("</td><td>");
 				UmlAttribute a = (UmlAttribute) item;
+				UmlTypeSpec t = a.type();
+				if (t != null)
+					fw.write(t.toString());
+				fw.write("</td><td>");
 				fw.write(a.multiplicity());
 			}
 			break;
@@ -138,6 +144,7 @@ public class HtmlWriter {
 					writeItemHtml(fw, item.parent());
 					fw.write("</td><td style=\"word-wrap: break-word\">");
 					writeItemHtml(fw, item);
+					fw.write("</td><td>");
 					fw.write("</td><td>");
 					fw.write(rel.multiplicity());
 				}

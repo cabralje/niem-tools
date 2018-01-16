@@ -48,6 +48,7 @@ public class CsvWriter {
 				UmlRelation r = (UmlRelation) item;
 				nextLine[0] = item.parent().name();
 				nextLine[1] = r.name();
+				nextLine[2] = "";
 				nextLine[3] = r.multiplicity();
 				break;
 			case anItemKind._aClassInstance:
