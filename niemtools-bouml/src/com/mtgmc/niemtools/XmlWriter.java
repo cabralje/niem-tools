@@ -330,7 +330,7 @@ public class XmlWriter {
 						}
 						if (inputType == null || !inputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE))
 							continue;
-						String inputMessage = inputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
+						String inputMessage = inputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_PROPERTY);
 						if (inputMessage == null || inputMessage.equals(""))
 							continue;
 						Log.debug("exportWSDL: input Message: " + inputMessage + " from operation " + operationName);
@@ -369,22 +369,27 @@ public class XmlWriter {
 				}
 				if (outputType == null || !outputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE))
 					continue;
-				String outputMessage = outputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
+				String outputMessage = outputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_PROPERTY);
 				if (outputMessage == null || outputMessage.equals(""))
 					continue;
 				Log.debug("exportWSDL: output Message: " + outputMessage + " from operation " + operationName);
+				Log.debug("0");
 				messageNamespaces.add(NamespaceModel.getPrefix(outputMessage));
+				Log.debug("1");
 				String elementName = operationName + "Response";
 				String outputTypeName = elementName + "Type";
 				String outputTypeSchema = "<xs:complexType name=\"" + outputTypeName + "\">" + "<xs:sequence>";
+				Log.debug("2");
 				if (NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(outputMessage)))
 					outputTypeSchema += "<!--xs:element ref=\"" + outputMessage + "\"/-->";
 				else
 					outputTypeSchema += "<xs:element ref=\"" + outputMessage + "\"/>";
+				Log.debug("3");
 				outputTypeSchema += "</xs:sequence>" + "</xs:complexType>";
 				xmlTypes.add(outputTypeSchema);
 				xmlElements.add("<xs:element name=\"" + elementName + "\" type=\""
 						+ NamespaceModel.getPrefixedName(WRAPPER_PREFIX, outputTypeName) + "\"/>");
+				Log.debug("4");
 			}
 		}
 

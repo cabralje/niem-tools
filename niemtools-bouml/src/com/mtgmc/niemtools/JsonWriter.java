@@ -263,6 +263,7 @@ public class JsonWriter {
 			return null;
 		default:
 			Log.trace("exportJsonPrimitiveSchemafromUml: error - type not recognized " + name);
+			return "";
 		}
 		return jsonType;
 	}
@@ -713,6 +714,8 @@ public class JsonWriter {
 								String paramSchema = exportJsonPrimitiveSchemafromUml(paramType2);
 								if (paramSchema == null)
 									continue;
+								if (paramSchema.equals(""))
+									Log.trace("exportOpenAPI - operation " + operationName + " parameter " + param.name + " has no base type "); 
 								String mult = param.multiplicity;
 								mult = convertMultiplicity(mult);
 								// String minOccurs = getMinOccurs(mult);
@@ -743,7 +746,9 @@ public class JsonWriter {
 							}
 							if (inputType == null) {
 								String inputTypeSchema = exportJsonPrimitiveSchemafromUml(inputType2);
-								if (inputTypeSchema != null)
+								if (inputTypeSchema != null) {
+									if (inputTypeSchema.equals(""))
+										Log.trace("exportOpenAPI - operation " + operationName + " parameter " + param.name + " has no base type "); 
 									openapiBodyParameters.add("{\n" 
 											+ "            \"name\": \"" + elementName + "\",\n"
 											+ "            \"in\": \"body\",\n" 
@@ -751,12 +756,13 @@ public class JsonWriter {
 											+ "            \"required\": true,\n"
 											+ inputTypeSchema + "\n" 
 											+ "          }");
+								}
 							} else {
 								if (!inputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)) {
 									Log.trace("exportOpenAPI: error - no NIEM input message for " + operationName);
 									continue;
 								}
-								String inputMessage = inputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
+								String inputMessage = inputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_PROPERTY);
 								if (inputMessage == null || inputMessage.equals("")) {
 									Log.trace("exportOpenAPI: error - NIEM XPath not defined for input message for " + operationName);
 									continue;
@@ -816,7 +822,7 @@ public class JsonWriter {
 					UmlTypeSpec outputType2 = null;
 					try {
 						outputType2 = operation.returnType();
-						if (outputType2 == null) {
+						if (outputType2 == null || outputType2.equals("")) {
 							Log.trace("exportOpenAPI: error - no output message for " + operationName);
 							continue;
 						}
@@ -831,18 +837,21 @@ public class JsonWriter {
 									+ "          \"200\": {\n" 
 									+ "            \"description\": \"" + operationName + " response\"\n" 
 									+ "            }");
-						else 
+						else  {
+							if (outputTypeSchema.equals(""))
+								Log.trace("exportOpenAPI - operation " + operationName + " response has no base type "); 
 							openapiResponses.add("\n" 
 									+ "          \"200\": {\n" 
 									+ "            \"description\": \"" + operationName + " response\",\n" 
 									+ "\"schema\": {" + outputTypeSchema + "}\n" 
 									+ "            }");
+						}
 					} else {
 						if (!outputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)) {
 							Log.trace("exportOpenAPI: error - no NIEM output message for " + operationName);
 							continue;
 						}
-						String outputMessage = outputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
+						String outputMessage = outputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_PROPERTY);
 						if (outputMessage == null || outputMessage.equals("")) {
 							Log.trace("exportOpenAPI: error - NIEM XPath not defined for output message for " + operationName);
 							continue;
@@ -1011,12 +1020,12 @@ public class JsonWriter {
 		return elementSchema;
 	}
 
-	/** filter illegal characters in XML strings
+	/** filter illegal characters in JSON strings
 	 * @param string
 	 * @return filtered String
 	 */
 	private String filterQuotes(String string) {
-		return string.replaceAll("&", "&amp;").replaceAll("\"", "&quot;").replaceAll("\r|\n", "");
+		return string.replaceAll("\r|\n|\"|\\\\", "");
 	}
 
 	/**
