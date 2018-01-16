@@ -112,7 +112,7 @@ public class NamespaceModel {
 	 * @return an extension schema URI as a String
 	 */
 	static String getExtensionSchema(String prefix) {
-		return NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + prefix;
+		return NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + "/" + prefix;
 	}
 	
 	/**

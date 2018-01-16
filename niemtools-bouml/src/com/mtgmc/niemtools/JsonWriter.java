@@ -826,7 +826,7 @@ public class JsonWriter {
 					UmlTypeSpec outputType2 = null;
 					try {
 						outputType2 = operation.returnType();
-						if (outputType2 == null || outputType2.equals("")) {
+						if (outputType2 == null) {
 							Log.trace("exportOpenAPI: error - no output message for " + operationName);
 							continue;
 						}
