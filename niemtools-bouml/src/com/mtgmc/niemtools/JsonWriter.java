@@ -50,12 +50,15 @@ public class JsonWriter {
 
 	private static final String ERROR_RESPONSE = "cbrn:MessageStatus";
 	private static final String[] HTTP_METHODS = { "get", "put", "post", "update" };
-	private static final String HTTP_METHODS_PROPERTY = JsonWriter.WEBSERVICE_STEREOTYPE + NiemUmlClass.STEREOTYPE_DELIMITER
+	public static final String WEBSERVICE_STEREOTYPE = "niem-profile:webservice";
+	private static final String HTTP_METHODS_PROPERTY = WEBSERVICE_STEREOTYPE + NiemUmlClass.STEREOTYPE_DELIMITER
 			+ "HTTPMethods";
 	static final String JSON_SCHEMA_FILE_TYPE = ".schema.json";
 	private static final String JSON_SCHEMA_URI = "http://json-schema.org/draft-04/schema#";
 	private static final String OPENAPI_FILE_TYPE = ".openapi.json";
-	public static final String WEBSERVICE_STEREOTYPE = "niem-profile:webservice";
+
+	public static final String INTERFACE_STEREOTYPE = "niem-profile:interface";
+	public static final String INTERFACE_PATH_PROPERTY = INTERFACE_STEREOTYPE + NiemUmlClass.STEREOTYPE_DELIMITER + "Path";
 	private static final String JSON_LD_ID_ELEMENT = "@id";
 	private static final String JSON_LD_ID_ELEMENT_TYPE = "xs:NCName";
 
@@ -649,6 +652,7 @@ public class JsonWriter {
 		Log.trace("Generating OpenAPIs");
 		for (UmlClass port : ports.values()) {
 			String portName = port.name();
+			String portPath = port.propertyValue(INTERFACE_PATH_PROPERTY);
 			// write OpenAPI paths
 			TreeSet<String> openapiPaths = new TreeSet<String>();
 
@@ -963,7 +967,7 @@ public class JsonWriter {
 						+ NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CONTACT_PROPERTY) + "\"\n" + "    },\n" + "    \"license\": {\n"
 						+ "      \"name\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY) + "\",\n"
 						+ "      \"url\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY) + "\"\n" + "    }\n"
-						+ "  },\n" + "  \"host\": \"host.example.com\",\n" + "  \"basePath\": \"/api\",\n"
+						+ "  },\n" + "  \"host\": \"host.example.com\",\n" + "  \"basePath\": \"" + portPath + "\",\n"
 						+ "  \"schemes\": [\n" + "    \"http\"\n" + "  ],\n" + "  \"consumes\": [\n"
 						+ "    \"application/json\"\n" + "  ],\n" + "  \"produces\": [\n"
 						+ "    \"application/json\"\n" + "  ]," + "  \"paths\": {" + "  "
