@@ -367,29 +367,41 @@ public class XmlWriter {
 				} catch (Exception e) {
 					Log.trace("exportWSDL: error - no output message for " + operationName + " " + e.toString());
 				}
-				if (outputType == null || !outputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE))
+				if (outputType == null || !outputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)) {
+					String returnType = operation.returnType().toString();
+					Log.debug("exportWsdl: unusual return type " + returnType);
+					String outputTypeName = null;
+					switch (returnType) {
+					case "bool":
+						outputTypeName = "xs:boolean";
+						break;
+					case "int":
+						outputTypeName = "xs:integer";
+						break;
+					case "string":
+					default:
+						outputTypeName = "xs:string";
+					}
+					if (outputTypeName != null)
+						xmlElements.add("<xs:element name=\"" + operationName + "Response" + "\" type=\"" + outputTypeName + "\"/>");
 					continue;
+				}
 				String outputMessage = outputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_PROPERTY);
 				if (outputMessage == null || outputMessage.equals(""))
 					continue;
 				Log.debug("exportWSDL: output Message: " + outputMessage + " from operation " + operationName);
-				Log.debug("0");
 				messageNamespaces.add(NamespaceModel.getPrefix(outputMessage));
-				Log.debug("1");
 				String elementName = operationName + "Response";
 				String outputTypeName = elementName + "Type";
 				String outputTypeSchema = "<xs:complexType name=\"" + outputTypeName + "\">" + "<xs:sequence>";
-				Log.debug("2");
 				if (NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(outputMessage)))
 					outputTypeSchema += "<!--xs:element ref=\"" + outputMessage + "\"/-->";
 				else
 					outputTypeSchema += "<xs:element ref=\"" + outputMessage + "\"/>";
-				Log.debug("3");
 				outputTypeSchema += "</xs:sequence>" + "</xs:complexType>";
 				xmlTypes.add(outputTypeSchema);
 				xmlElements.add("<xs:element name=\"" + elementName + "\" type=\""
 						+ NamespaceModel.getPrefixedName(WRAPPER_PREFIX, outputTypeName) + "\"/>");
-				Log.debug("4");
 			}
 		}
 
