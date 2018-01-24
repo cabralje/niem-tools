@@ -201,8 +201,10 @@ public class HtmlWriter {
 				bgcolor = defaultBGColor;
 				fgcolor = defaultFGColor;
 				if (!typeName.equals("")) {
-					if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName)) && !NiemUmlClass.isNiemType(typeName))
+					if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName)) && !NiemUmlClass.isNiemType(typeName)) {
 						fgcolor = invalidFGColor;
+						Log.trace("writeLineHtml: type " + typeName + " is not in the NIEM reference model");
+					}
 					if (!NamespaceModel.isNiemPrefix(typePrefix) && !NamespaceModel.isExternalPrefix(typePrefix))
 						bgcolor = extensionBGColor;
 				}
@@ -220,8 +222,10 @@ public class HtmlWriter {
 						if (!mat.find()) {
 							String prefix = NamespaceModel.getPrefix(elementName);
 							if (NamespaceModel.isNiemPrefix(typePrefix) && NamespaceModel.isNiemPrefix(prefix)
-									&& !NiemUmlClass.isNiemElementInType(typeName, elementName))
+									&& !NiemUmlClass.isNiemElementInType(typeName, elementName)) {
 								fgcolor = invalidFGColor;
+								Log.trace("writeLineHtml: element " + elementName + " is not in type " + typeName + " in the NIEM reference model");
+							}
 							prefix = NamespaceModel.getPrefix(elementLine);
 							if (!NamespaceModel.isNiemPrefix(prefix) && !NamespaceModel.isExternalPrefix(prefix))
 								bgcolor = extensionBGColor;
@@ -256,6 +260,7 @@ public class HtmlWriter {
 						throw new NumberFormatException();
 				} catch (NumberFormatException e) {
 					fgcolor = invalidFGColor;
+					Log.trace("writeLineHtml: illegal multiplicity " + multiplicity + " in type " + typeName);
 				}
 				fw.write(getColumnHtml(column[9], bgcolor, fgcolor, false));
 
