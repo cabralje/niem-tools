@@ -766,7 +766,7 @@ public class JsonWriter {
 									Log.trace("exportOpenAPI: error - no NIEM input message for " + operationName);
 									continue;
 								}
-								String inputMessage = inputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_PROPERTY);
+								String inputMessage = inputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
 								if (inputMessage == null || inputMessage.equals("")) {
 									Log.trace("exportOpenAPI: error - NIEM XPath not defined for input message for " + operationName);
 									continue;
@@ -855,7 +855,7 @@ public class JsonWriter {
 							Log.trace("exportOpenAPI: error - no NIEM output message for " + operationName);
 							continue;
 						}
-						String outputMessage = outputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_PROPERTY);
+						String outputMessage = outputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
 						if (outputMessage == null || outputMessage.equals("")) {
 							Log.trace("exportOpenAPI: error - NIEM XPath not defined for output message for " + operationName);
 							continue;
