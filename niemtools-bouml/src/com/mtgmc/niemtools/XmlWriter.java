@@ -328,11 +328,15 @@ public class XmlWriter {
 						} catch (Exception e) {
 							Log.trace("exportWSDL: error - no input message for " + operationName);
 						}
-						if (inputType == null || !inputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE))
+						if (inputType == null || !inputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)) {
+							Log.trace("exportWSDL: error - no type for input message for " + operationName);
 							continue;
-						String inputMessage = inputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_PROPERTY);
-						if (inputMessage == null || inputMessage.equals(""))
+						}
+						String inputMessage = inputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
+						if (inputMessage == null || inputMessage.equals("")) {
+							Log.trace("exportWSDL: error - non-NIEM type for input message for " + operationName);
 							continue;
+						}
 						Log.debug("exportWSDL: input Message: " + inputMessage + " from operation " + operationName);
 						messageNamespaces.add(NamespaceModel.getPrefix(inputMessage));
 						String mult = param.multiplicity;
@@ -386,9 +390,11 @@ public class XmlWriter {
 						xmlElements.add("<xs:element name=\"" + operationName + "Response" + "\" type=\"" + outputTypeName + "\"/>");
 					continue;
 				}
-				String outputMessage = outputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_PROPERTY);
-				if (outputMessage == null || outputMessage.equals(""))
+				String outputMessage = outputType.propertyValue(NiemUmlClass.NIEM_STEREOTYPE_XPATH);
+				if (outputMessage == null || outputMessage.equals("")) {
+					Log.trace("exportWSDL: error - no type for output message for " + operationName);
 					continue;
+				}
 				Log.debug("exportWSDL: output Message: " + outputMessage + " from operation " + operationName);
 				messageNamespaces.add(NamespaceModel.getPrefix(outputMessage));
 				String elementName = operationName + "Response";
