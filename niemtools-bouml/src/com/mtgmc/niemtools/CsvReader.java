@@ -39,11 +39,21 @@ public class CsvReader {
 				}
 		}
 		try {
-			CSVReader reader = new CSVReader(new FileReader(filename));
+			FileReader fr = new FileReader(filename);
+			Log.debug("importCsv: file read");
+			CSVReader reader = null;
+			try {
+				reader = new CSVReader(fr);
+			} catch (NoClassDefFoundError e) {
+				Log.trace("importCsv: error - Exception" + e.toString());
+			}
+			Log.debug("importCsv: file parsed");
 			String[] nextLine;
 	
 			// read header
 			reader.readNext();
+			Log.debug("importCsv: header read");
+
 			// read mappings
 			while ((nextLine = reader.readNext()) != null) {
 				String className = nextLine[0].trim();
