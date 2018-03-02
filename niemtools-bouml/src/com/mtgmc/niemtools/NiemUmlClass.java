@@ -912,16 +912,20 @@ public class NiemUmlClass {
 								}
 
 							// export enumerations
-							/*
-							 * String codeList = type.propertyValue(CODELIST_PROPERTY); if (codeList !=
-							 * null) { // trace("exportWantlist: exporting enumerations for " +
-							 * getPrefixedName(type)); if (codeList.trim().contains(CODELIST_DELIMITER)) {
-							 * String[] codes = codeList.split(CODELIST_DELIMITER); for (String code :
-							 * codes) { String[] pairs = code.split(CODELIST_DEFINITION_DELIMITER); String
-							 * value = pairs[0].trim(); if (!value.equals(""))
-							 * fw.write("<w:Facet w:facet=\"enumeration\" w:value=\"" + filterQuotes(value)
-							 * + "\"/>"); } } }
-							 */
+							
+							String codeList = type.propertyValue(CODELIST_PROPERTY); 
+							if (codeList != null) { 
+								// trace("exportWantlist: exporting enumerations for " + getPrefixedName(type));
+								if (codeList.trim().contains(NiemModel.CODELIST_DELIMITER)) {
+									String[] codes = codeList.split(NiemModel.CODELIST_DELIMITER);
+									for (String code : codes) {
+										String[] pairs = code.split(NiemModel.CODELIST_DEFINITION_DELIMITER); String
+										value = pairs[0].trim();
+										if (!value.equals(""))
+											fw.write("<w:Facet w:facet=\"enumeration\" w:value=\"" + ReferenceModel.filterEnum(value) + "\"/>"); 
+									}
+								}
+							}
 							fw.write("</w:Type>");
 						}
 				}

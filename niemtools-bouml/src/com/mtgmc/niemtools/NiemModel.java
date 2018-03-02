@@ -708,8 +708,15 @@ class NiemModel {
 	 * @param string
 	 * @return filtered String
 	 */
-	private String filterEnum(String string) {
-		return string.replaceAll(CODELIST_DELIMITER + CODELIST_DEFINITION_DELIMITER, "");
+	String filterEnum(String string) {
+		return string.replaceAll(CODELIST_DELIMITER + "|" + CODELIST_DEFINITION_DELIMITER, "");
+	}
+	/** filter illegal characters in enumeration definitions 
+	 * @param string
+	 * @return filtered String
+	 */
+	private String filterEnumDefinition(String string) {
+		return string.replaceAll(CODELIST_DELIMITER + "|" + CODELIST_DEFINITION_DELIMITER, "");
 	}
 	/** filter illegal characters in UML elements
 	 * @param string
@@ -883,7 +890,7 @@ class NiemModel {
 			String codeDescription = null;
 			if (_IMPORT_CODE_DESCRIPTIONS)
 				try {
-					codeDescription = filterEnum(filterASCII(xe.evaluate(enumElement)));
+					codeDescription = filterEnumDefinition(filterASCII(xe.evaluate(enumElement)));
 				} catch (Exception e) {
 					Log.trace("getCodeList: error - cannot import code descriptions " + e.toString());
 				}
