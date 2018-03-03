@@ -14,10 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<variableList>
-		<variable>
-			<name>NIEMTOOLS_COMMON</name>
-			<value>$%7BPARENT-1-PROJECT_LOC%7D/niemtools-common</value>
-		</variable>
-	</variableList>
 </projectDescription>
