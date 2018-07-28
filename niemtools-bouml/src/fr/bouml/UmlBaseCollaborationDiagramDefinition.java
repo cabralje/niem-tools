@@ -27,7 +27,7 @@ class UmlBaseCollaborationDiagramDefinition {
   /**
    *  internal, don't call it
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
 public void read_() {
     Hashtable instances;
     int n;

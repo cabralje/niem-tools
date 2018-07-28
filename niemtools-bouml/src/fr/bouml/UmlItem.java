@@ -309,7 +309,8 @@ public void memo_ref() {
   
   }
 
-  public static void ref_indexes() throws IOException
+  @SuppressWarnings("deprecation")
+public static void ref_indexes() throws IOException
   {
     fw.write("<hr />\n<p><a href=\"index.html\" target = \"projectFrame\"><b> -Top- </b></a>");
     
@@ -405,7 +406,8 @@ public void memo_ref() {
   	
   	previous = c;
   	
-  	String sn = new Integer(c & 255).toString();
+  	@SuppressWarnings("deprecation")
+	String sn = new Integer(c & 255).toString();
   	
   	start_file(new String("index_") + sn, new String("") + c, true);
   	
