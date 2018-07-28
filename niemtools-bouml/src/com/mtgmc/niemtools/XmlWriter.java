@@ -298,7 +298,7 @@ public class XmlWriter {
 	 * @param messageNamespaces
 	 * @throws IOException
 	 */
-	void exportWsdl(String wsdlDir, Map<String, UmlClass> ports, Set<String> messageNamespaces) throws IOException {
+	void exportWSDL(String wsdlDir, Map<String, UmlClass> ports, Set<String> messageNamespaces) throws IOException {
 
 		String WSDLURI = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + WSDL_SUFFIX;
 		String WRAPPERURI = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + "/" + MESSAGE_WRAPPERS_FILE_NAME;
@@ -373,7 +373,7 @@ public class XmlWriter {
 				}
 				if (outputType == null || !outputType.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)) {
 					String returnType = operation.returnType().toString();
-					Log.debug("exportWsdl: unusual return type " + returnType);
+					Log.debug("exportWSDL: unusual return type " + returnType);
 					String outputTypeName = null;
 					switch (returnType) {
 					case "bool":
@@ -396,7 +396,12 @@ public class XmlWriter {
 					continue;
 				}
 				Log.debug("exportWSDL: output Message: " + outputMessage + " from operation " + operationName);
-				messageNamespaces.add(NamespaceModel.getPrefix(outputMessage));
+				String ns = NamespaceModel.getPrefix(outputMessage);
+				if (ns == null) {
+					Log.trace("exportWSDL: error - no namespace for " + outputMessage);
+					continue;
+				}
+				messageNamespaces.add(ns);
 				String elementName = operationName + "Response";
 				String outputTypeName = elementName + "Type";
 				String outputTypeSchema = "<xs:complexType name=\"" + outputTypeName + "\">" + "<xs:sequence>";

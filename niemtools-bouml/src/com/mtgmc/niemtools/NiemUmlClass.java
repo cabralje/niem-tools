@@ -774,7 +774,7 @@ public class NiemUmlClass {
 			try {
 				xmlWriter.exportMpdCatalog(messages);
 				if (wsdlDir != null)
-					xmlWriter.exportWsdl(wsdlDir, ports, messageNamespaces);
+					xmlWriter.exportWSDL(wsdlDir, ports, messageNamespaces);
 			} catch (Exception e) {
 				Log.trace("exportIEPD: error exporting MPD catalog or WSDL " + e.toString());
 			}

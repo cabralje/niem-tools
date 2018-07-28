@@ -874,17 +874,33 @@ public class JsonWriter {
 							String elementName = operationName + "Response";
 							String outputTypeName = elementName + "Type";
 							String mult = "1";
+
 							String prefix = NamespaceModel.getPrefix(message);
+							if (prefix == null) {
+								Log.trace("exportOpenAPI: error - no namespace for " + operationName);
+								continue;
+							}
+							
 							if (!NamespaceModel.isExternalPrefix(prefix)) {
 								String schemaURI = NamespaceModel.getSchemaURI(message);
 								UmlClassInstance messageElement = (NamespaceModel.isNiemPrefix(prefix)) ? 
 									NiemUmlClass.getSubsetModel().getElement(schemaURI, message) : 
 									NiemUmlClass.getExtensionModel().getElement(schemaURI, message);
-								jsonElementsInType
-								.add(exportOpenApiElementInTypeSchema(openapiPath, messageElement, mult, false));
+								if (messageElement == null) {
+										Log.trace("exportOpenAPI: error - no messsage element for message " + message);
+										continue;
+									}
+
+								String elementSchema = exportOpenApiElementInTypeSchema(openapiPath, messageElement, mult, false);
+								if (elementSchema == null) {
+									Log.trace("exportOpenAPI: error - no schema for element " + messageElement);
+									continue;
+								}
+								jsonElementsInType.add(elementSchema);
+
 								jsonRequiredElementsInType.add("\"" + message + "\"");
 							}
-	
+
 							// export type wrapper
 							TreeSet<String> jsonDefinition = new TreeSet<String>();
 							// String description = "";
@@ -898,7 +914,7 @@ public class JsonWriter {
 								.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
 							String typeSchema = "\"" + outputTypeName + "\": {\n" + String.join(",", jsonDefinition)
 							+ "\n}\n";
-	
+
 							// export element wrapper
 							String elementSchema = "\"" + elementName + "\": {\n";
 							elementSchema += "\"description\": \"An output message\",";
@@ -907,7 +923,7 @@ public class JsonWriter {
 							// swagger code generation tools do not support relative references, rename them to local references
 							elementSchema = elementSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
 							typeSchema = typeSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
-	
+
 							jsonProperties.add(elementSchema);
 							jsonDefinitions.add(typeSchema);
 							Log.debug("exportOpenAPI: exported element " + elementName + " and type " + outputTypeName);
@@ -922,6 +938,7 @@ public class JsonWriter {
 										+ "            \"description\": \"unexpected error\",\n"
 										+ "            \"schema\": {\n" + "              \"$ref\": \"#/definitions/"
 										+ JsonWriter.ERROR_RESPONSE + "\"\n" + "            }\n" + "          }\n");
+
 						//}
 						}
 					for (String method : JsonWriter.HTTP_METHODS) {

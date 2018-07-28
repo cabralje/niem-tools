@@ -280,6 +280,10 @@ public class NamespaceModel {
 	 * @return name with namespace prefix for UmlItem item as a String
 	 */
 	static String getPrefixedName(UmlItem item) {
+		if (item == null) {
+			Log.debug("getPrefixedName: null item");
+			return null;
+		}
 		return getPrefix(item) + NAMESPACE_DELIMITER + item.name();
 	}
 
