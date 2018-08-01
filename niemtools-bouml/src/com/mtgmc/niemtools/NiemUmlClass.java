@@ -41,8 +41,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 //import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+//import java.util.regex.Matcher;
+//import java.util.regex.Pattern;
 
 // DOM
 import javax.xml.parsers.DocumentBuilder;
@@ -66,7 +66,7 @@ import fr.bouml.anItemKind;
 public class NiemUmlClass {
 
 	static final String STRUCTURES_PREFIX = "structures";
-	private static final String NIEM_VERSION_DEFAULT = "4.0";
+	private static final String NIEM_VERSION_DEFAULT = "4.1";
 	// NIEM subset schema generation tool (SSGT)
 	private static final String WANTLIST_URI = "http://niem.gov/niem/wantlist/2.2";
 	// Niem-tools UML modeling
@@ -945,12 +945,12 @@ public class NiemUmlClass {
 	private String getNiemVersion() {
 		String niemVersion = NIEM_VERSION_DEFAULT;
 
-		String schemaURI = NamespaceModel.getSchemaURIForPrefix("nc");
+/*		String schemaURI = NamespaceModel.getSchemaURIForPrefix("nc");
 		// UmlCom.trace("NIEM URI: " + schemaURI);
 		Matcher mat = Pattern.compile(".*niem-core/(.*)/").matcher(schemaURI);
 		if (mat.find())
 			niemVersion = mat.group(1);
-		Log.trace("NIEM version: " + niemVersion);
+		Log.trace("NIEM version: " + niemVersion);*/
 		return niemVersion;
 	}
 
