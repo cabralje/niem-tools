@@ -723,11 +723,16 @@ public class NiemUmlClass {
 						if (inputMessage == null || inputMessage.equals(""))
 							continue;
 						Log.debug("exportIEPD: input Message: " + inputMessage + " from operation " + operationName);
-						messageNamespaces.add(NamespaceModel.getPrefix(inputMessage));
-						NiemModel model = getModel(NiemModel.getURI(NamespaceModel.getSchemaURI(inputMessage), inputMessage));
-						UmlClassInstance element = model.getElementByURI(NiemModel.getURI(NamespaceModel.getSchemaURI(inputMessage), inputMessage));
-						if (element != null)
-							element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
+						String inputPrefix = NamespaceModel.getPrefix(inputMessage);
+						if (inputPrefix != null) {
+							messageNamespaces.add(inputPrefix);
+							NiemModel model = getModel(NiemModel.getURI(NamespaceModel.getSchemaURI(inputMessage), inputMessage));
+							UmlClassInstance element = model.getElementByURI(NiemModel.getURI(NamespaceModel.getSchemaURI(inputMessage), inputMessage));
+							if (element != null) {
+								element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
+								Log.debug("exportIEPD: element " + element.name() + " is input message element for operation " + operationName);
+							}
+						}
 					}
 				String outputMessage = null;
 				try {
@@ -746,12 +751,15 @@ public class NiemUmlClass {
 					continue;
 				Log.debug("exportIEPD: output Message: " + outputMessage + " from operation " + operationName);
 				String outputPrefix = NamespaceModel.getPrefix(outputMessage);
-				if (NamespaceModel.isNiemPrefix(outputPrefix)) {
+				if (outputPrefix != null) {
+				//if (NamespaceModel.isNiemPrefix(outputPrefix)) {
 					messageNamespaces.add(outputPrefix);
 					NiemModel model = getModel(NiemModel.getURI(NamespaceModel.getSchemaURI(outputMessage), outputMessage));
 					UmlClassInstance element = model.getElementByURI(NiemModel.getURI(NamespaceModel.getSchemaURI(outputMessage), outputMessage));
-					if (element != null)
+					if (element != null) {
 						element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
+						Log.debug("exportIEPD: element " + element.name() + " is output message element for operation " + operationName);
+					}
 				}
 			}
 		}
@@ -765,7 +773,7 @@ public class NiemUmlClass {
 		while (it2.hasNext()) {
 			String definition = it2.next();
 			String definition2 = definition.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
-			Log.debug("exportIEPD: definition " + definition2);
+			//Log.debug("exportIEPD: definition " + definition2);
 			if (definition2 != null && jsonDefinitions2 != null)
 				jsonDefinitions2.add(definition2);
 		}

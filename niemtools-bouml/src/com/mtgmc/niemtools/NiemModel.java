@@ -662,9 +662,11 @@ class NiemModel {
 						if (jsonElement != null)
 							jsonDefinitions.add(jsonElement);
 						String messageElement = element.propertyValue(NiemUmlClass.MESSAGE_ELEMENT_PROPERTY);
+						if (messageElement != null)
+							Log.debug("exportSchemas: messageElement " + messageElement);
 						if (messageElement != null && !messageElement.equals("")) {
 							jsonProperties.add(jsonElement);
-							jsonRequired.add("\"" + NamespaceModel.getPrefixedName(element) + "\"");
+							//jsonRequired.add("\"" + NamespaceModel.getPrefixedName(element) + "\"");
 						}
 					}
 				}
