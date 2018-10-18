@@ -544,7 +544,8 @@ public class NiemUmlClass {
 					element.set_PropertyValue(NILLABLE_PROPERTY, "true");
 				if (headElement != null && substitution && representation)
 					element.set_PropertyValue(SUBSTITUTION_PROPERTY, headElement);
-				if (codeList != null && !codeList.equals("") && (!substitution || !representation))
+				if (codeList != null && !codeList.equals("") && (!substitution || representation))
+				//if (codeList != null && !codeList.equals("") && (!substitution || !representation))
 					element.set_PropertyValue(CODELIST_PROPERTY, codeList);
 			}
 		}
