@@ -7,7 +7,7 @@ The advantages relative to other tools include:
 
 <b>Standards-Based</b> – Conforms to UML 2.0 and NIEM Naming and Design Rules (NDR).
 
-<b>Inexpensive</b> – An open source “plugout” module for BOUML, a low cost UML modeling program
+<b>Inexpensive</b> – An open source “plugout” module for BOUML, a free UML modeling program
 
 <b>Simple to Use</b> – Supports round-trip NIEM mapping using a simple spreadsheet and doesn’t require knowledge of the NIEM-UML Profile
 
