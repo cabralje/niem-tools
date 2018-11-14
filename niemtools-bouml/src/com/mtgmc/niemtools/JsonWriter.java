@@ -54,7 +54,8 @@ public class JsonWriter {
 	private static final String HTTP_METHODS_PROPERTY = WEBSERVICE_STEREOTYPE + NiemUmlClass.STEREOTYPE_DELIMITER
 			+ "HTTPMethods";
 	static final String JSON_SCHEMA_FILE_TYPE = ".schema.json";
-	private static final String JSON_SCHEMA_URI = "http://json-schema.org/draft-04/schema#";
+	private static final String JSON_SCHEMA_URI = "http://json-schema.org/schema#";
+//	private static final String JSON_SCHEMA_URI = "http://json-schema.org/draft-04/schema#";
 	private static final String OPENAPI_FILE_TYPE = ".openapi.json";
 
 	public static final String INTERFACE_STEREOTYPE = "niem-profile:interface";
@@ -118,17 +119,20 @@ public class JsonWriter {
 		if (maxOccurs.equals("1"))
 			elementSchema += "\"$ref\": \"" + elementRef + "\"\n";
 		else {
-			// OpenAPI 2.0 does not support "oneOf"
-			//elementSchema += "\"oneOf\": [";
-			//if (minOccurs.equals("0") || minOccurs.equals("1")) {
-			//	elementSchema += "{\n" + "\"$ref\": \"" + elementRef + "\"\n" + "},\n";
-			//}
-			//elementSchema += "{\n";
+			// OpenAPI 3.0 now supports "oneOf"
+			if (minOccurs.equals("0") || minOccurs.equals("1")) {
+				elementSchema += "\"oneOf\": [";
+				elementSchema += "{\n" + "\"$ref\": \"" + elementRef + "\"\n" + "},\n";
+			//	elementSchema +="]\n";
+			}
+			elementSchema += "{\n";
 			elementSchema += "\"items\": {\n" + "\"$ref\": \"" + elementRef + "\"\n" + "},\n" + "\n\"minItems\": " + minOccurs + ",\n";
 			if (!maxOccurs.equals("unbounded"))
 				elementSchema += "\n\"maxItems\": " + maxOccurs + ",\n";
 			elementSchema += "\"type\": \"array\"\n";
-			//elementSchema += "}\n" + "]\n";
+			elementSchema += "}\n";
+			if (minOccurs.equals("0") || minOccurs.equals("1"))
+				elementSchema +="]\n";
 		}
 		elementSchema += "}";
 		return elementSchema;
@@ -630,7 +634,7 @@ public class JsonWriter {
 		return typeSchema;
 	}
 
-	/** exports OpenAPI/Swagger 2.0 service definition
+	/** exports OpenAPI 3.0 service definition
 	 * @param openapiDir
 	 * @param ports
 	 * @param messageNamespaces
@@ -815,7 +819,7 @@ public class JsonWriter {
 						elementSchema += "\"description\": \"An input message\",";
 						elementSchema += "\"$ref\": \"#/definitions/" + inputTypeName + "\"" + "\n}\n";
 						
-						// swagger code generation tools do not support relative references, rename them to local references
+						// OpenApi code generation tools do not support relative references, rename them to local references
 						elementSchema = elementSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
 						typeSchema = typeSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
 
@@ -920,7 +924,7 @@ public class JsonWriter {
 							elementSchema += "\"description\": \"An output message\",";
 							elementSchema += "\"$ref\": \"#/definitions/" + outputTypeName + "\"" + "\n}\n";
 							
-							// swagger code generation tools do not support relative references, rename them to local references
+							// OpenAPI code generation tools do not support relative references, rename them to local references
 							elementSchema = elementSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
 							typeSchema = typeSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
 
@@ -928,16 +932,21 @@ public class JsonWriter {
 							jsonDefinitions.add(typeSchema);
 							Log.debug("exportOpenAPI: exported element " + elementName + " and type " + outputTypeName);
 							// add successful response
-							openapiResponses.add("\n" + "          \"200\": {\n" + "            \"description\": \""
-									+ operationName + " response\",\n" + "            \"schema\": {\n"
+							openapiResponses.add("\n" 
+									+ "          \"200\": {\n" 
+									+ "            \"description\": \"" + operationName + " response\",\n"
+									+ "            \"schema\": {\n"
 									+ "                \"$ref\": \"#/definitions/" + operationName + "Response" + "\"\n"
 									+ "            }\n" + "          }");
 							// add error response
 							if (JsonWriter.ERROR_RESPONSE != null)
-								openapiResponses.add("\n" + "          \"default\": {\n"
+								openapiResponses.add("\n" 
+										+ "          \"default\": {\n"
 										+ "            \"description\": \"unexpected error\",\n"
-										+ "            \"schema\": {\n" + "              \"$ref\": \"#/definitions/"
-										+ JsonWriter.ERROR_RESPONSE + "\"\n" + "            }\n" + "          }\n");
+										+ "            \"schema\": {\n" 
+										+ "              \"$ref\": \"#/definitions/" + JsonWriter.ERROR_RESPONSE + "\"\n" 
+										+ "            }\n" 
+										+ "          }\n");
 
 						//}
 						}
@@ -974,22 +983,33 @@ public class JsonWriter {
 				Log.debug("OpenAPI: " + portName + OPENAPI_FILE_TYPE);
 				fw.write("{\n" +
 						// jsonContext + ",\n" +
-						"  \"swagger\": \"2.0\",\n" + "  \"info\": {\n" + "    \"version\": \""
-						+ NiemUmlClass.getProperty(ConfigurationDialog.IEPD_VERSION_PROPERTY) + "\",\n" + "    \"title\": \"" + portName
-						+ "\",\n" + "    \"description\": \"" + port.description() + "\",\n"
+						"  \"openapi\": \"3.0.0\",\n" 
+						+ "  \"info\": {\n" 
+						+ "    \"version\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_VERSION_PROPERTY) + "\",\n" 
+						+ "    \"title\": \"" + portName + "\",\n" 
+						+ "    \"description\": \"" + port.description() + "\",\n"
 						+ "    \"termsOfService\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_TERMS_URL_PROPERTY) + "\",\n"
-						+ "    \"contact\": {\n" + "      \"name\": \""
-						+ NiemUmlClass.getProperty(ConfigurationDialog.IEPD_ORGANIZATION_PROPERTY) + "\",\n" + "      \"email\": \""
-						+ NiemUmlClass.getProperty(ConfigurationDialog.IEPD_EMAIL_PROPERTY) + "\",\n" + "      \"url\": \""
-						+ NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CONTACT_PROPERTY) + "\"\n" + "    },\n" + "    \"license\": {\n"
+						+ "    \"contact\": {\n" 
+						+ "      \"name\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_ORGANIZATION_PROPERTY) + "\",\n" 
+						+ "      \"email\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_EMAIL_PROPERTY) + "\",\n" 
+						+ "      \"url\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CONTACT_PROPERTY) + "\"\n" 
+						+ "    },\n" 
+						+ "    \"license\": {\n"
 						+ "      \"name\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY) + "\",\n"
-						+ "      \"url\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY) + "\"\n" + "    }\n"
-						+ "  },\n" + "  \"host\": \"host.example.com\",\n" + "  \"basePath\": \"" + portPath + "\",\n"
-						+ "  \"schemes\": [\n" + "    \"http\"\n" + "  ],\n" + "  \"consumes\": [\n"
-						+ "    \"application/json\"\n" + "  ],\n" + "  \"produces\": [\n"
-						+ "    \"application/json\"\n" + "  ]," + "  \"paths\": {" + "  "
-						+ String.join(",", openapiPaths) + "\n" + "      },\n" + "  \"definitions\": {\n"
-						+ String.join(",\n", jsonDefinitions) + "\n}" + "}\n");
+						+ "      \"url\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY) + "\"\n" 
+						+ "    }\n"
+						+ "  },\n" 
+						+ "  \"host\": \"host.example.com\",\n" 
+						+ "  \"basePath\": \"" + portPath + "\",\n"
+						+ "  \"schemes\": [\n" + "    \"http\"\n" + "  ],\n" 
+						+ "  \"consumes\": [\n"
+						+ "    \"application/json\"\n" + "  ],\n" 
+						+ "  \"produces\": [\n"
+						+ "    \"application/json\"\n" + "  ]," 
+						+ "  \"paths\": {" + "  " + String.join(",", openapiPaths) + "\n" 
+						+ "      },\n" 
+						+ "  \"definitions\": {\n" + String.join(",\n", jsonDefinitions) + "\n}" 
+						+ "}\n");
 				fw.close();
 			} catch (Exception e1) {
 				Log.trace("exportOpenAPI: error exporting OpenAPI JSON " + e1.toString());
