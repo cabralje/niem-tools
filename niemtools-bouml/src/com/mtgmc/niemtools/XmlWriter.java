@@ -213,7 +213,7 @@ public class XmlWriter {
 	 * @param messages
 	 * @throws IOException
 	 */
-	void exportMpdCatalog(Set<String> messages)
+	void exportMpdCatalog(Set<String> messages, String xmlExampleDir)
 			throws IOException {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = new Date();
@@ -251,6 +251,7 @@ public class XmlWriter {
 				+ "</nc:OrganizationPrimaryContactInformation>" + "</nc:EntityOrganization>"
 				+ "</c:AuthoritativeSource>" + "<c:CreationDate>" + today + "</c:CreationDate>" + "<c:StatusText>"
 				+ NiemUmlClass.getProperty(ConfigurationDialog.IEPD_STATUS_PROPERTY) + "</c:StatusText>" + "</c:MPDInformation>");
+		Path p2 = Paths.get(directory, MPD_CATALOG_FILE).getParent();
 		for (String message : messages) {
 			UmlClassInstance element = null;
 			if (NiemUmlClass.isNiemElement(message))
@@ -264,11 +265,11 @@ public class XmlWriter {
 				xml.write("<nc:DescriptionText>" + element.description() + "</nc:DescriptionText>");
 			xml.write("<c:HasDocumentElement c:qualifiedNameList=\"" + message + "\"/>" + "<c:XMLSchemaValid>"
 					+ "<c:XMLCatalog c:pathURI=\"" + XML_CATALOG_FILE + "\"/>" + "</c:XMLSchemaValid>"
-					+ "<c:IEPSampleXMLDocument c:pathURI=\"" + NamespaceModel.getName(message) + XmlWriter.XML_FILE_TYPE + "\"/>"
+					+ "<c:IEPSampleXMLDocument c:pathURI=\"" + p2.relativize(Paths.get(xmlExampleDir + "\\" + NamespaceModel.getName(message) + XmlWriter.XML_FILE_TYPE)).toString() + "\"/>"
 					+ "</c:IEPConformanceTarget>");
 		}
-		xml.write("<c:ReadMe c:pathURI=\"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_READ_ME_FILE_PROPERTY) + "\"/>"
-				+ "<c:MPDChangeLog c:pathURI=\"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CHANGE_LOG_FILE_PROPERTY) + "\"/>"
+		xml.write("<c:ReadMe c:pathURI=\"" + p2.relativize(Paths.get(NiemUmlClass.getProperty(ConfigurationDialog.IEPD_READ_ME_FILE_PROPERTY))).toString() + "\"/>"
+				+ "<c:MPDChangeLog c:pathURI=\"" + p2.relativize(Paths.get(NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CHANGE_LOG_FILE_PROPERTY))).toString() + "\"/>"
 				+ "<c:Wantlist c:pathURI=\"" + Paths.get(NiemUmlClass.NIEM_DIR, WANTLIST_FILE).toString() + "\"/>"
 				+ "<c:ConformanceAssertion c:pathURI=\"" + CONFORMANCE_ASSERTION_FILE + " \"/>");
 

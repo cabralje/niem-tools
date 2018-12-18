@@ -651,7 +651,7 @@ public class NiemUmlClass {
 	 * @param openapiDir
 	 */
 	@SuppressWarnings("unchecked")
-	public void exportIEPD(String xmlDir, String wsdlDir, String jsonDir, String openapiDir) {
+	public void exportIEPD(String xmlDir, String wsdlDir, String jsonDir, String openapiDir, String xmlExampleDir, String jsonExampleDir) {
 
 		Log.start("exportIEPD");
 		
@@ -723,6 +723,7 @@ public class NiemUmlClass {
 						String inputMessage = inputType.propertyValue(NIEM_STEREOTYPE_XPATH);
 						if (inputMessage == null || inputMessage.equals(""))
 							continue;
+						messages.add(inputMessage);
 						Log.debug("exportIEPD: input Message: " + inputMessage + " from operation " + operationName);
 						String inputPrefix = NamespaceModel.getPrefix(inputMessage);
 						if (inputPrefix != null) {
@@ -750,6 +751,7 @@ public class NiemUmlClass {
 					outputMessage = outputType.propertyValue(NIEM_STEREOTYPE_XPATH);
 				if (outputMessage == null || outputMessage.equals(""))
 					continue;
+				messages.add(outputMessage);
 				Log.debug("exportIEPD: output Message: " + outputMessage + " from operation " + operationName);
 				String outputPrefix = NamespaceModel.getPrefix(outputMessage);
 				if (outputPrefix != null) {
@@ -781,7 +783,7 @@ public class NiemUmlClass {
 			
 		if (xmlDir != null)
 			try {
-				xmlWriter.exportMpdCatalog(messages);
+				xmlWriter.exportMpdCatalog(messages, xmlExampleDir);
 				if (wsdlDir != null)
 					xmlWriter.exportWSDL(wsdlDir, ports, messageNamespaces);
 			} catch (Exception e) {

@@ -331,31 +331,43 @@ class ConfigurationDialog extends JDialog {
 
 		ConfigurationDialog.FilePanel xsdPanel = new FilePanel("Directory", properties.getProperty("xsdDir", root.propertyValue("html dir")),
 				fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-		ConfigurationDialog.ToggleBox xsdBox = new ToggleBox("XML", root.propertyValue("exportXML"), xsdPanel);
+		ConfigurationDialog.ToggleBox xsdBox = new ToggleBox("XML Schema", root.propertyValue("exportXML"), xsdPanel);
 		modelPanel.add(xsdBox, labelLayout);
 		fieldLayout.gridy = 1;
 		modelPanel.add(xsdPanel, fieldLayout);
 
+		ConfigurationDialog.FilePanel xmlExamplePanel = new FilePanel("Directory", properties.getProperty("xmlExampleDir", root.propertyValue("html dir")),
+				fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+		modelPanel.add(new JLabel("XML Examples"), labelLayout);
+		fieldLayout.gridy = 2;
+		modelPanel.add(xmlExamplePanel, fieldLayout);
+		
 		ConfigurationDialog.FilePanel wsdlPanel = new FilePanel("Directory", properties.getProperty("wsdlDir", root.propertyValue("html dir")),
 				fieldColumns, JFileChooser.DIRECTORIES_ONLY);
 		ConfigurationDialog.ToggleBox wsdlBox = new ToggleBox("WSDL", root.propertyValue("exportWSDL"), wsdlPanel);
 		modelPanel.add(wsdlBox, labelLayout);
-		fieldLayout.gridy = 2;
+		fieldLayout.gridy = 3;
 		modelPanel.add(wsdlPanel, fieldLayout);
 
 		ConfigurationDialog.FilePanel jsonPanel = new FilePanel("Directory", properties.getProperty("jsonDir", root.propertyValue("html dir")),
 				fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-		ConfigurationDialog.ToggleBox jsonBox = new ToggleBox("JSON", root.propertyValue("exportJSON"), jsonPanel);
+		ConfigurationDialog.ToggleBox jsonBox = new ToggleBox("JSON Schema", root.propertyValue("exportJSON"), jsonPanel);
 		modelPanel.add(jsonBox, labelLayout);
-		fieldLayout.gridy = 3;
+		fieldLayout.gridy = 4;
 		modelPanel.add(jsonPanel, fieldLayout);
 
+		ConfigurationDialog.FilePanel jsonExamplePanel = new FilePanel("Directory", properties.getProperty("jsonExampleDir", root.propertyValue("html dir")),
+				fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+		modelPanel.add(new JLabel("JSON Examples"), labelLayout);
+		fieldLayout.gridy = 5;
+		modelPanel.add(jsonExamplePanel, fieldLayout);
+		
 		ConfigurationDialog.FilePanel openapiPanel = new FilePanel("Directory", properties.getProperty("openapiDir", root.propertyValue("html dir")),
 				fieldColumns, JFileChooser.DIRECTORIES_ONLY);
 		ConfigurationDialog.ToggleBox openapiBox = new ToggleBox("OpenAPI", root.propertyValue("exportOpenAPI"),
 				openapiPanel);
 		modelPanel.add(openapiBox, labelLayout);
-		fieldLayout.gridy = 4;
+		fieldLayout.gridy = 6;
 		modelPanel.add(openapiPanel, fieldLayout);
 
 		// Add external panel
@@ -422,8 +434,10 @@ class ConfigurationDialog extends JDialog {
 			root.set_PropertyValue("exportJSON", String.valueOf(jsonBox.isSelected()));
 			root.set_PropertyValue("exportOpenAPI", String.valueOf(openapiBox.isSelected()));
 			properties.setProperty("xsdDir", xsdPanel.value);
+			properties.setProperty("xmlExampleDir", xmlExamplePanel.value);			
 			properties.setProperty("wsdlDir", wsdlPanel.value);
 			properties.setProperty("jsonDir", jsonPanel.value);
+			properties.setProperty("jsonExampleDir", jsonExamplePanel.value);
 			properties.setProperty("openapiDir", openapiPanel.value);
 			LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<String>();
 			// DefaultTableModel model = table.getModel();

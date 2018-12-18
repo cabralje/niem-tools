@@ -226,7 +226,9 @@ class Main
 		String wsdlDir = (root.propertyValue("exportWSDL").equals("true")) ? properties.getProperty("wsdlDir") : null;					
 		String jsonDir = (root.propertyValue("exportJSON").equals("true")) ? properties.getProperty("jsonDir") : null;
 		String openapiDir = (root.propertyValue("exportOpenAPI").equals("true")) ? properties.getProperty("openapiDir") : null;
-		niemTools.exportIEPD(xsdDir, wsdlDir, jsonDir, openapiDir);
+		String xmlExampleDir = (root.propertyValue("exportXML").equals("true")) ? properties.getProperty("xmlExampleDir") : null;
+		String jsonExampleDir = (root.propertyValue("exportJSON").equals("true")) ? properties.getProperty("jsonExampleDir") : null;
+		niemTools.exportIEPD(xsdDir, wsdlDir, jsonDir, openapiDir, xmlExampleDir, jsonExampleDir);
 		Log.stop("generateModels");
 	}
 
