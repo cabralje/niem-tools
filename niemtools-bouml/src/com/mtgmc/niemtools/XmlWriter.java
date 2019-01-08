@@ -260,18 +260,44 @@ public class XmlWriter {
 				element = NiemUmlClass.getExtensionModel().getElement(NamespaceModel.getSchemaURI(message), message);
 			xml.write("<c:IEPConformanceTarget structures:id=\"" + NamespaceModel.getName(message) + "\">");
 			if (element == null)
-				Log.trace("exportMPDCatalog: error - no root element " + message);
+				Log.trace("exportMpdCatalog: error - no root element " + message);
 			else
 				xml.write("<nc:DescriptionText>" + element.description() + "</nc:DescriptionText>");
 			xml.write("<c:HasDocumentElement c:qualifiedNameList=\"" + message + "\"/>" + "<c:XMLSchemaValid>"
-					+ "<c:XMLCatalog c:pathURI=\"" + XML_CATALOG_FILE + "\"/>" + "</c:XMLSchemaValid>"
-					+ "<c:IEPSampleXMLDocument c:pathURI=\"" + p2.relativize(Paths.get(xmlExampleDir + "\\" + NamespaceModel.getName(message) + XmlWriter.XML_FILE_TYPE)).toString() + "\"/>"
-					+ "</c:IEPConformanceTarget>");
+					+ "<c:XMLCatalog c:pathURI=\"" + XML_CATALOG_FILE + "\"/>" + "</c:XMLSchemaValid>");
+			if (xmlExampleDir != null) {
+				Path p3 = null;
+				String path3 = xmlExampleDir + "\\" + NamespaceModel.getName(message) + XmlWriter.XML_FILE_TYPE;
+				try {
+					p3 = p2.relativize(Paths.get(path3));
+					path3 = p3.toString();
+				} catch (Exception e1) {
+					Log.trace("exportMpdCatalog: No relative path from " + p2.toString() + " to " + path3 + " " + e1.toString());
+				}
+				xml.write("<c:IEPSampleXMLDocument c:pathURI=\"" + path3 + "\"/>" );
+			}
+			xml.write("</c:IEPConformanceTarget>");
 		}
-		xml.write("<c:ReadMe c:pathURI=\"" + p2.relativize(Paths.get(NiemUmlClass.getProperty(ConfigurationDialog.IEPD_READ_ME_FILE_PROPERTY))).toString() + "\"/>"
-				+ "<c:MPDChangeLog c:pathURI=\"" + p2.relativize(Paths.get(NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CHANGE_LOG_FILE_PROPERTY))).toString() + "\"/>"
-				+ "<c:Wantlist c:pathURI=\"" + Paths.get(NiemUmlClass.NIEM_DIR, WANTLIST_FILE).toString() + "\"/>"
-				+ "<c:ConformanceAssertion c:pathURI=\"" + CONFORMANCE_ASSERTION_FILE + " \"/>");
+		Path p4 = null;
+		String path4 = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_READ_ME_FILE_PROPERTY);
+		try {
+			p4 = p2.relativize(Paths.get(directory, path4));
+			path4 = p4.toString();
+		} catch (Exception e1) {
+			Log.trace("exportMpdCatalog: No relative path from " + p2.toString() + " to " + path4 + " " + e1.toString());
+		}
+		Path p5 = null;
+		String path5 = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CHANGE_LOG_FILE_PROPERTY);
+		try {
+			p5 = p2.relativize(Paths.get(directory, path5));
+			path5 = p5.toString();
+		} catch (Exception e1) {
+			Log.trace("exportMpdCatalog: No relative path from " + p2.toString() + " to " + path5 + " " + e1.toString());
+		}
+		xml.write("<c:ReadMe c:pathURI=\"" + path4 + "\"/>"				
+		    + "<c:MPDChangeLog c:pathURI=\"" + 	path5 + "\"/>"
+			+ "<c:Wantlist c:pathURI=\"" + Paths.get(NiemUmlClass.NIEM_DIR, WANTLIST_FILE).toString() + "\"/>"
+			+ "<c:ConformanceAssertion c:pathURI=\"" + CONFORMANCE_ASSERTION_FILE + " \"/>");
 
 		for (Entry<String, String> entry : NamespaceModel.getPrefixes().entrySet()) {
 			String prefix = entry.getKey();
@@ -428,7 +454,8 @@ public class XmlWriter {
 		Log.trace("Generating WSDLs");
 		for (UmlClass port : ports.values()) {
 			String portName = port.name();
-			Path p1 = Paths.get(wsdlDir, portName + WSDL_FILE_TYPE);
+			String path1 = portName + WSDL_FILE_TYPE;
+			Path p1 = Paths.get(wsdlDir, path1);
 			File file = p1.toFile();
 			File parentFile = file.getParentFile();
 			if (parentFile != null)
@@ -446,8 +473,15 @@ public class XmlWriter {
 			writeXmlNs(wsdl, WSRMP_PREFIX, WSRMP_URI);
 			writeXmlNs(wsdl, WSU_PREFIX, WSU_URI);
 			wsdl.write("><!-- " + port.description() + " -->");
-			Path p2 = Paths.get(directory, MESSAGE_WRAPPERS_FILE_NAME + XmlWriter.XSD_FILE_TYPE);
-			Path p3 = p1.getParent().relativize(p2);
+			Path p2 = null;
+			String path2= MESSAGE_WRAPPERS_FILE_NAME + XmlWriter.XSD_FILE_TYPE;
+			Path p3 = null;
+			try {
+				p2 = Paths.get(directory, path2);
+				p3 = p1.getParent().relativize(p2);
+			} catch (Exception e1) {
+				Log.trace("exportWSDL: No relative path from " + path1 + " to " + path2 + " " + e1.toString());
+			}
 			wsdl.write("<wsp:UsingPolicy wsdl:required=\"true\"/>" + "<wsp:Policy wsu:Id=\"" + WSP_POLICY + "\">"
 					+ "<wsrmp:RMAssertion/>" + "</wsp:Policy>" + "<wsdl:types>" + "<xsd:schema>"
 					+ "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + p3.toString() + "\"/>"
@@ -647,8 +681,14 @@ public class XmlWriter {
 						Log.trace("exportXMLSchema: error - namespace " + nsSchemaURI2 + " not in model");
 						continue;
 					}
-					Path p2 = Paths.get(directory, ns2.getFilepath());
-					Path p3 = path1.relativize(p2);
+					Path p2 = null;
+					Path p3 = null;
+					try {
+						p2 = Paths.get(directory, ns2.getFilepath());
+					    p3 = path1.relativize(p2);
+					} catch (Exception e1) {
+						Log.trace("exportXmlSchema: No relative path from " + path1.toString() + " to " + p2.toString() + " " + e1.toString());
+					}
 					if (!nsSchemaURI2.equals(nsSchemaURI) && !nsSchemaURI2.equals(NiemModel.LOCAL_URI)
 							&& !nsSchemaURI2.equals(NiemModel.XSD_URI))
 						xml.write("<xs:import namespace=\"" + nsSchemaURI2 + "\" schemaLocation=\"" + p3.toString()

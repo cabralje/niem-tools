@@ -781,15 +781,19 @@ public class NiemUmlClass {
 				jsonDefinitions2.add(definition2);
 		}
 			
-		if (xmlDir != null)
+		if (xmlDir != null) {
 			try {
 				xmlWriter.exportMpdCatalog(messages, xmlExampleDir);
-				if (wsdlDir != null)
-					xmlWriter.exportWSDL(wsdlDir, ports, messageNamespaces);
 			} catch (Exception e) {
-				Log.trace("exportIEPD: error exporting MPD catalog or WSDL " + e.toString());
+				Log.trace("exportIEPD: error exporting MPD catalog " + e.toString());
 			}
-
+			if (wsdlDir != null)
+				try {
+					xmlWriter.exportWSDL(wsdlDir, ports, messageNamespaces);
+				} catch (Exception e) {
+					Log.trace("exportIEPD: error exporting WSDL " + e.toString());
+				}
+		}
 		if (jsonDir != null)
 			try {
 				if (openapiDir != null)
