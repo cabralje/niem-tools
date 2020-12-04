@@ -630,7 +630,6 @@ public class JsonWriter {
 		// if (baseType != null)
 		// jsonDefinition.add("\"$ref\": \"" +
 		// exportJsonTypePointer(getPrefixedName(baseType), prefix) + "\"");
-		// TODO fix this
 		jsonDefinition.add("\"type\": \"object\"");
 		jsonDefinition.add("\"additionalProperties\" : " + anyJSON);
 		
