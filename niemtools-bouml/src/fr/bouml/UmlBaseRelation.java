@@ -1,8 +1,12 @@
 package fr.bouml;
 
+
+import java.util.*;
+
 /**
  *  Manage the relations between classes
  */
+@SuppressWarnings("unused")
 abstract class UmlBaseRelation extends UmlClassMember {
   /**
    *  returns a new relation of the given 'kind' from 'start' to 'end'

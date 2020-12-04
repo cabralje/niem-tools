@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.util.*;
 /**
  *  This class manages settings not linked with a language, configured through
@@ -196,7 +197,7 @@ protected static Hashtable _map_relation_attribute_stereotypes;
   @SuppressWarnings("rawtypes")
 protected static Hashtable _map_class_stereotypes;
   protected static UmlStereotype[] _class_stereotypes;
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+  @SuppressWarnings({ "unchecked", "rawtypes" })
 protected static void read_()
   {
     int n;

@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseDeepHistoryPseudoState extends UmlPseudoState {
   /**
    *  returns a new deep history pseudo state created under 'parent'

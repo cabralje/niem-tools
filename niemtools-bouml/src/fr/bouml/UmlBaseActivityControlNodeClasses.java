@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseInitialActivityNode extends UmlActivityControlNode {
   /**
    *   returns a new initial activity control node named 's' created under 'parent'

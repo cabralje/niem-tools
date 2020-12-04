@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseState extends UmlItem {
   /**
    *   returns a new state named 's' created under 'parent'

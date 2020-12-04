@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseChoicePseudoState extends UmlPseudoState {
   /**
    *  returns a new choice pseudo state created under 'parent'

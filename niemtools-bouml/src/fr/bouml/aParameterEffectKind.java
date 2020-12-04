@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 final class aParameterEffectKind {
   public static final int _noEffect = 0;
   public static final aParameterEffectKind noEffect = new aParameterEffectKind(_noEffect);

@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 final class anOrdering {
   public static final int _unordered = 0;
   public static final anOrdering unordered = new anOrdering(_unordered);

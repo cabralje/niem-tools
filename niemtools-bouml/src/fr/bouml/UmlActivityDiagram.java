@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 import java.util.*;
 
@@ -10,7 +11,6 @@ import java.util.*;
  * 
  *  You can modify it as you want (except the constructor)
  */
-@SuppressWarnings("rawtypes")
 class UmlActivityDiagram extends UmlBaseActivityDiagram implements UmlActivityItem {
   /**
    * set he html ref
@@ -40,9 +40,10 @@ public void memo_ref() {
    generate_index(diagrams, "Activity Diagram", "activitydiagrams");
   }
 
+  @SuppressWarnings("rawtypes")
 protected static Vector diagrams;
 
-  static { diagrams = new Vector(); }  /**
+  static { diagrams = new Vector<UmlActivityDiagram>(); }  /**
    *   the constructor, do not call it yourself !!!!!!!!!!
    */
   public  UmlActivityDiagram(long id, String s) {

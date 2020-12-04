@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseRegion extends UmlItem {
   /**
    *   returns a new region named 's' created under 'parent'

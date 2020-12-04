@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseExtraArtifactDefinition extends UmlItem {
   /**
    *   returns a new extra artifact definition named 's' created under 'parent'

@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseInitialPseudoState extends UmlPseudoState {
   /**
    *  returns a new initial pseudo state created under 'parent'

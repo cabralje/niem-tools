@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  this class manages class instance reference
  */

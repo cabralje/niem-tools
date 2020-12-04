@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 final class aMySqlRefOption {
   public static final int _anUnspecifiedRefOption = 0;
   public static final aMySqlRefOption anUnspecifiedRefOption = new aMySqlRefOption(_anUnspecifiedRefOption);

@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 import java.util.*;
 
@@ -10,7 +11,7 @@ import java.util.*;
  * 
  *  You can modify it as you want (except the constructor)
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 class UmlSequenceDiagram extends UmlBaseSequenceDiagram {
   public UmlSequenceDiagram(long id, String n){ super(id, n); }
   /**
@@ -24,8 +25,7 @@ class UmlSequenceDiagram extends UmlBaseSequenceDiagram {
    * set he html ref
    * set the diagrams list
    */
-  @SuppressWarnings("unchecked")
-public void memo_ref() {
+  public void memo_ref() {
     diagrams.addElement(this);
     super.memo_ref();
   }
@@ -41,6 +41,6 @@ public void memo_ref() {
     generate_index(diagrams, "Sequence Diagram", "sequencediagrams");
   }
 
-  protected static Vector diagrams;
+  protected static Vector<UmlSequenceDiagram> diagrams;
 
   static { diagrams = new Vector(); }};

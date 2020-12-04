@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseInterruptibleActivityRegion extends UmlActivityRegion {
   /**
    *   returns a new interruptible activity region named 's' created under 'parent'

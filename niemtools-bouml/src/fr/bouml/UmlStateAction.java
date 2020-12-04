@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 
 class UmlStateAction extends UmlBaseStateAction implements UmlStateItem {

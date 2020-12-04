@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseStateAction extends UmlItem {
   /**
    *  returns a new state action created under 'parent'

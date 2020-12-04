@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseAccessVariableValueAction extends UmlActivityAction {
   /**
    *   the constructor, do not call it yourself !!!!!!!!!!
@@ -9,9 +10,9 @@ abstract class UmlBaseAccessVariableValueAction extends UmlActivityAction {
   }
 
   /**
-   *  return the variable, may be an attribute or a relation
+   *  return the variable
    */
-  public UmlItem variable() {
+  public UmlVariable variable() {
     read_if_needed_();
     return _variable;
   }
@@ -21,18 +22,18 @@ abstract class UmlBaseAccessVariableValueAction extends UmlActivityAction {
    * 
    *  On error return FALSE in C++, produce a RuntimeException in Java
    */
-  public void set_Variable(UmlItem v) throws RuntimeException {
+  public void set_Variable(UmlVariable v) throws RuntimeException {
     UmlCom.send_cmd(identifier_(), OnInstanceCmd.setDefCmd, v.identifier_());
     UmlCom.check();
   
     _variable = v;
   }
 
-  private UmlItem _variable;
-
   protected void read_uml_() {
     super.read_uml_();
-    _variable = UmlBaseItem.read_();
+    _variable = (UmlVariable) UmlBaseItem.read_();
   }
+
+  private UmlVariable _variable;
 
 }

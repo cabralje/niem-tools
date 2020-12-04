@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  Manage the relations between non class objects, for instances
  *  dependency between packages and use case generalization

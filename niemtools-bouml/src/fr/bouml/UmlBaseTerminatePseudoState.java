@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseTerminatePseudoState extends UmlPseudoState {
   /**
    *  returns a new terminate pseudo state created under 'parent'

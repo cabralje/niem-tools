@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBasePinParameter extends UmlActivityObject {
   /**
    *   the constructor, do not call it yourself !!!!!!!!!!

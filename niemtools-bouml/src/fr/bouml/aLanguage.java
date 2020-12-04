@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 final class aLanguage {
   public static final int _umlLanguage = 0;
   public static final aLanguage umlLanguage = new aLanguage(_umlLanguage);

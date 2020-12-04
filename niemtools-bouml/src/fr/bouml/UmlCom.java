@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 import java.net.*;
 
@@ -52,7 +53,7 @@ public class UmlCom {
       p_buffer_out = 4/*bytes for length*/;
   
       // send API version
-      write_unsigned(64);
+      write_unsigned(71);
       flush();
     }
     catch (Exception e) {
@@ -607,6 +608,37 @@ public class UmlCom {
     flush();
   }
 
+  /**
+   * internal, do NOT use it
+   */
+  public static void send_cmd(long id, OnInstanceCmd cmd, UmlClass[] l1, UmlClass[] l2, UmlClass[] l3)
+  {
+    write_char((byte) CmdFamily._onInstanceCmd);
+    write_id(id);
+    write_char((byte) cmd.value());
+    
+    int n;
+    
+    n = l1.length;
+    write_unsigned(n);
+    
+    for (int i = 0; i != n; i += 1)
+      write_id(l1[i].identifier_());
+    
+    n = l2.length;
+    write_unsigned(n);
+    
+    for (int i = 0; i != n; i += 1)
+      write_id(l2[i].identifier_());
+    
+    n = l3.length;
+    write_unsigned(n);
+    
+    for (int i = 0; i != n; i += 1)
+      write_id(l3[i].identifier_());
+    
+    flush();
+  }
   public static long read_id()
   {
     read_if_needed();

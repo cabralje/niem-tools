@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 import java.util.*;
 
@@ -8,7 +9,7 @@ import java.util.*;
  * 
  *  You can modify it as you want (except the constructor)
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class UmlPackage extends UmlBasePackage {
   public UmlPackage(long id, String n){ super(id, n); }
 
@@ -80,8 +81,7 @@ public class UmlPackage extends UmlBasePackage {
    * set the html ref
    * set the package list
    */
-  @SuppressWarnings("unchecked")
-public void memo_ref() {
+  public void memo_ref() {
     packages.addElement(this);
     super.memo_ref();
   
@@ -102,16 +102,7 @@ public void memo_ref() {
     return true;
   }
 
-  protected static Vector packages;
+  protected static Vector<UmlPackage> packages;
 
   static { packages = new Vector(); }
-  
-  public void sort() {
-	sortChildren();
-  }
-
-  public int orderWeight() {
-	return 1;
-  }
-	
 };

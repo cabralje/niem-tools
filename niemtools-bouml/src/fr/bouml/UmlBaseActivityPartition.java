@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseActivityPartition extends UmlItem {
   /**
    *   returns a new activity partition named 's' created under 'parent'

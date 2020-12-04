@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 class SlotRelation {
   public UmlRelation relation;
 

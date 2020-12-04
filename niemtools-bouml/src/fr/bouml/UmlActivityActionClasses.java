@@ -1,7 +1,10 @@
 package fr.bouml;
 
-import java.io.IOException;
 
+import java.io.*;
+import java.util.*;
+
+@SuppressWarnings("unused")
 class UmlSendObjectAction extends UmlBaseSendObjectAction {
   /**
    * returns a string indicating the king of the element
@@ -373,22 +376,6 @@ class UmlReadVariableValueAction extends UmlBaseReadVariableValueAction {
   }
 
 }
-class UmlWriteVariableValueAction extends UmlBaseWriteVariableValueAction {
-  /**
-   * returns a string indicating the king of the element
-   */
-  public String sKind() {
-    return "write variable value activity action";
-  }
-
-  /**
-   *   the constructor, do not call it yourself !!!!!!!!!!
-   */
-  public  UmlWriteVariableValueAction(long id, String s) {
-    super(id, s);
-  }
-
-}
 class UmlAddVariableValueAction extends UmlBaseAddVariableValueAction {
   /**
    * returns a string indicating the king of the element
@@ -725,7 +712,7 @@ class UmlReduceAction extends UmlBaseReduceAction {
       reducer().write();
       fw.write("</p>");
     }
-  
+    
     write_children(pfix, rank, level);
   
     unload(false, false);
@@ -735,6 +722,325 @@ class UmlReduceAction extends UmlBaseReduceAction {
    *   the constructor, do not call it yourself !!!!!!!!!!
    */
   public  UmlReduceAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+class UmlStartObjectBehaviorAction extends UmlBaseStartObjectBehaviorAction {
+  /**
+   * returns a string indicating the king of the element
+   */
+  public String sKind() {
+    return "start object behavior activity action";
+  }
+
+  /**
+   * entry to produce the html code receiving chapter number
+   * path, rank in the mother and level in the browser tree
+   */
+  public void html(String pfix, int rank, int level) throws IOException {
+    super.html();
+  
+    if (isSynchronous())
+      fw.write("<p>Synchronous</p>");
+  
+    write_children(pfix, rank, level);
+  
+    unload(false, false);
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  public  UmlStartObjectBehaviorAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+class UmlReadSelfAction extends UmlBaseReadSelfAction {
+  /**
+   * returns a string indicating the king of the element
+   */
+  public String sKind() {
+    return "read self activity action";
+  }
+
+  /**
+   * entry to produce the html code receiving chapter number
+   * path, rank in the mother and level in the browser tree
+   */
+  public void html(String pfix, int rank, int level) throws IOException {
+    super.html();
+    
+    write_children(pfix, rank, level);
+  
+    unload(false, false);
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  public  UmlReadSelfAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+class UmlReadExtentAction extends UmlBaseReadExtentAction {
+  /**
+   * returns a string indicating the king of the element
+   */
+  public String sKind() {
+    return "read extent activity action";
+  }
+
+  /**
+   * entry to produce the html code receiving chapter number
+   * path, rank in the mother and level in the browser tree
+   */
+  public void html(String pfix, int rank, int level) throws IOException {
+    super.html();
+  
+    if (classifier().length() != 0) {
+      fw.write("<p>Classifier : ");
+      fw.write(classifier());
+      fw.write("</p>");
+    }
+    
+    write_children(pfix, rank, level);
+  
+    unload(false, false);
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  public  UmlReadExtentAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+class UmlReclassifyObjectAction extends UmlBaseReclassifyObjectAction {
+  /**
+   * returns a string indicating the king of the element
+   */
+  public String sKind() {
+    return "reclassify object activity action";
+  }
+
+  /**
+   * entry to produce the html code receiving chapter number
+   * path, rank in the mother and level in the browser tree
+   */
+  public void html(String pfix, int rank, int level) throws IOException {
+    super.html();
+  
+    if (isReplaceAll())
+      fw.write("<p>ReplaceAll</p>");
+  
+    if (oldClassifier().length() != 0) {
+      fw.write("<p>Old Classifier : ");
+      fw.write(oldClassifier());
+      fw.write("</p>");
+    }
+  
+    if (newClassifier().length() != 0) {
+      fw.write("<p>New Classifier : ");
+      fw.write(newClassifier());
+      fw.write("</p>");
+    }
+    
+    write_children(pfix, rank, level);
+  
+    unload(false, false);
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  public  UmlReclassifyObjectAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+class UmlReadIsClassifiedObjectAction extends UmlBaseReadIsClassifiedObjectAction {
+  /**
+   * returns a string indicating the king of the element
+   */
+  public String sKind() {
+    return "read is classified object activity action";
+  }
+
+  /**
+   * entry to produce the html code receiving chapter number
+   * path, rank in the mother and level in the browser tree
+   */
+  public void html(String pfix, int rank, int level) throws IOException {
+    super.html();
+  
+    if (isDirect())
+      fw.write("<p>Direct</p>");
+  
+    if (classifier().length() != 0) {
+      fw.write("<p>Classifier : ");
+      fw.write(classifier());
+      fw.write("</p>");
+    }
+    
+    write_children(pfix, rank, level);
+  
+    unload(false, false);
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  public  UmlReadIsClassifiedObjectAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+class UmlStartClassifierBehaviorAction extends UmlBaseStartClassifierBehaviorAction {
+  /**
+   * returns a string indicating the king of the element
+   */
+  public String sKind() {
+    return "start classifier behavior activity action";
+  }
+
+  /**
+   * entry to produce the html code receiving chapter number
+   * path, rank in the mother and level in the browser tree
+   */
+  public void html(String pfix, int rank, int level) throws IOException {
+    super.html();
+    
+    write_children(pfix, rank, level);
+  
+    unload(false, false);
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  public  UmlStartClassifierBehaviorAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+class UmlReadStructuralFeatureAction extends UmlBaseReadStructuralFeatureAction {
+  /**
+   * returns a string indicating the king of the element
+   */
+  public String sKind() {
+    return "read structural feature activity action";
+  }
+
+  /**
+   * entry to produce the html code receiving chapter number
+   * path, rank in the mother and level in the browser tree
+   */
+  public void html(String pfix, int rank, int level) throws IOException {
+    super.html();
+    
+    write_children(pfix, rank, level);
+  
+    unload(false, false);
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  public  UmlReadStructuralFeatureAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+class UmlClearStructuralFeatureAction extends UmlBaseClearStructuralFeatureAction {
+  /**
+   * returns a string indicating the king of the element
+   */
+  public String sKind() {
+    return "clear structural feature activity action";
+  }
+
+  /**
+   * entry to produce the html code receiving chapter number
+   * path, rank in the mother and level in the browser tree
+   */
+  public void html(String pfix, int rank, int level) throws IOException {
+    super.html();
+    
+    write_children(pfix, rank, level);
+  
+    unload(false, false);
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  public  UmlClearStructuralFeatureAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+class UmlAddStructuralFeatureValueAction extends UmlBaseAddStructuralFeatureValueAction {
+  /**
+   * returns a string indicating the king of the element
+   */
+  public String sKind() {
+    return "add structural feature value activity action";
+  }
+
+  /**
+   * entry to produce the html code receiving chapter number
+   * path, rank in the mother and level in the browser tree
+   */
+  public void html(String pfix, int rank, int level) throws IOException {
+    super.html();
+  
+    if (isReplaceAll())
+      fw.write("<p>Replace All</p>");
+    
+    write_children(pfix, rank, level);
+  
+    unload(false, false);
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  public  UmlAddStructuralFeatureValueAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+class UmlRemoveStructuralFeatureValueAction extends UmlBaseRemoveStructuralFeatureValueAction {
+  /**
+   * returns a string indicating the king of the element
+   */
+  public String sKind() {
+    return "remove structural feature value activity action";
+  }
+
+  /**
+   * entry to produce the html code receiving chapter number
+   * path, rank in the mother and level in the browser tree
+   */
+  public void html(String pfix, int rank, int level) throws IOException {
+    super.html();
+  
+    if (isRemoveDuplicates())
+      fw.write("<p>Remove Duplicates</p>");
+    
+    write_children(pfix, rank, level);
+  
+    unload(false, false);
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  public  UmlRemoveStructuralFeatureValueAction(long id, String s) {
     super(id, s);
   }
 

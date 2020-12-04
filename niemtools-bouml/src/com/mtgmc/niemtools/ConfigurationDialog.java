@@ -369,6 +369,14 @@ class ConfigurationDialog extends JDialog {
 		modelPanel.add(openapiBox, labelLayout);
 		fieldLayout.gridy = 6;
 		modelPanel.add(openapiPanel, fieldLayout);
+		
+		ConfigurationDialog.FilePanel metamodelPanel = new FilePanel("Directory", properties.getProperty("metamodelDir", root.propertyValue("html dir")),
+				fieldColumns, JFileChooser.DIRECTORIES_ONLY);
+		ConfigurationDialog.ToggleBox metamodelBox = new ToggleBox("Metamodel", root.propertyValue("exportMetamodel"),
+				metamodelPanel);
+		modelPanel.add(metamodelBox, labelLayout);
+		fieldLayout.gridy = 7;
+		modelPanel.add(metamodelPanel, fieldLayout);
 
 		// Add external panel
 		JPanel externalPanel = new JPanel(new BorderLayout());
@@ -378,10 +386,8 @@ class ConfigurationDialog extends JDialog {
 		String[][] data = new String[externalNamespaces.length][3];
 		for (String namespace : externalNamespaces) {
 			String[] parts = namespace.split("=");
-			if (parts.length == 3) {
-				data[row] = parts;
-				row++;
-			}
+			if (parts.length == 3)
+				data[row++] = parts;
 		}
 		DefaultTableModel model = new DefaultTableModel(data, new String[] { "Prefix", "Namespace", "URL" });
 		JTable table = new JTable(model);
@@ -433,12 +439,14 @@ class ConfigurationDialog extends JDialog {
 			root.set_PropertyValue("exportWSDL", String.valueOf(wsdlBox.isSelected()));
 			root.set_PropertyValue("exportJSON", String.valueOf(jsonBox.isSelected()));
 			root.set_PropertyValue("exportOpenAPI", String.valueOf(openapiBox.isSelected()));
+			root.set_PropertyValue("exportMetamodel", String.valueOf(metamodelBox.isSelected()));
 			properties.setProperty("xsdDir", xsdPanel.value);
 			properties.setProperty("xmlExampleDir", xmlExamplePanel.value);			
 			properties.setProperty("wsdlDir", wsdlPanel.value);
 			properties.setProperty("jsonDir", jsonPanel.value);
 			properties.setProperty("jsonExampleDir", jsonExamplePanel.value);
 			properties.setProperty("openapiDir", openapiPanel.value);
+			properties.setProperty("metamodelDir", metamodelPanel.value);			
 			LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<String>();
 			// DefaultTableModel model = table.getModel();
 			if (model != null)

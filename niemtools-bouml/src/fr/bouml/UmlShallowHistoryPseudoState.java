@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 class UmlShallowHistoryPseudoState extends UmlBaseShallowHistoryPseudoState {
   /**
    * returns a string indicating the king of the element

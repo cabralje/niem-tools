@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 class UmlFinalState extends UmlBaseFinalState {
   /**
    * returns a string indicating the king of the element

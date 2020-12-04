@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.util.*;
 /**
  *  this class manages messages indenpendently of the diagram
@@ -46,8 +47,8 @@ class UmlBaseMessage {
   /**
    *  internal, don't call it
    */
-  @SuppressWarnings({ "rawtypes", "deprecation" })
-public void read_(Hashtable instances) {
+  @SuppressWarnings("deprecation")
+public void read_(@SuppressWarnings("rawtypes") Hashtable instances) {
     _operation = (UmlOperation) UmlBaseItem.read_();
     if (_operation == null) _form = UmlCom.read_string();
     _from = (UmlClassInstanceReference) instances.get(new Integer(UmlCom.read_unsigned()));

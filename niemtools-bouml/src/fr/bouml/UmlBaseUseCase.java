@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  Manage the use cases
  */

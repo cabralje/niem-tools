@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  This class manages 'actual parameters' of a template class. For instance T in
  * 

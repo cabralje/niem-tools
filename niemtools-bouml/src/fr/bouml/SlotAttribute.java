@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 class SlotAttribute {
   public UmlAttribute attribute;
 

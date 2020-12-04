@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 class UmlInitialActivityNode extends UmlBaseInitialActivityNode {
   /**
    *   the constructor, do not call it yourself !!!!!!!!!!

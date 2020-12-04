@@ -1,7 +1,10 @@
 package fr.bouml;
 
-import java.io.IOException;
 
+import java.io.*;
+import java.util.*;
+
+@SuppressWarnings("unused")
 abstract class UmlOnSignalAction extends UmlBaseOnSignalAction {
   /**
    * entry to produce the html code receiving chapter number

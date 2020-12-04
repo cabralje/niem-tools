@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseOnSignalAction extends UmlActivityAction {
   /**
    *   the constructor, do not call it yourself !!!!!!!!!!

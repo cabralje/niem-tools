@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.util.*;
 /**
  *  Base class of all the classes representing browser's objects.
@@ -182,7 +183,7 @@ abstract class UmlBaseItem {
    *  
    *  On error return FALSE in C++, produce a RuntimeException in Java
    */
-@SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked" })
 public void set_PropertyValue(String k, String v) throws RuntimeException {
     read_if_needed_();
     
@@ -199,7 +200,7 @@ public void set_PropertyValue(String k, String v) throws RuntimeException {
   /**
    *  returns all the properties of the object through (in Java a copy of) a dictionnary
    */
-public Hashtable properties() {
+  public Hashtable properties() {
     read_if_needed_();
   
     return (_dict == null)
@@ -265,7 +266,7 @@ public Hashtable properties() {
   }
 
   /**
-   *   Apply asynchronously the tool on the item, returns an identifier to call isToolDone()
+   *   Apply asynchronously the tool on the item, returns an identifier to call isToolRunning()
    */
   public int apply(String cmd) {
     UmlCom.send_cmd(identifier_(), OnInstanceCmd.applyCmd, cmd); 
@@ -375,8 +376,8 @@ public void unload(boolean rec, boolean del) {
   private String _description;
   private UmlItem _parent;
   private UmlItem[] _children;
-private Hashtable _dict;
-private static Hashtable _all;
+  private Hashtable _dict;
+  private static Hashtable _all;
 static { _all = new Hashtable(997); }  protected final void read_if_needed_() {
     if (!_defined) {
       UmlCom.send_cmd(identifier_(), OnInstanceCmd.getDefCmd);
@@ -593,8 +594,8 @@ protected void read_uml_() {
         return new UmlReadVariableValueAction(id, name);
       case anItemKind._aClearVariableValueAction:
         return new UmlClearVariableValueAction(id, name);
-      case anItemKind._aWriteVariableValueAction:
-        return new UmlWriteVariableValueAction(id, name);
+      //case anItemKind._aWriteVariableValueAction:
+        //return new UmlWriteVariableValueAction(id, name);
       case anItemKind._anAddVariableValueAction:
         return new UmlAddVariableValueAction(id, name);
       case anItemKind._aRemoveVariableValueAction:
@@ -653,6 +654,42 @@ protected void read_uml_() {
         return new UmlReduceAction(id, name);
       case anItemKind._anExtraArtifactDefinition:
         return new UmlExtraArtifactDefinition(id, name);
+      case anItemKind._aPort:
+        return new UmlPort(id, name);
+      case anItemKind._aPortRef:
+        return new UmlPortRef(id, name);
+      case anItemKind._aClassCompositeDiagram:
+        return new UmlClassCompositeDiagram(id, name);
+      case anItemKind._anObjectCompositeDiagram:
+        return new UmlObjectCompositeDiagram(id, name);
+      case anItemKind._aRolePart:
+        return new UmlRolePart(id, name);
+      case anItemKind._aRolePartInstance:
+        return new UmlRolePartInstance(id, name);
+      case anItemKind._aConnector:
+        return new UmlConnector(id, name);
+      case anItemKind._aVariable:
+        return new UmlVariable(id, name);
+      case anItemKind._aStartObjectBehaviorAction:
+        return new UmlStartObjectBehaviorAction(id, name);
+      case anItemKind._aReadSelfAction:
+        return new UmlReadSelfAction(id, name);
+      case anItemKind._aReadExtentAction:
+        return new UmlReadExtentAction(id, name);
+      case anItemKind._aReclassifyObjectAction:
+        return new UmlReclassifyObjectAction(id, name);
+      case anItemKind._aReadIsClassifiedObjectAction:
+        return new UmlReadIsClassifiedObjectAction(id, name);
+      case anItemKind._aStartClassifierBehaviorAction:
+        return new UmlStartClassifierBehaviorAction(id, name);
+      case anItemKind._aReadStructuralFeatureAction:
+        return new UmlReadStructuralFeatureAction(id, name);
+      case anItemKind._aClearStructuralFeatureAction:
+        return new UmlClearStructuralFeatureAction(id, name);
+      case anItemKind._anAddStructuralFeatureValueAction:
+        return new UmlAddStructuralFeatureValueAction(id, name);
+      case anItemKind._aRemoveStructuralFeatureValueAction:
+        return new UmlRemoveStructuralFeatureValueAction(id, name);
       default:
         UmlCom.bye(-1);
         UmlCom.fatal_error(new String("unknown item type ") + String.valueOf(kind));
@@ -665,7 +702,7 @@ protected void read_uml_() {
   /**
    *  the constructor, do not call it yourself !!!!!!!!!!
    */
-  @SuppressWarnings({ "unchecked", "deprecation" })
+  @SuppressWarnings({ "deprecation", "unchecked" })
 public UmlBaseItem(long id, String n) {
     _defined = false;
     _identifier = id;

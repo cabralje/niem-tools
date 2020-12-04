@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseStateDiagram extends UmlDiagram {
   /**
    *   returns a new state diagram named 's' created under 'parent'

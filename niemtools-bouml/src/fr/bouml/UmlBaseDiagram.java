@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *   Mother class of all the classes managing the diagrams
  */

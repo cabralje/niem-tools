@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  indicate the kind of a message
  */

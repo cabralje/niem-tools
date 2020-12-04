@@ -1,7 +1,10 @@
 package fr.bouml;
 
-import java.io.IOException;
 
+import java.io.*;
+import java.util.*;
+
+@SuppressWarnings("unused")
 abstract class UmlActivityControlNode extends UmlBaseActivityControlNode {
   /**
    *   the constructor, do not call it yourself !!!!!!!!!!

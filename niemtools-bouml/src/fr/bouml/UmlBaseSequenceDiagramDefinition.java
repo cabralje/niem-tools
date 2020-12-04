@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.util.*;
 /**
  *  this class manages sequence diagram definition
@@ -36,7 +37,7 @@ class UmlBaseSequenceDiagramDefinition {
   /**
    *  internal, don't call it
    */
-  @SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
+  @SuppressWarnings({ "deprecation", "unchecked", "rawtypes" })
 public void read_() {
     Hashtable instances;
     int n;

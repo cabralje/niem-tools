@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseFlow extends UmlItem {
   /**
    *  returns the kind of the item

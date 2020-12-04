@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 import java.util.*;
 
@@ -135,8 +136,7 @@ public void memo_ref() {
         
       for (int i = 0; i != n; i += 1) {
         UmlItem prop = (UmlItem) attrs.elementAt(i);
-        if (!prop.known)
-        	continue;
+        
         fw.write("<tr bgcolor=\"#f0f0f0\"><td>");
         prop.write();
         fw.write("</td><td>");

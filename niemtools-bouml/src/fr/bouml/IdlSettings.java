@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.util.*;
 /**
  *  This class manages settings concerning IDL, configured through
@@ -818,7 +819,7 @@ public static void set_Include(String s, String v) throws RuntimeException
   private static String _ext;
   @SuppressWarnings("rawtypes")
 private static Hashtable _map_includes;
-  @SuppressWarnings({ "unchecked", "rawtypes" })
+  @SuppressWarnings({ "rawtypes", "unchecked" })
 protected static void read_()
   {
     _root = UmlCom.read_string();

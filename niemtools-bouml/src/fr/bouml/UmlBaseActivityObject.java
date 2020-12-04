@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseActivityObject extends UmlActivityNode {
   /**
    *   returns a new activity object named 's' created under 'parent'

@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 import java.util.*;
 
@@ -42,7 +43,7 @@ public void memo_ref() {
     generate_index(diagrams, "Class Diagram", "classdiagrams");
   }
 
-protected static Vector diagrams;
+  protected static Vector diagrams;
 
   static { diagrams = new Vector(); }
 };

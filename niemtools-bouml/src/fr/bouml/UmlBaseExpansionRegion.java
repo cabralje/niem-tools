@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseExpansionRegion extends UmlActivityRegion {
   /**
    *   returns a new expansion region named 's' created under 'parent'

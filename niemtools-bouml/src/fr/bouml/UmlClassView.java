@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 
 /**
@@ -31,12 +32,4 @@ public class UmlClassView extends UmlBaseClassView {
     return true;
   }
 
-  public void sort() {
-  	sortChildren();
-  }
-
-  public int orderWeight() {
-  	return 3;
-  }
-	
 };

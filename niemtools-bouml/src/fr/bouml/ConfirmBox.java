@@ -1,4 +1,5 @@
 package fr.bouml;
+
 import java.awt.*;
 import java.awt.event.*;
 

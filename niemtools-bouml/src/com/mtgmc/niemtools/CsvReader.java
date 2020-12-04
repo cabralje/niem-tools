@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 
 import fr.bouml.UmlClass;
 import fr.bouml.UmlClassInstance;
@@ -52,6 +53,7 @@ public class CsvReader {
 	
 			// read header
 			reader.readNext();
+
 			Log.debug("importCsv: header read");
 
 			// read mappings
@@ -89,6 +91,8 @@ public class CsvReader {
 				}
 			}
 			reader.close();
+		} catch (CsvValidationException e) {
+			Log.trace("importCsv: error reading CSV " + e.toString());
 		} catch (FileNotFoundException e) {
 			Log.trace("importCsv: error - file not found" + e.toString());
 		} catch (IOException e) {

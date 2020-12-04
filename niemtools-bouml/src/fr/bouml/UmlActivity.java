@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 import java.util.*;
 
@@ -155,7 +156,7 @@ public void memo_ref() {
     return true;
   }
 
-protected static Vector activities;
+  protected static Vector activities;
 
   static { activities = new Vector(); }
 }

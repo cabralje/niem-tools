@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  Manage the 'extra' class members to produce any code, for instance a C++ pre-processing form or a Java initialization
  */

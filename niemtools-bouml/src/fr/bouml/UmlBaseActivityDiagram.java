@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseActivityDiagram extends UmlDiagram {
   /**
    *   returns a new activity diagram named 's' created under 'parent'

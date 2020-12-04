@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  This class manages settings concerning PHP, configured through
  *  the 'Generation settings' dialog.
@@ -442,6 +443,29 @@ class PhpSettings extends UmlSettings {
   }
 
   /**
+   *  returns the default definition of a trait
+   */
+  public static String traitDecl()
+  {
+    read_if_needed_();
+  
+    return _trait_decl;
+  }
+
+  /**
+   *  set the default definition of a trait
+   * 
+   *  On error : return FALSE in C++, produce a RuntimeException in Java
+   */
+  public static void set_TraitDecl(String v) throws RuntimeException
+  {
+    UmlCom.send_cmd(CmdFamily.phpSettingsCmd, PhpSettingsCmd._setPhpTraitDeclCmd, v);
+    UmlCom.check();
+  
+    _trait_decl = v;
+  }
+
+  /**
    *  returns the default definition of an attribute
    */
   public static String attributeDecl()
@@ -745,6 +769,8 @@ class PhpSettings extends UmlSettings {
   private static String _enum_decl;
 
   private static String _interface_decl;
+  private static String _trait_decl;
+
   private static String _attr_decl;
 
   private static String _enum_item_decl;
@@ -824,6 +850,8 @@ class PhpSettings extends UmlSettings {
   
     _is_param_typed = UmlCom.read_bool();
     _is_out_inout_by_ref = UmlCom.read_bool();
+  
+    _trait_decl = UmlCom.read_string();
   }
 
   protected static void read_if_needed_()
