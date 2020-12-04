@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseJunctionPseudoState extends UmlPseudoState {
   /**
    *  returns a new junction pseudo state created under 'parent'

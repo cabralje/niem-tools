@@ -198,8 +198,7 @@ public class NamespaceModel {
 			} catch (Exception e) {
 				Log.trace("getNamespaceClassView: multiple namespace URIs for prefix " + prefix3 + " " + schemaURI + " and "
 						+ Prefixes.get(prefix2));
-				prefix3 = prefix2 + conflictCounter;
-				conflictCounter++;
+				prefix3 = prefix2 + conflictCounter++;
 			}
 		}
 		namespaceClassView.set_PropertyValue(NiemModel.URI_PROPERTY, schemaURI);

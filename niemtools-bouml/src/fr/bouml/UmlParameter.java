@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *   Represent an operation's parameter
  */

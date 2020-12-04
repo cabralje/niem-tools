@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  This class manages settings concerning MYSQL, configured through
  *  the 'Generation settings' dialog.

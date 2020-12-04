@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 class UmlJoinPseudoState extends UmlBaseJoinPseudoState {
   /**
    * returns a string indicating the king of the element

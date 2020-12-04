@@ -1,4 +1,5 @@
 package fr.bouml;
+
 import java.io.*;
 
 // the program is called with the socket port number in argument
@@ -10,7 +11,7 @@ class Main {
       UmlCom.connect(Integer.valueOf(argv[argv.length - 1]).intValue());
 
       try {
-        UmlCom.trace("<b>Html generator</b> release 6.4 (Java version)<br />");
+        UmlCom.trace("<b>Html generator</b> release 6.6 (Java version)<br />");
 
         UmlItem target = UmlCom.targetItem();
 	try {

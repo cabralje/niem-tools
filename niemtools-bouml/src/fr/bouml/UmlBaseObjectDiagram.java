@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseObjectDiagram extends UmlDiagram {
   /**
    *   returns a new object diagram named 's' created under 'parent'

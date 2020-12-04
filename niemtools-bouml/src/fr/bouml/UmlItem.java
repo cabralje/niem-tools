@@ -320,9 +320,12 @@ public static void ref_indexes() throws IOException
     UmlPackage.ref_index();
     UmlUseCase.ref_index();
     UmlActivity.ref_index();
+    UmlVariable.ref_index();
     UmlState.ref_index();
     UmlClassDiagram.ref_index();
+    UmlClassCompositeDiagram.ref_index();
     UmlObjectDiagram.ref_index();
+    UmlObjectCompositeDiagram.ref_index();
     UmlActivityDiagram.ref_index();
     UmlStateDiagram.ref_index();
     UmlUseCaseDiagram.ref_index();
@@ -353,9 +356,12 @@ public static void ref_indexes() throws IOException
     UmlPackage.generate_index();
     UmlUseCase.generate_index();
     UmlActivity.generate_index();
+    UmlVariable.generate_index();
     UmlState.generate_index();
     UmlClassDiagram.generate_index();
+    UmlClassCompositeDiagram.generate_index();
     UmlObjectDiagram.generate_index();
+    UmlObjectCompositeDiagram.generate_index();
     UmlActivityDiagram.generate_index();
     UmlStateDiagram.generate_index();
     UmlUseCaseDiagram.generate_index();
@@ -578,7 +584,7 @@ public static void ref_indexes() throws IOException
     }
   }
 
-public void write_properties() throws IOException {
+  public void write_properties() throws IOException {
     if (!stereotype().equals("")) {
       fw.write("<p>Stereotype: ");
       writeq(stereotype());
@@ -939,7 +945,6 @@ public void write_properties() throws IOException {
 
   public static void generate_index(Vector v, String k, String r) throws IOException
   {
-	  
     int n = v.size();
     
     if (n != 0) {

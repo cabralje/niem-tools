@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseActivityRegion extends UmlItem {
   /**
    *   the constructor, do not call it yourself !!!!!!!!!!

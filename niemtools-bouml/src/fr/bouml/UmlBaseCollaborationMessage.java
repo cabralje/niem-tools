@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.util.*;
 /**
  *  this class manages messages in a collaboration diagram
@@ -26,8 +27,7 @@ class UmlBaseCollaborationMessage extends UmlMessage {
   /**
    *  internal, don't call it
    */
-  @SuppressWarnings("rawtypes")
-public void read_(Hashtable instances) {
+  public void read_(@SuppressWarnings("rawtypes") Hashtable instances) {
     super.read_(instances);
     _rank = UmlCom.read_unsigned();
     _hrank = UmlCom.read_string();

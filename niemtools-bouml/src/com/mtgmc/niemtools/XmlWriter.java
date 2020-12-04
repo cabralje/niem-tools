@@ -52,7 +52,7 @@ import fr.bouml.anItemKind;
 
 public class XmlWriter {
 
-	private static final String AUGMENTATION_POINT_NAME = "AugmentationPoint";
+	static final String AUGMENTATION_POINT_NAME = "AugmentationPoint";
 	// NIEM code lists
 	static final String CODELIST_APPINFO_PREFIX = "clsa";
 	static final String CODELIST_APPINFO_URI = "http://reference.niem.gov/niem/specification/code-lists/1.0/code-lists-schema-appinfo/";
@@ -116,8 +116,8 @@ public class XmlWriter {
 	static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"US-ASCII\"?>\n";
 	static final String XSD_FILE_TYPE = ".xsd";
 	// XML
-	private static final String XSI_PREFIX = "xsi";
-	private static final String XSI_URI = XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
+	static final String XSI_PREFIX = "xsi";
+	static final String XSI_URI = XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 	private Set<String> CodeListNamespaces = new HashSet<String>();
 
 	private String directory;
@@ -231,7 +231,7 @@ public class XmlWriter {
 			String prefix = entry.getKey();
 			if (prefix.equals(NC_PREFIX))
 				writeXmlNs(xml, prefix, MPD_NC_URI);
-			else if (prefix.equals(NiemUmlClass.STRUCTURES_PREFIX))
+			else if (prefix.equals(NiemModel.STRUCTURES_PREFIX))
 				writeXmlNs(xml, prefix, MPD_STRUCTURES_URI);
 			else
 				writeXmlNs(xml, prefix, NamespaceModel.getSchemaURIForPrefix(prefix));
@@ -272,7 +272,7 @@ public class XmlWriter {
 					p3 = p2.relativize(Paths.get(path3));
 					path3 = p3.toString();
 				} catch (Exception e1) {
-					Log.trace("exportMpdCatalog: No relative path from " + p2.toString() + " to " + path3 + " " + e1.toString());
+					Log.trace("exportMpdCatalog: No relative path 1 from " + p2.toString() + " to " + path3 + " " + e1.toString());
 				}
 				xml.write("<c:IEPSampleXMLDocument c:pathURI=\"" + path3 + "\"/>" );
 			}
@@ -281,18 +281,18 @@ public class XmlWriter {
 		Path p4 = null;
 		String path4 = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_READ_ME_FILE_PROPERTY);
 		try {
-			p4 = p2.relativize(Paths.get(directory, path4));
+			p4 = p2.relativize(Paths.get(path4));
 			path4 = p4.toString();
 		} catch (Exception e1) {
-			Log.trace("exportMpdCatalog: No relative path from " + p2.toString() + " to " + path4 + " " + e1.toString());
+			Log.trace("exportMpdCatalog: No relative path 2 from " + p2.toString() + " to " + path4 + " " + e1.toString());
 		}
 		Path p5 = null;
 		String path5 = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CHANGE_LOG_FILE_PROPERTY);
 		try {
-			p5 = p2.relativize(Paths.get(directory, path5));
+			p5 = p2.relativize(Paths.get(path5));
 			path5 = p5.toString();
 		} catch (Exception e1) {
-			Log.trace("exportMpdCatalog: No relative path from " + p2.toString() + " to " + path5 + " " + e1.toString());
+			Log.trace("exportMpdCatalog: No relative path 3 from " + p2.toString() + " to " + path5 + " " + e1.toString());
 		}
 		xml.write("<c:ReadMe c:pathURI=\"" + path4 + "\"/>"				
 		    + "<c:MPDChangeLog c:pathURI=\"" + 	path5 + "\"/>"
@@ -734,7 +734,7 @@ public class XmlWriter {
 
 		TreeSet<String> xmlEnumerations = new TreeSet<String>();
 		if (isComplexType == false && baseType != null)
-			if (codeList != null && codeList.equals("")) {
+			if (codeList != null && codeList.contains(NiemModel.CODELIST_DELIMITER)) {
 				for (String code : codeList.split(NiemModel.CODELIST_DELIMITER)) {
 					if (code.equals(""))
 						continue;
@@ -852,7 +852,7 @@ public class XmlWriter {
 	 * @param prefix
 	 * @param value
 	 */
-	void writeXmlNs(FileWriter fw, String prefix, String value) {
+	static public void writeXmlNs(FileWriter fw, String prefix, String value) {
 		try {
 			if (prefix.equals(""))
 				fw.write(" " + NamespaceModel.NAMESPACE_ATTRIBUTE + "=\"" + value + "\"");

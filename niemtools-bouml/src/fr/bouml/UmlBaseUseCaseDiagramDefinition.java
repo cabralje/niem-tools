@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.util.*;
 /**
  *  this class manages use case diagram definition
@@ -53,7 +54,7 @@ class UmlBaseUseCaseDiagramDefinition {
   /**
    *  internal, don't call it
    */
-  @SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
+  @SuppressWarnings({ "deprecation", "unchecked", "rawtypes" })
 public void read_() {
     Hashtable ucrefs;
     int n;

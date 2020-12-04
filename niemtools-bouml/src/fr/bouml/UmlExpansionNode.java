@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 class UmlExpansionNode extends UmlBaseExpansionNode {
   /**
    *   the constructor, do not call it yourself !!!!!!!!!!

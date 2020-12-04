@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.util.*;
 /**
  *   Manage the classes
@@ -46,6 +47,15 @@ abstract class UmlBaseClass extends UmlClassMember {
     UmlCom.check();
   
     _abstract = y;
+  }
+
+  /**
+   *  returns TRUE in case the class is locked
+   */
+  public boolean isLocked() {
+    read_if_needed_();
+  
+    return _locked;
   }
 
   /**
@@ -548,9 +558,11 @@ abstract class UmlBaseClass extends UmlClassMember {
   /**
    * key includes package/class-container
    */
-private static Hashtable classes;
+  private static Hashtable classes;
 static { classes = new Hashtable(1001); }
   private boolean _abstract;
+  private boolean _locked;
+
   private boolean _active;
 
   private boolean _cpp_external;
@@ -596,6 +608,8 @@ static { classes = new Hashtable(1001); }
         _base_type.explicit_type = UmlCom.read_string();
     }
     _active = UmlCom.read_bool();
+  
+    _locked = UmlCom.read_bool();
   }
 
   protected void read_cpp_() {

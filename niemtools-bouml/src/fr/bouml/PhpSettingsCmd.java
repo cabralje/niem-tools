@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 final class PhpSettingsCmd {
   public static final int _getPhpSettingsCmd = 0;
   public static final PhpSettingsCmd getPhpSettingsCmd = new PhpSettingsCmd(_getPhpSettingsCmd);
@@ -59,6 +60,8 @@ final class PhpSettingsCmd {
   public static final PhpSettingsCmd setPhpParametersTypedCmd = new PhpSettingsCmd(_setPhpParametersTypedCmd);
   public static final int _setPhpOutInoutParametersByReferenceCmd = 28;
   public static final PhpSettingsCmd setPhpOutInoutParametersByReferenceCmd = new PhpSettingsCmd(_setPhpOutInoutParametersByReferenceCmd);
+  public static final int _setPhpTraitDeclCmd = 29;
+  public static final PhpSettingsCmd setPhpTraitDeclCmd = new PhpSettingsCmd(_setPhpTraitDeclCmd);
 
   private int value;
 
@@ -97,6 +100,7 @@ final class PhpSettingsCmd {
     case _setPhpForceNamespaceGenCmd: return setPhpForceNamespaceGenCmd;
     case _setPhpParametersTypedCmd: return setPhpParametersTypedCmd;
     case _setPhpOutInoutParametersByReferenceCmd: return setPhpOutInoutParametersByReferenceCmd;
+    case _setPhpTraitDeclCmd: return setPhpTraitDeclCmd;
     default: throw new Error();
     }
   }

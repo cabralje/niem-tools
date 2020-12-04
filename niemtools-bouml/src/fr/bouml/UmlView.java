@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlView extends UmlBaseView {
   /**
    *   the constructor, do not call it yourself !!!!!!!!!!

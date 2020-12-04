@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseParameterSet extends UmlItem {
   /**
    *   returns a new parameter set named 's' created under 'parent'

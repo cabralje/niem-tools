@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseSendObjectAction extends UmlActivityAction {
   /**
    *   returns a new send object action named 's' created under 'parent'
@@ -53,6 +54,33 @@ abstract class UmlBaseUnmarshallAction extends UmlActivityAction {
    */
   protected  UmlBaseUnmarshallAction(long id, String s) {
     super(id, s);
+  }
+
+  /**
+   *  return the classifier
+   */
+  public String classifier() {
+    read_if_needed_();
+    return _classifier;
+  }
+
+  /**
+   *  set the classifier
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_Classifier(String v) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setUmlActivityCmd, v);
+    UmlCom.check();
+  
+    _classifier = v;
+  }
+
+  private String _classifier;
+
+  protected void read_uml_() {
+    super.read_uml_();
+    _classifier = UmlCom.read_string();
   }
 
 }
@@ -742,34 +770,6 @@ abstract class UmlBaseReadVariableValueAction extends UmlAccessVariableValueActi
   }
 
 }
-abstract class UmlBaseWriteVariableValueAction extends UmlAccessVariableValueAction {
-  /**
-   *   returns a new write variable value action named 's' created under 'parent'
-   * 
-   *  In case it cannot be created (the name is already used or
-   *  invalid, 'parent' cannot contain it etc ...) return 0 in C++
-   *  and produce a RuntimeException in Java
-   */
-  public static UmlWriteVariableValueAction create(UmlItem parent, String s) throws RuntimeException
-  {
-    return (UmlWriteVariableValueAction) parent.create_(anItemKind.aWriteVariableValueAction, s);
-  }
-
-  /**
-   *  returns the kind of the item
-   */
-  public anItemKind kind() {
-    return anItemKind.aWriteVariableValueAction;
-  }
-
-  /**
-   *   the constructor, do not call it yourself !!!!!!!!!!
-   */
-  protected  UmlBaseWriteVariableValueAction(long id, String s) {
-    super(id, s);
-  }
-
-}
 abstract class UmlBaseAddVariableValueAction extends UmlAccessVariableValueAction {
   /**
    *   returns a new add variable value action named 's' created under 'parent'
@@ -908,6 +908,26 @@ abstract class UmlBaseAcceptCallAction extends UmlActivityAction {
   }
 
   /**
+   *  return the property 'unmarshall'
+   */
+  public boolean isUnmarshall() {
+    read_if_needed_();
+    return _unmarshall;
+  }
+
+  /**
+   *  set the property 'unmarshall'
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_isUnmarshall(boolean v) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setUnmarshallCmd, (v) ? (byte) 1 : (byte) 0);
+    UmlCom.check();
+  
+    _unmarshall = v;
+  }
+
+  /**
    *  return the trigger
    */
   public String trigger() {
@@ -982,6 +1002,8 @@ abstract class UmlBaseAcceptCallAction extends UmlActivityAction {
     super.unload(rec, del);
   }
 
+  private boolean _unmarshall;
+
   private String _trigger;
 
   private String _cpp_trigger;
@@ -990,6 +1012,7 @@ abstract class UmlBaseAcceptCallAction extends UmlActivityAction {
 
   protected void read_uml_() {
     super.read_uml_();
+    _unmarshall = UmlCom.read_bool();
     _trigger = UmlCom.read_string();
   }
 
@@ -1406,5 +1429,516 @@ abstract class UmlBaseReduceAction extends UmlActivityAction {
     _ordered = UmlCom.read_bool();
     _reducer = UmlBaseItem.read_();
   }
+
+}
+abstract class UmlBaseStartObjectBehaviorAction extends UmlActivityAction {
+  /**
+   *   returns a new start object behavior action named 's' created under 'parent'
+   * 
+   *  In case it cannot be created (the name is already used or
+   *  invalid, 'parent' cannot contain it etc ...) return 0 in C++
+   *  and produce a RuntimeException in Java
+   */
+  public static UmlStartObjectBehaviorAction create(UmlItem parent, String s) throws RuntimeException
+  {
+    return (UmlStartObjectBehaviorAction) parent.create_(anItemKind.aStartObjectBehaviorAction, s);
+  }
+
+  /**
+   *  returns the kind of the item
+   */
+  public anItemKind kind() {
+    return anItemKind.aStartObjectBehaviorAction;
+  }
+
+  /**
+   *  return the property 'synchronous'
+   */
+  public boolean isSynchronous() {
+    read_if_needed_();
+    return _synchronous;
+  }
+
+  /**
+   *  set the property 'synchronous'
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_isSynchronous(boolean v) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setFlagCmd, (v) ? (byte) 1 : (byte) 0);
+    UmlCom.check();
+  
+    _synchronous = v;
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  protected  UmlBaseStartObjectBehaviorAction(long id, String s) {
+    super(id, s);
+  }
+
+  protected void read_uml_() {
+    super.read_uml_();
+    _synchronous = UmlCom.read_bool();
+  }
+
+  private boolean _synchronous;
+
+}
+abstract class UmlBaseReadSelfAction extends UmlActivityAction {
+  /**
+   *   returns a new read self action named 's' created under 'parent'
+   * 
+   *  In case it cannot be created (the name is already used or
+   *  invalid, 'parent' cannot contain it etc ...) return 0 in C++
+   *  and produce a RuntimeException in Java
+   */
+  public static UmlReadSelfAction create(UmlItem parent, String s) throws RuntimeException
+  {
+    return (UmlReadSelfAction) parent.create_(anItemKind.aReadSelfAction, s);
+  }
+
+  /**
+   *  returns the kind of the item
+   */
+  public anItemKind kind() {
+    return anItemKind.aReadSelfAction;
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  protected  UmlBaseReadSelfAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+abstract class UmlBaseReadExtentAction extends UmlActivityAction {
+  /**
+   *   returns a new read extent action named 's' created under 'parent'
+   * 
+   *  In case it cannot be created (the name is already used or
+   *  invalid, 'parent' cannot contain it etc ...) return 0 in C++
+   *  and produce a RuntimeException in Java
+   */
+  public static UmlReadExtentAction create(UmlItem parent, String s) throws RuntimeException
+  {
+    return (UmlReadExtentAction) parent.create_(anItemKind.aReadExtentAction, s);
+  }
+
+  /**
+   *  returns the kind of the item
+   */
+  public anItemKind kind() {
+    return anItemKind.aReadExtentAction;
+  }
+
+  /**
+   *  return the classifier
+   */
+  public String classifier() {
+    read_if_needed_();
+    return _classifier;
+  }
+
+  /**
+   *  set the classifier
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_Classifier(String v) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setUmlActivityCmd, v);
+    UmlCom.check();
+  
+    _classifier = v;
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  protected  UmlBaseReadExtentAction(long id, String s) {
+    super(id, s);
+  }
+
+  protected void read_uml_() {
+    super.read_uml_();
+    _classifier = UmlCom.read_string();
+  }
+
+  private String _classifier;
+
+}
+abstract class UmlBaseReclassifyObjectAction extends UmlActivityAction {
+  /**
+   *   returns a new reclassify object action named 's' created under 'parent'
+   * 
+   *  In case it cannot be created (the name is already used or
+   *  invalid, 'parent' cannot contain it etc ...) return 0 in C++
+   *  and produce a RuntimeException in Java
+   */
+  public static UmlReclassifyObjectAction create(UmlItem parent, String s) throws RuntimeException
+  {
+    return (UmlReclassifyObjectAction) parent.create_(anItemKind.aReclassifyObjectAction, s);
+  }
+
+  /**
+   *  returns the kind of the item
+   */
+  public anItemKind kind() {
+    return anItemKind.aReclassifyObjectAction;
+  }
+
+  /**
+   *  return the property 'replaceAll'
+   */
+  public boolean isReplaceAll() {
+    read_if_needed_();
+    return _replace_all;
+  }
+
+  /**
+   *  set the property 'replaceAll'
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_isReplaceAll(boolean v) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setFlagCmd, (v) ? (byte) 1 : (byte) 0);
+    UmlCom.check();
+  
+    _replace_all = v;
+  }
+
+  /**
+   *  return the old classifiers
+   */
+  public String oldClassifier() {
+    read_if_needed_();
+    return _old_classifier;
+  }
+
+  /**
+   *  set the old classifier
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_OldClassifier(String v) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setUmlActivityCmd, v);
+    UmlCom.check();
+  
+    _old_classifier = v;
+  }
+
+  /**
+   *  return the new classifiers
+   */
+  public String newClassifier() {
+    read_if_needed_();
+    return _new_classifier;
+  }
+
+  /**
+   *  set the new classifier
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_NewClassifier(String v) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setUmlGuardCmd, v);
+    UmlCom.check();
+  
+    _new_classifier = v;
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  protected  UmlBaseReclassifyObjectAction(long id, String s) {
+    super(id, s);
+  }
+
+  protected void read_uml_() {
+    super.read_uml_();
+    _replace_all = UmlCom.read_bool();
+    _old_classifier = UmlCom.read_string();
+    _new_classifier = UmlCom.read_string();
+  }
+
+  private boolean _replace_all;
+
+  private String _old_classifier;
+
+  private String _new_classifier;
+
+}
+abstract class UmlBaseReadIsClassifiedObjectAction extends UmlActivityAction {
+  /**
+   *   returns a new read is classified object action named 's' created under 'parent'
+   * 
+   *  In case it cannot be created (the name is already used or
+   *  invalid, 'parent' cannot contain it etc ...) return 0 in C++
+   *  and produce a RuntimeException in Java
+   */
+  public static UmlReadIsClassifiedObjectAction create(UmlItem parent, String s) throws RuntimeException
+  {
+    return (UmlReadIsClassifiedObjectAction) parent.create_(anItemKind.aReadIsClassifiedObjectAction, s);
+  }
+
+  /**
+   *  returns the kind of the item
+   */
+  public anItemKind kind() {
+    return anItemKind.aReadIsClassifiedObjectAction;
+  }
+
+  /**
+   *  return the property 'direct'
+   */
+  public boolean isDirect() {
+    read_if_needed_();
+    return _direct;
+  }
+
+  /**
+   *  set the property 'direct'
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_isDirect(boolean v) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setFlagCmd, (v) ? (byte) 1 : (byte) 0);
+    UmlCom.check();
+  
+    _direct = v;
+  }
+
+  /**
+   *  return the classifier
+   */
+  public String classifier() {
+    read_if_needed_();
+    return _classifier;
+  }
+
+  /**
+   *  set the classifier
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_Classifier(String v) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setUmlActivityCmd, v);
+    UmlCom.check();
+  
+    _classifier = v;
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  protected  UmlBaseReadIsClassifiedObjectAction(long id, String s) {
+    super(id, s);
+  }
+
+  protected void read_uml_() {
+    super.read_uml_();
+    _direct = UmlCom.read_bool();
+    _classifier = UmlCom.read_string();
+  }
+
+  private boolean _direct;
+
+  private String _classifier;
+
+}
+abstract class UmlBaseStartClassifierBehaviorAction extends UmlActivityAction {
+  /**
+   *   returns a new start classifier behavior action named 's' created under 'parent'
+   * 
+   *  In case it cannot be created (the name is already used or
+   *  invalid, 'parent' cannot contain it etc ...) return 0 in C++
+   *  and produce a RuntimeException in Java
+   */
+  public static UmlStartClassifierBehaviorAction create(UmlItem parent, String s) throws RuntimeException
+  {
+    return (UmlStartClassifierBehaviorAction) parent.create_(anItemKind.aStartClassifierBehaviorAction, s);
+  }
+
+  /**
+   *  returns the kind of the item
+   */
+  public anItemKind kind() {
+    return anItemKind.aStartClassifierBehaviorAction;
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  protected  UmlBaseStartClassifierBehaviorAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+abstract class UmlBaseReadStructuralFeatureAction extends UmlStructuralFeatureAction {
+  /**
+   *   returns a new read structural feature action named 's' created under 'parent'
+   * 
+   *  In case it cannot be created (the name is already used or
+   *  invalid, 'parent' cannot contain it etc ...) return 0 in C++
+   *  and produce a RuntimeException in Java
+   */
+  public static UmlReadStructuralFeatureAction create(UmlStructuralFeatureAction parent, String s) throws RuntimeException
+  {
+    return (UmlReadStructuralFeatureAction) parent.create_(anItemKind.aReadStructuralFeatureAction, s);
+  }
+
+  /**
+   *  returns the kind of the item
+   */
+  public anItemKind kind() {
+    return anItemKind.aReadStructuralFeatureAction;
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  protected  UmlBaseReadStructuralFeatureAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+abstract class UmlBaseClearStructuralFeatureAction extends UmlStructuralFeatureAction {
+  /**
+   *   returns a new clear structural feature action named 's' created under 'parent'
+   * 
+   *  In case it cannot be created (the name is already used or
+   *  invalid, 'parent' cannot contain it etc ...) return 0 in C++
+   *  and produce a RuntimeException in Java
+   */
+  public static UmlClearStructuralFeatureAction create(UmlStructuralFeatureAction parent, String s) throws RuntimeException
+  {
+    return (UmlClearStructuralFeatureAction) parent.create_(anItemKind.aClearStructuralFeatureAction, s);
+  }
+
+  /**
+   *  returns the kind of the item
+   */
+  public anItemKind kind() {
+    return anItemKind.aClearStructuralFeatureAction;
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  protected  UmlBaseClearStructuralFeatureAction(long id, String s) {
+    super(id, s);
+  }
+
+}
+abstract class UmlBaseAddStructuralFeatureValueAction extends UmlWriteStructuralFeatureAction {
+  /**
+   *   returns a new add structural feature action named 's' created under 'parent'
+   * 
+   *  In case it cannot be created (the name is already used or
+   *  invalid, 'parent' cannot contain it etc ...) return 0 in C++
+   *  and produce a RuntimeException in Java
+   */
+  public static UmlAddStructuralFeatureValueAction create(UmlWriteStructuralFeatureAction parent, String s) throws RuntimeException
+  {
+    return (UmlAddStructuralFeatureValueAction) parent.create_(anItemKind.anAddStructuralFeatureValueAction, s);
+  }
+
+  /**
+   *  returns the kind of the item
+   */
+  public anItemKind kind() {
+    return anItemKind.anAddStructuralFeatureValueAction;
+  }
+
+  /**
+   *  return the property 'replaceAll'
+   */
+  public boolean isReplaceAll() {
+    read_if_needed_();
+    return _replace_all;
+  }
+
+  /**
+   *  set the property 'replaceAll'
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_isReplaceAll(boolean v) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setFlagCmd, (v) ? (byte) 1 : (byte) 0);
+    UmlCom.check();
+  
+    _replace_all = v;
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  protected  UmlBaseAddStructuralFeatureValueAction(long id, String s) {
+    super(id, s);
+  }
+
+  protected void read_uml_() {
+    super.read_uml_();
+    _replace_all = UmlCom.read_bool();
+  }
+
+  private boolean _replace_all;
+
+}
+abstract class UmlBaseRemoveStructuralFeatureValueAction extends UmlWriteStructuralFeatureAction {
+  /**
+   *   returns a new remove structural feature action named 's' created under 'parent'
+   * 
+   *  In case it cannot be created (the name is already used or
+   *  invalid, 'parent' cannot contain it etc ...) return 0 in C++
+   *  and produce a RuntimeException in Java
+   */
+  public static UmlRemoveStructuralFeatureValueAction create(UmlWriteStructuralFeatureAction parent, String s) throws RuntimeException
+  {
+    return (UmlRemoveStructuralFeatureValueAction) parent.create_(anItemKind.aRemoveStructuralFeatureValueAction, s);
+  }
+
+  /**
+   *  returns the kind of the item
+   */
+  public anItemKind kind() {
+    return anItemKind.aRemoveStructuralFeatureValueAction;
+  }
+
+  /**
+   *  return the property 'removeDuplicates'
+   */
+  public boolean isRemoveDuplicates() {
+    read_if_needed_();
+    return _remove_duplicates;
+  }
+
+  /**
+   *  set the property 'removeDuplicates'
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_isRemoveDuplicates(boolean v) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setFlagCmd, (v) ? (byte) 1 : (byte) 0);
+    UmlCom.check();
+  
+    _remove_duplicates = v;
+  }
+
+  /**
+   *   the constructor, do not call it yourself !!!!!!!!!!
+   */
+  protected  UmlBaseRemoveStructuralFeatureValueAction(long id, String s) {
+    super(id, s);
+  }
+
+  protected void read_uml_() {
+    super.read_uml_();
+    _remove_duplicates = UmlCom.read_bool();
+  }
+
+  private boolean _remove_duplicates;
 
 }

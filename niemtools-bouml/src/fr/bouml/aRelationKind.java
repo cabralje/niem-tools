@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  The king of a relation, returned by UmlBaseRelation::RelationKind()
  */

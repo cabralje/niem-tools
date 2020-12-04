@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
 <jardesc>
-    <jar path="C:/Users/JamesECabral/OneDrive/xml/niemtools/niemtools-bouml.jar"/>
+    <jar path="niemtools/niemtools-bouml.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/niemtools-bouml/niemtools-bouml.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
-    <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+    <manifest generateManifest="true" mainClassHandleIdentifier="=niemtools-bouml/src&lt;com.mtgmc.niemtools{Main.java[Main" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
         <sealing sealJar="true">
-            <packagesToSeal/>
+            <packagesToSeal>
+                <package handleIdentifier="=niemtools-bouml/src&lt;com.mtgmc.niemtools"/>
+            </packagesToSeal>
             <packagesToUnSeal/>
         </sealing>
     </manifest>

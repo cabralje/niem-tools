@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  The visibility of a class member
  * 

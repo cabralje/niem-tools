@@ -1,7 +1,10 @@
 package fr.bouml;
 
-import java.io.IOException;
 
+import java.io.*;
+import java.util.*;
+
+@SuppressWarnings("unused")
 class UmlFlow extends UmlBaseFlow implements UmlActivityItem {
   /**
    * returns a string indicating the king of the element

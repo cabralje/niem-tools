@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 final class aMySqlKind {
   public static final int _aColumn = 0;
   public static final aMySqlKind aColumn = new aMySqlKind(_aColumn);

@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  The direction of an operation's parameter, see UmlParameter
  */

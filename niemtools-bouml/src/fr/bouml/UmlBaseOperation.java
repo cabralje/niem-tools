@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *   Manage the class's operations
  */
@@ -283,6 +284,60 @@ abstract class UmlBaseOperation extends UmlClassMember {
   }
 
   /**
+   *  returns (a copy of) the formals list
+   */
+  public UmlFormalParameter[] formals() {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.formalsCmd);
+    
+    int n = UmlCom.read_unsigned();
+    UmlFormalParameter[] formals = new UmlFormalParameter[n];
+    
+    for (int i = 0; i != n; i += 1) {
+      UmlFormalParameter f = new UmlFormalParameter();
+      
+      f.read_();
+      formals[i] = f;
+    }
+    
+    return formals;
+  }
+
+  /**
+   *  remove the formal of the given rank (0...), returns 0 on error
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java,
+   *  does not check that the class is (already) a typedef
+   */
+  public void removeFormal(int rank) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.removeFormalCmd, rank);
+    UmlCom.check();
+  }
+
+  /**
+   *  adds a formal at the given rank (0...), returns 0 on error
+   * 
+   * On error return FALSE in C++, produce a RuntimeException in Java,
+   * does not check that the class is (already) a typedef
+   */
+  public void addFormal(int rank, UmlFormalParameter formal) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.addFormalCmd, rank, formal._name, 
+  		   formal._type, formal._default_value, formal._extends);
+    UmlCom.check();
+  }
+
+  /**
+   *  replace the formal at the given rank (0...)
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java,
+   *  does not check that the class is (already) a typedef
+   */
+  public void replaceFormal(int rank, UmlFormalParameter formal) throws RuntimeException {
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.replaceFormalCmd, rank, formal._name, 
+  		   formal._type, formal._default_value, formal._extends);
+    UmlCom.check();
+  }
+
+  /**
    *  returns TRUE if the operation is declared const in C++
    */
   public boolean isCppConst() {
@@ -301,6 +356,72 @@ abstract class UmlBaseOperation extends UmlClassMember {
     UmlCom.check();
   
     _cpp_const =  y;
+  }
+
+  /**
+   *  return if the operation value is declared volatile in C++
+   */
+  public boolean isCppVolatileValue() {
+    read_if_needed_();
+    return _cpp_volatilevalue;
+  }
+
+  /**
+   * if the operation value is declared volatile in C++
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_isCppVolatileValue(boolean v) throws RuntimeException {
+    byte vv = (byte) (((v) ? 1 : 0) | 4);
+    
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setIsCppConstExprCmd, vv);
+    UmlCom.check();
+    
+    _cpp_volatilevalue = v;
+  }
+
+  /**
+   *  return if the operation value is declared const in C++
+   */
+  public boolean isCppConstValue() {
+    read_if_needed_();
+    return _cpp_constvalue;
+  }
+
+  /**
+   * if the operation value is declared const in C++
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_isCppConstValue(boolean v) throws RuntimeException {
+    byte vv = (byte) ((v) ? 1 : 0);
+    
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setIsCppConstExprCmd, vv);
+    UmlCom.check();
+    
+    _cpp_constvalue = v;
+  }
+
+  /**
+   *  return if the operation value is declared const in C++
+   */
+  public boolean isCppConstExprValue() {
+    read_if_needed_();
+    return _cpp_constexprvalue;
+  }
+
+  /**
+   * if the operation value is declared const in C++
+   * 
+   *  On error return FALSE in C++, produce a RuntimeException in Java
+   */
+  public void set_isCppConstExprValue(boolean v) throws RuntimeException {
+    byte vv = (byte) (((v) ? 1 : 0) | 2);
+    
+    UmlCom.send_cmd(identifier_(), OnInstanceCmd.setIsCppConstExprCmd, vv);
+    UmlCom.check();
+    
+    _cpp_constexprvalue = v;
   }
 
   /**
@@ -1090,6 +1211,12 @@ abstract class UmlBaseOperation extends UmlClassMember {
 
   private boolean _abstract;
   private boolean _cpp_const;
+  private boolean _cpp_volatilevalue;
+
+  private boolean _cpp_constvalue;
+
+  private boolean _cpp_constexprvalue;
+
   private boolean _cpp_friend;
 
   private boolean _cpp_virtual;
@@ -1209,6 +1336,9 @@ abstract class UmlBaseOperation extends UmlClassMember {
   protected void read_cpp_() {
     super.read_cpp_();
     _cpp_const = UmlCom.read_bool();
+    _cpp_volatilevalue = UmlCom.read_bool();
+    _cpp_constvalue = UmlCom.read_bool();
+    _cpp_constexprvalue = UmlCom.read_bool();
     _cpp_friend = UmlCom.read_bool();
     _cpp_virtual = UmlCom.read_bool();
     _cpp_override = UmlCom.read_bool();

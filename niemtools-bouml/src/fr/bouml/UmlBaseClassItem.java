@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *   Mother class of the all the class's items including the class themself
  */

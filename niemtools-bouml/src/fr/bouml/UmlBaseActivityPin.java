@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseActivityPin extends UmlPinParameter {
   /**
    *   returns a new activity action pin named 's' created under 'parent'

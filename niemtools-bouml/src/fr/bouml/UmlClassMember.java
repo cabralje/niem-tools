@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 /**
  *  This class globaly manages class's relations, attributes, operations 

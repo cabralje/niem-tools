@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 class UmlForkPseudoState extends UmlBaseForkPseudoState {
   /**
    * returns a string indicating the king of the element

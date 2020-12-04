@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 import java.util.*;
 
@@ -224,6 +225,8 @@ public void memo_ref() {
     else
       index = 0;
     
+    generate(formals());
+    
     UmlParameter[] pa = params();
   
     while (index != n) {
@@ -250,6 +253,15 @@ public void memo_ref() {
         index += 10;
         if (isCppVirtual())
   	fw.write("virtual ");
+      }
+      else if (s.startsWith("${typeprefix}", index)) {
+        index += 13;
+        if (isCppVolatileValue())
+  	fw.write("volatile ");
+        if (isCppConstExprValue())
+  	fw.write("constexpr ");
+        if (isCppConstValue())
+  	fw.write("const ");
       }
       else if (s.startsWith("${type}", index)) {
         index += 7;
@@ -762,9 +774,9 @@ public void memo_ref() {
   /**
    * produce the definition in Python
    */
-  @SuppressWarnings("unused")
-private void gen_python_decl(String s, boolean descr) throws IOException {
-    String cl_stereotype = 
+  private void gen_python_decl(String s, boolean descr) throws IOException {
+    @SuppressWarnings("unused")
+	String cl_stereotype = 
        PythonSettings.classStereotype(parent().stereotype());
     int n = s.length();
     int index = bypass_comment(s);
@@ -933,6 +945,24 @@ private void gen_python_decl(String s, boolean descr) throws IOException {
     }
   
     return name();
+  }
+
+  private void generate(UmlFormalParameter[] f) throws IOException {
+    if (f.length != 0) {
+      String sep = "template<";
+      int i;
+      
+      for (i = 0; i != f.length; i += 1) {
+        writeq(sep);
+        writeq(f[i].type());
+        fw.write(' ');
+        writeq(f[i].name());
+        sep = ", ";
+      }
+      
+      writeq("> ");
+    }
+  
   }
 
   protected static Vector opers;

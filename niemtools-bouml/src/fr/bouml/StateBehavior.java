@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 class StateBehavior {
   public String on_entry;
 

@@ -28,7 +28,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -54,10 +53,17 @@ public class JsonWriter {
 	private static final String HTTP_METHODS_PROPERTY = WEBSERVICE_STEREOTYPE + NiemUmlClass.STEREOTYPE_DELIMITER
 			+ "HTTPMethods";
 	static final String JSON_SCHEMA_FILE_TYPE = ".schema.json";
-	private static final String JSON_SCHEMA_URI = "http://json-schema.org/schema#";
+//	private static final String JSON_SCHEMA_URI = "http://json-schema.org/schema#";
 //	private static final String JSON_SCHEMA_URI = "http://json-schema.org/draft-04/schema#";
+	private static final String JSON_SCHEMA_URI = "https://json-schema.org/draft/2019-09/schema";
+	
+	// definition tag changed
+	private static final String JSON_SCHEMA_DEFSTAG = "definitions";
+//	private static final String JSON_SCHEMA_DEFSTAG = "JSON_SCHEMA_DEFTAG";
+	
 	private static final String OPENAPI_FILE_TYPE = ".openapi.json";
-
+	private static final String OPENAPI_VERSION = "3.1";
+	
 	public static final String INTERFACE_STEREOTYPE = "niem-profile:interface";
 	public static final String INTERFACE_PATH_PROPERTY = INTERFACE_STEREOTYPE + NiemUmlClass.STEREOTYPE_DELIMITER + "Path";
 	private static final String JSON_LD_ID_ELEMENT = "@id";
@@ -123,16 +129,15 @@ public class JsonWriter {
 			if (minOccurs.equals("0") || minOccurs.equals("1")) {
 				elementSchema += "\"oneOf\": [";
 				elementSchema += "{\n" + "\"$ref\": \"" + elementRef + "\"\n" + "},\n";
+				elementSchema += "{\n";
 			//	elementSchema +="]\n";
 			}
-			elementSchema += "{\n";
 			elementSchema += "\"items\": {\n" + "\"$ref\": \"" + elementRef + "\"\n" + "},\n" + "\n\"minItems\": " + minOccurs + ",\n";
 			if (!maxOccurs.equals("unbounded"))
 				elementSchema += "\n\"maxItems\": " + maxOccurs + ",\n";
 			elementSchema += "\"type\": \"array\"\n";
-			elementSchema += "}\n";
 			if (minOccurs.equals("0") || minOccurs.equals("1"))
-				elementSchema +="]\n";
+				elementSchema +="}\n]\n";
 		}
 		elementSchema += "}";
 		return elementSchema;
@@ -161,6 +166,7 @@ public class JsonWriter {
 			baseType = baseType2;
 		Path elementPath = getJsonPath(element);
 		jsonDefinition.add("\"$ref\": \"" + exportJsonPointer(elementPath, baseType) + "\"");
+		
 		String elementSchema = "\"" + elementName + "\": {\n" + String.join(",", jsonDefinition) + "\n}\n";
 		return elementSchema;
 	}
@@ -188,7 +194,7 @@ public class JsonWriter {
 		String prefixedName = NamespaceModel.getPrefixedName(targetItem);
 		if (prefixedName.contains(NamespaceModel.ATTRIBUTE_PREFIX) && !prefixedName.endsWith(JSON_LD_ID_ELEMENT))
 			prefixedName = NamespaceModel.filterAttributePrefix(prefixedName);
-		path += "#/definitions/" + prefixedName;
+		path += "#/" + JSON_SCHEMA_DEFSTAG + "/" + prefixedName;
 		//Log.trace("exportJsonPointer: " + sourcePath.toString() + " " + targetPath.toString() + " " + path);
 		return path;
 	}
@@ -495,7 +501,7 @@ public class JsonWriter {
 			json.write("{\n" + getJsonPair("$id", nsSchemaURI) + ",\n" + getJsonPair("$schema", JsonWriter.JSON_SCHEMA_URI)
 			+ ",\n" + getJsonPair("type", "object") + ",\n" + "\"additionalProperties\" : false" + ",\n"
 			+ "\"@context\" : {\n" + String.join(",\n", jsonNamespaces) + "},\n"
-			+ "\"definitions\": {\n" + String.join(",\n", jsonDefinitions) + "\n}" + ",\n"
+			+ "\"" + JSON_SCHEMA_DEFSTAG + "\": {\n" + String.join(",\n", jsonDefinitions) + "\n}" + ",\n"
 			+ "\"properties\" : {\n" + String.join(",\n", jsonProperties) + "\n}" + ",\n"
 			+ "\"required\" : [\n" + String.join(",\n", jsonRequired) + "]" + "\n" + "}");
 			json.close();
@@ -550,13 +556,14 @@ public class JsonWriter {
 								jsonElementsInType.add(jsonElementInType);
 						}
 						List<UmlClassInstance> enlist = (NiemModel.Substitutions.get(elementName));
-						// add substitution elements
-						for (UmlClassInstance element2 : enlist) {
-							String jsonElementInType = exportJsonElementInTypeSchema(type,
-									element2, multiplicity2, prefix, NiemUmlClass.isAttribute(element2));
-							if (jsonElementInType != null)
-								jsonElementsInType.add(jsonElementInType);
-						}
+						if (enlist != null)
+							// add substitution elements
+							for (UmlClassInstance element2 : enlist) {
+								String jsonElementInType = exportJsonElementInTypeSchema(type,
+										element2, multiplicity2, prefix, NiemUmlClass.isAttribute(element2));
+								if (jsonElementInType != null)
+									jsonElementsInType.add(jsonElementInType);
+							}
 					} else if ((elementBaseType != model.getAbstractType())) {
 						String jsonElementInType = exportJsonElementInTypeSchema(type, element, multiplicity,
 								prefix, elementIsAttribute);
@@ -601,18 +608,19 @@ public class JsonWriter {
 			baseType2 = null;
 		}
 		// get code list
-		String codeList = type.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
-		Set<String> enums = new HashSet<String>();
-		if (codeList != null && codeList.equals("")) {
-			for (String code : codeList.split(NiemModel.CODELIST_DELIMITER)) {
-				if (code.equals(""))
-					continue;
-				String[] codeParams = code.replace("&", "&amp;").split(NiemModel.CODELIST_DEFINITION_DELIMITER);
-				String codeValue = codeParams[0].trim();
-				if (!codeValue.equals(""))
-					enums.add("\"" + codeValue + "\"");
-			}
-		}
+//		String codeList = type.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
+//		Set<String> enums = new HashSet<String>();
+//		if (codeList != null && codeList.equals("")) {
+//			for (String code : codeList.split(NiemModel.CODELIST_DELIMITER)) {
+//				if (code.equals(""))
+//					continue;
+//				String[] codeParams = code.replace("&", "&amp;").split(NiemModel.CODELIST_DEFINITION_DELIMITER);
+//				String codeValue = codeParams[0].trim();
+//				if (!codeValue.equals(""))
+//					enums.add("\"" + codeValue + "\"");
+//			}
+//		}
+		
 		// define JSON type
 		TreeSet<String> jsonDefinition = new TreeSet<String>();
 		String description = type.description();
@@ -622,10 +630,13 @@ public class JsonWriter {
 		// if (baseType != null)
 		// jsonDefinition.add("\"$ref\": \"" +
 		// exportJsonTypePointer(getPrefixedName(baseType), prefix) + "\"");
+		// TODO fix this
 		jsonDefinition.add("\"type\": \"object\"");
 		jsonDefinition.add("\"additionalProperties\" : " + anyJSON);
-		if (codeList != null && codeList.equals(""))
-			jsonDefinition.add("\"enums\": [" + String.join(",", enums) + "]");
+		
+//		if (codeList != null && codeList.equals(""))
+//			jsonDefinition.add("\"enums\": [" + String.join(",", enums) + "]");
+
 		if (jsonElementsInType != null)
 			jsonDefinition.add("\"properties\": {\n" + String.join(",", jsonElementsInType) + "\n}");
 		if (jsonRequiredElementsInType != null && jsonRequiredElementsInType.size()>0)
@@ -634,7 +645,7 @@ public class JsonWriter {
 		return typeSchema;
 	}
 
-	/** exports OpenAPI 3.0 service definition
+	/** exports OpenAPI service definition
 	 * @param openapiDir
 	 * @param ports
 	 * @param messageNamespaces
@@ -809,8 +820,7 @@ public class JsonWriter {
 						if (jsonElementsInType != null && jsonElementsInType.size()>0)
 							jsonDefinition.add("\"properties\": {\n" + String.join(",", jsonElementsInType) + "\n}");
 						if (jsonRequiredElementsInType != null && jsonRequiredElementsInType.size()>0)
-							jsonDefinition
-							.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
+							jsonDefinition.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
 						String typeSchema = "\"" + inputTypeName + "\": {\n" + String.join(",", jsonDefinition)
 						+ "\n}\n";
 
@@ -983,7 +993,7 @@ public class JsonWriter {
 				Log.debug("OpenAPI: " + portName + OPENAPI_FILE_TYPE);
 				fw.write("{\n" +
 						// jsonContext + ",\n" +
-						"  \"openapi\": \"3.0.0\",\n" 
+						"  \"openapi\": \"" + OPENAPI_VERSION + "\",\n" 
 						+ "  \"info\": {\n" 
 						+ "    \"version\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_VERSION_PROPERTY) + "\",\n" 
 						+ "    \"title\": \"" + portName + "\",\n" 

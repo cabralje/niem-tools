@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  * Manage the artifacts
  */
@@ -21,6 +22,15 @@ abstract class UmlBaseArtifact extends UmlItem {
    */
   public anItemKind kind() {
     return anItemKind.anArtifact;
+  }
+
+  /**
+   *  returns TRUE in case the artifact is locked
+   */
+  public boolean isLocked() {
+    read_if_needed_();
+  
+    return _locked;
   }
 
   /**
@@ -373,6 +383,8 @@ abstract class UmlBaseArtifact extends UmlItem {
   private UmlItem[] _assoc_elems;
   private UmlArtifact[] _associated;
 
+  private boolean _locked;
+
   private String _cpp_h;
   private String _cpp_src;
   private String _java_src;
@@ -400,6 +412,8 @@ abstract class UmlBaseArtifact extends UmlItem {
       
     for (index = 0; index != n; index += 1)
       _associated[index] = (UmlArtifact) UmlBaseItem.read_();
+  
+    _locked = UmlCom.read_bool();
   }
 
   protected void read_cpp_() {

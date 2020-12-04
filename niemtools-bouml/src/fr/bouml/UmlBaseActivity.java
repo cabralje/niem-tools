@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseActivity extends UmlItem {
   /**
    *   returns a new activity named 's' created under 'parent'

@@ -85,7 +85,10 @@ class NiemModel {
 	private static XPath xPath = XPathFactory.newInstance().newXPath();
 	static final String XSD_PREFIX = "xs";
 	static final String XSD_URI = XMLConstants.W3C_XML_SCHEMA_NS_URI;
-	
+	static final String PROXY_PREFIX = "niem-xs";
+	static final String PROXY_URI = "http://release.niem.gov/niem/proxy/xsd/4.0/";
+	static final String STRUCTURES_PREFIX = "structures";
+	static final String STRUCTURES_URI = "http://release.niem.gov/niem/structures/4.0/";
 	private UmlClass abstractType = null;
 	private UmlClass augmentationType = null;
 	private Map<String, UmlClassInstance> elements = new HashMap<String, UmlClassInstance>();
@@ -120,7 +123,7 @@ class NiemModel {
 				}
 			if (baseType == null) {
 				String prefix = NamespaceModel.getPrefix(item);
-				if (prefix.equals(NiemUmlClass.STRUCTURES_PREFIX) || prefix.equals(XSD_PREFIX))
+				if (prefix.equals(STRUCTURES_PREFIX) || prefix.equals(XSD_PREFIX))
 					return null;
 				if (NamespaceModel.getName(item).endsWith(AUGMENTATION_TYPE_NAME))
 					baseType = NiemUmlClass.getSubsetModel().augmentationType;
@@ -337,14 +340,18 @@ class NiemModel {
 						if (!elements.containsKey(uri))
 							elements.put(uri, element);
 						String headElement = element.propertyValue(NiemUmlClass.SUBSTITUTION_PROPERTY);
-						if (headElement != null) {
-							List<UmlClassInstance> enlist = (Substitutions.get(headElement));
-							if (enlist == null) {
-								enlist = new ArrayList<UmlClassInstance>();
+						try {
+							if (headElement != null) {
+								List<UmlClassInstance> enlist = (Substitutions.get(headElement));
+								if (enlist == null)
+									enlist = new ArrayList<UmlClassInstance>();
+								if (!enlist.contains(element))
+									enlist.add(element);
 								Substitutions.put(headElement, enlist);
 							}
-							if (!enlist.contains(element))
-								enlist.add(element);
+						}
+						catch (Exception e) {
+							Log.trace("cacheModel: error caching sustitutions " + e.toString());
 						}
 						break;
 					default:
@@ -385,10 +392,10 @@ class NiemModel {
 			addElement(XSD_URI, NamespaceModel.getPrefixedName(XSD_PREFIX, ANY_ELEMENT_NAME), null, null, null);
 		} else if (this == NiemUmlClass.getSubsetModel()) {
 			abstractType = copyType(NamespaceModel.getPrefixedName(LOCAL_PREFIX, ABSTRACT_TYPE_NAME));
-			augmentationType = copyType(NamespaceModel.getPrefixedName(NiemUmlClass.STRUCTURES_PREFIX, AUGMENTATION_TYPE_NAME));
-			objectType = copyType(NamespaceModel.getPrefixedName(NiemUmlClass.STRUCTURES_PREFIX, OBJECT_TYPE_NAME));
+			augmentationType = copyType(NamespaceModel.getPrefixedName(STRUCTURES_PREFIX, AUGMENTATION_TYPE_NAME));
+			objectType = copyType(NamespaceModel.getPrefixedName(STRUCTURES_PREFIX, OBJECT_TYPE_NAME));
 			simpleObjectAttributeGroup = copyType(
-					NamespaceModel.getPrefixedName(NiemUmlClass.STRUCTURES_PREFIX, SIMPLE_OBJECT_ATTRIBUTE_GROUP));
+					NamespaceModel.getPrefixedName(STRUCTURES_PREFIX, SIMPLE_OBJECT_ATTRIBUTE_GROUP));
 			NamespaceModel.getNamespaceClassView(null, XSD_PREFIX, XSD_URI);
 			copyElement(NamespaceModel.getPrefixedName(XSD_PREFIX, ANY_ELEMENT_NAME));
 			copyType("xs:NCName"); // JSON-LD @id is type xs:NCName
@@ -596,10 +603,10 @@ class NiemModel {
 	
 			// build list of referenced namespaces
 			TreeSet<String> schemaNamespaces = new TreeSet<String>();
-			schemaNamespaces.add(NiemModel.XSD_PREFIX);
+			schemaNamespaces.add(XSD_PREFIX);
 			
 			// add structures namespaces (for base types)
-			schemaNamespaces.add(NiemUmlClass.STRUCTURES_PREFIX);
+			schemaNamespaces.add(STRUCTURES_PREFIX);
 	
 			TreeSet<String> xmlTypes = new TreeSet<String>();
 			TreeSet<String> jsonDefinitions = new TreeSet<String>();

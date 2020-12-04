@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  this class memorize a type specification, which may be
  * 

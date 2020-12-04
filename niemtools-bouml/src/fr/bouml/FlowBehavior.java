@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 class FlowBehavior {
   public String weight;
 

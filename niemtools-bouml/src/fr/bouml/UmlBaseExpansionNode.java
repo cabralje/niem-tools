@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseExpansionNode extends UmlActivityObject {
   /**
    *   returns a new expansion node named 's' created under 'parent'

@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 final class PythonSettingsCmd {
   public static final int _getPythonSettingsCmd = 0;
   public static final PythonSettingsCmd getPythonSettingsCmd = new PythonSettingsCmd(_getPythonSettingsCmd);

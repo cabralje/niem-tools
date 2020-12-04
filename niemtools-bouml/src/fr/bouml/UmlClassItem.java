@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  This class globaly manages class's children including UmlClassExtraMember
  * 

@@ -1,13 +1,16 @@
 package fr.bouml;
 
-import java.io.IOException;
 
+import java.io.*;
+import java.util.*;
+
+@SuppressWarnings("unused")
 abstract class UmlAccessVariableValueAction extends UmlBaseAccessVariableValueAction {
   /**
    * entry to produce the html code receiving chapter number
    * path, rank in the mother and level in the browser tree
    */
-  public void html(String pfix, int rank, int level) throws IOException {
+  public void html(String pfix, int rank, int level) throws java.io.IOException {
     super.html();
   
     if (variable() != null){

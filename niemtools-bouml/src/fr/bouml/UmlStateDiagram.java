@@ -1,16 +1,16 @@
 package fr.bouml;
 
+
 import java.io.*;
 import java.util.*;
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 class UmlStateDiagram extends UmlBaseStateDiagram implements UmlStateItem {
   /**
    * set he html ref
    * set the diagrams list
    */
-  @SuppressWarnings("unchecked")
-public void memo_ref() {
+  public void memo_ref() {
     diagrams.addElement(this);
     super.memo_ref();
   }
@@ -33,7 +33,7 @@ public void memo_ref() {
    generate_index(diagrams, "State Diagram", "statediagrams");
   }
 
-protected static Vector diagrams;
+  protected static Vector<UmlStateDiagram> diagrams;
 
   static { diagrams = new Vector(); }  /**
    *   the constructor, do not call it yourself !!!!!!!!!!

@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  Internal enum
  */
@@ -393,6 +394,14 @@ final class OnInstanceCmd {
   public static final OnInstanceCmd setJavaDefaultOperCmd = new OnInstanceCmd(_setJavaDefaultOperCmd);
   public static final int _setIsJavaStaticCmd = 214;
   public static final OnInstanceCmd setIsJavaStaticCmd = new OnInstanceCmd(_setIsJavaStaticCmd);
+  public static final int _setIsConjugatedCmd = 215;
+  public static final OnInstanceCmd setIsConjugatedCmd = new OnInstanceCmd(_setIsConjugatedCmd);
+  public static final int _setIsServiceCmd = 216;
+  public static final OnInstanceCmd setIsServiceCmd = new OnInstanceCmd(_setIsServiceCmd);
+  public static final int _setProtocolCmd = 217;
+  public static final OnInstanceCmd setProtocolCmd = new OnInstanceCmd(_setProtocolCmd);
+  public static final int _setIsPartCmd = 218;
+  public static final OnInstanceCmd setIsPartCmd = new OnInstanceCmd(_setIsPartCmd);
 
   private int value;
 
@@ -595,6 +604,10 @@ final class OnInstanceCmd {
     case _setIsMysqlAutoIncrBtreeCmd: return setIsMysqlAutoIncrBtreeCmd;
     case _setJavaDefaultOperCmd: return setJavaDefaultOperCmd;
     case _setIsJavaStaticCmd: return setIsJavaStaticCmd;
+    case _setIsConjugatedCmd: return setIsConjugatedCmd;
+    case _setIsServiceCmd: return setIsServiceCmd;
+    case _setProtocolCmd: return setProtocolCmd;
+    case _setIsPartCmd: return setIsPartCmd;
     default: throw new Error();
     }
   }

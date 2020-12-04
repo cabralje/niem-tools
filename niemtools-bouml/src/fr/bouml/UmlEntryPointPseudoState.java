@@ -1,4 +1,5 @@
 package fr.bouml;
+
 import java.io.*;
 
 class UmlEntryPointPseudoState extends UmlBaseEntryPointPseudoState {

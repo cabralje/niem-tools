@@ -1,8 +1,11 @@
 package fr.bouml;
 
+
+import java.util.*;
 /**
  *  this class manages use case references
  */
+@SuppressWarnings("unused")
 class UmlBaseUseCaseReference {
   /**
    *  return the use case

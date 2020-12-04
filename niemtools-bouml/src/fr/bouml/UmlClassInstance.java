@@ -1,7 +1,10 @@
 package fr.bouml;
-import java.io.IOException;
+
+import java.io.*;
+import java.util.*;
 
 
+@SuppressWarnings("unused")
 public class UmlClassInstance extends UmlBaseClassInstance {
   /**
    *   the constructor, do not call it yourself !!!!!!!!!!
@@ -73,6 +76,8 @@ public class UmlClassInstance extends UmlBaseClassInstance {
     }
     
     write_properties();
+  
+    write_children(pfix, rank, level);
   
     unload(false, false);
   

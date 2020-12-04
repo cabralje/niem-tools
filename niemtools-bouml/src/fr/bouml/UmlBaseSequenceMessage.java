@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.util.*;
 /**
  *  this class manages messages in a sequence diagram

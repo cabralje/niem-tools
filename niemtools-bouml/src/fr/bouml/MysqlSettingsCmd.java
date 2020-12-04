@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 final class MysqlSettingsCmd {
   public static final int _getMysqlSettingsCmd = 0;
   public static final MysqlSettingsCmd getMysqlSettingsCmd = new MysqlSettingsCmd(_getMysqlSettingsCmd);

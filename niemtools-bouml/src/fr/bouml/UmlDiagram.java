@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 /**
  *  This class allows to manage diagram

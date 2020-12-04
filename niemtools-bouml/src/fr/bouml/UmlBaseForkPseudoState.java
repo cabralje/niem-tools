@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseForkPseudoState extends UmlPseudoState {
   /**
    *  returns a new fork pseudo state created under 'parent'

@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseExitPointPseudoState extends UmlPseudoState {
   /**
    *   returns a new exit point pseudo state named 's' created under 'parent'

@@ -1,7 +1,10 @@
 package fr.bouml;
 
-import java.io.IOException;
 
+import java.io.*;
+import java.util.*;
+
+@SuppressWarnings("unused")
 class UmlActivityParameter extends UmlBaseActivityParameter {
   /**
    *   the constructor, do not call it yourself !!!!!!!!!!

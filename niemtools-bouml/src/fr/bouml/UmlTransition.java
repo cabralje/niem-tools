@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 
 class UmlTransition extends UmlBaseTransition implements UmlStateItem {

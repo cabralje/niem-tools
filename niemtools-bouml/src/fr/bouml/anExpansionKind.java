@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 final class anExpansionKind {
   public static final int _parallelExecution = 0;
   public static final anExpansionKind parallelExecution = new anExpansionKind(_parallelExecution);

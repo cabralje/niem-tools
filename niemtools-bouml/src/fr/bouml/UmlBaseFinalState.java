@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseFinalState extends UmlPseudoState {
   /**
    *  returns a new final state created under 'parent'

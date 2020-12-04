@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 class TransitionBehavior {
   public String trigger;
 

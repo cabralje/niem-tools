@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 /**
  *  This class manages 'true' class's items : attributes, relation,
  *  operation and sub-classes

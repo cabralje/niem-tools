@@ -1,8 +1,12 @@
 package fr.bouml;
 
+
+import java.util.*;
+
 /**
  *   Manage the class's attributs
  */
+@SuppressWarnings("unused")
 abstract class UmlBaseAttribute extends UmlClassMember {
   /**
    *  returns a new attribute named 'name' created under 'parent'

@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.util.*;
 /**
  *  this class manages fragments
@@ -106,8 +107,8 @@ class UmlBaseFragment {
   /**
    * internal, do NOT use it
    */
-  @SuppressWarnings({ "rawtypes", "deprecation" })
-public void read_covered_(Hashtable instances) {
+  @SuppressWarnings("deprecation")
+public void read_covered_(@SuppressWarnings("rawtypes") Hashtable instances) {
     int n = UmlCom.read_unsigned();
     int rank;
   

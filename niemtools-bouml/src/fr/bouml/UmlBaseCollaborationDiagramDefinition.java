@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.util.*;
 /**
  *  this class manages collaboration diagram definition
@@ -27,7 +28,7 @@ class UmlBaseCollaborationDiagramDefinition {
   /**
    *  internal, don't call it
    */
-  @SuppressWarnings({ "rawtypes", "unchecked", "deprecation" })
+  @SuppressWarnings({ "deprecation", "unchecked", "rawtypes" })
 public void read_() {
     Hashtable instances;
     int n;

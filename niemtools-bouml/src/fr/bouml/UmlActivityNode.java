@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlActivityNode extends UmlBaseActivityNode implements UmlActivityItem {
   /**
    *   the constructor, do not call it yourself !!!!!!!!!!

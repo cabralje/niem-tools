@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 import java.io.*;
 import java.util.*;
 
@@ -10,7 +11,7 @@ import java.util.*;
  * 
  *  You can modify it as you want (except the constructor)
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({ "unchecked", "rawtypes" })
 class UmlUseCaseDiagram extends UmlBaseUseCaseDiagram {
   public UmlUseCaseDiagram(long id, String n){ super(id, n); }
 
@@ -25,8 +26,7 @@ class UmlUseCaseDiagram extends UmlBaseUseCaseDiagram {
    * set he html ref
    * set the diagrams list
    */
-  @SuppressWarnings("unchecked")
-public void memo_ref() {
+  public void memo_ref() {
     diagrams.addElement(this);
     super.memo_ref();
   }
@@ -42,6 +42,6 @@ public void memo_ref() {
     generate_index(diagrams, "Use Case Diagram", "usecasediagrams");
   }
 
-  protected static Vector diagrams;
+  protected static Vector<UmlUseCaseDiagram> diagrams;
 
   static { diagrams = new Vector(); }};

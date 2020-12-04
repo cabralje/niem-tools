@@ -1,5 +1,6 @@
 package fr.bouml;
 
+
 abstract class UmlBaseJoinPseudoState extends UmlPseudoState {
   /**
    *  returns a new join pseudo state created under 'parent'

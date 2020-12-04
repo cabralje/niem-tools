@@ -1,5 +1,7 @@
 package com.mtgmc.niemtools;
 
+import java.io.File;
+
 /*
  *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
  *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
@@ -27,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Properties;
 
 import javax.swing.JFileChooser;
@@ -60,12 +63,30 @@ class Main
 			Log.trace("Exception: " + e.toString());
 		}
 
-		if (argv.length >= 1)
+		// check for BOUML port from test harness
+		int boumlPort = 0;
+		try {
+			File file = new File(TestHarness.filename);
+			String buffer = new String(Files.readAllBytes(file.toPath()));
+			boumlPort = Integer.parseInt(buffer.toString());
+			
+			// delete file - BOUML ports are one-time use
+			file.delete();
+		}
+		catch (Exception e) 
 		{
-			int boumlPort = Integer.valueOf(argv[argv.length - 1]).intValue();
+			// get BOUML port from command line 
+			if (argv.length >= 1)
+				boumlPort = Integer.valueOf(argv[argv.length - 1]).intValue();
+		}
+		
+		if (boumlPort != 0) {
+			
+			System.out.println("Connecting to BOUML on port " + boumlPort);
 			UmlCom.connect(boumlPort);
-
-			//Log.debug("Port: " + boumlPort);
+			Log.debug("Port: " + boumlPort + "\n");
+			Log.debug("Classpath: " + System.getProperty("java.class.path") + "\n");
+			
 			try
 			{	
 				//UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
@@ -158,6 +179,10 @@ class Main
 			{
 				Log.trace("RuntimeException: " + re.getMessage());
 			}
+			catch (Exception e)
+			{
+				Log.trace("Exception: " + e.getMessage());
+			}
 			finally {
 				Log.trace("Done");
 				UmlCom.message("");
@@ -208,7 +233,7 @@ class Main
 
 		// Generate NIEM Mapping CSV
 		niemTools.exportCsv(root.propertyValue("html dir"), "niem-mapping.csv"); 
-
+		
 		// Clearing NIEM Models
 		niemTools.deleteNIEM(false);
 		niemTools.createNIEM();
@@ -228,7 +253,9 @@ class Main
 		String openapiDir = (root.propertyValue("exportOpenAPI").equals("true")) ? properties.getProperty("openapiDir") : null;
 		String xmlExampleDir = (root.propertyValue("exportXML").equals("true")) ? properties.getProperty("xmlExampleDir") : null;
 		String jsonExampleDir = (root.propertyValue("exportJSON").equals("true")) ? properties.getProperty("jsonExampleDir") : null;
-		niemTools.exportIEPD(xsdDir, wsdlDir, jsonDir, openapiDir, xmlExampleDir, jsonExampleDir);
+		String metamodelDir = (root.propertyValue("exportMetamodel").equals("true")) ? properties.getProperty("metamodelDir") : null;
+		
+		niemTools.exportIEPD(xsdDir, wsdlDir, jsonDir, openapiDir, xmlExampleDir, jsonExampleDir, metamodelDir);
 		Log.stop("generateModels");
 	}
 
@@ -275,6 +302,6 @@ class Main
 		niemTools.createNIEM();
 		niemTools.cacheModels(true);
 		niemTools.importSchemaDir(directory,false);
-		Log.stop("impoirtSchema");
+		Log.stop("importSchema");
 	}
 }
