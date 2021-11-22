@@ -4,10 +4,10 @@
     <options buildIfNeeded="true" compress="true" descriptionLocation="/niemtools-bouml/niemtools-bouml.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
-    <manifest generateManifest="true" mainClassHandleIdentifier="=niemtools-bouml/src&lt;com.mtgmc.niemtools{Main.java[Main" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+    <manifest generateManifest="true" mainClassHandleIdentifier="=niemtools-bouml/src&lt;com.infotrack.niemtools{Main.java[Main" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
         <sealing sealJar="true">
             <packagesToSeal>
-                <package handleIdentifier="=niemtools-bouml/src&lt;com.mtgmc.niemtools"/>
+                <package handleIdentifier="=niemtools-bouml/src&lt;com.infotrack.niemtools"/>
             </packagesToSeal>
             <packagesToUnSeal/>
         </sealing>

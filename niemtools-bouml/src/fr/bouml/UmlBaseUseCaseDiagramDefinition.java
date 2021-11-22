@@ -54,7 +54,7 @@ class UmlBaseUseCaseDiagramDefinition {
   /**
    *  internal, don't call it
    */
-  @SuppressWarnings({ "deprecation", "unchecked", "rawtypes" })
+  @SuppressWarnings({ "unchecked", "rawtypes", "removal" })
 public void read_() {
     Hashtable ucrefs;
     int n;

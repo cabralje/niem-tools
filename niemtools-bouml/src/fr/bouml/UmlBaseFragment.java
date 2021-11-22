@@ -107,7 +107,7 @@ class UmlBaseFragment {
   /**
    * internal, do NOT use it
    */
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings({ "removal" })
 public void read_covered_(@SuppressWarnings("rawtypes") Hashtable instances) {
     int n = UmlCom.read_unsigned();
     int rank;

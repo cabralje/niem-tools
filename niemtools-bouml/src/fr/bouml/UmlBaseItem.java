@@ -312,7 +312,7 @@ public void set_PropertyValue(String k, String v) throws RuntimeException {
    *  internal dictionnary in C++ and Java (to allow it to be garbaged),
    *  you will have to call Children() to re-access to them
    */
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings({ "removal" })
 public void unload(boolean rec, boolean del) {
     _defined = false;
     _stereotype = null;
@@ -491,7 +491,7 @@ protected void read_uml_() {
     int kind = (int) UmlCom.read_char();
     String name = UmlCom.read_string();
     
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({ "removal" })
 	UmlItem result = (UmlItem) _all.get(new Long(id));
     
     if (result == null) {
@@ -702,7 +702,7 @@ protected void read_uml_() {
   /**
    *  the constructor, do not call it yourself !!!!!!!!!!
    */
-  @SuppressWarnings({ "deprecation", "unchecked" })
+  @SuppressWarnings({ "unchecked", "removal" })
 public UmlBaseItem(long id, String n) {
     _defined = false;
     _identifier = id;

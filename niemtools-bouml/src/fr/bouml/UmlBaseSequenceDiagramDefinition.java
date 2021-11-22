@@ -37,7 +37,7 @@ class UmlBaseSequenceDiagramDefinition {
   /**
    *  internal, don't call it
    */
-  @SuppressWarnings({ "deprecation", "unchecked", "rawtypes" })
+  @SuppressWarnings({ "unchecked", "rawtypes", "removal" })
 public void read_() {
     Hashtable instances;
     int n;

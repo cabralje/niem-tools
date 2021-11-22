@@ -383,7 +383,11 @@ public void memo_ref() {
     fw.write("<table border=\"0\" width=\"100%\">\n<tr>\n<td nowrap=\"nowrap\">");
     
     for (int i = 0; i != n; i += 1) {
-      ((UmlItem) classes.elementAt(i)).write("projectFrame");
+    	
+      UmlItem x = ((UmlItem) classes.elementAt(i));
+        if (!x.known)
+          	continue;
+        x.write("projectFrame");
       fw.write("<br />\n");
     }
     
@@ -977,8 +981,12 @@ private void add_inherited_opers(Vector ops) {
     if (! flat) {
       int n = classes.size();
       
-      for (int i = 0; i != n; i += 1)
-        ((UmlClass) classes.elementAt(i)).html();
+      for (int i = 0; i != n; i += 1) {
+    	UmlClass x = ((UmlClass) classes.elementAt(i));
+    	if (!x.known)
+    	  continue;
+        x.html();
+      }
     }
   }
 

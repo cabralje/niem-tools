@@ -54,7 +54,7 @@ class UmlBaseUseCaseAssociation {
   /**
    *  internal, don't call it
    */
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings({ "removal" })
 public void read_(@SuppressWarnings("rawtypes") Hashtable useCases) {
     _use_case = (UmlUseCaseReference) useCases.get(new Integer(UmlCom.read_unsigned()));
     _actor = (UmlClass) UmlBaseItem.read_();

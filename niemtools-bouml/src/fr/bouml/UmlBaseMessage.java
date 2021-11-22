@@ -47,7 +47,7 @@ class UmlBaseMessage {
   /**
    *  internal, don't call it
    */
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings({ "removal" })
 public void read_(@SuppressWarnings("rawtypes") Hashtable instances) {
     _operation = (UmlOperation) UmlBaseItem.read_();
     if (_operation == null) _form = UmlCom.read_string();

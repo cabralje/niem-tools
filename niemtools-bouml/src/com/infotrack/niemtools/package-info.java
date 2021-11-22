@@ -5,4 +5,4 @@
  * @author James Cabral
  *
  */
-package com.mtgmc.niemtools;
+package com.infotrack.niemtools;

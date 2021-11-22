@@ -1,4 +1,4 @@
-package com.mtgmc.niemtools;
+package com.infotrack.niemtools;
 
 import java.io.File;
 import java.io.FileNotFoundException;

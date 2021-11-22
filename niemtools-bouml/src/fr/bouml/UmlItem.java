@@ -12,7 +12,7 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
-import com.mtgmc.niemtools.NiemUmlClass;
+import com.infotrack.niemtools.NiemUmlClass;
 
 
 
@@ -309,7 +309,7 @@ public void memo_ref() {
   
   }
 
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings({ "removal" })
 public static void ref_indexes() throws IOException
   {
     fw.write("<hr />\n<p><a href=\"index.html\" target = \"projectFrame\"><b> -Top- </b></a>");
@@ -378,6 +378,8 @@ public static void ref_indexes() throws IOException
     previous = 0;
     for (int i = 0; i != n; i += 1) {
       UmlItem x = (UmlItem) all.elementAt(i);
+      if (!x.known)
+      	continue;
       String s = x.pretty_name();
       
       if (s.length() != 0) {
@@ -396,6 +398,8 @@ public static void ref_indexes() throws IOException
     previous = 0;
     for (int i = 0; i != n; i += 1) {
       UmlItem x = (UmlItem) all.elementAt(i);
+      if (!x.known)
+        	continue;
       String s = x.pretty_name();
       
       if (s.length() != 0) {
@@ -412,7 +416,7 @@ public static void ref_indexes() throws IOException
   	
   	previous = c;
   	
-  	@SuppressWarnings("deprecation")
+  	@SuppressWarnings({ "removal" })
 	String sn = new Integer(c & 255).toString();
   	
   	start_file(new String("index_") + sn, new String("") + c, true);
@@ -956,7 +960,9 @@ public static void ref_indexes() throws IOException
       
       for (int i = 0; i != n; i += 1) {
         UmlItem x = (UmlItem) v.elementAt(i);
-        
+        if (!x.known)
+          continue;
+          
         fw.write("<tr bgcolor=\"#f0f0f0\"><td>");
         x.write("projectFrame");
         fw.write("</td><td>");
