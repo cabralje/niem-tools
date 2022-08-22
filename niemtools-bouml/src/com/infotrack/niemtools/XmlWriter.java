@@ -476,15 +476,18 @@ public class XmlWriter {
 			Path p2 = null;
 			String path2= MESSAGE_WRAPPERS_FILE_NAME + XmlWriter.XSD_FILE_TYPE;
 			Path p3 = null;
+			String s3 = "";
 			try {
 				p2 = Paths.get(directory, path2);
 				p3 = p1.getParent().relativize(p2);
+				s3 = p3.toString().replace('\\','/');
 			} catch (Exception e1) {
 				Log.trace("exportWSDL: No relative path from " + path1 + " to " + path2 + " " + e1.toString());
 			}
 			wsdl.write("<wsp:UsingPolicy wsdl:required=\"true\"/>" + "<wsp:Policy wsu:Id=\"" + WSP_POLICY + "\">"
 					+ "<wsrmp:RMAssertion/>" + "</wsp:Policy>" + "<wsdl:types>" + "<xsd:schema>"
-					+ "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + p3.toString() + "\"/>"
+//					+ "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + p3.toString() + "\"/>"
+					+ "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + s3 + "\"/>"
 					+ "</xsd:schema>" + "</wsdl:types>");
 
 			wsdl.write("<!-- messages -->");
