@@ -676,7 +676,7 @@ public class XmlWriter {
 					continue;
 				}
 				if (NamespaceModel.isExternalPrefix(nsPrefix))
-					xml.write("<xs:import namespace=\"" + nsSchemaURI2 + "\" schemaLocation=\""
+					xml.write("<xs:import namespace=\"" + nsSchemaURI2.replace('\\','/') + "\" schemaLocation=\""
 							+ NamespaceModel.getExternalSchemaURL(nsSchemaURI2) + "\"/>");
 				else {
 					Namespace ns2 = NamespaceModel.getNamespace(nsSchemaURI2);
@@ -694,7 +694,7 @@ public class XmlWriter {
 					}
 					if (!nsSchemaURI2.equals(nsSchemaURI) && !nsSchemaURI2.equals(NiemModel.LOCAL_URI)
 							&& !nsSchemaURI2.equals(NiemModel.XSD_URI))
-						xml.write("<xs:import namespace=\"" + nsSchemaURI2 + "\" schemaLocation=\"" + p3.toString()
+						xml.write("<xs:import namespace=\"" + nsSchemaURI2.toString().replace('\\','/') + "\" schemaLocation=\"" + p3.toString().replace('\\','/')
 						+ "\"/>");
 				}
 			}
