@@ -1,0 +1,8 @@
+{
+    "maven.terminal.favorites": [
+        {
+            "command": "package",
+            "debug": false
+        }
+    ]
+}
