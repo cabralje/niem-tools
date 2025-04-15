@@ -23,7 +23,9 @@
 hs_err_pid*
 replay_pid*
 
-target/
+*/target/**
+!niemtools-bouml.jar
+
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -53,3 +55,4 @@ buildNumber.properties
 
 # Built Visual Studio Code Extensions
 *.vsix
+
