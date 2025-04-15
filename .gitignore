@@ -12,6 +12,7 @@
 
 # Package Files #
 *.jar
+!target/niemtools-bouml.jar
 *.war
 *.nar
 *.ear
