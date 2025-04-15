@@ -12,7 +12,7 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
-import com.infotrack.niemtools.NiemUmlClass;
+import org.cabral.niemtools.NiemUmlClass;
 
 
 

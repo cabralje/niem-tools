@@ -1,4 +1,4 @@
-package com.infotrack.niemtools;
+package org.cabral.niemtools;
 
 /*
  *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
