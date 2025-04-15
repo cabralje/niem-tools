@@ -1,4 +1,4 @@
-package com.infotrack.niemtools;
+package org.cabral.niemtools;
 
 /*
  *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
@@ -219,7 +219,7 @@ public class JsonWriter {
 		case "int":
 			jsonType += "\"type\": \"number\",\n";
 			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": –2147483648,\n";
+			jsonType += "\"minimum\": ï¿½2147483648,\n";
 			jsonType += "\"maximum\": 2147483647\n";
 			break;
 		case "long":
@@ -302,7 +302,7 @@ public class JsonWriter {
 		case "int":
 			jsonType += "\"type\": \"number\",\n";
 			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": –2147483648,\n";
+			jsonType += "\"minimum\": ï¿½2147483648,\n";
 			jsonType += "\"maximum\": 2147483647\n";
 			break;
 		case "integer":

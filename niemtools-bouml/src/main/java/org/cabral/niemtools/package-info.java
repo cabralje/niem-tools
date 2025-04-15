@@ -5,4 +5,4 @@
  * @author James Cabral
  *
  */
-package com.infotrack.niemtools;
+package org.cabral.niemtools;

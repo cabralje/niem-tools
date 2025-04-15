@@ -1,4 +1,4 @@
-package com.infotrack.niemtools;
+package org.cabral.niemtools;
 
 import fr.bouml.UmlClassView;
 

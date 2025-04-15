@@ -1,4 +1,4 @@
-package com.infotrack.niemtools;
+package org.cabral.niemtools;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
