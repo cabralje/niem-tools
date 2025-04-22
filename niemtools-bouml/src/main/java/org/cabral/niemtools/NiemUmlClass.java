@@ -1107,19 +1107,25 @@ public class NiemUmlClass {
 		return false;
 	}
 	
-	public void addStereotype(UmlItem item) {		
-		if (item.kind() == anItemKind.aClass || 
-			item.kind() == anItemKind.aClassInstance ||
-			item.kind() == anItemKind.anAttribute) {
-				item.set_Stereotype(NIEM_STEREOTYPE);
-				item.applyStereotype();
-		}
-		else if (item.kind() == anItemKind.aRelation) {
-			UmlRelation r = (UmlRelation)item;
-			if (r.relationKind() != aRelationKind.aGeneralisation) {
-				item.set_Stereotype(NIEM_STEREOTYPE);
-				item.applyStereotype();
+	public void addStereotype(UmlItem item) {	
+		Log.trace("addStereotype: " + item.name());
+		try {
+			anItemKind kind = item.kind();
+			if (kind == anItemKind.aClass || 
+				kind == anItemKind.aClassInstance ||
+				kind == anItemKind.anAttribute) {
+
+					item.set_Stereotype(NIEM_STEREOTYPE);
+					item.applyStereotype();
+			} else if (item.kind() == anItemKind.aRelation) {
+				UmlRelation r = (UmlRelation)item;
+				if (r.relationKind() != aRelationKind.aGeneralisation) {
+						item.set_Stereotype(NIEM_STEREOTYPE);
+						item.applyStereotype();
+				}
 			}
+		} catch (Exception e) {
+			Log.trace("addStereotype: error applying stereotype" + e.toString());
 		}
 		UmlItem[] ch = item.children();
 		for(UmlItem c : ch)
@@ -1127,19 +1133,23 @@ public class NiemUmlClass {
 	}
 	
 	public void removeStereotype(UmlItem item) {
-		if (item.kind() == anItemKind.aClass || 
-				item.kind() == anItemKind.aClassInstance ||
-				item.kind() == anItemKind.anAttribute) {
+		try {
+			anItemKind kind = item.kind();
+			if (kind == anItemKind.aClass || 
+				kind == anItemKind.aClassInstance ||
+				kind == anItemKind.anAttribute) {
 					item.set_Stereotype(null);
 					item.applyStereotype();
-				}
-			else if (item.kind() == anItemKind.aRelation) {
+			} else if (item.kind() == anItemKind.aRelation) {
 				UmlRelation r = (UmlRelation)item;
 				if (r.relationKind() != aRelationKind.aGeneralisation) {
-					item.set_Stereotype(null);
-					item.applyStereotype();
+						item.set_Stereotype(null);
+						item.applyStereotype();
 				}
 			}
+		} catch (Exception e) {
+			Log.trace("removeStereotype: error removing stereotype from relation" + e.toString());
+		}	
 			UmlItem[] ch = item.children();
 			for(UmlItem c : ch)
 				removeStereotype(c);
