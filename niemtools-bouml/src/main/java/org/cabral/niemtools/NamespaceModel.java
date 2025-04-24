@@ -398,4 +398,14 @@ public class NamespaceModel {
 			return false;
 		return ns.getReferenceClassView() != null;
 	}
+
+/**
+	 * @param name
+	 * @return attribute name with prefix filtered as a String
+	 */
+	static Boolean isAttribute(String name) {
+		String tagname = getName(name);
+		return tagname.startsWith(ATTRIBUTE_PREFIX);
+	}
 }
+

@@ -485,9 +485,9 @@ public class JsonWriter {
 		for (String nsPrefix : schemaNamespaces)
 			if (!nsPrefix.equals(NiemModel.LOCAL_PREFIX))
 				jsonNamespaces.add("\n" + getJsonPair(nsPrefix, NamespaceModel.getSchemaURIForPrefix(nsPrefix) + "#"));
-		jsonNamespaces.add("\n" + getJsonPair(XmlWriter.CODELIST_APPINFO_PREFIX, XmlWriter.CODELIST_APPINFO_URI + "#"));
+		jsonNamespaces.add("\n" + getJsonPair(XmlWriter.APPINFO_PREFIX, XmlWriter.APPINFO_URI + "#"));
 		jsonNamespaces.add("\n" + getJsonPair(XmlWriter.CT_PREFIX, XmlWriter.CT_URI + "#"));
-		jsonNamespaces.add("\n" + getJsonPair(XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI + "#"));
+		//jsonNamespaces.add("\n" + getJsonPair(XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI + "#"));
 
 		try {
 			// Open JSON schema file for each extension schema and write header
@@ -534,7 +534,7 @@ public class JsonWriter {
 						continue;
 					String elementName = NamespaceModel.getPrefixedName(element);
 					boolean elementIsAttribute = NiemUmlClass.isAttribute(element);
-					Log.debug("exportSchema: exporting element in type " + elementName);
+					Log.debug("exportJsonTypeSchema: exporting element in type " + elementName);
 					if (elementName.equals(anyElement)) {
 						anyJSON = true;
 						continue;
@@ -642,6 +642,7 @@ public class JsonWriter {
 		if (jsonRequiredElementsInType != null && jsonRequiredElementsInType.size()>0)
 			jsonDefinition.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
 		String typeSchema = "\"" + NamespaceModel.getPrefixedName(type) + "\": {\n" + String.join(",", jsonDefinition) + "\n}\n";
+		Log.debug("exportJsonTypeSchema: exported " + NamespaceModel.getPrefixedName(type));
 		return typeSchema;
 	}
 
@@ -659,9 +660,9 @@ public class JsonWriter {
 		for (String nsPrefix : messageNamespaces)
 			if (!nsPrefix.equals(NiemModel.LOCAL_PREFIX))
 				jsonNamespaces.add("\n" + getJsonPair(nsPrefix, NamespaceModel.getSchemaURIForPrefix(nsPrefix) + "#"));
-		jsonNamespaces.add("\n" + getJsonPair(XmlWriter.CODELIST_APPINFO_PREFIX, XmlWriter.CODELIST_APPINFO_URI + "#"));
+		jsonNamespaces.add("\n" + getJsonPair(XmlWriter.APPINFO_PREFIX, XmlWriter.APPINFO_URI + "#"));
 		jsonNamespaces.add("\n" + getJsonPair(XmlWriter.CT_PREFIX, XmlWriter.CT_URI + "#"));
-		jsonNamespaces.add("\n" + getJsonPair(XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI + "#"));
+		//jsonNamespaces.add("\n" + getJsonPair(XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI + "#"));
 
 		// generate OpenAPI definitions
 		Log.trace("Generating OpenAPIs");

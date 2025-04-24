@@ -222,7 +222,7 @@ public class HtmlWriter {
 						if (!mat.find()) {
 							String prefix = NamespaceModel.getPrefix(elementName);
 							if (NamespaceModel.isNiemPrefix(typePrefix) && NamespaceModel.isNiemPrefix(prefix)
-									&& !NiemUmlClass.isNiemElementInType(typeName, elementName)) {
+									&& !NamespaceModel.isAttribute(elementName) && !NiemUmlClass.isNiemElementInType(typeName, elementName)) {
 								fgcolor = invalidFGColor;
 								Log.trace("writeLineHtml: element " + elementName + " is not in type " + typeName + " in the NIEM reference model");
 							}

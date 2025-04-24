@@ -406,6 +406,7 @@ public class NiemUmlClass {
 			String elementName = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
 			String notes = item.propertyValue(NIEM_STEREOTYPE_NOTES).trim();
 			String baseTypeName = item.propertyValue(NIEM_STEREOTYPE_BASE_TYPE).trim();
+
 			if (baseTypeName.equals(NiemModel.ABSTRACT_TYPE_NAME))
 				continue;
 			Log.debug("createSubsetAndExtension: adding type " + typeName + " and base type " + baseTypeName);
@@ -442,6 +443,8 @@ public class NiemUmlClass {
 			String typeName = item.propertyValue(NIEM_STEREOTYPE_TYPENAME).trim();
 			String elementName = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
 			String baseTypeName = item.propertyValue(NIEM_STEREOTYPE_BASE_TYPE).trim();
+			String codeList = item.propertyValue(NIEM_STEREOTYPE_CODE_LIST).trim();
+
 			if (typeName.equals("") || isNiemType(typeName))
 				continue;
 			NiemModel model = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName)) ? SubsetModel : ExtensionModel;
@@ -449,7 +452,7 @@ public class NiemUmlClass {
 			if (type == null)
 				continue;
 			UmlClass baseType = null;
-			if (baseTypeName.equals("") || typeName.endsWith(NiemModel.AUGMENTATION_TYPE_NAME))
+			if (baseTypeName.equals("") && typeName.endsWith(NiemModel.AUGMENTATION_TYPE_NAME))
 				baseType = SubsetModel.getAugmentationType();
 			else {
 				if (!elementName.equals(""))
@@ -475,6 +478,12 @@ public class NiemUmlClass {
 			String baseTypePrefix = NamespaceModel.getPrefix(baseType);
 			if (baseTypePrefix != null && baseTypePrefix.equals(NiemModel.XSD_PREFIX))
 				ExtensionModel.relateAttributeGroup(type, SubsetModel.getSimpleObjectAttributeGroup());
+
+			// Copy code list
+			if (codeList != null && !codeList.equals("")) {
+				Log.debug("createSubsetAndExtension: adding code list " + codeList + " to type " + typeName);
+				type.set_PropertyValue(CODELIST_PROPERTY, codeList);
+			}
 		}
 		Log.stop("createSubsetAndExtension - add base types");
 		Log.start("createSubsetAndExtension - add elements");
@@ -544,7 +553,6 @@ public class NiemUmlClass {
 				if (headElement != null && substitution && representation)
 					element.set_PropertyValue(SUBSTITUTION_PROPERTY, headElement);
 				if (codeList != null && !codeList.equals("") && (!substitution || representation))
-				//if (codeList != null && !codeList.equals("") && (!substitution || !representation))
 					element.set_PropertyValue(CODELIST_PROPERTY, codeList);
 			}
 		}
@@ -1133,6 +1141,7 @@ public class NiemUmlClass {
 	}
 	
 	public void removeStereotype(UmlItem item) {
+		Log.trace("removeStereotype: " + item.name());
 		try {
 			anItemKind kind = item.kind();
 			if (kind == anItemKind.aClass || 
@@ -1142,10 +1151,10 @@ public class NiemUmlClass {
 					item.applyStereotype();
 			} else if (item.kind() == anItemKind.aRelation) {
 				UmlRelation r = (UmlRelation)item;
-				if (r.relationKind() != aRelationKind.aGeneralisation) {
+				//if (r.relationKind() != aRelationKind.aGeneralisation) {
 						item.set_Stereotype(null);
 						item.applyStereotype();
-				}
+				//}
 			}
 		} catch (Exception e) {
 			Log.trace("removeStereotype: error removing stereotype from relation" + e.toString());

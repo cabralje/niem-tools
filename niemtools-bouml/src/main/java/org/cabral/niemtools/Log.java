@@ -7,11 +7,11 @@ import fr.bouml.UmlCom;
 public class Log {
 
 	// Debugging options
-	private static final Boolean _DEBUG = true;
-	//private static final Boolean _DEBUG = false;
+	//private static final Boolean DEBUG = true;
+	private static final Boolean DEBUG = false;
 
-	//private static final Boolean _PROFILE = true;
-	private static final Boolean _PROFILE = false;
+	//private static final Boolean PROFILE = true;
+	private static final Boolean PROFILE = false;
 	
 	private static HashMap<String, Long> timer = new HashMap<String, Long>();
 	
@@ -20,7 +20,7 @@ public class Log {
 	 * @param output
 	 */
 	static void debug(String output) {
-		if (_DEBUG)
+		if (DEBUG)
 			Log.trace(output);
 	}
 
@@ -35,7 +35,7 @@ public class Log {
 	 * @param s
 	 */
 	public static void start(String s) {
-		if (_PROFILE) {
+		if (PROFILE) {
 			trace("ELAPSED TIME (" + s + "): starting timer");
 			timer.put(s, System.nanoTime());
 		}
@@ -45,7 +45,7 @@ public class Log {
 	 * @param s
 	 */
 	public static void stop(String s) {
-		if (_PROFILE) {
+		if (PROFILE) {
 			if (!timer.containsKey(s)) {
 				trace("ELAPSED TIME: (" + s + "): not set");
 				return;

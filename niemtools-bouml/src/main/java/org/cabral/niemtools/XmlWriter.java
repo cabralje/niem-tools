@@ -54,15 +54,15 @@ public class XmlWriter {
 
 	static final String AUGMENTATION_POINT_NAME = "AugmentationPoint";
 	// NIEM code lists
-	static final String CODELIST_APPINFO_PREFIX = "clsa";
-	static final String CODELIST_APPINFO_URI = "http://reference.niem.gov/niem/specification/code-lists/1.0/code-lists-schema-appinfo/";
+	static final String APPINFO_PREFIX = "appinfo";
+	static final String APPINFO_URI = "https://docs.oasis-open.org/niemopen/ns/model/appinfo/6.0/";
 	private static final String CODELIST_CODE = "code";
 	private static final String CODELIST_DEFINITION = "definition";
 	private static final String CODELIST_URI = "http://reference.niem.gov/niem/specification/code-lists/1.0/";
 	private static final String CONFORMANCE_ASSERTION_FILE = "conformance-assertion.pdf";
 	// NIEM conformance targets
 	static final String CT_PREFIX = "ct";
-	static final String CT_URI = "http://release.niem.gov/niem/conformanceTargets/3.0/";
+	static final String CT_URI = "https://docs.oasis-open.org/niemopen/ns/specification/conformanceTargets/6.0/";
 	// Genericode
 	private static final String GC_APPINFO_PREFIX = "gca";
 	private static final String GC_APPINFO_URI = "http://example.org/namespace/genericode-appinfo";
@@ -83,7 +83,7 @@ public class XmlWriter {
 	// NIEM naming and design rules
 	private static final String NC_PREFIX = "nc";
 	private static final String NDR_URI = "http://reference.niem.gov/niem/specification/naming-and-design-rules/3.0/";
-
+	private static final String NILLABLE_DEFAULT = "true";
 	// Web services
 	private static final String REQUEST_MESSAGE_SUFFIX = "Request";
 	private static final String RESPONSE_MESSAGE_SUFFIX = "Response";
@@ -91,8 +91,8 @@ public class XmlWriter {
 	private static final String SOAP_PREFIX = "soap";
 	private static final String SOAP_URI = "http://schemas.xmlsoap.org/wsdl/soap/";
 	// NIEM terms
-	static final String TERM_PREFIX = "term";
-	static final String TERM_URI = "http://release.niem.gov/niem/localTerminology/3.0/";
+	//static final String TERM_PREFIX = "term";
+	//static final String TERM_URI = "http://release.niem.gov/niem/localTerminology/3.0/";
 	private static final String WANTLIST_FILE = "wantlist.xml";
 	private static final String WRAPPER_PREFIX = "wrappers";
 	private static final String WSDL_FILE_TYPE = ".wsdl";
@@ -606,10 +606,10 @@ public class XmlWriter {
 			elementSchema += " substitutionGroup=\"" + headElement + "\"";
 		String isNillable = element.propertyValue(NiemUmlClass.NILLABLE_PROPERTY);
 		if (isNillable == null)
-			isNillable = "false";
+			isNillable = NILLABLE_DEFAULT;
 		if (isNillable.equals("true"))
 			elementSchema += " nillable=\"true\"";
-		elementSchema += ">\n";
+		elementSchema += ">";
 		String mappingNotes = element.propertyValue(NiemUmlClass.NOTES_PROPERTY);
 		if (mappingNotes != null && !mappingNotes.equals(""))
 			elementSchema += "<!--" + mappingNotes + "-->";
@@ -623,6 +623,37 @@ public class XmlWriter {
 			elementSchema += "</xs:annotation>\n";
 		}
 		elementSchema += "</xs:element>\n";
+		return elementSchema;
+	}
+
+		/**
+	 * @param element
+	 * @return XML schema attribute definition as a String
+	 */
+	String exportXmlAttributeSchema(UmlClassInstance element) {
+		String elementName = NamespaceModel.getName(element);
+		String elementSchema = "<xs:attribute name=\"" + NamespaceModel.filterAttributePrefix(elementName) + "\"";
+		UmlClass baseType = NiemModel.getBaseType(element);
+		if (baseType != null) {
+			if (baseType == NiemUmlClass.getSubsetModel().getAbstractType())
+				elementSchema += " abstract=\"true\"";
+			else
+				elementSchema += " type=\"" + NamespaceModel.getPrefixedName(baseType) + "\"";
+		}
+		elementSchema += " appinfo:referenceAttributeIndicator=\"true\">\n";
+		String mappingNotes = element.propertyValue(NiemUmlClass.NOTES_PROPERTY);
+		if (mappingNotes != null && !mappingNotes.equals(""))
+			elementSchema += "<!--" + mappingNotes + "-->";
+		String description = element.description();
+		if (description != null && !description.equals("")) {
+			elementSchema += "\n<xs:annotation>\n" + "<xs:documentation>" + description + "</xs:documentation>\n";
+			String codeList = element.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
+			if (codeList != null)
+				elementSchema += "<xs:appinfo>" + "<clsa:SimpleCodeListBinding codeListURI=\""
+						+ NamespaceModel.getExtensionSchema(elementName) + "\"/>" + " </xs:appinfo>";
+			elementSchema += "</xs:annotation>\n";
+		}
+		elementSchema += "</xs:attribute>\n";
 		return elementSchema;
 	}
 
@@ -652,9 +683,9 @@ public class XmlWriter {
 			for (String nsPrefix : schemaNamespaces)
 				if (!nsPrefix.equals(NiemModel.LOCAL_PREFIX))
 					writeXmlNs(xml, nsPrefix, NamespaceModel.getSchemaURIForPrefix(nsPrefix));
-			writeXmlNs(xml, XmlWriter.CODELIST_APPINFO_PREFIX, XmlWriter.CODELIST_APPINFO_URI);
+			writeXmlNs(xml, XmlWriter.APPINFO_PREFIX, XmlWriter.APPINFO_URI);
 			writeXmlNs(xml, XmlWriter.CT_PREFIX, XmlWriter.CT_URI);
-			writeXmlNs(xml, XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI);
+			//writeXmlNs(xml, XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI);
 			writeXmlAttribute(xml, "ct:conformanceTargets",
 					NDR_URI + "#ExtensionSchemaDocument " + CODELIST_URI + "#SchemaDocument");
 			writeXmlAttribute(xml, "elementFormDefault", "qualified");
@@ -727,7 +758,7 @@ public class XmlWriter {
 		String baseTypeName = NamespaceModel.getPrefixedName(baseType);
 		if (codeList != null && !codeList.equals("")) { // code list simple type
 			Log.debug("exportXmlTypeSchema: exporting code list simple type " + typeName);
-			isComplexType = false;
+			isComplexType = true;
 			isComplexContent = false;
 		} else if (baseTypeCodeList != null && !baseTypeCodeList.equals("")) { // code list complex type
 			Log.debug("exportXmlTypeSchema: exporting code list complex type " + typeName);
@@ -736,7 +767,7 @@ public class XmlWriter {
 			Log.debug("exportXmlTypeSchema: exporting complex type " + typeName); // complexContent
 
 		TreeSet<String> xmlEnumerations = new TreeSet<String>();
-		if (isComplexType == false && baseType != null)
+		if (isComplexContent == false && baseType != null)
 			if (codeList != null && codeList.contains(NiemModel.CODELIST_DELIMITER)) {
 				for (String code : codeList.split(NiemModel.CODELIST_DELIMITER)) {
 					if (code.equals(""))
@@ -818,22 +849,21 @@ public class XmlWriter {
 		if (description != null && !description.equals(""))
 			typeSchema += "<xs:annotation>\n" + "<xs:documentation>" + description + "</xs:documentation>\n"
 					+ "</xs:annotation>\n";
-		if (isComplexType) {
-			if (isComplexContent) {
-				typeSchema += "<xs:complexContent>\n" + "<xs:extension base=\"" + baseTypeName + "\">\n"
-						+ "<xs:sequence>\n" + String.join("", xmlElementsInType) + "\n" + "</xs:sequence>\n"
-						+ "</xs:extension>\n" + String.join("", xmlAttributesInType) + "\n" + "</xs:complexContent>\n"
-						+ "</xs:complexType>\n";
-			} else {
-				typeSchema += "<xs:simpleContent>\n" + "<xs:extension base=\"" + baseTypeName + "\"/>\n"
-						+ String.join("", xmlAttributesInType) + "\n" + "</xs:simpleContent>\n" + "</xs:complexType>\n";
-			}
+		//if (isComplexType) {
+		if (isComplexContent) {
+			typeSchema += "<xs:complexContent>\n" + "<xs:extension base=\"" + baseTypeName + "\">\n"
+					+ "<xs:sequence>\n" + String.join("", xmlElementsInType) + "</xs:sequence>\n"
+					+ "</xs:extension>\n" + String.join("", xmlAttributesInType) + "</xs:complexContent>\n";
 		} else {
-			typeSchema += "<xs:restriction base=\"" + baseTypeName + "\"";
-			if (xmlEnumerations.size() > 0)
-				typeSchema += String.join("", xmlEnumerations) + "\n";
-			typeSchema += "</xs:restriction>\n" + "</xs:simpleType>\n";
+			typeSchema += "<xs:simpleContent>\n";
+			if (xmlEnumerations.size() > 0) {
+				typeSchema += "<xs:restriction base=\"" + baseTypeName + "\">" + String.join("", xmlEnumerations) + "</xs:restriction>\n";
+			} else
+				typeSchema += "<xs:simpleContent>\n" + "<xs:extension base=\"" + baseTypeName + "\">\n"
+					+ String.join("", xmlAttributesInType) + "\n" + "</xs:extension>";
+			typeSchema += "</xs:simpleContent>\n"; 
 		}
+		typeSchema += (isComplexType) ? "</xs:complexType>" : "</xs:simpleType>";
 		return typeSchema;
 	}
 

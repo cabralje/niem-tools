@@ -1,9 +1,6 @@
 window_sizes 2700 1596 675 2019 1311 216
 cleanlooks_style
-selected 
-package_ref 154626 // NIEMReference
 open
-  
-package_ref 154242 // NIEM
+  classview_ref 210434 // j
 end
 end
