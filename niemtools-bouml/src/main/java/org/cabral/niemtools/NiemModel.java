@@ -86,9 +86,9 @@ class NiemModel {
 	static final String XSD_PREFIX = "xs";
 	static final String XSD_URI = XMLConstants.W3C_XML_SCHEMA_NS_URI;
 	static final String PROXY_PREFIX = "niem-xs";
-	static final String PROXY_URI = "http://release.niem.gov/niem/proxy/xsd/4.0/";
+	static final String PROXY_URI = "https://docs.oasis-open.org/niemopen/ns/model/adapters/niem-xs/6.0/";
 	static final String STRUCTURES_PREFIX = "structures";
-	static final String STRUCTURES_URI = "http://release.niem.gov/niem/structures/4.0/";
+	static final String STRUCTURES_URI = "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/";
 	private UmlClass abstractType = null;
 	private UmlClass augmentationType = null;
 	private Map<String, UmlClassInstance> elements = new HashMap<String, UmlClassInstance>();
@@ -1468,6 +1468,13 @@ class NiemModel {
 			}
 		}
 		return ns;
+	}
+
+	/** identify if a prefix is an infrastructure prefix
+	 * @param prefix
+	 */
+	static Boolean isInfrastructurePrefix(String prefix) {
+		return (prefix.equals(LOCAL_PREFIX) || prefix.equals(XSD_PREFIX) || prefix.equals(STRUCTURES_PREFIX));
 	}
 
 	/** create a relationship between a type and an attribute group

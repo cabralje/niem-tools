@@ -63,6 +63,8 @@ public class XmlWriter {
 	// NIEM conformance targets
 	static final String CT_PREFIX = "ct";
 	static final String CT_URI = "https://docs.oasis-open.org/niemopen/ns/specification/conformanceTargets/6.0/";
+	static final String CT_REFERENCE = "#SubsetSchemaDocument";
+	static final String CT_EXTENSION = "#ExtensionSchemaDocument";
 	// Genericode
 	private static final String GC_APPINFO_PREFIX = "gca";
 	private static final String GC_APPINFO_URI = "http://example.org/namespace/genericode-appinfo";
@@ -81,8 +83,8 @@ public class XmlWriter {
 	// NIEM model package descriptions
 	private static final String MPD_URI = "http://reference.niem.gov/niem/specification/model-package-description/3.0/";
 	// NIEM naming and design rules
-	private static final String NC_PREFIX = "nc";
-	private static final String NDR_URI = "http://reference.niem.gov/niem/specification/naming-and-design-rules/3.0/";
+	static final String NC_PREFIX = "nc";
+	static final String NDR_URI = "https://docs.oasis-open.org/niemopen/ns/specification/NDR/6.0/";
 	private static final String NILLABLE_DEFAULT = "true";
 	// Web services
 	private static final String REQUEST_MESSAGE_SUFFIX = "Request";
@@ -118,6 +120,8 @@ public class XmlWriter {
 	// XML
 	static final String XSI_PREFIX = "xsi";
 	static final String XSI_URI = XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
+	static final String XML_LANG = "en-US";
+
 	private Set<String> CodeListNamespaces = new HashSet<String>();
 
 	private String directory;
@@ -687,7 +691,7 @@ public class XmlWriter {
 			writeXmlNs(xml, XmlWriter.CT_PREFIX, XmlWriter.CT_URI);
 			//writeXmlNs(xml, XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI);
 			writeXmlAttribute(xml, "ct:conformanceTargets",
-					NDR_URI + "#ExtensionSchemaDocument " + CODELIST_URI + "#SchemaDocument");
+					NDR_URI + CT_EXTENSION);
 			writeXmlAttribute(xml, "elementFormDefault", "qualified");
 			writeXmlAttribute(xml, "attributeFormDefault", "unqualified");
 			writeXmlAttribute(xml, "version", NiemUmlClass.getProperty(ConfigurationDialog.IEPD_VERSION_PROPERTY));

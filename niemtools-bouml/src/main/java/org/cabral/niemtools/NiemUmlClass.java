@@ -65,7 +65,7 @@ import fr.bouml.anItemKind;
 
 public class NiemUmlClass {
 
-	private static final String NIEM_VERSION_DEFAULT = "4.1";
+	private static final String NIEM_VERSION_DEFAULT = "6.0";
 	// NIEM subset schema generation tool (SSGT)
 	private static final String WANTLIST_URI = "http://niem.gov/niem/wantlist/2.2";
 	// Niem-tools UML modeling
@@ -664,14 +664,14 @@ public class NiemUmlClass {
 	 * @param openapiDir
 	 */
 	@SuppressWarnings("unchecked")
-	public void exportIEPD(String xmlDir, String wsdlDir, String jsonDir, String openapiDir, String xmlExampleDir, String jsonExampleDir, String metamodelDir) {
+	public void exportSpecification(String xmlDir, String wsdlDir, String jsonDir, String openapiDir, String xmlExampleDir, String jsonExampleDir, String cmfDir) {
 
-		Log.start("exportIEPD");
-		Log.trace("Generating IEPD");
+		Log.start("exportSpecification");
+		Log.trace("Generating Specification");
 		
 		XmlWriter xmlWriter = new XmlWriter(xmlDir);
 		JsonWriter jsonWriter = new JsonWriter(jsonDir);
-		MetamodelWriter metamodelWriter = new MetamodelWriter(metamodelDir);
+		CommonModelFormatWriter cmfWriter = new CommonModelFormatWriter(cmfDir);
 		
 		TreeSet<String> jsonDefinitions = new TreeSet<String>();
 		TreeSet<String> jsonDefinitions2 = new TreeSet<String>();
@@ -693,11 +693,11 @@ public class NiemUmlClass {
 				xmlWriter.exportXmlCatalog();
 			}
 		} catch (Exception e) {
-			Log.trace("exportIEPD: error creating XML catalog file " + e.toString());
+			Log.trace("exportSpecification: error creating XML catalog file " + e.toString());
 		}
 
 		// cache list of ports and message elements
-		Log.debug("exportIEPD: cache ports and message elements");
+		Log.debug("exportSpecification: cache ports and message elements");
 		Map<String, UmlClass> ports = new TreeMap<String, UmlClass>();
 		Map<String, UmlClassInstance> messages = new TreeMap<String, UmlClassInstance>();
 		Set<String> messageNamespaces = new TreeSet<String>();
@@ -710,13 +710,13 @@ public class NiemUmlClass {
 			UmlClass port = (UmlClass) item;
 			String portName = port.name();
 			ports.put(portName, port);
-			Log.debug("exportIEPD: port: " + port.name());
+			Log.debug("exportSpecification: port: " + port.name());
 			for (UmlItem item2 : port.children()) {
 				if (item2.kind() != anItemKind.anOperation)
 					continue;
 				UmlOperation operation = (UmlOperation) item2;
 				String operationName = operation.name();
-				Log.debug("exportIEPD: operation: " + operationName);
+				Log.debug("exportSpecification: operation: " + operationName);
 				// operations.put(operationName, operation);
 				UmlClass outputType = null, inputType = null;
 				UmlParameter[] params = operation.params();
@@ -725,21 +725,21 @@ public class NiemUmlClass {
 						// ignore RESTful path, query, header or cookie parameters
 						if (!param.name.equals("") && !param.name.equals("body"))
 							continue;
-						Log.debug("exportIEPD: param " + param.name);
+						Log.debug("exportSpecification: param " + param.name);
 						try {
 							UmlTypeSpec inputType2 = param.type;
 							if (inputType2 != null)
 								inputType = inputType2.type;
 							// String mult = param.multiplicity;
 						} catch (Exception e) {
-							Log.trace("exportIEPD: error - no input message for " + operationName);
+							Log.trace("exportSpecification: error - no input message for " + operationName);
 						}
 						if (inputType == null || !inputType.stereotype().equals(NIEM_STEREOTYPE))
 							continue;
 						String inputMessage = inputType.propertyValue(NIEM_STEREOTYPE_XPATH);
 						if (inputMessage == null || inputMessage.equals(""))
 							continue;
-						Log.debug("exportIEPD: input Message: " + inputMessage + " from operation " + operationName);
+						Log.debug("exportSpecification: input Message: " + inputMessage + " from operation " + operationName);
 						String inputPrefix = NamespaceModel.getPrefix(inputMessage);
 						if (inputPrefix != null) {
 							messageNamespaces.add(inputPrefix);
@@ -748,7 +748,7 @@ public class NiemUmlClass {
 							if (element != null) {
 								element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
 								messages.put(inputMessage,element);
-								Log.debug("exportIEPD: element " + element.name() + " is input message element for operation " + operationName);
+								Log.debug("exportSpecification: element " + element.name() + " is input message element for operation " + operationName);
 							}
 						}
 					}
@@ -761,14 +761,14 @@ public class NiemUmlClass {
 							outputMessage = outputType.name();
 					}
 				} catch (Exception e) {
-					Log.trace("exportIEPD: error - no output message for " + operationName + " " + e.toString());
+					Log.trace("exportSpecification: error - no output message for " + operationName + " " + e.toString());
 				}
 				if (outputType != null && outputType.stereotype().equals(NIEM_STEREOTYPE))
 					outputMessage = outputType.propertyValue(NIEM_STEREOTYPE_XPATH);
 				if (outputMessage == null || outputMessage.equals(""))
 					continue;
 
-				Log.debug("exportIEPD: output Message: " + outputMessage + " from operation " + operationName);
+				Log.debug("exportSpecification: output Message: " + outputMessage + " from operation " + operationName);
 				String outputPrefix = NamespaceModel.getPrefix(outputMessage);
 				if (outputPrefix != null) {
 				//if (NamespaceModel.isNiemPrefix(outputPrefix)) {
@@ -778,7 +778,7 @@ public class NiemUmlClass {
 					if (element != null) {
 						element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
 						messages.put(outputMessage, element);
-						Log.debug("exportIEPD: element " + element.name() + " is output message element for operation " + operationName);
+						Log.debug("exportSpecification: element " + element.name() + " is output message element for operation " + operationName);
 					}
 				}
 			}
@@ -793,7 +793,7 @@ public class NiemUmlClass {
 		while (it2.hasNext()) {
 			String definition = it2.next();
 			String definition2 = definition.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")","$1#/$3");
-			//Log.debug("exportIEPD: definition " + definition2);
+			//Log.debug("exportSpecification: definition " + definition2);
 			if (definition2 != null && jsonDefinitions2 != null)
 				jsonDefinitions2.add(definition2);
 		}
@@ -802,13 +802,13 @@ public class NiemUmlClass {
 			try {
 				xmlWriter.exportMpdCatalog(messages.keySet(), xmlExampleDir);
 			} catch (Exception e) {
-				Log.trace("exportIEPD: error exporting MPD catalog " + e.toString());
+				Log.trace("exportSpecification: error exporting MPD catalog " + e.toString());
 			}
 			if (wsdlDir != null)
 				try {
 					xmlWriter.exportWSDL(wsdlDir, ports, messageNamespaces);
 				} catch (Exception e) {
-					Log.trace("exportIEPD: error exporting WSDL " + e.toString());
+					Log.trace("exportSpecification: error exporting WSDL " + e.toString());
 				}
 		}
 		if (jsonDir != null)
@@ -816,15 +816,15 @@ public class NiemUmlClass {
 				if (openapiDir != null)
 					jsonWriter.exportOpenApi(openapiDir, ports, messageNamespaces, jsonDefinitions2);
 			} catch (Exception e) {
-				Log.trace("exportIEPD: error exporting OpenAPI files " + e.toString());
+				Log.trace("exportSpecification: error exporting OpenAPI files " + e.toString());
 			} 
-		if (metamodelDir != null)
+		if (cmfDir != null)
 			try {
-				metamodelWriter.exportMetamodel(metamodelDir, messages);
+				cmfWriter.exportCMF(cmfDir);
 			} catch (Exception e) {
-				Log.trace("exportIEPD: error exporting metamodel files " + e.toString());
+				Log.trace("exportSpecification: error exporting common model format files " + e.toString());
 			}
-		Log.stop("exportIEPD");
+		Log.stop("exportSpecification");
 	}
 
 	/** exports a NIEM wantlist for import into Subset Schema Generator Tool (SSGT)
@@ -870,7 +870,7 @@ public class NiemUmlClass {
 					UmlClassView classView = (UmlClassView) item;
 					String prefix = classView.propertyValue(PREFIX_PROPERTY);
 					String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
-					if (prefix.equals(NiemModel.LOCAL_PREFIX) || prefix.equals(NiemModel.XSD_PREFIX) || prefix.equals(NiemModel.STRUCTURES_PREFIX))
+					if (NiemModel.isInfrastructurePrefix(prefix))
 						continue;
 					for (UmlItem item2 : classView.children())
 						if (item2.kind() == anItemKind.aClassInstance) {
@@ -898,7 +898,7 @@ public class NiemUmlClass {
 				if (item.kind() == anItemKind.aClassView) {
 					UmlClassView classView = (UmlClassView) item;
 					String prefix = classView.propertyValue(PREFIX_PROPERTY);
-					if (prefix.equals(NiemModel.LOCAL_PREFIX) || prefix.equals(NiemModel.XSD_PREFIX) || prefix.equals(NiemModel.STRUCTURES_PREFIX))
+					if (NiemModel.isInfrastructurePrefix(prefix))
 						continue;
 					for (UmlItem item2 : classView.children())
 						if (item2.kind() == anItemKind.aClass) {
@@ -980,7 +980,7 @@ public class NiemUmlClass {
 	/**
 	 * @return NIEM version as a String
 	 */
-	private String getNiemVersion() {
+	static public String getNiemVersion() {
 		String niemVersion = NIEM_VERSION_DEFAULT;
 
 /*		String schemaURI = NamespaceModel.getSchemaURIForPrefix("nc");

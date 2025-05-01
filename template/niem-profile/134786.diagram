@@ -1,0 +1,43 @@
+format 209
+
+classcanvas 128002 class_ref 146178 // CaseTypeSpecificInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 405 28 2000
+end
+classcanvas 128130 class_ref 138370 // CivilCaseInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 353 99 2000
+end
+classcanvas 128386 class_ref 139010 // FiduciaryCaseInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 653 417 2000
+end
+classcanvas 128642 class_ref 139138 // PersonInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 643 579 2000
+end
+classcanvas 128898 class_ref 139906 // DecedentEstateCaseInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 269 420 2005
+end
+relationcanvas 128258 relation_ref 182018 // <generalisation>
+  from ref 128130 z 2001 to ref 128002
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 128514 relation_ref 182146 // <directional aggregation>
+  from ref 128130 z 2001 to ref 128386
+  role_a_pos 731 392 3000 no_role_b
+  multiplicity_a_pos 685 392 3000 no_multiplicity_b
+end
+relationcanvas 128770 relation_ref 182274 // <directional aggregation>
+  from ref 128386 z 2001 to ref 128642
+  role_a_pos 765 554 3000 no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 129026 relation_ref 182402 // <directional aggregation>
+  from ref 128130 z 2006 to ref 128898
+  role_a_pos 432 395 3000 no_role_b
+  multiplicity_a_pos 386 395 3000 no_multiplicity_b
+end
+end

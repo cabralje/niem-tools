@@ -1,6 +1,9 @@
 window_sizes 2700 1596 675 2019 1311 216
 cleanlooks_style
+selected 
+  package_ref 134530 // niem-profile
 open
-  classview_ref 210434 // j
+  
+  package_ref 134530 // niem-profile
 end
 end

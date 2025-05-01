@@ -1,37 +1,50 @@
 format 224
-"niem-profile" // niem-profile
-  revision 1
-  modified_by 2 "JamesCabral"
+"niem-profile"
+  revision 156
+  modified_by 2 "jim.cabral"
+
+
+  
   // class settings
+  default_attribute_visibility public default_relation_visibility public default_operation_visibility public
   
-  classdiagramsettings member_max_width 0 end
+  classdiagramsettings draw_all_relations no hide_attributes no hide_operations yes hide_getset_operations yes hide_ports no show_members_full_definition yes show_members_visibility no show_members_stereotype no show_members_context no show_members_multiplicity yes show_members_initialization no show_attribute_modifiers no member_max_width 127 show_parameter_dir no show_parameter_name no package_name_in_tab no class_drawing_mode natural drawing_language uml show_context_mode no auto_label_position yes show_relation_modifiers no show_relation_visibility no show_infonote no shadow yes gradient none show_stereotype_properties no end
   
-  classcompositediagramsettings end
+  classcompositediagramsettings auto_label_position yes draw_all_relations yes shadow yes gradient none end
   
-  usecasediagramsettings end
+  usecasediagramsettings package_name_in_tab no show_context_mode no auto_label_position yes draw_all_relations yes class_drawing_mode actor shadow yes gradient none show_stereotype_properties no end
   
-  sequencediagramsettings end
+  sequencediagramsettings show_full_operations_definition no show_class_of_operation no write_horizontally no instances_drawing_mode class drawing_language uml draw_all_relations yes shadow yes gradient none show_stereotype_properties no show_class_context_mode no show_msg_context_mode no end
   
-  collaborationdiagramsettings end
+  collaborationdiagramsettings show_full_operations_definition no show_class_of_operation no show_hierarchical_rank no write_horizontally yes instances_drawing_mode natural drawing_language uml package_name_in_tab no show_class_pack_context_mode no show_msg_context_mode no draw_all_relations yes shadow yes gradient none show_stereotype_properties no end
   
-  objectdiagramsettings end
+  objectdiagramsettings write_horizontally yes package_name_in_tab no show_class_pack_context_mode no auto_label_position yes draw_all_relations yes shadow yes gradient none show_stereotype_properties no end
   
-  objectcompositediagramsettings end
+  objectcompositediagramsettings auto_label_position yes draw_all_relations yes shadow yes gradient none end
   
-  componentdiagramsettings
-   end
+  componentdiagramsettings package_name_in_tab no show_context_mode no auto_label_position yes draw_all_relations yes shadow yes gradient none
+   draw_component_as_icon no show_component_req_prov yes show_component_rea no show_stereotype_properties no end
   
-  deploymentdiagramsettings
-   end
+  deploymentdiagramsettings package_name_in_tab no show_context_mode no write_horizontally yes auto_label_position yes draw_all_relations yes shadow yes gradient none
+   draw_component_as_icon no show_component_req_prov no show_component_rea no show_stereotype_properties no end
   
-  statediagramsettings
-   end
+  statediagramsettings package_name_in_tab no show_context_mode no auto_label_position yes write_label_horizontally yes show_trans_definition no draw_all_relations yes shadow yes gradient none
+   show_activities yes region_horizontally yes drawing_language uml show_stereotype_properties no end
   
-  activitydiagramsettings
-   end
+  activitydiagramsettings package_name_in_tab no show_context_mode no show_opaque_action_definition no auto_label_position yes write_label_horizontally no draw_all_relations yes shadow yes gradient none
+   show_infonote yes drawing_language uml show_stereotype_properties no end
+  
+  class_color yellow duration_color transparent continuation_color gray note_color blue fragment_color transparent subject_color transparent usecase_color yellow package_color transparent component_color green artifact_color green deploymentnode_color gray state_color yellow stateaction_color transparent activity_color transparent activityregion_color transparent activitypartition_color transparent activityaction_color transparent parameterpin_color white generalization_color black 
+  dpi 96
+  font_size 10
+  diagram_format Letter-Landscape
+
+  image_root_dir ""
+
+
+  mark_for_import
   
   stereotype "profile"
-  oid -1
   ncouples 27
   key "" value ""
   key "" value ""
@@ -60,7 +73,6 @@ format 224
   key "gxmi gen eclipse" value "no"
   key "gxmi comment exporter" value "no"
   key "gxmi linefeed" value "no"
-  imported_project_dir "C:/Users/JamesCabral/OneDrive/xml/niem-profile"
   classview 172802 "Stereotypes"
     
     classdiagramsettings member_max_width 0 end
@@ -81,7 +93,6 @@ format 224
     
     activitydiagramsettings
      end
-    oid 172802
     class 206082 "niem"
       visibility package stereotype "stereotype"
       cpp_decl ""
@@ -92,7 +103,6 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      oid 206082
       ncouples 6
       key "stereotypeSet" value ""
       key "stereotypeCheck" value ""
@@ -110,7 +120,6 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 246146
 	comment "XML mapping to the NIEM"
       end
 
@@ -123,7 +132,6 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 253058
 	comment "The NIEM type that implements the source class or property"
       end
 
@@ -136,7 +144,6 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 253314
 	comment "The NIEM property that implements the source class or property"
       end
 
@@ -149,7 +156,6 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 253570
 	comment "The NIEM base type that implements the source class or property"
       end
 
@@ -162,7 +168,6 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 253954
 	comment "The multiplicity of the NIEM property that implements the source class or property"
       end
 
@@ -175,7 +180,6 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 260482
 	comment "The values and definitions of a code list in the format \"value1\", \"definition1\", \"value2\", \"definition2\""
       end
 
@@ -188,7 +192,6 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 246018
 	comment "Old XML mapping to the NIEM"
       end
 
@@ -201,7 +204,6 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 253698
 	comment "The old mutiplicity of the NIEM property that implements the source class or property"
       end
 
@@ -214,12 +216,11 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 253826
 	comment "Notes regarding the mapping of the source class and property to the NIEM"
       end
     end
 
-    class 2913282 "webservice"
+    class 212610 "webservice"
       visibility package stereotype "stereotype"
       cpp_decl ""
       java_decl ""
@@ -229,7 +230,6 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      oid 212610
       ncouples 6
       key "stereotypeSet" value ""
       key "stereotypeCheck" value ""
@@ -247,7 +247,6 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 267010
 	comment "HTTP methods supported by the web service"
       end
 
@@ -261,7 +260,6 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 287106
 	comment "Relative URL path to the web service"
       end
     end
@@ -276,7 +274,6 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      oid 219138
       ncouples 6
       key "stereotypeSet" value ""
       key "stereotypeCheck" value ""
@@ -294,7 +291,6 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 273538
       end
     end
 
@@ -319,7 +315,6 @@ ${items}};
       explicit_switch_type ""
       mysql_decl ""
       
-      oid 225666
       attribute 280194 "GET"
 	public explicit_type ""
 	cpp_decl ""
@@ -329,7 +324,6 @@ ${items}};
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 280194
       end
 
       attribute 280322 "PUT"
@@ -341,7 +335,6 @@ ${items}};
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 280322
       end
 
       attribute 280450 "POST"
@@ -353,7 +346,6 @@ ${items}};
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 280450
       end
 
       attribute 280578 "DELETE"
@@ -365,7 +357,6 @@ ${items}};
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	oid 280578
       end
     end
   end

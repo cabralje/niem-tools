@@ -1,6 +1,6 @@
 format 224
 "niem6-bouml"
-  revision 7
+  revision 9
   modified_by 2 "JamesCabral"
 
 
@@ -57,9 +57,9 @@ format 224
   key "IEPDReadMeFile" value "readme.txt"
   key "IEPDChangeLogFile" value "changelog.txt"
   key "externalSchemas" value "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,cbc=urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonBasicComponents-2.1.xsd,ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd"
-  package_ref 134530 // niem-profile
-
   package_ref 141058 // UML
 
   package_ref 154242 // NIEM
+
+  package_ref 134530 // niem-profile
 end

@@ -215,6 +215,17 @@ public class NamespaceModel {
 				ns.setNsClassView(namespaceClassView);
 				ns.setFilepath(prefix2 + XmlWriter.XSD_FILE_TYPE);
 				namespaceClassView.set_PropertyValue(NiemUmlClass.FILE_PATH_PROPERTY, ns.getFilepath());
+			} else {
+				UmlClassView referenceClassView = ns.getReferenceClassView();
+				if (referenceClassView != null) {
+					namespaceClassView.set_Description(referenceClassView.description());
+					String filepath = referenceClassView.propertyValue(NiemUmlClass.FILE_PATH_PROPERTY);
+					if (filepath != null) {
+						namespaceClassView.set_PropertyValue(NiemUmlClass.FILE_PATH_PROPERTY, filepath);
+					} else {
+						Log.debug("getNamespaceClassView: error - no filepath for " + referenceClassView.name());
+					}
+				}
 			}
 		}
 		return namespaceClassView;

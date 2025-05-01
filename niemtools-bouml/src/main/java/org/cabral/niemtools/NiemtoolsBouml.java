@@ -245,9 +245,9 @@ public class NiemtoolsBouml
 		String openapiDir = (root.propertyValue("exportOpenAPI").equals("true")) ? properties.getProperty("openapiDir") : null;
 		String xmlExampleDir = (root.propertyValue("exportXML").equals("true")) ? properties.getProperty("xmlExampleDir") : null;
 		String jsonExampleDir = (root.propertyValue("exportJSON").equals("true")) ? properties.getProperty("jsonExampleDir") : null;
-		String metamodelDir = (root.propertyValue("exportMetamodel").equals("true")) ? properties.getProperty("metamodelDir") : null;
+		String cmfDir = (root.propertyValue("exportMetamodel").equals("true")) ? properties.getProperty("metamodelDir") : null;
 		
-		niemTools.exportIEPD(xsdDir, wsdlDir, jsonDir, openapiDir, xmlExampleDir, jsonExampleDir, metamodelDir);
+		niemTools.exportSpecification(xsdDir, wsdlDir, jsonDir, openapiDir, xmlExampleDir, jsonExampleDir, cmfDir);
 		Log.stop("generateModels");
 	}
 

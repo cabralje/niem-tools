@@ -496,7 +496,7 @@ public class JsonWriter {
 			if (parentFile != null)
 				parentFile.mkdirs();
 			
-			Log.debug("exportSchemas: schema " + path.toString());
+			Log.debug("exportJsonSchema: schema " + path.toString());
 			FileWriter json = new FileWriter(path.toFile());
 			json.write("{\n" + getJsonPair("$id", nsSchemaURI) + ",\n" + getJsonPair("$schema", JsonWriter.JSON_SCHEMA_URI)
 			+ ",\n" + getJsonPair("type", "object") + ",\n" + "\"additionalProperties\" : false" + ",\n"
@@ -506,7 +506,7 @@ public class JsonWriter {
 			+ "\"required\" : [\n" + String.join(",\n", jsonRequired) + "]" + "\n" + "}");
 			json.close();
 		} catch (Exception e1) {
-			Log.trace("exportSchemas: error exporting JSON file " + e1.toString());
+			Log.trace("exportJsonSchema: error exporting JSON file " + e1.toString());
 		}
 	}
 
