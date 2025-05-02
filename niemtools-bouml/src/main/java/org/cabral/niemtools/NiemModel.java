@@ -24,6 +24,7 @@ package org.cabral.niemtools;
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +44,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import fr.bouml.UmlAttribute;
 import fr.bouml.UmlClass;
@@ -57,7 +59,7 @@ import fr.bouml.anItemKind;
 
 class NiemModel {
 
-	private static final Boolean _IMPORT_CODE_DESCRIPTIONS = true;
+	private static final Boolean IMPORT_CODE_DESCRIPTIONS = true;
 	// private static final Boolean _IMPORT_CODE_DESCRIPTIONS = false;
 
 	static final String ABSTRACT_TYPE_NAME = "abstract";
@@ -71,7 +73,7 @@ class NiemModel {
 	static final String LOCAL_URI = "local";
 	private static final String OBJECT_TYPE_NAME = "ObjectType";
 	private static final String SIMPLE_OBJECT_ATTRIBUTE_GROUP = "@SimpleObjectAttributeGroup";
-	static Map<String, List<UmlClassInstance>> Substitutions = new HashMap<String, List<UmlClassInstance>>();
+	static Map<String, List<UmlClassInstance>> Substitutions = new HashMap<>();
 	static final String URI_PROPERTY = "URI";
 	static final String XML_PREFIX = XMLConstants.XML_NS_PREFIX;
 	static final String XML_URI = XMLConstants.XML_NS_URI;
@@ -82,21 +84,21 @@ class NiemModel {
 			"NOTATION", "positiveInteger", "QName", "short", "string", "time", "token", "unsignedByte", "unsignedInt",
 			"unsignedLong", "unsignedShort" };
 
-	private static XPath xPath = XPathFactory.newInstance().newXPath();
+	private static final XPath xPath = XPathFactory.newInstance().newXPath();
 	static final String XSD_PREFIX = "xs";
 	static final String XSD_URI = XMLConstants.W3C_XML_SCHEMA_NS_URI;
 	static final String PROXY_PREFIX = "niem-xs";
-	static final String PROXY_URI = "https://docs.oasis-open.org/niemopen/ns/model/adapters/niem-xs/6.0/";
+	//static final String PROXY_URI = "https://docs.oasis-open.org/niemopen/ns/model/adapters/niem-xs/6.0/";
 	static final String STRUCTURES_PREFIX = "structures";
 	static final String STRUCTURES_URI = "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/";
 	private UmlClass abstractType = null;
 	private UmlClass augmentationType = null;
-	private Map<String, UmlClassInstance> elements = new HashMap<String, UmlClassInstance>();
-	private Map<String, List<UmlClassInstance>> elementsInType = new HashMap<String, List<UmlClassInstance>>();
+	private final Map<String, UmlClassInstance> elements = new HashMap<>();
+	private final Map<String, List<UmlClassInstance>> elementsInType = new HashMap<>();
 	private UmlPackage modelPackage = null;
 	private UmlClass objectType = null;
 	private UmlClass simpleObjectAttributeGroup = null;
-	private Map<String, UmlClass> types = new HashMap<String, UmlClass>();
+	private final Map<String, UmlClass> types = new HashMap<>();
 	
 	/**
 	 * @param item
@@ -143,7 +145,7 @@ class NiemModel {
 	 * @return URI of a item in schemaURI with name itemName as a String
 	 */
 	static String getURI(String schemaURI, String itemName) {
-		itemName.replaceAll("[^-._:A-Za-z0-9]", "");
+		itemName = itemName.replaceAll("[^-._:A-Za-z0-9]", "");
 		return schemaURI + HASH_DELIMITER + NamespaceModel.getName(itemName).replaceAll(HASH_DELIMITER, "");
 	}
 	/**
@@ -331,31 +333,31 @@ class NiemModel {
 				String uri = getURI(item);
 				if (uri != null) {
 					switch (item.kind().value()) {
-					case anItemKind._aClass:
-						if (!types.containsKey(uri))
-							types.put(uri, (UmlClass) item);
-						break;
-					case anItemKind._aClassInstance:
-						UmlClassInstance element = (UmlClassInstance) item;
-						if (!elements.containsKey(uri))
-							elements.put(uri, element);
-						String headElement = element.propertyValue(NiemUmlClass.SUBSTITUTION_PROPERTY);
-						try {
-							if (headElement != null) {
-								List<UmlClassInstance> enlist = (Substitutions.get(headElement));
-								if (enlist == null)
-									enlist = new ArrayList<UmlClassInstance>();
-								if (!enlist.contains(element))
-									enlist.add(element);
-								Substitutions.put(headElement, enlist);
-							}
-						}
-						catch (Exception e) {
-							Log.trace("cacheModel: error caching sustitutions " + e.toString());
-						}
-						break;
-					default:
-						break;
+					case anItemKind._aClass -> {
+                                            if (!types.containsKey(uri))
+                                                types.put(uri, (UmlClass) item);
+                                        }
+					case anItemKind._aClassInstance -> {
+                                            UmlClassInstance element = (UmlClassInstance) item;
+                                            if (!elements.containsKey(uri))
+                                                elements.put(uri, element);
+                                            String headElement = element.propertyValue(NiemUmlClass.SUBSTITUTION_PROPERTY);
+                                            try {
+                                                if (headElement != null) {
+                                                    List<UmlClassInstance> enlist = (Substitutions.get(headElement));
+                                                    if (enlist == null)
+                                                        enlist = new ArrayList<>();
+                                                    if (!enlist.contains(element))
+                                                        enlist.add(element);
+                                                    Substitutions.put(headElement, enlist);
+                                                }
+                                            }
+                                            catch (Exception e) {
+                                                Log.trace("cacheModel: error caching sustitutions " + e.toString());
+                                            }
+                                        }
+					default -> {
+                                        }
 					}
 				}
 			}
@@ -367,7 +369,7 @@ class NiemModel {
 			String typeURI = getURI(type);
 			List<UmlClassInstance> list = (elementsInType.get(typeURI));
 			if (list == null) {
-				list = new ArrayList<UmlClassInstance>();
+				list = new ArrayList<>();
 				elementsInType.put(typeURI, list);
 			}
 			for (UmlItem attribute : type.children())
@@ -582,7 +584,7 @@ class NiemModel {
 		JsonWriter jsonWriter = new JsonWriter(jsonDir);
 		boolean exportXML = (xmlDir != null);
 		boolean exportJSON = (jsonDir != null);
-		TreeSet<String> openapiDefinitions = new TreeSet<String>();
+		TreeSet<String> openapiDefinitions = new TreeSet<>();
 		
 		// export each schema
 		for (UmlItem thisPackage : modelPackage.children()) {
@@ -601,21 +603,21 @@ class NiemModel {
 			Log.debug("exportSchemas: exporting schema " + prefix);
 	
 			// build list of referenced namespaces
-			TreeSet<String> schemaNamespaces = new TreeSet<String>();
+			TreeSet<String> schemaNamespaces = new TreeSet<>();
 			schemaNamespaces.add(XSD_PREFIX);
 			
 			// add structures namespaces (for base types)
 			schemaNamespaces.add(STRUCTURES_PREFIX);
 	
-			TreeSet<String> xmlTypes = new TreeSet<String>();
-			TreeSet<String> jsonDefinitions = new TreeSet<String>();
-			TreeSet<String> xmlElements = new TreeSet<String>();
-			TreeSet<String> jsonProperties = new TreeSet<String>();
-			TreeSet<String> jsonRequired = new TreeSet<String>();
+			TreeSet<String> xmlTypes = new TreeSet<>();
+			TreeSet<String> jsonDefinitions = new TreeSet<>();
+			TreeSet<String> xmlElements = new TreeSet<>();
+			TreeSet<String> jsonProperties = new TreeSet<>();
+			TreeSet<String> jsonRequired = new TreeSet<>();
 	
 			Log.debug("exportSchemas: exporting types and elements");
-			String xmlType = null;
-			String jsonType = null;
+			String xmlType;
+			String jsonType;
 			for (UmlItem item : classView.children()) {
 				// add types and attribute groups
 				if (item.kind() == anItemKind.aClass) {
@@ -656,7 +658,7 @@ class NiemModel {
 					}
 				}
 				// add elements and attributes
-				String xmlElement = null;
+				String xmlElement;
 				String jsonElement = null;
 				if (item.kind() == anItemKind.aClassInstance) {
 					UmlClassInstance element = (UmlClassInstance) item;
@@ -703,7 +705,6 @@ class NiemModel {
 						}
 					} catch (RuntimeException re) {
 						Log.trace("exportSchemas: error exporting element " + element.name() + " " + re.toString());
-						continue;
 					}
 				}
 			}
@@ -806,7 +807,7 @@ class NiemModel {
 	 * @param doc
 	 * @return the default schema URI for the current file as a String
 	 */
-	private String getDefaultSchemaURI(String filename, Document doc) {
+	private String getDefaultSchemaURI(Document doc) {
 		String defaultSchemaURI = doc.lookupNamespaceURI(null);
 		if (defaultSchemaURI == null) {
 			// trace("getDefaultSchemaURI: no default namespace found in " + filename);
@@ -855,7 +856,7 @@ class NiemModel {
 	List<UmlClassInstance> getElementsInType( String typeURI) {
 		List<UmlClassInstance> elementInTypeList = elementsInType.get(typeURI);
 		if (elementInTypeList == null) {
-			elementInTypeList = new ArrayList<UmlClassInstance>();
+			elementInTypeList = new ArrayList<>();
 			elementsInType.put(typeURI, elementInTypeList);
 		}
 		return elementInTypeList;
@@ -915,7 +916,7 @@ class NiemModel {
 	private String importCodeList(NodeList elist) {
 		String codeList = "";
 		XPathExpression xe = null;
-		if (_IMPORT_CODE_DESCRIPTIONS)
+		if (IMPORT_CODE_DESCRIPTIONS)
 			try {
 				xe = xPath.compile("xs:annotation[1]/xs:documentation[1]");
 			} catch (XPathExpressionException e) {
@@ -926,10 +927,10 @@ class NiemModel {
 			Element enumElement = (Element) elist.item(j);
 			String value = filterEnum(filterASCII(enumElement.getAttribute("value")));
 			String codeDescription = null;
-			if (_IMPORT_CODE_DESCRIPTIONS)
+			if (IMPORT_CODE_DESCRIPTIONS)
 				try {
 					codeDescription = filterEnumDefinition(filterASCII(xe.evaluate(enumElement)));
-				} catch (Exception e) {
+				} catch (XPathExpressionException e) {
 					Log.trace("getCodeList: error - cannot import code descriptions " + e.toString());
 				}
 			if (codeDescription != null && !codeDescription.equals("")) {
@@ -961,7 +962,7 @@ class NiemModel {
 			
 			// compile XPath queries
 			xe = xPath.compile("xs:annotation[1]/xs:documentation[1]");
-		} catch (Exception e) {
+		} catch (IOException | XPathExpressionException | SAXException e) {
 			Log.trace(filename2 + "importElements: error " + e.toString());
 			filename2 = "";
 		}
@@ -972,7 +973,7 @@ class NiemModel {
 			return ns;
 		}		
 		String targetPrefix = NamespaceModel.getPrefix(targetClassView);
-		String defaultSchemaURI = getDefaultSchemaURI(filename, doc);
+		String defaultSchemaURI = getDefaultSchemaURI(doc);
 		Namespace defaultNamespace = NamespaceModel.getNamespace(defaultSchemaURI);
 		if (defaultNamespace == null)
 			defaultNamespace = ns;
@@ -985,7 +986,7 @@ class NiemModel {
 		try {
 			elementList = (NodeList) xPath.evaluate("xs:element[@name]", doc.getDocumentElement(),
 					XPathConstants.NODESET);
-		} catch (Exception e) {
+		} catch (XPathExpressionException e) {
 			Log.trace("importElements: error - cannot import element " + e.toString());
 		}
 
@@ -997,7 +998,7 @@ class NiemModel {
 			String abstractAttribute = elementElement.getAttribute("abstract");
 			String baseTypeSchemaURI = null;
 			String baseTypeName = elementElement.getAttribute("type");
-			UmlClass baseType = null;
+			UmlClass baseType;
 			if (abstractAttribute.equals("true") || (baseTypeName.equals(""))) {
 				baseType = getAbstractType();
 			} else {
@@ -1017,7 +1018,7 @@ class NiemModel {
 					Log.trace("importElements: error - base type " + baseTypeName + " not in model with URI "+ baseTypeSchemaURI);
 				else
 					addElement(ns.getSchemaURI(), elementName, baseType, xe.evaluate(elementElement), null);
-			} catch (Exception e) {
+			} catch (XPathExpressionException e) {
 				Log.trace("importElements: error - cannot import element " + e.toString());
 			}
 		}
@@ -1028,7 +1029,7 @@ class NiemModel {
 		try {
 			attributeList = (NodeList) xPath.evaluate("xs:attribute[@name]", doc.getDocumentElement(),
 					XPathConstants.NODESET);
-		} catch (Exception e) {
+		} catch (XPathExpressionException e) {
 			Log.trace("importElements: error - cannot import attributes " + e.toString());
 		}
 		for (int attributeIndex = 0; attributeIndex < attributeList.getLength(); attributeIndex++) {
@@ -1054,7 +1055,7 @@ class NiemModel {
 					} else {
 						baseTypeName = xPath.evaluate(".//xs:simpleType/xs:list/@itemType", attribute);
 					}
-				} catch (Exception e) {
+				} catch (XPathExpressionException e) {
 					Log.trace(filename + "\nimportElements: error importing base types for attribute "
 							+ attributeName + " " + e.toString());
 				}
@@ -1078,7 +1079,7 @@ class NiemModel {
 					Log.trace("importElements: error - base type " + baseTypeName + " not in model with URI "+ baseTypeSchemaURI);
 				else
 					element = addElement(ns.getSchemaURI(), attributeName, baseType2, xe.evaluate(attribute), null);
-			} catch (Exception e) {
+			} catch (XPathExpressionException e) {
 				Log.trace(filename2 + "importElements: error - cannot add attribute " + attributeName + " of type "
 						+ baseTypeName + " " + e.toString());
 				filename2 = "";
@@ -1108,7 +1109,7 @@ class NiemModel {
 			ns = NamespaceModel.importNamespaces(doc);
 			if (ns == null)
 				return ns;
-		} catch (Exception e) {
+		} catch (IOException | SAXException e) {
 			Log.trace(filename + "\nimportElementsInTypes: error parsing the schema " + e.toString());
 		}
 
@@ -1119,7 +1120,7 @@ class NiemModel {
 			return ns;
 		}		
 		String targetPrefix = NamespaceModel.getPrefix(targetClassView);
-		String defaultSchemaURI = getDefaultSchemaURI(filename, doc);
+		String defaultSchemaURI = getDefaultSchemaURI(doc);
 		Namespace defaultNamespace = NamespaceModel.getNamespace(defaultSchemaURI);
 		if (defaultNamespace == null)
 			defaultNamespace = ns;
@@ -1133,7 +1134,7 @@ class NiemModel {
 		try {
 			root = doc.getDocumentElement();
 			attributeGroupList = (NodeList) xPath.evaluate("xs:attributeGroup[@name]", root, XPathConstants.NODESET);
-		} catch (Exception e) {
+		} catch (XPathExpressionException e) {
 			Log.trace(filename + "\nimportElementsInTypes: error parsing the schema " + e.toString());
 		}
 
@@ -1152,7 +1153,7 @@ class NiemModel {
 			try {
 				attributeList = (NodeList) xPath.evaluate(".//xs:attribute[@ref]", attributeGroupElement,
 						XPathConstants.NODESET);
-			} catch (Exception e) {
+			} catch (XPathExpressionException e) {
 				Log.trace(filename + "\nimportElementsInTypes: error parsing the schema " + e.toString());
 			}
 			for (int attributeIndex = 0; attributeIndex < attributeList.getLength(); attributeIndex++) {
@@ -1185,7 +1186,7 @@ class NiemModel {
 		try {
 			simpleTypeNodeList = (NodeList) xPath.evaluate("xs:simpleType[@name]/xs:restriction[1][@base]", root,
 					XPathConstants.NODESET);
-		} catch (Exception e) {
+		} catch (XPathExpressionException e) {
 			Log.trace(filename + "\nimportElementsInTypes: error importing base types for simple types " + e.toString());
 		}
 		for (int elementIndex = 0; elementIndex < simpleTypeNodeList.getLength(); elementIndex++) {
@@ -1212,7 +1213,7 @@ class NiemModel {
 		NodeList complexTypeNodeList = null;
 		try {
 			complexTypeNodeList = (NodeList) xPath.evaluate("xs:complexType[@name]", root, XPathConstants.NODESET);
-		} catch (Exception e) {
+		} catch (XPathExpressionException e) {
 			Log.trace(filename + "\nimportElementsInTypes: error parsing types" + e.toString());
 		}
 		for (int elementIndex = 0; elementIndex < complexTypeNodeList.getLength(); elementIndex++) {
@@ -1233,7 +1234,7 @@ class NiemModel {
 				baseTypeList = (NodeList) xPath.evaluate(
 						"xs:simpleContent[1]/xs:extension[1][@base] | xs:complexContent[1]/xs:extension[1][@base]",
 						typeElement, XPathConstants.NODESET);
-			} catch (Exception e) {
+			} catch (XPathExpressionException e) {
 				Log.trace(filename + "\nimportElementsInTypes: error importing base types for complex types"
 						+ e.toString());
 			}
@@ -1254,7 +1255,7 @@ class NiemModel {
 			try {
 				attributeGroupInTypeNodeList = (NodeList) xPath.evaluate(".//xs:attributeGroup[@ref]", typeElement,
 						XPathConstants.NODESET);
-			} catch (Exception e) {
+			} catch (XPathExpressionException e) {
 				Log.trace(filename + "\nimportElementsInTypes:error importing attributeGroup in complex type" + typeName + " "
 						+ e.toString());
 			}
@@ -1278,7 +1279,7 @@ class NiemModel {
 			try {
 				attributeInTypeNodeList = (NodeList) xPath.evaluate(".//xs:attribute[@ref]", typeElement,
 						XPathConstants.NODESET);
-			} catch (Exception re) {
+			} catch (XPathExpressionException re) {
 				Log.trace(filename + "\nimportElementsInTypes: error importing attributes in type " + typeName + " " + re.toString());
 			}
 			for (int attributeIndex = 0; attributeIndex < attributeInTypeNodeList.getLength(); attributeIndex++) {
@@ -1301,7 +1302,6 @@ class NiemModel {
 					UmlAttribute attributeInType = addElementInType(type, element, multiplicity);
 					if (attributeInType == null) {
 						Log.trace("importElementsInTypes: error adding attribute " + attributeName + " to type");
-						continue;
 					} else {
 					Log.trace("importElementsInTypes: imported attribute " + attributeName + " in type " + typeName);
 					}
@@ -1314,7 +1314,7 @@ class NiemModel {
 			try {
 				elementInTypeNodeList = (NodeList) xPath.evaluate(".//xs:sequence[1]/xs:element[@ref]", typeElement,
 						XPathConstants.NODESET);
-			} catch (Exception e) {
+			} catch (XPathExpressionException e) {
 				Log.trace(filename + "\nimportElementsInTypes: error importing elements in type " + e.toString());
 			}
 			String elementName = null;
@@ -1385,7 +1385,7 @@ class NiemModel {
 			// compile XPath queries
 			xe = xPath.compile("xs:annotation[1]/xs:documentation[1]");
 			xe1 = xPath.compile("xs:restriction[1]/xs:enumeration");
-		} catch (Exception re) {
+		} catch (IOException | XPathExpressionException | SAXException re) {
 			Log.trace(filename2 + "importTypes: error " + re.toString());
 			filename2 = "";
 		}
@@ -1403,7 +1403,7 @@ class NiemModel {
 		try {
 			typeList = (NodeList) xPath.evaluate("xs:complexType|xs:simpleType[@name]", doc.getDocumentElement(),
 					XPathConstants.NODESET);
-		} catch (Exception e) {
+		} catch (XPathExpressionException e) {
 			Log.trace(filename2 + "importTypes: error - cannot parse types " + e.toString());
 		}
 
@@ -1416,7 +1416,7 @@ class NiemModel {
 			UmlClass type = null;
 			try {
 				type = addType(ns.getSchemaURI(), typeName, xe.evaluate(typeElement), null);
-			} catch (Exception e) {
+			} catch (XPathExpressionException e) {
 				Log.trace(filename2 + "importTypes: error - cannot add type " + typeName + " to schema " + ns.getSchemaURI() + " "
 						+ e.toString());
 			}
@@ -1424,13 +1424,13 @@ class NiemModel {
 				Log.trace(filename2 + "importTypes: error - cannot add type " + typeName + " to schema " + ns.getSchemaURI());
 				continue;
 			}
-			if (nodeType == "xs:simpleType") {
+			if ("xs:simpleType".equals(nodeType)) {
 				type.set_Stereotype("enum_pattern");
 				// import enumerated values for simple types (codes)
 				NodeList elist = null;
 				try {
 					elist = (NodeList) xe1.evaluate(typeElement, XPathConstants.NODESET);
-				} catch (Exception e) {
+				} catch (XPathExpressionException e) {
 					Log.trace(filename2 + "importTypes: error - cannot import enumerations " + e.toString());
 				}
 				String codeList = importCodeList(elist);
@@ -1457,14 +1457,13 @@ class NiemModel {
 			UmlClass attributeGroup = null;
 			try {
 				attributeGroup = addType(ns.getSchemaURI(), attributeGroupName, xe.evaluate(attributeGroupElement), null);
-			} catch (Exception e) {
+			} catch (XPathExpressionException e) {
 				Log.trace(filename2 + "importTypes: error - cannot add attribute group " + attributeGroupName + " "
 						+ e.toString());
 				filename2 = "";
 			}
 			if (attributeGroup == null) {
 				Log.trace(filename2 + "importTypes: error - cannot add attribute group " + attributeGroupName + " to schema " + ns.getSchemaURI());
-				continue;
 			}
 		}
 		return ns;
@@ -1486,7 +1485,7 @@ class NiemModel {
 			try {
 				UmlRelation.create(aRelationKind.aDirectionalAggregation, type, attributeGroupType);
 				//Log.trace("relateAttributeGroup: " + type.name() + " related to attribute group "+ attributeGroupType.name());
-			} catch (Exception re) {
+			} catch (RuntimeException re) {
 				// trace("createSubsetAndExtension: " + typeName + " already related to
 				// attribute group " + baseTypeName);
 			}
@@ -1499,7 +1498,7 @@ class NiemModel {
 		if (type != null && baseType != null)
 			try {
 				UmlRelation.create(aRelationKind.aGeneralisation, type, baseType);
-			} catch (Exception re) {
+			} catch (RuntimeException re) {
 				// trace("copyType: error - type " + type.name() + " already related to base
 				// type " + sourceBaseTypeName);
 			}
@@ -1514,7 +1513,7 @@ class NiemModel {
 		if (elementType.type != null)
 			try {
 				elementInType.set_Type(elementType);
-			} catch (Exception re) {
+			} catch (RuntimeException re) {
 				Log.trace("relateElementInType: error relating element in type to " + NamespaceModel.getPrefixedName(element) + " "
 						+ re.toString());
 			}

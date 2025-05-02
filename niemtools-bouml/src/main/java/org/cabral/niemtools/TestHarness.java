@@ -1,6 +1,7 @@
 package org.cabral.niemtools;
 
 import java.io.FileWriter;
+import java.io.IOException;
 
 public class TestHarness {
 
@@ -10,13 +11,13 @@ public class TestHarness {
 
 		if (argv.length >= 1)
 		{
-			int boumlPort = Integer.valueOf(argv[argv.length - 1]).intValue();
+			int boumlPort = Integer.parseInt(argv[argv.length - 1]);
 			
 			try {
-				FileWriter out = new FileWriter(filename);
-				out.write(Integer.toString(boumlPort));
-				out.close();
-			} catch (Exception e) {
+                            try (FileWriter out = new FileWriter(filename)) {
+                                out.write(Integer.toString(boumlPort));
+                            }
+			} catch (IOException e) {
 				// nothing to do
 			}
 		}

@@ -11,6 +11,7 @@ import java.util.Properties;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import fr.bouml.UmlBasePackage;
@@ -34,7 +35,7 @@ public class NiemtoolsBouml
 					//UIManager.getCrossPlatformLookAndFeelClassName()
 					);
 		}
-		catch (Exception e)
+		catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e)
 		{
 			Log.trace("Exception: " + e.toString());
 		}
@@ -44,16 +45,16 @@ public class NiemtoolsBouml
 		try {
 			File file = new File(TestHarness.filename);
 			String buffer = new String(Files.readAllBytes(file.toPath()));
-			boumlPort = Integer.parseInt(buffer.toString());
+			boumlPort = Integer.parseInt(buffer);
 			
 			// delete file - BOUML ports are one-time use
 			file.delete();
 		}
-		catch (Exception e) 
+		catch (IOException | NumberFormatException e) 
 		{
 			// get BOUML port from command line 
 			if (argv.length >= 1)
-				boumlPort = Integer.valueOf(argv[argv.length - 1]).intValue();
+				boumlPort = Integer.parseInt(argv[argv.length - 1]);
 		}
 		
 		if (boumlPort != 0) {
@@ -81,7 +82,7 @@ public class NiemtoolsBouml
 				//load properties
 				String command = argv[0];
 				Properties properties = new Properties();
-				FileReader in = null;
+				FileReader in;
 				try {
 					in = new FileReader(propFile);
 					properties.load(in);
@@ -138,12 +139,12 @@ public class NiemtoolsBouml
 				// store properties
 				try {
 					Log.trace("Storing properties to " + propFile);
-					FileWriter out = new FileWriter(propFile);
-					properties.setProperty("htmlDir", root.propertyValue("html dir"));
-					properties.store(out, "BOUML NiemTools plugout settings");
-					out.close();
+                                    try (FileWriter out = new FileWriter(propFile)) {
+                                        properties.setProperty("htmlDir", root.propertyValue("html dir"));
+                                        properties.store(out, "BOUML NiemTools plugout settings");
+                                    }
 				}
-				catch (Exception e)
+				catch (IOException e)
 				{
 					Log.trace("Unable to write properties to " + propFile);
 				}

@@ -22,8 +22,8 @@ public class CsvReader {
 	 */
 	void importCsv(String filename) {
 		// cache UML classes
-		Map<String, UmlClass> UMLClasses = new HashMap<String, UmlClass>();
-		Map<String, UmlClassInstance> UMLInstances = new HashMap<String, UmlClassInstance>();
+		Map<String, UmlClass> UMLClasses = new HashMap<>();
+		Map<String, UmlClassInstance> UMLInstances = new HashMap<>();
 		@SuppressWarnings("unchecked")
 		Iterator<UmlItem> it = UmlItem.all.iterator();
 		while (it.hasNext()) {
@@ -42,11 +42,12 @@ public class CsvReader {
 		try {
 			FileReader fr = new FileReader(filename);
 			Log.debug("importCsv: file read");
-			CSVReader reader = null;
+			CSVReader reader;
 			try {
 				reader = new CSVReader(fr);
 			} catch (NoClassDefFoundError e) {
 				Log.trace("importCsv: error - Exception" + e.toString());
+				return;
 			}
 			Log.debug("importCsv: file parsed");
 			String[] nextLine;

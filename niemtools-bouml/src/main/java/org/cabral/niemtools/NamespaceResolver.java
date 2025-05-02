@@ -38,8 +38,8 @@ import org.w3c.dom.NodeList;
 
 public class NamespaceResolver implements NamespaceContext {
 	private static final String DEFAULT_NS = "DEFAULT";
-	private Map<String, String> prefix2Uri = new HashMap<String, String>();
-	private Map<String, String> uri2Prefix = new HashMap<String, String>();
+	private final Map<String, String> prefix2Uri = new HashMap<>();
+	private final Map<String, String> uri2Prefix = new HashMap<>();
 
 	/**
 	 * This constructor parses the document and stores all namespaces it can
@@ -129,16 +129,18 @@ public class NamespaceResolver implements NamespaceContext {
 	/* (non-Javadoc)
 	 * @see javax.xml.namespace.NamespaceContext#getNamespaceURI(java.lang.String)
 	 */
+        @Override
 	public String getNamespaceURI(String prefix) {
-		if (prefix == null || prefix.equals(XMLConstants.DEFAULT_NS_PREFIX))	
+		if (prefix == null)	
 			//			return prefix2Uri.get(DEFAULT_NS);
 			return XMLConstants.W3C_XML_SCHEMA_NS_URI;
-		else if (prefix.equals("xs")  || prefix.equals("xsd"))
-			return XMLConstants.W3C_XML_SCHEMA_NS_URI;
-		else if (prefix.equals("local"))
-			return "http://local";
-		else 
-			return prefix2Uri.get(prefix);
+		else return switch (prefix) {
+                    case XMLConstants.DEFAULT_NS_PREFIX -> XMLConstants.W3C_XML_SCHEMA_NS_URI;
+                    case "xs", "xsd" -> XMLConstants.W3C_XML_SCHEMA_NS_URI;
+                    case "local" -> "http://local";
+                    default -> prefix2Uri.get(prefix);
+                }; //			return prefix2Uri.get(DEFAULT_NS);
+                
 	}
 
 	/**
@@ -148,6 +150,7 @@ public class NamespaceResolver implements NamespaceContext {
 	/* (non-Javadoc)
 	 * @see javax.xml.namespace.NamespaceContext#getPrefix(java.lang.String)
 	 */
+        @Override
 	public String getPrefix(String namespaceURI) {
 		return uri2Prefix.get(namespaceURI);
 	}
@@ -156,6 +159,7 @@ public class NamespaceResolver implements NamespaceContext {
 	 * @see javax.xml.namespace.NamespaceContext#getPrefixes(java.lang.String)
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
+        @Override
 	public Iterator getPrefixes(String namespaceURI) {
 		// Not implemented
 		return null;

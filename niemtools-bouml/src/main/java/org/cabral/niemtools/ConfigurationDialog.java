@@ -29,11 +29,9 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashSet;
@@ -114,25 +112,21 @@ class ConfigurationDialog extends JDialog {
 
 			// add text field
 			JTextField textField1 = new JTextField(value, columns);
-			textField1.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					value = textField1.getText();
-				}
-			});
+			textField1.addActionListener((ActionEvent e) -> {
+                            value = textField1.getText();
+                        });
 			add(textField1);
 
 			// add field button
 			JButton button1 = new JButton("Browse...");
-			button1.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					JFileChooser fc = new JFileChooser(value);
-					fc.setFileSelectionMode(fileType);
-					if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
-						return;
-					value = fc.getSelectedFile().getAbsolutePath();
-					textField1.setText(value);
-				}
-			});
+			button1.addActionListener((ActionEvent e) -> {
+                            JFileChooser fc = new JFileChooser(value);
+                            fc.setFileSelectionMode(fileType);
+                            if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
+                                return;
+                            value = fc.getSelectedFile().getAbsolutePath();
+                            textField1.setText(value);
+                        });
 			add(button1);
 		}
 	}
@@ -153,6 +147,7 @@ class ConfigurationDialog extends JDialog {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
 		 */
+                @Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column) {
 			if (value != null)
@@ -177,11 +172,9 @@ class ConfigurationDialog extends JDialog {
 		ToggleBox(String name, String initialValue, JPanel panel) {
 			super(name, (initialValue == null || !initialValue.equals("false")));
 			panel.setVisible(this.isSelected());
-			addItemListener(new ItemListener() {
-				public void itemStateChanged(ItemEvent e) {
-					panel.setVisible(((JCheckBox) (e.getItem())).isSelected());
-				}
-			});
+			addItemListener((ItemEvent e) -> {
+                            panel.setVisible(((JCheckBox) (e.getItem())).isSelected());
+                        });
 		}
 	}
 
@@ -402,12 +395,10 @@ class ConfigurationDialog extends JDialog {
 		table.setDefaultRenderer(Object.class, new LineWrapCellRenderer());
 		JScrollPane scrollPanel = new JScrollPane(table);
 		JButton namespaceButton = new JButton("Add namespace");
-		namespaceButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				DefaultTableModel model = (DefaultTableModel) table.getModel();
-				model.addRow(new String[] { "", "", "" });
-			}
-		});
+		namespaceButton.addActionListener((ActionEvent e) -> {
+                    DefaultTableModel model1 = (DefaultTableModel) table.getModel();
+                    model1.addRow(new String[] { "", "", "" });
+                });
 		externalPanel.add(namespaceButton, BorderLayout.SOUTH);
 		externalPanel.add(scrollPanel, BorderLayout.CENTER);
 
@@ -421,11 +412,9 @@ class ConfigurationDialog extends JDialog {
 		// add frame button
 		JButton frameButton = new JButton("OK");
 		frameButton.setHorizontalAlignment(SwingConstants.CENTER);
-		frameButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-			}
-		});
+		frameButton.addActionListener((ActionEvent e) -> {
+                    setVisible(false);
+                });
 		add(frameButton, BorderLayout.SOUTH);
 
 		// show frame
@@ -447,30 +436,29 @@ class ConfigurationDialog extends JDialog {
 			properties.setProperty("jsonExampleDir", jsonExamplePanel.value);
 			properties.setProperty("openapiDir", openapiPanel.value);
 			properties.setProperty("metamodelDir", metamodelPanel.value);			
-			LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<String>();
+			LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<>();
 			// DefaultTableModel model = table.getModel();
-			if (model != null)
-				for (int i = 0; i < model.getRowCount(); i++) {
-					String prefix = "", namespace = "", url = "";
-					Object prefixValue = model.getValueAt(i, 0);
-					if (prefixValue != null)
-						prefix = prefixValue.toString();
-					Object namespaceValue = model.getValueAt(i, 1);
-					if (namespaceValue != null)
-						namespace = namespaceValue.toString();
-					Object urlValue = model.getValueAt(i,2);
-					if (urlValue != null)
-						url = urlValue.toString();
-					if (url.startsWith("http"))
-						try {
-							new URL(url);
-						} catch (MalformedURLException e1) {
-							Log.trace("URL " + url + " is malformed");
-						}
-					if (prefix != null && !prefix.equals("") && namespace != null && !namespace.equals("") && url != null
-							&& !url.equals(""))
-						externalSchemas2.add(prefix + "=" + namespace + "=" + url);
-				}
+			for (int i = 0; i < model.getRowCount(); i++) {
+				String prefix = "", namespace = "", url = "";
+				Object prefixValue = model.getValueAt(i, 0);
+				if (prefixValue != null)
+					prefix = prefixValue.toString();
+				Object namespaceValue = model.getValueAt(i, 1);
+				if (namespaceValue != null)
+					namespace = namespaceValue.toString();
+				Object urlValue = model.getValueAt(i,2);
+				if (urlValue != null)
+					url = urlValue.toString();
+				if (url.startsWith("http"))
+					try {
+						new URL(url);
+					} catch (MalformedURLException e1) {
+						Log.trace("URL " + url + " is malformed");
+					}
+				if (prefix != null && !prefix.equals("") && namespace != null && !namespace.equals("") 
+						&& !url.equals(""))
+					externalSchemas2.add(prefix + "=" + namespace + "=" + url);
+			}
 			root.set_PropertyValue(ConfigurationDialog.IEPD_EXTERNAL_SCHEMAS_PROPERTY, String.join(",", externalSchemas2));
 
 			// save IEPD values

@@ -30,6 +30,7 @@ import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
@@ -43,13 +44,13 @@ import fr.bouml.anItemKind;
 public class NamespaceModel {
 
 	static final String ATTRIBUTE_PREFIX = "@";
-	private static Set<String> externalPrefixes = new HashSet<String>();
-	private static Map<String, String> externalSchemaURL = new HashMap<String, String>();
+	private static final Set<String> externalPrefixes = new HashSet<>();
+	private static final Map<String, String> externalSchemaURL = new HashMap<>();
 	public static final String NAMESPACE_ATTRIBUTE = XMLConstants.XMLNS_ATTRIBUTE;
 	private static final String NAMESPACE_DELIMITER = ":";
-	private static Map<String, Namespace> Namespaces = new HashMap<String, Namespace>();
-	private static Map<String, String> Prefixes = new HashMap<String, String>();
-	private static XPath xPath = XPathFactory.newInstance().newXPath();
+	private static final Map<String, Namespace> Namespaces = new HashMap<>();
+	private static final Map<String, String> Prefixes = new HashMap<>();
+	private static final XPath xPath = XPathFactory.newInstance().newXPath();
 	
 	/** adds a new namespace
 	 * @param schemaURI
@@ -77,17 +78,17 @@ public class NamespaceModel {
 	static void cacheExternalSchemas() {
 		String externalSchemas = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_EXTERNAL_SCHEMAS_PROPERTY);
 		String[] external = externalSchemas.split(",");
-		for (int schemaIndex = 0; schemaIndex < external.length; schemaIndex++) {
-			String[] part = external[schemaIndex].split("=");
-			if (part.length > 2) {
-				String prefix = part[0].trim();
-				String schemaURI = part[1].trim();
-				String schemaLocation = part[2].trim();
-				externalPrefixes.add(prefix);
-				Prefixes.put(prefix, schemaURI);
-				externalSchemaURL.put(schemaURI, schemaLocation);
-			}
-		}
+            for (String external1 : external) {
+                String[] part = external1.split("=");
+                if (part.length > 2) {
+                    String prefix = part[0].trim();
+                    String schemaURI = part[1].trim();
+                    String schemaLocation = part[2].trim();
+                    externalPrefixes.add(prefix);
+                    Prefixes.put(prefix, schemaURI);
+                    externalSchemaURL.put(schemaURI, schemaLocation);
+                }
+            }
 		Log.debug("cacheExternalSchemas: external schemas cached");
 	}
 
@@ -195,7 +196,7 @@ public class NamespaceModel {
 		while (namespaceClassView == null) {
 			try {
 				namespaceClassView = UmlClassView.create(model.getModelPackage(), prefix3);
-			} catch (Exception e) {
+			} catch (RuntimeException e) {
 				Log.trace("getNamespaceClassView: multiple namespace URIs for prefix " + prefix3 + " " + schemaURI + " and "
 						+ Prefixes.get(prefix2));
 				prefix3 = prefix2 + conflictCounter++;
@@ -204,8 +205,7 @@ public class NamespaceModel {
 		namespaceClassView.set_PropertyValue(NiemModel.URI_PROPERTY, schemaURI);
 		Log.debug("getNamespaceClassView: added class view " + namespaceClassView.name());
 
-		if (prefix != null)
-			namespaceClassView.set_PropertyValue(NiemUmlClass.PREFIX_PROPERTY, prefix2);
+		namespaceClassView.set_PropertyValue(NiemUmlClass.PREFIX_PROPERTY, prefix2);
 
 		if (model == NiemUmlClass.getReferenceModel())
 			ns.setReferenceClassView(namespaceClassView);
@@ -377,7 +377,7 @@ public class NamespaceModel {
 				if (classView != null)
 					classView.set_Description(xPath.evaluate("xs:schema/xs:annotation[1]/xs:documentation[1]", doc));
 			}
-		} catch (Exception e) {
+		} catch (RuntimeException | XPathExpressionException e) {
 			Log.trace("importNamespaces: error - could not create namespace for schema " + targetSchemaURI);
 		} 
 		

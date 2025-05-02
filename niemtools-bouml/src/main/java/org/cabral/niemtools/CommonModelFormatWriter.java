@@ -33,9 +33,9 @@ public class CommonModelFormatWriter {
 	private static final int MAX_ENUMS = 20;
 
 	@SuppressWarnings("unused")
-	private String directory;
-	private Set<String> tagIds = new HashSet<String>();
-	private Set<String> dataTypeIds = new HashSet<String>();
+	private final String directory;
+	private final Set<String> tagIds = new HashSet<>();
+	private final Set<String> dataTypeIds = new HashSet<>();
 //	private List<UmlClassInstance> substitutionElements = new ArrayList<UmlClassInstance>();
 
 	/**
@@ -54,12 +54,12 @@ public class CommonModelFormatWriter {
 	 */
 	LinkedHashSet<String> exportCMFModel() {
 	
-		LinkedHashSet<String> cmfModel = new LinkedHashSet<String>();
-		TreeSet<String> cmfNamespaces = new TreeSet<String>();
-		TreeSet<String> cmfClasses = new TreeSet<String>();
-		TreeSet<String> cmfProperties = new TreeSet<String>();
+		LinkedHashSet<String> cmfModel = new LinkedHashSet<>();
+		TreeSet<String> cmfNamespaces = new TreeSet<>();
+		TreeSet<String> cmfClasses = new TreeSet<>();
+		TreeSet<String> cmfProperties = new TreeSet<>();
 
-		List<UmlItem> items = new ArrayList<UmlItem>();
+		List<UmlItem> items = new ArrayList<>();
 		items.addAll(Arrays.asList(NiemUmlClass.getSubsetModel().getModelPackage().children()));
 		items.addAll(Arrays.asList(NiemUmlClass.getExtensionModel().getModelPackage().children()));
 
@@ -113,25 +113,25 @@ public class CommonModelFormatWriter {
 			File parentFile = file.getParentFile();
 			if (parentFile != null)
 				parentFile.mkdirs();
-			FileWriter fw = new FileWriter(file);
+                    // write header with namespace definitions
+                    try (FileWriter fw = new FileWriter(file)) {
+                        // write header with namespace definitions
+                        fw.write(XmlWriter.XML_HEADER);
+                        fw.write("<Model ");
+                        XmlWriter.writeXmlNs(fw,"",CMF_URI);
+                        XmlWriter.writeXmlNs(fw,CMF_PREFIX,CMF_URI);
+                        XmlWriter.writeXmlNs(fw,XmlWriter.XSI_PREFIX,XmlWriter.XSI_URI);
+                        XmlWriter.writeXmlNs(fw,NiemModel.STRUCTURES_PREFIX,NiemModel.STRUCTURES_URI);
+                        fw.write(">");
+                        
+                        // message CMF
+                        fw.write(" " + String.join("\n",modelCmf));
+                        
+                        // close file
+                        fw.write("</Model>");
+                    }	
 
-			// write header with namespace definitions
-			fw.write(XmlWriter.XML_HEADER);
-			fw.write("<Model ");
-			XmlWriter.writeXmlNs(fw,"",CMF_URI);
-			XmlWriter.writeXmlNs(fw,CMF_PREFIX,CMF_URI);
-			XmlWriter.writeXmlNs(fw,XmlWriter.XSI_PREFIX,XmlWriter.XSI_URI);
-			XmlWriter.writeXmlNs(fw,NiemModel.STRUCTURES_PREFIX,NiemModel.STRUCTURES_URI);
-			fw.write(">");
-
-			// message CMF
-			fw.write(" " + String.join("\n",modelCmf));
-
-			// close file
-			fw.write("</Model>");
-			fw.close();	
-
-		} catch (Exception e) {
+		} catch (IOException e) {
 			Log.trace("exportCMF - error exporting CMF model " + e.toString());
 		}
 		Log.stop("exportCMF");
@@ -141,6 +141,8 @@ public class CommonModelFormatWriter {
 	 * @param type
 	 * @return CMF class definition
 	 */
+	// TODO exportCMFClass: handle facets other than enumerations
+	
 	String exportCMFClass(UmlClass type) {
 
 		String id = NamespaceModel.getPrefixedName(type);
@@ -156,8 +158,7 @@ public class CommonModelFormatWriter {
 			baseType = NiemUmlClass.getSubsetModel().getObjectType();
 
 		String prefix = NamespaceModel.getPrefix(type);
-		String codeList = type.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
-		//UmlAttribute augmentationPoint = null;
+            //UmlAttribute augmentationPoint = null;
 
 		// abstract class
 		if (baseType != null && 
@@ -173,7 +174,6 @@ public class CommonModelFormatWriter {
 
 		int properties = 0;
 		String childrenCMF = "";
-		String augmentationCmf = "";
 		for (UmlItem item : type.children())
 			if (item.kind() == anItemKind.anAttribute) {
 				UmlAttribute attribute = (UmlAttribute) item;
@@ -297,6 +297,8 @@ public class CommonModelFormatWriter {
 	 * @param prefix
 	 * @return CMF namespace definition
 	 */
+	// TODO exportCMFNamespace: augmentation multiplicity
+	// TODO exportCMFNamespace: local terms
 	String exportCMFNamespace(UmlClassView classview) {
 		if (classview == null)
 			return null;
@@ -308,20 +310,11 @@ public class CommonModelFormatWriter {
 			conformanceTargetURI = XmlWriter.CT_EXTENSION; 
 		} else {
 			conformanceTargetURI = XmlWriter.CT_REFERENCE; 
- 			switch (prefix) {
-			case XmlWriter.NC_PREFIX:
-				namespaceCategoryCode = "CORE";
-				break;
-			case NiemModel.LOCAL_PREFIX:
-			case NiemModel.XML_PREFIX:
-			case NiemModel.XSD_PREFIX:
-			case NiemModel.PROXY_PREFIX:
-			case NiemModel.STRUCTURES_PREFIX:
-				namespaceCategoryCode = "OTHERNIEM";
-				break;
-			default:
-				namespaceCategoryCode = "DOMAIN";
-			}
+                        namespaceCategoryCode = switch (prefix) {
+                        case XmlWriter.NC_PREFIX -> "CORE";
+                        case NiemModel.LOCAL_PREFIX, NiemModel.XML_PREFIX, NiemModel.XSD_PREFIX, NiemModel.PROXY_PREFIX, NiemModel.STRUCTURES_PREFIX -> "OTHERNIEM";
+                        default -> "DOMAIN";
+                    };
 		}
 
 		String path = classview.propertyValue(NiemUmlClass.FILE_PATH_PROPERTY);

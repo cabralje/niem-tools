@@ -69,7 +69,7 @@ public class JsonWriter {
 	private static final String JSON_LD_ID_ELEMENT = "@id";
 	private static final String JSON_LD_ID_ELEMENT_TYPE = "xs:NCName";
 
-	private String directory;
+	private final String directory;
 
 	/**
 	 * @param initialDirectory
@@ -150,7 +150,7 @@ public class JsonWriter {
 	 */
 	String exportJsonElementSchema(UmlClassInstance element, String prefix) {
 		String elementName = NamespaceModel.filterAttributePrefix(NamespaceModel.getPrefixedName(element));
-		TreeSet<String> jsonDefinition = new TreeSet<String>();
+		TreeSet<String> jsonDefinition = new TreeSet<>();
 		if (element != null && element.description() != null && !element.description().equals(""))
 			jsonDefinition.add("\"description\": \"" + filterQuotes(element.description()) + "\"");
 		UmlClass baseType = NiemModel.getBaseType(element);
@@ -207,77 +207,68 @@ public class JsonWriter {
 		String name = type.toString();
 		String jsonType = "";
 		switch (name) {
-		case "bool":
-			jsonType += "\"type\": \"boolean\"\n";
-			break;
-
-			// numeric types
-		case "double":
-		case "float":
-			jsonType += "\"type\": \"number\"\n";
-			break;
-		case "int":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": �2147483648,\n";
-			jsonType += "\"maximum\": 2147483647\n";
-			break;
-		case "long":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": -9223372036854775808,\n";
-			jsonType += "\"maximum\": 9223372036854775807\n";
-			break;
-		case "uLong":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": 0,\n";
-			jsonType += "\"maximum\": 18446744073709551615\n";
-			break;
-		case "uint":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": 0,\n";
-			jsonType += "\"maximum\": 4294967295\n";
-			break;
-		case "short":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": -32768,\n";
-			jsonType += "\"maximum\": 32767\n";
-			break;
-		case "ushort":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": 0,\n";
-			jsonType += "\"maximum\": 65535\n";
-			break;
-		case "char":
-		case "byte":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": -128,\n";
-			jsonType += "\"maximum\": 127\n";
-			break;
-		case "uchar":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": 0,\n";
-			jsonType += "\"maximum\": 255\n";
-			break;
-			
-		// String types
-		case "string":
-			jsonType += "\"type\": \"string\"\n";
-			break;
-		// Other types
-		case "any":
-		case "void":
-			return null;
-		default:
-			Log.trace("exportJsonPrimitiveSchemafromUml: error - type not recognized " + name);
-			return "";
+		case "bool" -> jsonType += "\"type\": \"boolean\"\n";
+		case "double", "float" -> jsonType += "\"type\": \"number\"\n";
+		case "int" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": �2147483648,\n";
+                    jsonType += "\"maximum\": 2147483647\n";
+                }
+		case "long" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": -9223372036854775808,\n";
+                    jsonType += "\"maximum\": 9223372036854775807\n";
+                }
+		case "uLong" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": 0,\n";
+                    jsonType += "\"maximum\": 18446744073709551615\n";
+                }
+		case "uint" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": 0,\n";
+                    jsonType += "\"maximum\": 4294967295\n";
+                }
+		case "short" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": -32768,\n";
+                    jsonType += "\"maximum\": 32767\n";
+                }
+		case "ushort" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": 0,\n";
+                    jsonType += "\"maximum\": 65535\n";
+                }
+		case "char", "byte" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": -128,\n";
+                    jsonType += "\"maximum\": 127\n";
+                }
+		case "uchar" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": 0,\n";
+                    jsonType += "\"maximum\": 255\n";
+                }
+                case "string" -> jsonType += "\"type\": \"string\"\n";
+		case "any", "void" -> {
+                    return null;
+                }
+                default -> {
+                    Log.trace("exportJsonPrimitiveSchemafromUml: error - type not recognized " + name);
+                    return "";
+                }
 		}
+            // numeric types
+            // String types
+            // Other types
 		return jsonType;
 	}
 
@@ -289,184 +280,166 @@ public class JsonWriter {
 	String exportJsonPrimitiveSchemafromXML(UmlClass type) {
 		String jsonType = "\"" + NamespaceModel.getPrefixedName(type) + "\": {\n";
 		switch (NamespaceModel.getName(type)) {
-		case "boolean":
-			jsonType += "\"type\": \"boolean\"\n";
-			break;
-
-			// numeric types
-		case "decimal":
-		case "double":
-		case "float":
-			jsonType += "\"type\": \"number\"\n";
-			break;
-		case "int":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": �2147483648,\n";
-			jsonType += "\"maximum\": 2147483647\n";
-			break;
-		case "integer":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0\n";
-			break;
-		case "long":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": -9223372036854775808,\n";
-			jsonType += "\"maximum\": 9223372036854775807\n";
-			break;
-		case "unsignedLong":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": 0,\n";
-			jsonType += "\"maximum\": 18446744073709551615\n";
-			break;
-		case "unsignedInt":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": 0,\n";
-			jsonType += "\"maximum\": 4294967295\n";
-			break;
-		case "short":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": -32768,\n";
-			jsonType += "\"maximum\": 32767\n";
-			break;
-		case "unsignedShort":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": 0,\n";
-			jsonType += "\"maximum\": 65535\n";
-			break;
-		case "byte":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": -128,\n";
-			jsonType += "\"maximum\": 127\n";
-			break;
-		case "unsignedByte":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": 0,\n";
-			jsonType += "\"maximum\": 255\n";
-			break;
-		case "negativeInteger":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"maximum\": -1\n";
-			break;
-		case "nonNegativeInteger":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": 0\n";
-			break;
-		case "nonPositiveInteger":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"maximum\": 0\n";
-			break;
-		case "positiveInteger":
-			jsonType += "\"type\": \"number\",\n";
-			jsonType += "\"multipleOf\": 1.0,\n";
-			jsonType += "\"minimum\": 1\n";
-			break;
-
-			// date/time types
-		case "date":
-		case "dateTime":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"format\": \"date-time\"\n";
-			break;
-		case "time":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^([0-9]{2}):([0-9]{2}):([0-9]{2}([.][0-9]{1,6})?)([+-]([0-9]{2}):([0-9]{2}))?$\"\n";
-			break;
-		case "duration":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^[-+]?P(([0-9]d+Y)|([0-9]+M)|([0-9]+D)|(T([0-9]+H)|([0-9]+M)|([0-9]+([.][0-9]{1,6})?S)))$\"\n";
-			break;
-		case "gDay":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^---[0-3][0-9]$\"\n";
-			break;
-		case "gMonth":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^--[0-1][0-9]$\"\n";
-			break;
-		case "gMonthDay":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^--[0-1][0-9]-[0-3][0-9]$\"\n";
-			break;
-		case "gYear":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^[0-9]{4}$\"\n";
-			break;
-		case "gYearMonth":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^[0-9]{4}-[0-1][0-9]$\"\n";
-			break;
-
-			// string types
-		case "token":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^\\\\S*$\"\n";
-			break;
-		case "normalizedString":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^\\\\s?(\\\\S+\\\\s?)+\\\\s?$\"\n";
-			break;
-		case "NMTOKEN":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^[-.:_A-Za-z0-9]+$\"\n";
-			break;
-		case "NMTOKENS":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^([-.:_A-Za-z0-9]+\\\\s)+$\"\n";
-			break;
-		case "NAME":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^[_:A-Za-z][-.:_A-Za-z0-9]*$\"\n";
-			break;
-		case "language":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$\"\n";
-			break;
-		case "hexBinary":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^([A-Z0-9]{2})*$\"\n";
-			break;
-		case "base64Binary":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^[A-Za-z0-9+/=\\\\s]*$\"\n";
-			break;
-
-			// reference types
-		case "anyURI":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"format\": \"uri\"\n";
-			break;
-		case "ID":
-		case "IDREF":
-		case "NCNAME":
-		case "ENTITY":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^[_A-Za-z][-._A-Za-z0-9]*$\"\n";
-			break;
-		case "IDREFS":
-		case "ENTITIES":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^([_A-Za-z][-._A-Za-z0-9]*\\\\s)*$\"\n";
-			break;
-		case "NOTATION":
-		case "QName":
-			jsonType += "\"type\": \"string\",\n";
-			jsonType += "\"pattern\": \"^[_A-Za-z][-._A-Za-z0-9]*:[_A-Za-z][-._A-Za-z0-9]*$\"\n";
-			break;
-
-		default:
-			jsonType += "\"type\": \"string\"\n";
+		case "boolean" -> jsonType += "\"type\": \"boolean\"\n";
+		case "decimal", "double", "float" -> jsonType += "\"type\": \"number\"\n";
+		case "int" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": �2147483648,\n";
+                    jsonType += "\"maximum\": 2147483647\n";
+                }
+		case "integer" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0\n";
+                }
+		case "long" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": -9223372036854775808,\n";
+                    jsonType += "\"maximum\": 9223372036854775807\n";
+                }
+		case "unsignedLong" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": 0,\n";
+                    jsonType += "\"maximum\": 18446744073709551615\n";
+                }
+		case "unsignedInt" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": 0,\n";
+                    jsonType += "\"maximum\": 4294967295\n";
+                }
+		case "short" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": -32768,\n";
+                    jsonType += "\"maximum\": 32767\n";
+                }
+		case "unsignedShort" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": 0,\n";
+                    jsonType += "\"maximum\": 65535\n";
+                }
+		case "byte" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": -128,\n";
+                    jsonType += "\"maximum\": 127\n";
+                }
+		case "unsignedByte" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": 0,\n";
+                    jsonType += "\"maximum\": 255\n";
+                }
+		case "negativeInteger" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"maximum\": -1\n";
+                }
+		case "nonNegativeInteger" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": 0\n";
+                }
+		case "nonPositiveInteger" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"maximum\": 0\n";
+                }
+		case "positiveInteger" -> {
+                    jsonType += "\"type\": \"number\",\n";
+                    jsonType += "\"multipleOf\": 1.0,\n";
+                    jsonType += "\"minimum\": 1\n";
+                }
+		case "date", "dateTime" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"format\": \"date-time\"\n";
+                }
+		case "time" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^([0-9]{2}):([0-9]{2}):([0-9]{2}([.][0-9]{1,6})?)([+-]([0-9]{2}):([0-9]{2}))?$\"\n";
+                }
+		case "duration" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^[-+]?P(([0-9]d+Y)|([0-9]+M)|([0-9]+D)|(T([0-9]+H)|([0-9]+M)|([0-9]+([.][0-9]{1,6})?S)))$\"\n";
+                }
+		case "gDay" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^---[0-3][0-9]$\"\n";
+                }
+		case "gMonth" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^--[0-1][0-9]$\"\n";
+                }
+		case "gMonthDay" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^--[0-1][0-9]-[0-3][0-9]$\"\n";
+                }
+		case "gYear" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^[0-9]{4}$\"\n";
+                }
+		case "gYearMonth" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^[0-9]{4}-[0-1][0-9]$\"\n";
+                }
+		case "token" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^\\\\S*$\"\n";
+                }
+		case "normalizedString" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^\\\\s?(\\\\S+\\\\s?)+\\\\s?$\"\n";
+                }
+		case "NMTOKEN" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^[-.:_A-Za-z0-9]+$\"\n";
+                }
+		case "NMTOKENS" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^([-.:_A-Za-z0-9]+\\\\s)+$\"\n";
+                }
+		case "NAME" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^[_:A-Za-z][-.:_A-Za-z0-9]*$\"\n";
+                }
+		case "language" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$\"\n";
+                }
+		case "hexBinary" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^([A-Z0-9]{2})*$\"\n";
+                }
+		case "base64Binary" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^[A-Za-z0-9+/=\\\\s]*$\"\n";
+                }
+		case "anyURI" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"format\": \"uri\"\n";
+                }
+		case "ID", "IDREF", "NCNAME", "ENTITY" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^[_A-Za-z][-._A-Za-z0-9]*$\"\n";
+                }
+		case "IDREFS", "ENTITIES" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^([_A-Za-z][-._A-Za-z0-9]*\\\\s)*$\"\n";
+                }
+		case "NOTATION", "QName" -> {
+                    jsonType += "\"type\": \"string\",\n";
+                    jsonType += "\"pattern\": \"^[_A-Za-z][-._A-Za-z0-9]*:[_A-Za-z][-._A-Za-z0-9]*$\"\n";
+                }
+                default -> jsonType += "\"type\": \"string\"\n";
 		}
+            // numeric types
+            // date/time types
+            // string types
+            // reference types
 		jsonType += "}\n";
 		return jsonType;
 	}
@@ -481,7 +454,7 @@ public class JsonWriter {
 	 */
 	void exportJsonSchema(String prefix, String nsSchemaURI, TreeSet<String> schemaNamespaces, TreeSet<String> jsonDefinitions, TreeSet<String> jsonProperties, TreeSet<String> jsonRequired) {
 		// export JSON-LD namespace definitions
-		TreeSet<String> jsonNamespaces = new TreeSet<String>();
+		TreeSet<String> jsonNamespaces = new TreeSet<>();
 		for (String nsPrefix : schemaNamespaces)
 			if (!nsPrefix.equals(NiemModel.LOCAL_PREFIX))
 				jsonNamespaces.add("\n" + getJsonPair(nsPrefix, NamespaceModel.getSchemaURIForPrefix(nsPrefix) + "#"));
@@ -497,15 +470,15 @@ public class JsonWriter {
 				parentFile.mkdirs();
 			
 			Log.debug("exportJsonSchema: schema " + path.toString());
-			FileWriter json = new FileWriter(path.toFile());
-			json.write("{\n" + getJsonPair("$id", nsSchemaURI) + ",\n" + getJsonPair("$schema", JsonWriter.JSON_SCHEMA_URI)
-			+ ",\n" + getJsonPair("type", "object") + ",\n" + "\"additionalProperties\" : false" + ",\n"
-			+ "\"@context\" : {\n" + String.join(",\n", jsonNamespaces) + "},\n"
-			+ "\"" + JSON_SCHEMA_DEFSTAG + "\": {\n" + String.join(",\n", jsonDefinitions) + "\n}" + ",\n"
-			+ "\"properties\" : {\n" + String.join(",\n", jsonProperties) + "\n}" + ",\n"
-			+ "\"required\" : [\n" + String.join(",\n", jsonRequired) + "]" + "\n" + "}");
-			json.close();
-		} catch (Exception e1) {
+                    try (FileWriter json = new FileWriter(path.toFile())) {
+                        json.write("{\n" + getJsonPair("$id", nsSchemaURI) + ",\n" + getJsonPair("$schema", JsonWriter.JSON_SCHEMA_URI)
+                                + ",\n" + getJsonPair("type", "object") + ",\n" + "\"additionalProperties\" : false" + ",\n"
+                                        + "\"@context\" : {\n" + String.join(",\n", jsonNamespaces) + "},\n"
+                                                + "\"" + JSON_SCHEMA_DEFSTAG + "\": {\n" + String.join(",\n", jsonDefinitions) + "\n}" + ",\n"
+                                                        + "\"properties\" : {\n" + String.join(",\n", jsonProperties) + "\n}" + ",\n"
+                                                                + "\"required\" : [\n" + String.join(",\n", jsonRequired) + "]" + "\n" + "}");
+                    }
+		} catch (IOException e1) {
 			Log.trace("exportJsonSchema: error exporting JSON file " + e1.toString());
 		}
 	}
@@ -519,8 +492,8 @@ public class JsonWriter {
 	String exportJsonTypeSchema(NiemModel model, UmlClass type, String prefix) {
 		// add properties
 		// type.sortChildren();
-		TreeSet<String> jsonRequiredElementsInType = new TreeSet<String>();
-		TreeSet<String> jsonElementsInType = new TreeSet<String>();
+		TreeSet<String> jsonRequiredElementsInType = new TreeSet<>();
+		TreeSet<String> jsonElementsInType = new TreeSet<>();
 		String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
 		Boolean anyJSON = false;
 		UmlClass type2 = type, baseType2 = null;
@@ -622,7 +595,7 @@ public class JsonWriter {
 //		}
 		
 		// define JSON type
-		TreeSet<String> jsonDefinition = new TreeSet<String>();
+		TreeSet<String> jsonDefinition = new TreeSet<>();
 		String description = type.description();
 		if (description != null && !description.equals(""))
 			jsonDefinition.add("\"description\": \"" + filterQuotes(description) + "\"");
@@ -630,7 +603,7 @@ public class JsonWriter {
 		// if (baseType != null)
 		// jsonDefinition.add("\"$ref\": \"" +
 		// exportJsonTypePointer(getPrefixedName(baseType), prefix) + "\"");
-		// TODO fix this
+		// TODO exportJsonTypeSchema: fix this
 		jsonDefinition.add("\"type\": \"object\"");
 		jsonDefinition.add("\"additionalProperties\" : " + anyJSON);
 		
@@ -656,7 +629,7 @@ public class JsonWriter {
 	void exportOpenApi(String openapiDir, Map<String, UmlClass> ports, Set<String> messageNamespaces, TreeSet<String> jsonDefinitions) throws IOException {
 
 		// export JSON-LD namespace definitions
-		TreeSet<String> jsonNamespaces = new TreeSet<String>();
+		TreeSet<String> jsonNamespaces = new TreeSet<>();
 		for (String nsPrefix : messageNamespaces)
 			if (!nsPrefix.equals(NiemModel.LOCAL_PREFIX))
 				jsonNamespaces.add("\n" + getJsonPair(nsPrefix, NamespaceModel.getSchemaURIForPrefix(nsPrefix) + "#"));
@@ -670,11 +643,11 @@ public class JsonWriter {
 			String portName = port.name();
 			String portPath = port.propertyValue(INTERFACE_PATH_PROPERTY);
 			// write OpenAPI paths
-			TreeSet<String> openapiPaths = new TreeSet<String>();
+			TreeSet<String> openapiPaths = new TreeSet<>();
 
 			// for each OpenAPI path
 			//TreeSet<String> jsonDefinitions = new TreeSet<String>();
-			TreeSet<String> jsonProperties = new TreeSet<String>();
+			TreeSet<String> jsonProperties = new TreeSet<>();
 
 			// get directory path
 			Path openapiPath = Paths.get(openapiDir, portName + OPENAPI_FILE_TYPE);

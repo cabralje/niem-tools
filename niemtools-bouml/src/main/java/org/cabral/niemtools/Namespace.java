@@ -23,13 +23,9 @@ class Namespace {
 	String getSchemaURI() {
 		return schemaURI;
 	}
-	/**
-	 * @param schemaURI
-	 */
-	void setSchemaURI(String schemaURI) {
-		this.schemaURI = schemaURI;
-	}
-	/**
+    /**
+     * @param schemaURI
+     */	/**
 	 * @return namespace class view as a UmlClassView
 	 */
 	UmlClassView getNsClassView() {

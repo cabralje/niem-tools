@@ -13,7 +13,7 @@ public class Log {
 	//private static final Boolean PROFILE = true;
 	private static final Boolean PROFILE = false;
 	
-	private static HashMap<String, Long> timer = new HashMap<String, Long>();
+	private static final HashMap<String, Long> timer = new HashMap<>();
 	
 	/** outputs debugging information */
 	/**

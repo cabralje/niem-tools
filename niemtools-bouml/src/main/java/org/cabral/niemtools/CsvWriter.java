@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Iterator;
 
-import com.opencsv.*;
+import com.opencsv.CSVWriter;
 
 import fr.bouml.UmlAttribute;
 import fr.bouml.UmlClass;
@@ -29,46 +29,46 @@ public class CsvWriter {
 		try {
 			// Export Class and Property
 			switch (item.kind().value()) {
-			case anItemKind._aClass:
-				nextLine[0] = item.name();
-				nextLine[1] = "";
-				nextLine[2] = "";
-				nextLine[3] = "";
-				break;
-			case anItemKind._anAttribute:
-				UmlAttribute a = (UmlAttribute) item;
-				nextLine[0] = item.parent().name();
-				nextLine[1] = item.name();
-				UmlTypeSpec t = a.type();
-				if (t != null)
-					nextLine[2] = t.toString();
-				else
-					nextLine[2] = "";
-				nextLine[3] = a.multiplicity();
-				break;
-			case anItemKind._aRelation:
-				UmlRelation r = (UmlRelation) item;
-				nextLine[0] = item.parent().name();
-				nextLine[1] = r.name();
-				nextLine[2] = "";
-				nextLine[3] = r.multiplicity();
-				break;
-			case anItemKind._aClassInstance:
-				UmlClassInstance ci = (UmlClassInstance) item;
-				nextLine[0] = "";
-				nextLine[1] = item.name();
-				UmlClass c = ci.type();
-				if (c != null)
-					nextLine[2] = c.name();
-				else
-					nextLine[2] = "";
-				nextLine[3] = "";
-				break;
-			default:
-				nextLine[0] = item.parent().name();
-				nextLine[1] = item.name();
-				nextLine[3] = "";
-				break;
+			case anItemKind._aClass -> {
+                            nextLine[0] = item.name();
+                            nextLine[1] = "";
+                            nextLine[2] = "";
+                            nextLine[3] = "";
+                        }
+			case anItemKind._anAttribute -> {
+                            UmlAttribute a = (UmlAttribute) item;
+                            nextLine[0] = item.parent().name();
+                            nextLine[1] = item.name();
+                            UmlTypeSpec t = a.type();
+                            if (t != null)
+                                nextLine[2] = t.toString();
+                            else
+                                nextLine[2] = "";
+                            nextLine[3] = a.multiplicity();
+                        }
+			case anItemKind._aRelation -> {
+                            UmlRelation r = (UmlRelation) item;
+                            nextLine[0] = item.parent().name();
+                            nextLine[1] = r.name();
+                            nextLine[2] = "";
+                            nextLine[3] = r.multiplicity();
+                        }
+			case anItemKind._aClassInstance -> {
+                            UmlClassInstance ci = (UmlClassInstance) item;
+                            nextLine[0] = "";
+                            nextLine[1] = item.name();
+                            UmlClass c = ci.type();
+                            if (c != null)
+                                nextLine[2] = c.name();
+                            else
+                                nextLine[2] = "";
+                            nextLine[3] = "";
+                        }
+			default -> {
+                            nextLine[0] = item.parent().name();
+                            nextLine[1] = item.name();
+                            nextLine[3] = "";
+                        }
 			}
 		} catch (Exception e) {
 			Log.trace("itemCsv: error importing class, property multiplicity " + e.toString());

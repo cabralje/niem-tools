@@ -31,34 +31,35 @@ public class HtmlWriter {
 			File parentFile = file.getParentFile();
 			if (parentFile != null)
 				parentFile.mkdirs();
-			FileWriter fw = new FileWriter(file);
-			fw.write("<html>");
-			fw.write("<head><title>" + NiemUmlClass.MAPPING_SPREADSHEET_TITLE
-					+ "</title><link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" /></head>"
-					+ "<body><div class = \"title\">" + NiemUmlClass.MAPPING_SPREADSHEET_TITLE + "</div>"
-					+ "<table style=\"table-layout: fixed; width: 100%\"><tr bgcolor=\"#f0f0f0\">");
-			for (int column = 0; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length; column++)
-				fw.write("<td style=\"word-wrap: break-word\">" + NiemUmlClass.NIEM_STEREOTYPE_MAP[column][0] + "</td>");
-			fw.write("</tr>\n");
-	
-			// Show NIEM Mappings for Classes
-			@SuppressWarnings("unchecked")
-			Iterator<UmlItem> it = (UmlClass.classes.iterator());
-			while (it.hasNext()) {
-				UmlItem thisClass = it.next();
-				if (thisClass.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)) {
-					writeLineHtml(fw, thisClass);
-	
-					// Show NIEM Mapping for Attributes and Relations
-					for (UmlItem item : thisClass.children())
-						if (item.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE))
-							writeLineHtml(fw, item);
-				}
-			}
-			fw.write("</table>\n");
-			fw.write("</body></html>");
-			fw.close();
-		} catch (Exception e) {
+                    try (FileWriter fw = new FileWriter(file)) {
+                        fw.write("<html>");
+                        fw.write("<head><title>" + NiemUmlClass.MAPPING_SPREADSHEET_TITLE
+                                + "</title><link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" /></head>"
+                                        + "<body><div class = \"title\">" + NiemUmlClass.MAPPING_SPREADSHEET_TITLE + "</div>"
+                                                + "<table style=\"table-layout: fixed; width: 100%\"><tr bgcolor=\"#f0f0f0\">");
+                            for (String[] NIEM_STEREOTYPE_MAP : NiemUmlClass.NIEM_STEREOTYPE_MAP) {
+                                fw.write("<td style=\"word-wrap: break-word\">" + NIEM_STEREOTYPE_MAP[0] + "</td>");
+                            }
+                        fw.write("</tr>\n");
+                        
+                        // Show NIEM Mappings for Classes
+                        @SuppressWarnings("unchecked")
+                                Iterator<UmlItem> it = (UmlClass.classes.iterator());
+                        while (it.hasNext()) {
+                            UmlItem thisClass = it.next();
+                            if (thisClass.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)) {
+                                writeLineHtml(fw, thisClass);
+                                
+                                // Show NIEM Mapping for Attributes and Relations
+                                for (UmlItem item : thisClass.children())
+                                    if (item.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE))
+                                        writeLineHtml(fw, item);
+                            }
+                        }
+                        fw.write("</table>\n");
+                        fw.write("</body></html>");
+                    }
+		} catch (IOException e) {
 			Log.trace("exportHtml: error " + e.toString());
 		}
 	}
@@ -112,46 +113,44 @@ public class HtmlWriter {
 			// Export Class, Property and Multiplicity
 			// trace("writeLineHtml: " + item.name());
 			switch (item.kind().value()) {
-			case anItemKind._aClass: {
-				fw.write("<tr bgcolor=\"#f0f0f0\"><td style=\"word-wrap: break-word\">");
-				writeItemHtml(fw, item);
-				fw.write("</td><td>");
-				fw.write("</td><td>");
-				fw.write("</td><td>");
-			}
-			break;
-			case anItemKind._anAttribute: {
-				fw.write("<tr><td style=\"word-wrap: break-word\">");
-				writeItemHtml(fw, item.parent());
-				fw.write("</td><td style=\"word-wrap: break-word\">");
-				writeItemHtml(fw, item);
-				fw.write("</td><td>");
-				UmlAttribute a = (UmlAttribute) item;
-				UmlTypeSpec t = a.type();
-				if (t != null)
-					fw.write(t.toString());
-				fw.write("</td><td>");
-				fw.write(a.multiplicity());
-			}
-			break;
-			case anItemKind._aRelation: {
-				UmlRelation rel = (UmlRelation) item;
-				if ((rel.relationKind() == aRelationKind.aGeneralisation)
-						|| (rel.relationKind() == aRelationKind.aRealization))
-					return;
-				else {
+				case anItemKind._aClass -> {
+					fw.write("<tr bgcolor=\"#f0f0f0\"><td style=\"word-wrap: break-word\">");
+					writeItemHtml(fw, item);
+					fw.write("</td><td>");
+					fw.write("</td><td>");
+					fw.write("</td><td>");
+				}
+				case anItemKind._anAttribute -> {
 					fw.write("<tr><td style=\"word-wrap: break-word\">");
 					writeItemHtml(fw, item.parent());
 					fw.write("</td><td style=\"word-wrap: break-word\">");
 					writeItemHtml(fw, item);
 					fw.write("</td><td>");
+					UmlAttribute a = (UmlAttribute) item;
+					UmlTypeSpec t = a.type();
+					if (t != null)
+						fw.write(t.toString());
 					fw.write("</td><td>");
-					fw.write(rel.multiplicity());
+					fw.write(a.multiplicity());
 				}
-			}
-			break;
-			default:
-				return;
+				case anItemKind._aRelation -> {
+					UmlRelation rel = (UmlRelation) item;
+					if ((rel.relationKind() == aRelationKind.aGeneralisation)
+							|| (rel.relationKind() == aRelationKind.aRealization))
+						return;
+					else {
+						fw.write("<tr><td style=\"word-wrap: break-word\">");
+						writeItemHtml(fw, item.parent());
+						fw.write("</td><td style=\"word-wrap: break-word\">");
+						writeItemHtml(fw, item);
+						fw.write("</td><td>");
+						fw.write("</td><td>");
+						fw.write(rel.multiplicity());
+					}
+				}
+				default -> {
+					return;
+				}
 			}
 			fw.write("</td><td>");
 
@@ -272,7 +271,7 @@ public class HtmlWriter {
 				fw.write(getColumnHtml(column[13], bgcolor, fgcolor, true));
 			}
 			fw.write("</tr>");
-		} catch (Exception e) {
+		} catch (IOException e) {
 			Log.trace("writeLineHtml: error " + e.toString());
 		}
 	}
