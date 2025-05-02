@@ -90,6 +90,7 @@ public class CsvWriter {
 	 * @param directory
 	 * @param filename
 	 */
+	//@SuppressWarnings("unchecked")
 	void exportCsv(String directory, String filename) {
 		File file = Paths.get(directory, filename).toFile();
 
@@ -108,8 +109,8 @@ public class CsvWriter {
 				for (int column = 0; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length; column++)
 					nextLine[column] = NiemUmlClass.NIEM_STEREOTYPE_MAP[column][0];
 				try {
-//					@SuppressWarnings("all")
-					writer.writeNext(nextLine);
+					if (writer !=null)
+							writer.writeNext(nextLine);
 				} catch (Exception e) {
 					Log.trace("exportCsv: writing error" + e.toString());
 				}
@@ -124,8 +125,8 @@ public class CsvWriter {
 						continue;
 					nextLine = getItemCsv(thisClass);
 					Log.debug("exportCsv: write line");
-//					@SuppressWarnings("all")
-					writer.writeNext(nextLine);
+					if (writer != null)
+						writer.writeNext(nextLine);
 		
 					// Export NIEM Mapping for Attributes and Relations
 					for (UmlItem item : thisClass.children()) {
@@ -133,12 +134,12 @@ public class CsvWriter {
 							continue;
 						nextLine = getItemCsv(item);
 						Log.debug("exportCsv: write line");
-						if (nextLine != null)
+						if (writer != null && nextLine != null)
 							writer.writeNext(nextLine);
 					}
 				}
-//				@SuppressWarnings("All")
-				writer.close();
+				if (writer != null)
+					writer.close();
 				Log.debug("exportCsv: CSV file created " + file.toString());
 			}
 	

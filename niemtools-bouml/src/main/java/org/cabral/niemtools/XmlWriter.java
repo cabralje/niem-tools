@@ -728,11 +728,13 @@ public class XmlWriter {
                                     p2 = Paths.get(directory, ns2.getFilepath());
                                     p3 = path1.relativize(p2);
                                 } catch (Exception e1) {
-                                    Log.trace("exportXmlSchema: No relative path from " + path1.toString() + " to " + p2.toString() + " " + e1.toString());
+									if (p2 != null)
+										Log.trace("exportXmlSchema: No relative path from " + path1.toString() + " to " + p2.toString() + " " + e1.toString());
                                 }
                                 if (!nsSchemaURI2.equals(nsSchemaURI) && !nsSchemaURI2.equals(NiemModel.LOCAL_URI)
                                         && !nsSchemaURI2.equals(NiemModel.XSD_URI))
-                                    xml.write("<xs:import namespace=\"" + nsSchemaURI2.replace('\\','/') + "\" schemaLocation=\"" + p3.toString().replace('\\','/')
+									if (p3 != null)
+										xml.write("<xs:import namespace=\"" + nsSchemaURI2.replace('\\','/') + "\" schemaLocation=\"" + p3.toString().replace('\\','/')
                                             + "\"/>");
                             }
                         }

@@ -628,12 +628,12 @@ public class JsonWriter {
 	void exportOpenApi(String openapiDir, Map<String, UmlClass> ports, Set<String> messageNamespaces, TreeSet<String> jsonDefinitions) throws IOException {
 
 		// export JSON-LD namespace definitions
-		TreeSet<String> jsonNamespaces = new TreeSet<>();
-		for (String nsPrefix : messageNamespaces)
-			if (!nsPrefix.equals(NiemModel.LOCAL_PREFIX))
-				jsonNamespaces.add("\n" + getJsonPair(nsPrefix, NamespaceModel.getSchemaURIForPrefix(nsPrefix) + "#"));
-		jsonNamespaces.add("\n" + getJsonPair(XmlWriter.APPINFO_PREFIX, XmlWriter.APPINFO_URI + "#"));
-		jsonNamespaces.add("\n" + getJsonPair(XmlWriter.CT_PREFIX, XmlWriter.CT_URI + "#"));
+		//TreeSet<String> jsonNamespaces = new TreeSet<>();
+		//for (String nsPrefix : messageNamespaces)
+		//	if (!nsPrefix.equals(NiemModel.LOCAL_PREFIX))
+		//		jsonNamespaces.add("\n" + getJsonPair(nsPrefix, NamespaceModel.getSchemaURIForPrefix(nsPrefix) + "#"));
+		//jsonNamespaces.add("\n" + getJsonPair(XmlWriter.APPINFO_PREFIX, XmlWriter.APPINFO_URI + "#"));
+		//jsonNamespaces.add("\n" + getJsonPair(XmlWriter.CT_PREFIX, XmlWriter.CT_URI + "#"));
 		//jsonNamespaces.add("\n" + getJsonPair(XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI + "#"));
 
 		// generate OpenAPI definitions
@@ -670,8 +670,8 @@ public class JsonWriter {
 					UmlClass outputType = null, inputType = null;
 					UmlParameter[] params = operation.params();
 					if (params != null) {
-						TreeSet<String> jsonRequiredElementsInType = new TreeSet<String>();
-						TreeSet<String> jsonElementsInType = new TreeSet<String>();
+						TreeSet<String> jsonRequiredElementsInType = new TreeSet<>();
+						TreeSet<String> jsonElementsInType = new TreeSet<>();
 						String elementName = operationName + "Request";
 						String inputTypeName = elementName + "Type";
 						for (UmlParameter param : params) {
@@ -856,7 +856,7 @@ public class JsonWriter {
 						//for (String message : outputs) {
 							String message = outputMessage;
 							TreeSet<String> jsonRequiredElementsInType = new TreeSet<>();
-							TreeSet<String> jsonElementsInType = new TreeSet<String>();
+							TreeSet<String> jsonElementsInType = new TreeSet<>();
 							//String elementName = (message.equals(JsonWriter.ERROR_RESPONSE) ? "Error" : operationName) + "Response";
 							String elementName = operationName + "Response";
 							String outputTypeName = elementName + "Type";
@@ -889,7 +889,7 @@ public class JsonWriter {
 							}
 
 							// export type wrapper
-							TreeSet<String> jsonDefinition = new TreeSet<String>();
+							TreeSet<String> jsonDefinition = new TreeSet<>();
 							// String description = "";
 							// if (description != null && !description.equals(""))
 							// jsonDefinition.add("\"description\": \"" + filterQuotes(description) + "\"");
@@ -994,7 +994,7 @@ public class JsonWriter {
                                                                                                                                         + "  \"definitions\": {\n" + String.join(",\n", jsonDefinitions) + "\n}"
                                                                                                                                                 + "}\n");
                             }
-			} catch (Exception e1) {
+			} catch (IOException e1) {
 				Log.trace("exportOpenAPI: error exporting OpenAPI JSON " + e1.toString());
 			}
 		}

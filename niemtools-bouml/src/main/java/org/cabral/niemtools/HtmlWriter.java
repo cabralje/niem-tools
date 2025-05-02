@@ -43,8 +43,7 @@ public class HtmlWriter {
                         fw.write("</tr>\n");
                         
                         // Show NIEM Mappings for Classes
-                        //@SuppressWarnings("unchecked")
-                                Iterator<UmlItem> it = (UmlClass.classes.iterator());
+						Iterator<UmlItem> it = (UmlClass.classes.iterator());
                         while (it.hasNext()) {
                             UmlItem thisClass = it.next();
                             if (thisClass.stereotype().equals(NiemUmlClass.NIEM_STEREOTYPE)) {

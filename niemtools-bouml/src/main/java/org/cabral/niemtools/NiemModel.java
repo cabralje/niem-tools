@@ -320,14 +320,16 @@ class NiemModel {
 				// create namespace
 				ns = NamespaceModel.addNamespace(schemaURI);
 			}
-			if (this == NiemUmlClass.getReferenceModel())
-				ns.setReferenceClassView((UmlClassView) classView);
-			else
-				ns.setNsClassView((UmlClassView) classView);
+			if (ns != null) {
+				if (this == NiemUmlClass.getReferenceModel())
+					ns.setReferenceClassView((UmlClassView) classView);
+				else
+					ns.setNsClassView((UmlClassView) classView);
 
-			if (this == NiemUmlClass.getReferenceModel() || this == NiemUmlClass.getExtensionModel())
-				ns.setFilepath(classView.propertyValue(NiemUmlClass.FILE_PATH_PROPERTY));
-
+				if (this == NiemUmlClass.getReferenceModel() || this == NiemUmlClass.getExtensionModel())
+					ns.setFilepath(classView.propertyValue(NiemUmlClass.FILE_PATH_PROPERTY));
+			}
+			
 			// cache types and elements
 			for (UmlItem item : classView.children()) {
 				String uri = getURI(item);
@@ -929,7 +931,11 @@ class NiemModel {
 			String codeDescription = null;
 			if (IMPORT_CODE_DESCRIPTIONS)
 				try {
-					codeDescription = filterEnumDefinition(filterASCII(xe.evaluate(enumElement)));
+					if (xe != null) {
+						codeDescription = filterEnumDefinition(filterASCII(xe.evaluate(enumElement)));
+					} else {
+						Log.trace("importCodeList: XPathExpression 'xe' is null, skipping code description evaluation.");
+					}
 				} catch (XPathExpressionException e) {
 					Log.trace("getCodeList: error - cannot import code descriptions " + e.toString());
 				}
@@ -967,6 +973,10 @@ class NiemModel {
 			filename2 = "";
 		}
 		// get target and default prefixes
+		if (ns == null) {
+			Log.trace("importElements: error - namespace is null");
+			return null;
+		}
 		UmlClassView targetClassView = ns.getReferenceClassView();
 		if (targetClassView == null) {
 			Log.trace("importElements: error - target classview is null");
@@ -984,110 +994,127 @@ class NiemModel {
 		// trace("importElement: importing elements");
 		NodeList elementList = null;
 		try {
-			elementList = (NodeList) xPath.evaluate("xs:element[@name]", doc.getDocumentElement(),
-					XPathConstants.NODESET);
+			if (doc != null)
+				elementList = (NodeList) xPath.evaluate("xs:element[@name]", doc.getDocumentElement(),
+						XPathConstants.NODESET);
 		} catch (XPathExpressionException e) {
 			Log.trace("importElements: error - cannot import element " + e.toString());
 		}
 
-		for (int elementIndex = 0; elementIndex < elementList.getLength(); elementIndex++) {
-			Element elementElement = (Element) elementList.item(elementIndex);
-			String elementName = elementElement.getAttribute("name");
-			if (NamespaceModel.getPrefix(elementName) == null)
-				elementName = NamespaceModel.getPrefixedName(targetPrefix, elementName);
-			String abstractAttribute = elementElement.getAttribute("abstract");
-			String baseTypeSchemaURI = null;
-			String baseTypeName = elementElement.getAttribute("type");
-			UmlClass baseType;
-			if (abstractAttribute.equals("true") || (baseTypeName.equals(""))) {
-				baseType = getAbstractType();
-			} else {
-				if (NamespaceModel.getPrefix(baseTypeName) == null)
-					baseTypeName = NamespaceModel.getPrefixedName(defaultPrefix, baseTypeName);
-				baseTypeSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(baseTypeName));
-				if (baseTypeSchemaURI == null)
-					baseTypeSchemaURI = NamespaceModel.getSchemaURI(baseTypeName);
-				if (baseTypeName != null && baseTypeSchemaURI == null && NamespaceModel.getPrefix(baseTypeName) == null) {
-					baseTypeSchemaURI = XSD_URI;
-					baseTypeName = NamespaceModel.getPrefixedName(XSD_PREFIX, baseTypeName);
+		if (elementList != null)
+			for (int elementIndex = 0; elementIndex < elementList.getLength(); elementIndex++) {
+				Element elementElement = (Element) elementList.item(elementIndex);
+				String elementName = elementElement.getAttribute("name");
+				if (NamespaceModel.getPrefix(elementName) == null)
+					elementName = NamespaceModel.getPrefixedName(targetPrefix, elementName);
+				String abstractAttribute = elementElement.getAttribute("abstract");
+				String baseTypeSchemaURI = null;
+				String baseTypeName = elementElement.getAttribute("type");
+				UmlClass baseType;
+				if (abstractAttribute.equals("true") || (baseTypeName.equals(""))) {
+					baseType = getAbstractType();
+				} else {
+					if (NamespaceModel.getPrefix(baseTypeName) == null)
+						baseTypeName = NamespaceModel.getPrefixedName(defaultPrefix, baseTypeName);
+					String baseTypePrefix = NamespaceModel.getPrefix(baseTypeName);
+					if (baseTypePrefix != null && doc != null)
+						baseTypeSchemaURI = doc.lookupNamespaceURI(baseTypePrefix);
+					 else 
+						Log.trace("Namespace prefix for baseTypeName is null: " + baseTypeName);
+					if (baseTypeSchemaURI == null)
+						baseTypeSchemaURI = NamespaceModel.getSchemaURI(baseTypeName);
+					if (baseTypeName != null && baseTypeSchemaURI == null && NamespaceModel.getPrefix(baseTypeName) == null) {
+						baseTypeSchemaURI = XSD_URI;
+						baseTypeName = NamespaceModel.getPrefixedName(XSD_PREFIX, baseTypeName);
+					}
+					baseType = getType(baseTypeSchemaURI, baseTypeName);
 				}
-				baseType = getType(baseTypeSchemaURI, baseTypeName);
+				try {
+					if (baseType == null && baseTypeName != null && !baseTypeName.equals(""))
+						Log.trace("importElements: error - base type " + baseTypeName + " not in model with URI "+ baseTypeSchemaURI);
+					else
+						if (xe != null) {
+							addElement(ns.getSchemaURI(), elementName, baseType, xe.evaluate(elementElement), null);
+						} else {
+							Log.trace("addElement: error - XPathExpression 'xe' is null, skipping element evaluation.");
+						}
+				} catch (XPathExpressionException e) {
+					Log.trace("importElements: error - cannot import element " + e.toString());
+				}
 			}
-			try {
-				if (baseType == null && !baseTypeName.equals(""))
-					Log.trace("importElements: error - base type " + baseTypeName + " not in model with URI "+ baseTypeSchemaURI);
-				else
-					addElement(ns.getSchemaURI(), elementName, baseType, xe.evaluate(elementElement), null);
-			} catch (XPathExpressionException e) {
-				Log.trace("importElements: error - cannot import element " + e.toString());
-			}
-		}
 
 		// import attributes
 		// trace("importElement: importing attributes");
 		NodeList attributeList = null;
 		try {
-			attributeList = (NodeList) xPath.evaluate("xs:attribute[@name]", doc.getDocumentElement(),
-					XPathConstants.NODESET);
+			if (doc != null) 
+				attributeList = (NodeList) xPath.evaluate("xs:attribute[@name]", doc.getDocumentElement(),
+						XPathConstants.NODESET);
 		} catch (XPathExpressionException e) {
 			Log.trace("importElements: error - cannot import attributes " + e.toString());
 		}
-		for (int attributeIndex = 0; attributeIndex < attributeList.getLength(); attributeIndex++) {
-			Element attribute = (Element) attributeList.item(attributeIndex);
-			String attributeName = attribute.getAttribute("name");
-			String attributePrefix = NamespaceModel.getPrefix(attributeName);
-			if (attributePrefix == null)
-				attributePrefix = targetPrefix;
-			attributeName = NamespaceModel.getPrefixedAttributeName(attributePrefix, NamespaceModel.getName(attributeName));
-			// trace("importElements: adding attribute " + elementName);
-			String codeList = "";
-			String baseTypeSchemaURI = null;
-			String baseTypeName = attribute.getAttribute("type");
-			if (baseTypeName.equals(""))
-				try {
-					Element restriction = (Element) xPath.evaluate(".//xs:simpleType/xs:restriction[1][@base]",
-							attribute, XPathConstants.NODE);
-					if (restriction != null) {
-						baseTypeName = restriction.getAttribute("base");
-						NodeList eList = (NodeList) xPath.evaluate("xs:enumeration[@value]", restriction,
-								XPathConstants.NODESET);
-						codeList = importCodeList(eList);
-					} else {
-						baseTypeName = xPath.evaluate(".//xs:simpleType/xs:list/@itemType", attribute);
+		if (attributeList != null)
+			for (int attributeIndex = 0; attributeIndex < attributeList.getLength(); attributeIndex++) {
+				Element attribute = (Element) attributeList.item(attributeIndex);
+				String attributeName = attribute.getAttribute("name");
+				String attributePrefix = NamespaceModel.getPrefix(attributeName);
+				if (attributePrefix == null)
+					attributePrefix = targetPrefix;
+				attributeName = NamespaceModel.getPrefixedAttributeName(attributePrefix, NamespaceModel.getName(attributeName));
+				// trace("importElements: adding attribute " + elementName);
+				String codeList = "";
+				String baseTypeSchemaURI = null;
+				String baseTypeName = attribute.getAttribute("type");
+				if (baseTypeName.equals(""))
+					try {
+						Element restriction = (Element) xPath.evaluate(".//xs:simpleType/xs:restriction[1][@base]",
+								attribute, XPathConstants.NODE);
+						if (restriction != null) {
+							baseTypeName = restriction.getAttribute("base");
+							NodeList eList = (NodeList) xPath.evaluate("xs:enumeration[@value]", restriction,
+									XPathConstants.NODESET);
+							codeList = importCodeList(eList);
+						} else {
+							baseTypeName = xPath.evaluate(".//xs:simpleType/xs:list/@itemType", attribute);
+						}
+					} catch (XPathExpressionException e) {
+						Log.trace(filename + "\nimportElements: error importing base types for attribute "
+								+ attributeName + " " + e.toString());
 					}
+				if (baseTypeName == null || baseTypeName.equals(""))
+					baseTypeName = null;
+				else {
+					if (NamespaceModel.getPrefix(baseTypeName) == null)
+						baseTypeName = NamespaceModel.getPrefixedName(defaultPrefix, baseTypeName);
+					if (doc != null)
+						baseTypeSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(baseTypeName));
+					if (baseTypeSchemaURI == null)
+						baseTypeSchemaURI = NamespaceModel.getSchemaURI(baseTypeName);
+					if (baseTypeName != null && baseTypeSchemaURI == null && NamespaceModel.getPrefix(baseTypeName) == null) {
+						baseTypeSchemaURI = XSD_URI;
+						baseTypeName = NamespaceModel.getPrefixedName(XSD_PREFIX, baseTypeName);
+					}
+				}
+				UmlClassInstance element = null;
+				try {
+					UmlClass baseType2 = getType(baseTypeSchemaURI, baseTypeName);
+					if (baseType2 == null && baseTypeName != null && !baseTypeName.equals(""))
+						Log.trace("importElements: error - base type " + baseTypeName + " not in model with URI "+ baseTypeSchemaURI);
+					else
+						if (xe != null) {
+							element = addElement(ns.getSchemaURI(), attributeName, baseType2, xe.evaluate(attribute), null);
+						} else {
+							Log.trace("addElement: error - XPathExpression 'xe' is null, skipping element evaluation.");
+						}
 				} catch (XPathExpressionException e) {
-					Log.trace(filename + "\nimportElements: error importing base types for attribute "
-							+ attributeName + " " + e.toString());
+					Log.trace(filename2 + "importElements: error - cannot add attribute " + attributeName + " of type "
+							+ baseTypeName + " " + e.toString());
+					filename2 = "";
 				}
-			if (baseTypeName == null || baseTypeName.equals(""))
-				baseTypeName = null;
-			else {
-				if (NamespaceModel.getPrefix(baseTypeName) == null)
-					baseTypeName = NamespaceModel.getPrefixedName(defaultPrefix, baseTypeName);
-				baseTypeSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(baseTypeName));
-				if (baseTypeSchemaURI == null)
-					baseTypeSchemaURI = NamespaceModel.getSchemaURI(baseTypeName);
-				if (baseTypeName != null && baseTypeSchemaURI == null && NamespaceModel.getPrefix(baseTypeName) == null) {
-					baseTypeSchemaURI = XSD_URI;
-					baseTypeName = NamespaceModel.getPrefixedName(XSD_PREFIX, baseTypeName);
-				}
+				if (element != null)
+					if (!codeList.equals(""))
+						element.set_PropertyValue(NiemUmlClass.CODELIST_PROPERTY, codeList);
 			}
-			UmlClassInstance element = null;
-			try {
-				UmlClass baseType2 = getType(baseTypeSchemaURI, baseTypeName);
-				if (baseType2 == null && !baseTypeName.equals(""))
-					Log.trace("importElements: error - base type " + baseTypeName + " not in model with URI "+ baseTypeSchemaURI);
-				else
-					element = addElement(ns.getSchemaURI(), attributeName, baseType2, xe.evaluate(attribute), null);
-			} catch (XPathExpressionException e) {
-				Log.trace(filename2 + "importElements: error - cannot add attribute " + attributeName + " of type "
-						+ baseTypeName + " " + e.toString());
-				filename2 = "";
-			}
-			if (element != null)
-				if (!codeList.equals(""))
-					element.set_PropertyValue(NiemUmlClass.CODELIST_PROPERTY, codeList);
-		}
 		return ns;
 	}
 
@@ -1114,7 +1141,9 @@ class NiemModel {
 		}
 
 		// get target and default prefixes
-		UmlClassView targetClassView = ns.getReferenceClassView();
+		UmlClassView targetClassView = null;
+		if (ns != null)
+			targetClassView = ns.getReferenceClassView();
 		if (targetClassView == null) {
 			Log.trace("importElementsInTypes: error - target classview is null");
 			return ns;
@@ -1124,7 +1153,9 @@ class NiemModel {
 		Namespace defaultNamespace = NamespaceModel.getNamespace(defaultSchemaURI);
 		if (defaultNamespace == null)
 			defaultNamespace = ns;
-		UmlClassView defaultClassView = defaultNamespace.getReferenceClassView();
+		UmlClassView defaultClassView = null;
+		if (defaultNamespace != null)
+			defaultClassView = defaultNamespace.getReferenceClassView();
 		String defaultPrefix = NamespaceModel.getPrefix(defaultClassView);
 
 		// import attributes in attribute groups
@@ -1132,53 +1163,59 @@ class NiemModel {
 		Node root = null;
 		NodeList attributeGroupList = null;
 		try {
-			root = doc.getDocumentElement();
+			if (doc != null)
+				root = doc.getDocumentElement();
 			attributeGroupList = (NodeList) xPath.evaluate("xs:attributeGroup[@name]", root, XPathConstants.NODESET);
 		} catch (XPathExpressionException e) {
 			Log.trace(filename + "\nimportElementsInTypes: error parsing the schema " + e.toString());
 		}
-
-		for (int attributeGroupIndex = 0; attributeGroupIndex < attributeGroupList.getLength(); attributeGroupIndex++) {
-			Element attributeGroupElement = (Element) attributeGroupList.item(attributeGroupIndex);
-			String attributeGroupName = attributeGroupElement.getAttribute("name");
-			if (NamespaceModel.getPrefix(attributeGroupName) == null)
-				attributeGroupName = NamespaceModel.getPrefixedAttributeName(targetPrefix, attributeGroupName);
-			UmlClass attributeGroup = getType(ns.getSchemaURI(), attributeGroupName);
-			if (attributeGroup == null) {
-				Log.trace("importElementsInType: error - attribute group " + attributeGroupName
-						+ " not in reference model");
-				continue;
-			}
-			NodeList attributeList = null;
-			try {
-				attributeList = (NodeList) xPath.evaluate(".//xs:attribute[@ref]", attributeGroupElement,
-						XPathConstants.NODESET);
-			} catch (XPathExpressionException e) {
-				Log.trace(filename + "\nimportElementsInTypes: error parsing the schema " + e.toString());
-			}
-			for (int attributeIndex = 0; attributeIndex < attributeList.getLength(); attributeIndex++) {
-				Element attributeElement = (Element) attributeList.item(attributeIndex);
-				String attributeName = attributeElement.getAttribute("ref");
-				String attributePrefix = NamespaceModel.getPrefix(attributeName);
-				if (attributePrefix == null)
-					attributePrefix = defaultPrefix;
-				attributeName = NamespaceModel.getPrefixedAttributeName(attributePrefix, NamespaceModel.getName(attributeName));
-				String multiplicity = (attributeElement.getAttribute("use")).equals("required") ? "1,1" : "0,1";
-				String attributeSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(attributeName));
-				if (attributeSchemaURI == null)
-					attributeSchemaURI = NamespaceModel.getSchemaURI(attributeName);
-				if (attributeSchemaURI == null) {
-					Log.trace("importElementInType: error - prefix for attribute " + attributeName + " not in model");
+		if (attributeGroupList != null)
+			for (int attributeGroupIndex = 0; attributeGroupIndex < attributeGroupList.getLength(); attributeGroupIndex++) {
+				Element attributeGroupElement = (Element) attributeGroupList.item(attributeGroupIndex);
+				String attributeGroupName = attributeGroupElement.getAttribute("name");
+				if (NamespaceModel.getPrefix(attributeGroupName) == null)
+					attributeGroupName = NamespaceModel.getPrefixedAttributeName(targetPrefix, attributeGroupName);
+				UmlClass attributeGroup = null;
+				if (ns != null)
+					attributeGroup = getType(ns.getSchemaURI(), attributeGroupName);
+				if (attributeGroup == null) {
+					Log.trace("importElementsInType: error - attribute group " + attributeGroupName
+							+ " not in reference model");
 					continue;
 				}
-				UmlClassInstance element = getElement(attributeSchemaURI, NamespaceModel.getName(attributeName));
-				if (element == null) {
-					Log.trace("importElementsInType: error - attribute " + attributeName + " not in model");
-					continue;
+				NodeList attributeList = null;
+				try {
+					attributeList = (NodeList) xPath.evaluate(".//xs:attribute[@ref]", attributeGroupElement,
+							XPathConstants.NODESET);
+				} catch (XPathExpressionException e) {
+					Log.trace(filename + "\nimportElementsInTypes: error parsing the schema " + e.toString());
 				}
-				addElementInType(attributeGroup, element, multiplicity);
+				if (attributeList != null)
+					for (int attributeIndex = 0; attributeIndex < attributeList.getLength(); attributeIndex++) {
+						Element attributeElement = (Element) attributeList.item(attributeIndex);
+						String attributeName = attributeElement.getAttribute("ref");
+						String attributePrefix = NamespaceModel.getPrefix(attributeName);
+						if (attributePrefix == null)
+							attributePrefix = defaultPrefix;
+						attributeName = NamespaceModel.getPrefixedAttributeName(attributePrefix, NamespaceModel.getName(attributeName));
+						String multiplicity = (attributeElement.getAttribute("use")).equals("required") ? "1,1" : "0,1";
+						String attributeSchemaURI = null;
+						if (doc != null)
+							attributeSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(attributeName));
+						if (attributeSchemaURI == null)
+							attributeSchemaURI = NamespaceModel.getSchemaURI(attributeName);
+						if (attributeSchemaURI == null) {
+							Log.trace("importElementInType: error - prefix for attribute " + attributeName + " not in model");
+							continue;
+						}
+						UmlClassInstance element = getElement(attributeSchemaURI, NamespaceModel.getName(attributeName));
+						if (element == null) {
+							Log.trace("importElementsInType: error - attribute " + attributeName + " not in model");
+							continue;
+						}
+						addElementInType(attributeGroup, element, multiplicity);
+					}
 			}
-		}
 
 		// import base types for simple types (codes)
 		// trace("importElementsInTypes: import base types for simple types (codes)");
@@ -1189,23 +1226,28 @@ class NiemModel {
 		} catch (XPathExpressionException e) {
 			Log.trace(filename + "\nimportElementsInTypes: error importing base types for simple types " + e.toString());
 		}
-		for (int elementIndex = 0; elementIndex < simpleTypeNodeList.getLength(); elementIndex++) {
-			Element restrictionElement = (Element) simpleTypeNodeList.item(elementIndex);
-			Element typeElement = (Element) restrictionElement.getParentNode();
-			String typeName = typeElement.getAttribute("name");
-			if (NamespaceModel.getPrefix(typeName) == null)
-				typeName = NamespaceModel.getPrefixedName(targetPrefix, typeName);
-			String baseTypeName = restrictionElement.getAttribute("base");
-			if (NamespaceModel.getPrefix(baseTypeName) == null)
-				baseTypeName = NamespaceModel.getPrefixedName(defaultPrefix, baseTypeName);
-			UmlClass type = getType(ns.getSchemaURI(), typeName);
-			if (type == null)
-				continue;
-			UmlClass baseType = getType(doc.lookupNamespaceURI(NamespaceModel.getPrefix(baseTypeName)), baseTypeName);
-			if (baseType == null)
-				continue;
-			relateBaseType(type, baseType);
-		}
+		if (simpleTypeNodeList != null)
+			for (int elementIndex = 0; elementIndex < simpleTypeNodeList.getLength(); elementIndex++) {
+				Element restrictionElement = (Element) simpleTypeNodeList.item(elementIndex);
+				Element typeElement = (Element) restrictionElement.getParentNode();
+				String typeName = typeElement.getAttribute("name");
+				if (NamespaceModel.getPrefix(typeName) == null)
+					typeName = NamespaceModel.getPrefixedName(targetPrefix, typeName);
+				String baseTypeName = restrictionElement.getAttribute("base");
+				if (NamespaceModel.getPrefix(baseTypeName) == null)
+					baseTypeName = NamespaceModel.getPrefixedName(defaultPrefix, baseTypeName);
+				UmlClass type = null;
+				if (ns != null)
+					type = getType(ns.getSchemaURI(), typeName);
+				if (type == null)
+					continue;
+				UmlClass baseType = null;
+				if (doc != null)
+					baseType = getType(doc.lookupNamespaceURI(NamespaceModel.getPrefix(baseTypeName)), baseTypeName);
+				if (baseType == null)
+					continue;
+				relateBaseType(type, baseType);
+			}
 
 		// import base types and elements for complex types
 		// trace("importElementsInTypes: import base types and elements for complex
@@ -1216,147 +1258,162 @@ class NiemModel {
 		} catch (XPathExpressionException e) {
 			Log.trace(filename + "\nimportElementsInTypes: error parsing types" + e.toString());
 		}
-		for (int elementIndex = 0; elementIndex < complexTypeNodeList.getLength(); elementIndex++) {
-			Element typeElement = (Element) complexTypeNodeList.item(elementIndex);
-			if (typeElement == null)
-				continue;
-			String typeName = typeElement.getAttribute("name");
-			if (NamespaceModel.getPrefix(typeName) == null)
-				typeName = NamespaceModel.getPrefixedName(targetPrefix, typeName);
-			UmlClass type = getType(ns.getSchemaURI(), typeName);
-			if (type == null)
-				continue;
-
-			// import base types for complex types
-			// trace("importElementsInTypes: import base types for complex types");
-			NodeList baseTypeList = null;
-			try {
-				baseTypeList = (NodeList) xPath.evaluate(
-						"xs:simpleContent[1]/xs:extension[1][@base] | xs:complexContent[1]/xs:extension[1][@base]",
-						typeElement, XPathConstants.NODESET);
-			} catch (XPathExpressionException e) {
-				Log.trace(filename + "\nimportElementsInTypes: error importing base types for complex types"
-						+ e.toString());
-			}
-			for (int baseTypeIndex = 0; baseTypeIndex < baseTypeList.getLength(); baseTypeIndex++) {
-				Element baseTypeElement = (Element) baseTypeList.item(baseTypeIndex);
-				String baseTypeName = baseTypeElement.getAttribute("base");
-				if (NamespaceModel.getPrefix(baseTypeName) == null)
-					baseTypeName = NamespaceModel.getPrefixedName(defaultPrefix, baseTypeName);
-				UmlClass baseType = getType(doc.lookupNamespaceURI(NamespaceModel.getPrefix(baseTypeName)), baseTypeName);
-				if (baseType == null)
+		if (complexTypeNodeList != null)
+			for (int elementIndex = 0; elementIndex < complexTypeNodeList.getLength(); elementIndex++) {
+				Element typeElement = (Element) complexTypeNodeList.item(elementIndex);
+				if (typeElement == null)
 					continue;
-				relateBaseType(type, baseType);
-			}
-
-			// import attribute groups in type
-			// trace("importElementsInTypes: import attributes groups in types");
-			NodeList attributeGroupInTypeNodeList = null;
-			try {
-				attributeGroupInTypeNodeList = (NodeList) xPath.evaluate(".//xs:attributeGroup[@ref]", typeElement,
-						XPathConstants.NODESET);
-			} catch (XPathExpressionException e) {
-				Log.trace(filename + "\nimportElementsInTypes:error importing attributeGroup in complex type" + typeName + " "
-						+ e.toString());
-			}
-			for (int attributeGroupIndex = 0; attributeGroupIndex < attributeGroupInTypeNodeList
-					.getLength(); attributeGroupIndex++) {
-				Element attributeGroupElement = (Element) attributeGroupInTypeNodeList.item(attributeGroupIndex);
-				String attributeGroupName = attributeGroupElement.getAttribute("ref");
-				if (NamespaceModel.getPrefix(attributeGroupName) == null)
-					attributeGroupName = NamespaceModel.getPrefixedName(defaultPrefix, attributeGroupName);
-				String prefix = NamespaceModel.getPrefix(attributeGroupName);
-				String schemaURI = (prefix == null) ? ns.getSchemaURI() : doc.lookupNamespaceURI(prefix);
-				UmlClass attributeGroupType = getType(schemaURI, NamespaceModel.getPrefixedAttributeName(NamespaceModel.getPrefix(attributeGroupName), NamespaceModel.getName(attributeGroupName)));
-				if (attributeGroupType == null)
+				String typeName = typeElement.getAttribute("name");
+				if (NamespaceModel.getPrefix(typeName) == null)
+					typeName = NamespaceModel.getPrefixedName(targetPrefix, typeName);
+				UmlClass type = null;
+				if (ns != null)
+					type = getType(ns.getSchemaURI(), typeName);
+				if (type == null)
 					continue;
-				relateAttributeGroup(type, attributeGroupType);
-			}
 
-			// import attributes in type
-			// trace("importElementsInTypes: import attributes in types");
-			NodeList attributeInTypeNodeList = null;
-			try {
-				attributeInTypeNodeList = (NodeList) xPath.evaluate(".//xs:attribute[@ref]", typeElement,
-						XPathConstants.NODESET);
-			} catch (XPathExpressionException re) {
-				Log.trace(filename + "\nimportElementsInTypes: error importing attributes in type " + typeName + " " + re.toString());
-			}
-			for (int attributeIndex = 0; attributeIndex < attributeInTypeNodeList.getLength(); attributeIndex++) {
-				Element attributeElement = (Element) attributeInTypeNodeList.item(attributeIndex);
-				String attributeName = attributeElement.getAttribute("ref");
-				attributeName = NamespaceModel.getPrefixedAttributeName(NamespaceModel.getPrefix(attributeName), NamespaceModel.getName(attributeName));
-				if (NamespaceModel.getPrefix(attributeName) == null)
-					attributeName = NamespaceModel.getPrefixedAttributeName(defaultPrefix, NamespaceModel.getName(attributeName));
-				Log.trace("importElementsInTypes: importing attribute " + attributeName + " in type " + typeName);
-				String multiplicity = (attributeElement.getAttribute("use").equals("required")) ? "1,1" : "0,1";
-				String attributeSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(attributeName));
-				//String attributeName2 = NamespaceModel.getPrefixedAttributeName(NamespaceModel.getPrefix(attributeName), attributeName);
-				Log.trace("importElementsInTypes: attribute SchemaURI " + attributeSchemaURI + " attributeName " + attributeName);
-				UmlClassInstance element = getElement(attributeSchemaURI, attributeName);
-				//UmlClassInstance element = getElement(doc.lookupNamespaceURI(NamespaceModel.getPrefix(attributeName)),
-				//		NamespaceModel.getPrefixedAttributeName(NamespaceModel.getPrefix(attributeName), attributeName));
-				if (element == null) {
-						Log.trace("importElementsInTypes: error - attribute " + attributeName + " not in model");
-				} else {
-					UmlAttribute attributeInType = addElementInType(type, element, multiplicity);
-					if (attributeInType == null) {
-						Log.trace("importElementsInTypes: error adding attribute " + attributeName + " to type");
-					} else {
-					Log.trace("importElementsInTypes: imported attribute " + attributeName + " in type " + typeName);
+				// import base types for complex types
+				// trace("importElementsInTypes: import base types for complex types");
+				NodeList baseTypeList = null;
+				try {
+					baseTypeList = (NodeList) xPath.evaluate(
+							"xs:simpleContent[1]/xs:extension[1][@base] | xs:complexContent[1]/xs:extension[1][@base]",
+							typeElement, XPathConstants.NODESET);
+				} catch (XPathExpressionException e) {
+					Log.trace(filename + "\nimportElementsInTypes: error importing base types for complex types"
+							+ e.toString());
+				}
+				if (baseTypeList != null)
+					for (int baseTypeIndex = 0; baseTypeIndex < baseTypeList.getLength(); baseTypeIndex++) {
+						Element baseTypeElement = (Element) baseTypeList.item(baseTypeIndex);
+						String baseTypeName = baseTypeElement.getAttribute("base");
+						if (NamespaceModel.getPrefix(baseTypeName) == null)
+							baseTypeName = NamespaceModel.getPrefixedName(defaultPrefix, baseTypeName);
+						UmlClass baseType = null;
+						if (doc != null)
+							baseType = getType(doc.lookupNamespaceURI(NamespaceModel.getPrefix(baseTypeName)), baseTypeName);
+						if (baseType == null)
+							continue;
+						relateBaseType(type, baseType);
 					}
+
+				// import attribute groups in type
+				// trace("importElementsInTypes: import attributes groups in types");
+				NodeList attributeGroupInTypeNodeList = null;
+				try {
+					attributeGroupInTypeNodeList = (NodeList) xPath.evaluate(".//xs:attributeGroup[@ref]", typeElement,
+							XPathConstants.NODESET);
+				} catch (XPathExpressionException e) {
+					Log.trace(filename + "\nimportElementsInTypes:error importing attributeGroup in complex type" + typeName + " "
+							+ e.toString());
+				}
+				if (attributeGroupInTypeNodeList != null)
+					for (int attributeGroupIndex = 0; attributeGroupIndex < attributeGroupInTypeNodeList
+							.getLength(); attributeGroupIndex++) {
+						Element attributeGroupElement = (Element) attributeGroupInTypeNodeList.item(attributeGroupIndex);
+						String attributeGroupName = attributeGroupElement.getAttribute("ref");
+						if (NamespaceModel.getPrefix(attributeGroupName) == null)
+							attributeGroupName = NamespaceModel.getPrefixedName(defaultPrefix, attributeGroupName);
+						String prefix = NamespaceModel.getPrefix(attributeGroupName);
+						String schemaURI = null;
+						if (ns != null && doc != null)
+							schemaURI = (prefix == null) ? ns.getSchemaURI() : doc.lookupNamespaceURI(prefix);
+						UmlClass attributeGroupType = getType(schemaURI, NamespaceModel.getPrefixedAttributeName(NamespaceModel.getPrefix(attributeGroupName), NamespaceModel.getName(attributeGroupName)));
+						if (attributeGroupType == null)
+							continue;
+						relateAttributeGroup(type, attributeGroupType);
+					}
+
+				// import attributes in type
+				// trace("importElementsInTypes: import attributes in types");
+				NodeList attributeInTypeNodeList = null;
+				try {
+					attributeInTypeNodeList = (NodeList) xPath.evaluate(".//xs:attribute[@ref]", typeElement,
+							XPathConstants.NODESET);
+				} catch (XPathExpressionException re) {
+					Log.trace(filename + "\nimportElementsInTypes: error importing attributes in type " + typeName + " " + re.toString());
+				}
+				if (attributeInTypeNodeList != null)
+					for (int attributeIndex = 0; attributeIndex < attributeInTypeNodeList.getLength(); attributeIndex++) {
+						Element attributeElement = (Element) attributeInTypeNodeList.item(attributeIndex);
+						String attributeName = attributeElement.getAttribute("ref");
+						attributeName = NamespaceModel.getPrefixedAttributeName(NamespaceModel.getPrefix(attributeName), NamespaceModel.getName(attributeName));
+						if (NamespaceModel.getPrefix(attributeName) == null)
+							attributeName = NamespaceModel.getPrefixedAttributeName(defaultPrefix, NamespaceModel.getName(attributeName));
+						Log.trace("importElementsInTypes: importing attribute " + attributeName + " in type " + typeName);
+						String multiplicity = (attributeElement.getAttribute("use").equals("required")) ? "1,1" : "0,1";
+						String attributeSchemaURI = null;
+						if (doc != null)
+							attributeSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(attributeName));
+						//String attributeName2 = NamespaceModel.getPrefixedAttributeName(NamespaceModel.getPrefix(attributeName), attributeName);
+						Log.trace("importElementsInTypes: attribute SchemaURI " + attributeSchemaURI + " attributeName " + attributeName);
+						UmlClassInstance element = getElement(attributeSchemaURI, attributeName);
+						//UmlClassInstance element = getElement(doc.lookupNamespaceURI(NamespaceModel.getPrefix(attributeName)),
+						//		NamespaceModel.getPrefixedAttributeName(NamespaceModel.getPrefix(attributeName), attributeName));
+						if (element == null) {
+								Log.trace("importElementsInTypes: error - attribute " + attributeName + " not in model");
+						} else {
+							UmlAttribute attributeInType = addElementInType(type, element, multiplicity);
+							if (attributeInType == null) {
+								Log.trace("importElementsInTypes: error adding attribute " + attributeName + " to type");
+							} else {
+							Log.trace("importElementsInTypes: imported attribute " + attributeName + " in type " + typeName);
+							}
+						}
+					}
+
+				// import elements in type
+				// trace("importElementsInTypes: import elements in types");
+				NodeList elementInTypeNodeList = null;
+				try {
+					elementInTypeNodeList = (NodeList) xPath.evaluate(".//xs:sequence[1]/xs:element[@ref]", typeElement,
+							XPathConstants.NODESET);
+				} catch (XPathExpressionException e) {
+					Log.trace(filename + "\nimportElementsInTypes: error importing elements in type " + e.toString());
+				}
+				String elementName = null;
+				try {
+					if (elementInTypeNodeList != null)
+						for (int elementInTypeIndex = 0; elementInTypeIndex < elementInTypeNodeList
+								.getLength(); elementInTypeIndex++) {
+							Element elementElement = (Element) elementInTypeNodeList.item(elementInTypeIndex);
+							elementName = elementElement.getAttribute("ref");
+							// trace("importElementsInTypes: adding element " + elementName + " to type " +
+							// typeName);
+							if (NamespaceModel.getPrefix(elementName) == null)
+								elementName = NamespaceModel.getPrefixedName(defaultPrefix, elementName);
+							String minOccurs = elementElement.getAttribute("minOccurs");
+							if (minOccurs.equals(""))
+								minOccurs = "1";
+							String maxOccurs = elementElement.getAttribute("maxOccurs");
+							if (maxOccurs.equals(""))
+								maxOccurs = "1";
+							String multiplicity = minOccurs + "," + maxOccurs;
+							String elementSchemaURI = null;
+							if (doc != null)
+								elementSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(elementName));
+							if (elementSchemaURI == null)
+								elementSchemaURI = NamespaceModel.getSchemaURI(elementName);
+							if (elementSchemaURI == null) {
+								Log.trace("importElementsInType: error - prefix for element " + elementName + " not in model");
+								continue;
+							}
+							UmlClassInstance element = getElement(elementSchemaURI, elementName);
+							if (element == null) {
+								Log.trace("importElementsInType: error - element " + getURI(elementSchemaURI, elementName)
+								+ " not in reference model");
+								continue;
+							}
+							addElementInType(type, element, multiplicity);
+							// trace("importElementsInTypes: added element " + elementName + " in type " +
+							// typeName);
+
+						}
+				} catch (Exception re) {
+					Log.trace(filename + "\nimportElementsInTypes: error importing element " + elementName + " in type "
+							+ typeName + " " + re.toString());
 				}
 			}
-
-			// import elements in type
-			// trace("importElementsInTypes: import elements in types");
-			NodeList elementInTypeNodeList = null;
-			try {
-				elementInTypeNodeList = (NodeList) xPath.evaluate(".//xs:sequence[1]/xs:element[@ref]", typeElement,
-						XPathConstants.NODESET);
-			} catch (XPathExpressionException e) {
-				Log.trace(filename + "\nimportElementsInTypes: error importing elements in type " + e.toString());
-			}
-			String elementName = null;
-			try {
-				for (int elementInTypeIndex = 0; elementInTypeIndex < elementInTypeNodeList
-						.getLength(); elementInTypeIndex++) {
-					Element elementElement = (Element) elementInTypeNodeList.item(elementInTypeIndex);
-					elementName = elementElement.getAttribute("ref");
-					// trace("importElementsInTypes: adding element " + elementName + " to type " +
-					// typeName);
-					if (NamespaceModel.getPrefix(elementName) == null)
-						elementName = NamespaceModel.getPrefixedName(defaultPrefix, elementName);
-					String minOccurs = elementElement.getAttribute("minOccurs");
-					if (minOccurs.equals(""))
-						minOccurs = "1";
-					String maxOccurs = elementElement.getAttribute("maxOccurs");
-					if (maxOccurs.equals(""))
-						maxOccurs = "1";
-					String multiplicity = minOccurs + "," + maxOccurs;
-					String elementSchemaURI = doc.lookupNamespaceURI(NamespaceModel.getPrefix(elementName));
-					if (elementSchemaURI == null)
-						elementSchemaURI = NamespaceModel.getSchemaURI(elementName);
-					if (elementSchemaURI == null) {
-						Log.trace("importElementsInType: error - prefix for element " + elementName + " not in model");
-						continue;
-					}
-					UmlClassInstance element = getElement(elementSchemaURI, elementName);
-					if (element == null) {
-						Log.trace("importElementsInType: error - element " + getURI(elementSchemaURI, elementName)
-						+ " not in reference model");
-						continue;
-					}
-					addElementInType(type, element, multiplicity);
-					// trace("importElementsInTypes: added element " + elementName + " in type " +
-					// typeName);
-
-				}
-			} catch (Exception re) {
-				Log.trace(filename + "\nimportElementsInTypes: error importing element " + elementName + " in type "
-						+ typeName + " " + re.toString());
-			}
-		}
 		return ns;
 	}
 
@@ -1390,82 +1447,94 @@ class NiemModel {
 			filename2 = "";
 		}
 		// get target and default prefixes
-		UmlClassView classView = ns.getReferenceClassView();
+		UmlClassView classView = null;
+		if (ns != null)
+			classView = ns.getReferenceClassView();
 		if (classView == null) {
 			Log.trace("importTypes: error - classview does not exist");
 			return ns;
 		}
 			
-		String targetPrefix = NamespaceModel.getPrefix(ns.getReferenceClassView());
+		String targetPrefix = null;
+		if (ns != null)
+			targetPrefix = NamespaceModel.getPrefix(ns.getReferenceClassView());
 
 		// import types
 		NodeList typeList = null;
 		try {
-			typeList = (NodeList) xPath.evaluate("xs:complexType|xs:simpleType[@name]", doc.getDocumentElement(),
-					XPathConstants.NODESET);
+			if (doc != null)
+				typeList = (NodeList) xPath.evaluate("xs:complexType|xs:simpleType[@name]", doc.getDocumentElement(),
+						XPathConstants.NODESET);
 		} catch (XPathExpressionException e) {
 			Log.trace(filename2 + "importTypes: error - cannot parse types " + e.toString());
 		}
-
-		for (int typeIndex = 0; typeIndex < typeList.getLength(); typeIndex++) {
-			Element typeElement = (Element) typeList.item(typeIndex);
-			String nodeType = typeElement.getNodeName();
-			String typeName = typeElement.getAttribute("name");
-			if (NamespaceModel.getPrefix(typeName) == null)
-				typeName = NamespaceModel.getPrefixedName(targetPrefix, typeName);
-			UmlClass type = null;
-			try {
-				type = addType(ns.getSchemaURI(), typeName, xe.evaluate(typeElement), null);
-			} catch (XPathExpressionException e) {
-				Log.trace(filename2 + "importTypes: error - cannot add type " + typeName + " to schema " + ns.getSchemaURI() + " "
-						+ e.toString());
-			}
-			if (type == null) {
-				Log.trace(filename2 + "importTypes: error - cannot add type " + typeName + " to schema " + ns.getSchemaURI());
-				continue;
-			}
-			if ("xs:simpleType".equals(nodeType)) {
-				type.set_Stereotype("enum_pattern");
-				// import enumerated values for simple types (codes)
-				NodeList elist = null;
+		if (typeList != null)
+			for (int typeIndex = 0; typeIndex < typeList.getLength(); typeIndex++) {
+				Element typeElement = (Element) typeList.item(typeIndex);
+				String nodeType = typeElement.getNodeName();
+				String typeName = typeElement.getAttribute("name");
+				if (NamespaceModel.getPrefix(typeName) == null)
+					typeName = NamespaceModel.getPrefixedName(targetPrefix, typeName);
+				UmlClass type = null;
 				try {
-					elist = (NodeList) xe1.evaluate(typeElement, XPathConstants.NODESET);
+					if (ns != null && xe != null)
+						type = addType(ns.getSchemaURI(), typeName, xe.evaluate(typeElement), null);
 				} catch (XPathExpressionException e) {
-					Log.trace(filename2 + "importTypes: error - cannot import enumerations " + e.toString());
+					if (ns != null)
+						Log.trace(filename2 + "importTypes: error - cannot add type " + typeName + " to schema " + ns.getSchemaURI() + " "
+							+ e.toString());
 				}
-				String codeList = importCodeList(elist);
-				if (!codeList.equals(""))
-					type.set_PropertyValue(NiemUmlClass.CODELIST_PROPERTY, codeList);
+				if (type == null) {
+					if (ns != null)
+						Log.trace(filename2 + "importTypes: error - cannot add type " + typeName + " to schema " + ns.getSchemaURI());
+					continue;
+				}
+				if ("xs:simpleType".equals(nodeType)) {
+					type.set_Stereotype("enum_pattern");
+					// import enumerated values for simple types (codes)
+					NodeList elist = null;
+					try {
+						if (xe1 != null)
+							elist = (NodeList) xe1.evaluate(typeElement, XPathConstants.NODESET);
+					} catch (XPathExpressionException e) {
+						Log.trace(filename2 + "importTypes: error - cannot import enumerations " + e.toString());
+					}
+					String codeList = importCodeList(elist);
+					if (!codeList.equals(""))
+						type.set_PropertyValue(NiemUmlClass.CODELIST_PROPERTY, codeList);
+				}
 			}
-		}
 
 		// import attribute groups
 		NodeList attributeGroupList = null;
 		try {
-			attributeGroupList = (NodeList) xPath.evaluate("xs:attributeGroup[@name]", doc.getDocumentElement(),
-					XPathConstants.NODESET);
+			if (doc != null)
+				attributeGroupList = (NodeList) xPath.evaluate("xs:attributeGroup[@name]", doc.getDocumentElement(),
+						XPathConstants.NODESET);
 		} catch (XPathExpressionException e) {
 			Log.trace(filename2 + "importTypes: error - cannot parse attribute groups " + e.toString());
 		}
-		for (int attributeGroupIndex = 0; attributeGroupIndex < attributeGroupList.getLength(); attributeGroupIndex++) {
-			Element attributeGroupElement = (Element) attributeGroupList.item(attributeGroupIndex);
-			String attributeGroupName = attributeGroupElement.getAttribute("name");
-			String attributeGroupPrefix = NamespaceModel.getPrefix(attributeGroupName);
-			if (attributeGroupPrefix == null)
-				attributeGroupPrefix = targetPrefix;
-			attributeGroupName = NamespaceModel.getPrefixedAttributeName(attributeGroupPrefix, NamespaceModel.getName(attributeGroupName));
-			UmlClass attributeGroup = null;
-			try {
-				attributeGroup = addType(ns.getSchemaURI(), attributeGroupName, xe.evaluate(attributeGroupElement), null);
-			} catch (XPathExpressionException e) {
-				Log.trace(filename2 + "importTypes: error - cannot add attribute group " + attributeGroupName + " "
-						+ e.toString());
-				filename2 = "";
+		if (attributeGroupList != null)
+			for (int attributeGroupIndex = 0; attributeGroupIndex < attributeGroupList.getLength(); attributeGroupIndex++) {
+				Element attributeGroupElement = (Element) attributeGroupList.item(attributeGroupIndex);
+				String attributeGroupName = attributeGroupElement.getAttribute("name");
+				String attributeGroupPrefix = NamespaceModel.getPrefix(attributeGroupName);
+				if (attributeGroupPrefix == null)
+					attributeGroupPrefix = targetPrefix;
+				attributeGroupName = NamespaceModel.getPrefixedAttributeName(attributeGroupPrefix, NamespaceModel.getName(attributeGroupName));
+				UmlClass attributeGroup = null;
+				try {
+					if (ns != null && xe != null)
+						attributeGroup = addType(ns.getSchemaURI(), attributeGroupName, xe.evaluate(attributeGroupElement), null);
+				} catch (XPathExpressionException e) {
+					Log.trace(filename2 + "importTypes: error - cannot add attribute group " + attributeGroupName + " "
+							+ e.toString());
+					filename2 = "";
+				}
+				if (attributeGroup == null && ns !=null) {
+					Log.trace(filename2 + "importTypes: error - cannot add attribute group " + attributeGroupName + " to schema " + ns.getSchemaURI());
+				}
 			}
-			if (attributeGroup == null) {
-				Log.trace(filename2 + "importTypes: error - cannot add attribute group " + attributeGroupName + " to schema " + ns.getSchemaURI());
-			}
-		}
 		return ns;
 	}
 
