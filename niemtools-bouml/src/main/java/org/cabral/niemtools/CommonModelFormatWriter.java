@@ -31,9 +31,8 @@ public class CommonModelFormatWriter {
 	// limit enumerations 
 	// private static final int MAX_ENUMS = 10000;
 	private static final int MAX_ENUMS = 20;
+    //@SuppressWarnings("unused")
 
-	@SuppressWarnings("unused")
-	private final String directory;
 	private final Set<String> tagIds = new HashSet<>();
 	private final Set<String> dataTypeIds = new HashSet<>();
 //	private List<UmlClassInstance> substitutionElements = new ArrayList<UmlClassInstance>();
@@ -43,7 +42,6 @@ public class CommonModelFormatWriter {
 	 */
 	public CommonModelFormatWriter(String initialDirectory) {
 		super();
-		directory = initialDirectory;
 	}
 
 

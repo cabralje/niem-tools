@@ -108,13 +108,14 @@ public class CsvWriter {
 				for (int column = 0; column < NiemUmlClass.NIEM_STEREOTYPE_MAP.length; column++)
 					nextLine[column] = NiemUmlClass.NIEM_STEREOTYPE_MAP[column][0];
 				try {
+//					@SuppressWarnings("all")
 					writer.writeNext(nextLine);
 				} catch (Exception e) {
 					Log.trace("exportCsv: writing error" + e.toString());
 				}
 				
 				// Export NIEM Mappings for Classes
-				@SuppressWarnings("unchecked")
+				//@SuppressWarnings("unchecked")
 				Iterator<UmlItem> it = (UmlClass.classes.iterator());
 				while (it.hasNext()) {
 					UmlItem thisClass = it.next();
@@ -123,6 +124,7 @@ public class CsvWriter {
 						continue;
 					nextLine = getItemCsv(thisClass);
 					Log.debug("exportCsv: write line");
+//					@SuppressWarnings("all")
 					writer.writeNext(nextLine);
 		
 					// Export NIEM Mapping for Attributes and Relations
@@ -135,6 +137,7 @@ public class CsvWriter {
 							writer.writeNext(nextLine);
 					}
 				}
+//				@SuppressWarnings("All")
 				writer.close();
 				Log.debug("exportCsv: CSV file created " + file.toString());
 			}

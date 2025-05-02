@@ -97,10 +97,9 @@ public class JsonWriter {
 	 * @return JSON property description of an element with name elementName and
 	 * multiplicity
 	 */
-	private String exportJsonElementInTypeSchema(UmlClass type, UmlClassInstance element, String multiplicity,
-			String localPrefix, boolean isAttribute) {
+	private String exportJsonElementInTypeSchema(UmlClass type, UmlClassInstance element, String multiplicity, boolean isAttribute) {
 		String elementName = NamespaceModel.getPrefixedName(element);
-		String elementName2 = null;
+		String elementName2;
 		String minOccurs = NiemUmlClass.getMinOccurs(multiplicity);
 		String maxOccurs = NiemUmlClass.getMaxOccurs(multiplicity);
 		Path typePath = getJsonPath(type);
@@ -524,7 +523,7 @@ public class JsonWriter {
 						// add head element if not abstract
 						if ((elementBaseType != model.getAbstractType())) {
 							String jsonElementInType = exportJsonElementInTypeSchema(type, element, multiplicity2,
-									prefix, elementIsAttribute);
+									elementIsAttribute);
 							if (jsonElementInType != null)
 								jsonElementsInType.add(jsonElementInType);
 						}
@@ -533,13 +532,13 @@ public class JsonWriter {
 							// add substitution elements
 							for (UmlClassInstance element2 : enlist) {
 								String jsonElementInType = exportJsonElementInTypeSchema(type,
-										element2, multiplicity2, prefix, NiemUmlClass.isAttribute(element2));
+										element2, multiplicity2, NiemUmlClass.isAttribute(element2));
 								if (jsonElementInType != null)
 									jsonElementsInType.add(jsonElementInType);
 							}
 					} else if ((elementBaseType != model.getAbstractType())) {
 						String jsonElementInType = exportJsonElementInTypeSchema(type, element, multiplicity,
-								prefix, elementIsAttribute);
+								elementIsAttribute);
 						if (jsonElementInType != null)
 							jsonElementsInType.add(jsonElementInType);
 						if (Integer.parseInt(NiemUmlClass.getMinOccurs(multiplicity)) > 0)
@@ -567,7 +566,7 @@ public class JsonWriter {
 							String minOccurs = NiemUmlClass.getMinOccurs(multiplicity);
 							if (elementBaseType != model.getAbstractType()) {
 								String jsonElementInType = exportJsonElementInTypeSchema(type, element,
-										multiplicity, prefix, NiemUmlClass.isAttribute(element));
+										multiplicity, NiemUmlClass.isAttribute(element));
 								if (jsonElementInType != null)
 									jsonElementsInType.add(jsonElementInType);
 								if (Integer.parseInt(minOccurs) > 0)
@@ -610,9 +609,9 @@ public class JsonWriter {
 //		if (codeList != null && codeList.equals(""))
 //			jsonDefinition.add("\"enums\": [" + String.join(",", enums) + "]");
 
-		if (jsonElementsInType != null)
+//		if (jsonElementsInType != null)
 			jsonDefinition.add("\"properties\": {\n" + String.join(",", jsonElementsInType) + "\n}");
-		if (jsonRequiredElementsInType != null && jsonRequiredElementsInType.size()>0)
+		if (!jsonRequiredElementsInType.isEmpty())
 			jsonDefinition.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
 		String typeSchema = "\"" + NamespaceModel.getPrefixedName(type) + "\": {\n" + String.join(",", jsonDefinition) + "\n}\n";
 		Log.debug("exportJsonTypeSchema: exported " + NamespaceModel.getPrefixedName(type));
@@ -654,10 +653,10 @@ public class JsonWriter {
 
 			for (UmlItem item : port.children()) {
 				if (item.kind() == anItemKind.anOperation) {
-					TreeSet<String> openapiOperations = new TreeSet<String>();
-					LinkedHashSet<String> openapiPathParameters = new LinkedHashSet<String>();
-					LinkedHashSet<String> openapiBodyParameters = new LinkedHashSet<String>();
-					LinkedHashSet<String> openapiResponses = new LinkedHashSet<String>();
+					TreeSet<String> openapiOperations = new TreeSet<>();
+					LinkedHashSet<String> openapiPathParameters = new LinkedHashSet<>();
+					LinkedHashSet<String> openapiBodyParameters = new LinkedHashSet<>();
+					LinkedHashSet<String> openapiResponses = new LinkedHashSet<>();
 					UmlOperation operation = (UmlOperation) item;
 					String operationName = operation.name();
 					String operationPath = "/" + operationName;
@@ -786,14 +785,14 @@ public class JsonWriter {
 							}
 						}
 						// export type wrapper
-						TreeSet<String> jsonDefinition = new TreeSet<String>();
+						TreeSet<String> jsonDefinition = new TreeSet<>();
 						// String description = "";
 						// if (description != null && !description.equals(""))
 						// jsonDefinition.add("\"description\": \"" + filterQuotes(description) + "\"");
 						jsonDefinition.add("\"type\": \"object\"");
-						if (jsonElementsInType != null && jsonElementsInType.size()>0)
+						if (!jsonElementsInType.isEmpty())
 							jsonDefinition.add("\"properties\": {\n" + String.join(",", jsonElementsInType) + "\n}");
-						if (jsonRequiredElementsInType != null && jsonRequiredElementsInType.size()>0)
+						if (!jsonRequiredElementsInType.isEmpty())
 							jsonDefinition.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
 						String typeSchema = "\"" + inputTypeName + "\": {\n" + String.join(",", jsonDefinition)
 						+ "\n}\n";
@@ -856,7 +855,7 @@ public class JsonWriter {
 						//	outputs.add(JsonWriter.ERROR_RESPONSE);
 						//for (String message : outputs) {
 							String message = outputMessage;
-							TreeSet<String> jsonRequiredElementsInType = new TreeSet<String>();
+							TreeSet<String> jsonRequiredElementsInType = new TreeSet<>();
 							TreeSet<String> jsonElementsInType = new TreeSet<String>();
 							//String elementName = (message.equals(JsonWriter.ERROR_RESPONSE) ? "Error" : operationName) + "Response";
 							String elementName = operationName + "Response";
@@ -895,9 +894,9 @@ public class JsonWriter {
 							// if (description != null && !description.equals(""))
 							// jsonDefinition.add("\"description\": \"" + filterQuotes(description) + "\"");
 							jsonDefinition.add("\"type\": \"object\"");
-							if (jsonElementsInType != null && jsonElementsInType.size()>0)
+							if (!jsonElementsInType.isEmpty())
 								jsonDefinition.add("\"properties\": {\n" + String.join(",", jsonElementsInType) + "\n}");
-							if (jsonRequiredElementsInType != null && jsonRequiredElementsInType.size()>0)
+							if (!jsonRequiredElementsInType.isEmpty())
 								jsonDefinition
 								.add("\"required\" : [" + String.join(", ", jsonRequiredElementsInType) + "]");
 							String typeSchema = "\"" + outputTypeName + "\": {\n" + String.join(",", jsonDefinition)
@@ -963,38 +962,38 @@ public class JsonWriter {
 				File parentFile = file.getParentFile();
 				if (parentFile != null)
 					parentFile.mkdirs();
-				FileWriter fw = new FileWriter(file);
-				Log.debug("OpenAPI: " + portName + OPENAPI_FILE_TYPE);
-				fw.write("{\n" +
-						// jsonContext + ",\n" +
-						"  \"openapi\": \"" + OPENAPI_VERSION + "\",\n" 
-						+ "  \"info\": {\n" 
-						+ "    \"version\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_VERSION_PROPERTY) + "\",\n" 
-						+ "    \"title\": \"" + portName + "\",\n" 
-						+ "    \"description\": \"" + port.description() + "\",\n"
-						+ "    \"termsOfService\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_TERMS_URL_PROPERTY) + "\",\n"
-						+ "    \"contact\": {\n" 
-						+ "      \"name\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_ORGANIZATION_PROPERTY) + "\",\n" 
-						+ "      \"email\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_EMAIL_PROPERTY) + "\",\n" 
-						+ "      \"url\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CONTACT_PROPERTY) + "\"\n" 
-						+ "    },\n" 
-						+ "    \"license\": {\n"
-						+ "      \"name\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY) + "\",\n"
-						+ "      \"url\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY) + "\"\n" 
-						+ "    }\n"
-						+ "  },\n" 
-						+ "  \"host\": \"host.example.com\",\n" 
-						+ "  \"basePath\": \"" + portPath + "\",\n"
-						+ "  \"schemes\": [\n" + "    \"http\"\n" + "  ],\n" 
-						+ "  \"consumes\": [\n"
-						+ "    \"application/json\"\n" + "  ],\n" 
-						+ "  \"produces\": [\n"
-						+ "    \"application/json\"\n" + "  ]," 
-						+ "  \"paths\": {" + "  " + String.join(",", openapiPaths) + "\n" 
-						+ "      },\n" 
-						+ "  \"definitions\": {\n" + String.join(",\n", jsonDefinitions) + "\n}" 
-						+ "}\n");
-				fw.close();
+                            try (FileWriter fw = new FileWriter(file)) {
+                                Log.debug("OpenAPI: " + portName + OPENAPI_FILE_TYPE);
+                                fw.write("{\n" +
+                                        // jsonContext + ",\n" +
+                                        "  \"openapi\": \"" + OPENAPI_VERSION + "\",\n"
+                                                + "  \"info\": {\n"
+                                                + "    \"version\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_VERSION_PROPERTY) + "\",\n"
+                                                        + "    \"title\": \"" + portName + "\",\n"
+                                                                + "    \"description\": \"" + port.description() + "\",\n"
+                                                                        + "    \"termsOfService\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_TERMS_URL_PROPERTY) + "\",\n"
+                                                                                + "    \"contact\": {\n"
+                                                                                + "      \"name\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_ORGANIZATION_PROPERTY) + "\",\n"
+                                                                                        + "      \"email\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_EMAIL_PROPERTY) + "\",\n"
+                                                                                                + "      \"url\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CONTACT_PROPERTY) + "\"\n"
+                                                                                                        + "    },\n"
+                                                                                                        + "    \"license\": {\n"
+                                                                                                        + "      \"name\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY) + "\",\n"
+                                                                                                                + "      \"url\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY) + "\"\n"
+                                                                                                                        + "    }\n"
+                                                                                                                        + "  },\n"
+                                                                                                                        + "  \"host\": \"host.example.com\",\n"
+                                                                                                                        + "  \"basePath\": \"" + portPath + "\",\n"
+                                                                                                                                + "  \"schemes\": [\n" + "    \"http\"\n" + "  ],\n"
+                                                                                                                                + "  \"consumes\": [\n"
+                                                                                                                                + "    \"application/json\"\n" + "  ],\n"
+                                                                                                                                + "  \"produces\": [\n"
+                                                                                                                                + "    \"application/json\"\n" + "  ],"
+                                                                                                                                + "  \"paths\": {" + "  " + String.join(",", openapiPaths) + "\n"
+                                                                                                                                        + "      },\n"
+                                                                                                                                        + "  \"definitions\": {\n" + String.join(",\n", jsonDefinitions) + "\n}"
+                                                                                                                                                + "}\n");
+                            }
 			} catch (Exception e1) {
 				Log.trace("exportOpenAPI: error exporting OpenAPI JSON " + e1.toString());
 			}
@@ -1013,13 +1012,13 @@ public class JsonWriter {
 			boolean isAttribute) {
 		String elementName = NamespaceModel.getPrefixedName(element);
 		Log.debug("exportOpenApiElementInTypeSchema: " + elementName);
-		String elementName2 = null;
+		String elementName2;
 		String minOccurs = NiemUmlClass.getMinOccurs(multiplicity);
 		String maxOccurs = NiemUmlClass.getMaxOccurs(multiplicity);
 		String elementRef = exportJsonPointer(openapiPath, element);
 		if (isAttribute) {
 			if (elementName.equals("@id") || elementName.equals("@ref")) {
-				elementName = JSON_LD_ID_ELEMENT_TYPE;
+//				elementName = JSON_LD_ID_ELEMENT_TYPE;
 				elementName2 = JSON_LD_ID_ELEMENT;
 				UmlClass baseType = NiemUmlClass.getSubsetModel().getType(NiemModel.XSD_URI, JSON_LD_ID_ELEMENT_TYPE);
 				elementRef = exportJsonPointer(openapiPath, baseType);

@@ -158,7 +158,7 @@ public class NamespaceResolver implements NamespaceContext {
 	/* (non-Javadoc)
 	 * @see javax.xml.namespace.NamespaceContext#getPrefixes(java.lang.String)
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	//@SuppressWarnings({ "rawtypes", "unchecked" })
         @Override
 	public Iterator getPrefixes(String namespaceURI) {
 		// Not implemented

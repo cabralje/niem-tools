@@ -97,7 +97,8 @@ public class NiemtoolsBouml
 				switch (command)
 				{
 				case "configure":
-					new ConfigurationDialog(root, properties);
+					ConfigurationDialog configDialog = new ConfigurationDialog(root, properties);
+					configDialog.setVisible(true); // Ensure the dialog is displayed
 					break;
 
 				case "importSchema":

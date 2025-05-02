@@ -390,7 +390,7 @@ public class NiemUmlClass {
 	// TODO createSubsetAndExtension: include comment when codelists are truncated
 	// FIXME createSubsetAndExtension: handle error "target not allowed, must be a package, any view or a use case"
 	// TODO createSubsetAndExtension: add augmentation type and multiplicity properties
-	@SuppressWarnings("unchecked")
+	//@SuppressWarnings("unchecked")
 	public void createSubsetAndExtension() {
 
 		Log.start("createSubsetAndExtension");
@@ -572,7 +572,7 @@ public class NiemUmlClass {
 	/** deletes NIEM mappings
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
+	//@SuppressWarnings("unchecked")
 	public void deleteMapping() {
 		Log.trace("Deleting NIEM Mapping");
 		Iterator<UmlItem> it = UmlItem.all.iterator();
@@ -667,7 +667,7 @@ public class NiemUmlClass {
 	 * @param jsonDir
 	 * @param openapiDir
 	 */
-	@SuppressWarnings("unchecked")
+	//@SuppressWarnings("unchecked")
 	public void exportSpecification(String xmlDir, String wsdlDir, String jsonDir, String openapiDir, String xmlExampleDir, String jsonExampleDir, String cmfDir) {
 
 		Log.start("exportSpecification");

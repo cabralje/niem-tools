@@ -275,7 +275,8 @@ class ConfigurationDialog extends JDialog {
 				String value = licenseField.getText();
 				if (value.startsWith("http"))
 					try {
-						new URL(value);
+						@SuppressWarnings("unused")
+						URL url = new URL(value);
 					} catch (MalformedURLException e1) {
 						Log.trace("main: URL " + value + " is malformed");
 					}
@@ -292,7 +293,8 @@ class ConfigurationDialog extends JDialog {
 				String value = termsField.getText();
 				if (value.startsWith("http"))
 					try {
-						new URL(value);
+						@SuppressWarnings("unused")
+						URL url = new URL(value);
 					} catch (MalformedURLException e1) {
 						Log.trace("URL " + value + " is malformed");
 					}
@@ -451,7 +453,8 @@ class ConfigurationDialog extends JDialog {
 					url = urlValue.toString();
 				if (url.startsWith("http"))
 					try {
-						new URL(url);
+						@SuppressWarnings("unused")
+						URL url2 = new URL(url);
 					} catch (MalformedURLException e1) {
 						Log.trace("URL " + url + " is malformed");
 					}

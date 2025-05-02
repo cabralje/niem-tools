@@ -145,7 +145,7 @@ class NiemModel {
 	 * @return URI of a item in schemaURI with name itemName as a String
 	 */
 	static String getURI(String schemaURI, String itemName) {
-		itemName = itemName.replaceAll("[^-._:A-Za-z0-9]", "");
+		// itemName.replaceAll("[^-._:A-Za-z0-9]", "");
 		return schemaURI + HASH_DELIMITER + NamespaceModel.getName(itemName).replaceAll(HASH_DELIMITER, "");
 	}
 	/**
@@ -310,7 +310,7 @@ class NiemModel {
 
 		Log.debug("cacheModel: caching namespaces, types and elements");
 		for (UmlItem classView : modelPackage.children()) {
-			if (classView.kind() != anItemKind.aClassView)
+			if ((classView == null) || (classView.kind() != anItemKind.aClassView))
 				continue;
 			schemaURI = getURI(classView);
 			String prefix = classView.propertyValue(NiemUmlClass.PREFIX_PROPERTY);

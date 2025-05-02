@@ -24,7 +24,7 @@ public class CsvReader {
 		// cache UML classes
 		Map<String, UmlClass> UMLClasses = new HashMap<>();
 		Map<String, UmlClassInstance> UMLInstances = new HashMap<>();
-		@SuppressWarnings("unchecked")
+		//@SuppressWarnings("unchecked")
 		Iterator<UmlItem> it = UmlItem.all.iterator();
 		while (it.hasNext()) {
 			UmlItem item = it.next();

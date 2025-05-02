@@ -43,7 +43,7 @@ public class HtmlWriter {
                         fw.write("</tr>\n");
                         
                         // Show NIEM Mappings for Classes
-                        @SuppressWarnings("unchecked")
+                        //@SuppressWarnings("unchecked")
                                 Iterator<UmlItem> it = (UmlClass.classes.iterator());
                         while (it.hasNext()) {
                             UmlItem thisClass = it.next();
