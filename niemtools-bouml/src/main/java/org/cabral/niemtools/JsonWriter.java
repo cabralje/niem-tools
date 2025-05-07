@@ -191,7 +191,7 @@ public class JsonWriter {
 				path = "./" + path;
 		}
 		String prefixedName = NamespaceModel.getPrefixedName(targetItem);
-		if (prefixedName.contains(NamespaceModel.ATTRIBUTE_PREFIX) && !prefixedName.endsWith(JSON_LD_ID_ELEMENT))
+		if (NamespaceModel.isAttribute(prefixedName) && !prefixedName.endsWith(JSON_LD_ID_ELEMENT))
 			prefixedName = NamespaceModel.filterAttributePrefix(prefixedName);
 		path += "#/" + JSON_SCHEMA_DEFSTAG + "/" + prefixedName;
 		//Log.trace("exportJsonPointer: " + sourcePath.toString() + " " + targetPath.toString() + " " + path);
@@ -505,7 +505,7 @@ public class JsonWriter {
 					if (element == null)
 						continue;
 					String elementName = NamespaceModel.getPrefixedName(element);
-					boolean elementIsAttribute = NiemUmlClass.isAttribute(element);
+					boolean elementIsAttribute = NamespaceModel.isAttribute(element);
 					Log.debug("exportJsonTypeSchema: exporting element in type " + elementName);
 					if (elementName.equals(anyElement)) {
 						anyJSON = true;
@@ -532,7 +532,7 @@ public class JsonWriter {
 							// add substitution elements
 							for (UmlClassInstance element2 : enlist) {
 								String jsonElementInType = exportJsonElementInTypeSchema(type,
-										element2, multiplicity2, NiemUmlClass.isAttribute(element2));
+										element2, multiplicity2, NamespaceModel.isAttribute(element2));
 								if (jsonElementInType != null)
 									jsonElementsInType.add(jsonElementInType);
 							}
@@ -558,7 +558,7 @@ public class JsonWriter {
 							UmlAttribute attribute = (UmlAttribute) item5;
 							NiemModel model2 = NiemUmlClass.getModel(NiemModel.getURI(attribute));
 							UmlClassInstance element = model2.getElementByURI(NiemModel.getURI(attribute));
-							if (element == null || !NiemUmlClass.isAttribute(element))
+							if (element == null || !NamespaceModel.isAttribute(element))
 								continue;
 							String elementName = NamespaceModel.getPrefixedName(element);
 							UmlClass elementBaseType = NiemModel.getBaseType(element);
@@ -566,7 +566,7 @@ public class JsonWriter {
 							String minOccurs = NiemUmlClass.getMinOccurs(multiplicity);
 							if (elementBaseType != model.getAbstractType()) {
 								String jsonElementInType = exportJsonElementInTypeSchema(type, element,
-										multiplicity, NiemUmlClass.isAttribute(element));
+										multiplicity, NamespaceModel.isAttribute(element));
 								if (jsonElementInType != null)
 									jsonElementsInType.add(jsonElementInType);
 								if (Integer.parseInt(minOccurs) > 0)

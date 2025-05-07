@@ -53,6 +53,7 @@ import fr.bouml.anItemKind;
 public class XmlWriter {
 
 	static final String AUGMENTATION_POINT_NAME = "AugmentationPoint";
+	static final String SIMPLE_TYPE_NAME = "SimpleType";
 	// NIEM code lists
 	static final String APPINFO_PREFIX = "appinfo";
 	static final String APPINFO_URI = "https://docs.oasis-open.org/niemopen/ns/model/appinfo/6.0/";
@@ -155,7 +156,7 @@ public class XmlWriter {
 					continue;
 				UmlClassInstance element = (UmlClassInstance) item2;
 				String elementName = NamespaceModel.getName(element);
-				String codeList = element.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
+				String codeList = NiemUmlClass.getCodeList(element);
 				if (codeList == null || codeList.trim().equals(""))
 					continue;
 				String codeListURI = NamespaceModel.getExtensionSchema(elementName);
@@ -617,7 +618,7 @@ public class XmlWriter {
                                          
                                          <xs:annotation>
                                          <xs:documentation>""" + description + "</xs:documentation>\n";
-			String codeList = element.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
+			String codeList = NiemUmlClass.getCodeList(element);
 			if (codeList != null)
 				elementSchema += "<xs:appinfo>" + "<clsa:SimpleCodeListBinding codeListURI=\""
 						+ NamespaceModel.getExtensionSchema(elementName) + "\"/>" + " </xs:appinfo>";
@@ -651,7 +652,7 @@ public class XmlWriter {
                                          
                                          <xs:annotation>
                                          <xs:documentation>""" + description + "</xs:documentation>\n";
-			String codeList = element.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
+			String codeList = NiemUmlClass.getCodeList(element);
 			if (codeList != null)
 				elementSchema += "<xs:appinfo>" + "<clsa:SimpleCodeListBinding codeListURI=\""
 						+ NamespaceModel.getExtensionSchema(elementName) + "\"/>" + " </xs:appinfo>";
@@ -757,13 +758,13 @@ public class XmlWriter {
 	String exportXmlTypeSchema(UmlClass type) {
 		String typeName = NamespaceModel.getName(type);
 		String typeSchema;
-		String codeList = type.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
+		String codeList = NiemUmlClass.getCodeList(type);
 		boolean isComplexType = true;
 		boolean isComplexContent = true;
 		UmlClass baseType = NiemModel.getBaseType(type);
 		if (baseType == null)
 			baseType = NiemUmlClass.getSubsetModel().getObjectType();
-		String baseTypeCodeList = baseType.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
+		String baseTypeCodeList = NiemUmlClass.getCodeList(baseType);
 		String baseTypeName = NamespaceModel.getPrefixedName(baseType);
 		if (codeList != null && !codeList.equals("")) { // code list simple type
 			Log.debug("exportXmlTypeSchema: exporting code list simple type " + typeName);
@@ -824,7 +825,7 @@ public class XmlWriter {
 				}
 				// if (complexContent)
 				String multiplicity = attribute.multiplicity();
-				if (NiemUmlClass.isAttribute(element)) {
+				if (NamespaceModel.isAttribute(element)) {
 					String use = multiplicity.equals("1,1") ? "required" : "optional";
 					xmlAttributesInType.add("<xs:attribute ref=\"" + elementName + "\" use = \"" + use + "\"/>");
 				} else {

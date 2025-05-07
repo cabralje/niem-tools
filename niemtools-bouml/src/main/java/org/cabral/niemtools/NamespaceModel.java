@@ -418,5 +418,13 @@ public class NamespaceModel {
 		String tagname = getName(name);
 		return tagname.startsWith(ATTRIBUTE_PREFIX);
 	}
+
+	/**
+	 * @param item
+	 * @return true if the UML item is an attribute or attribute group
+	 */
+	static boolean isAttribute(UmlItem item) {
+		return isAttribute(getName(item));
+	}
 }
 

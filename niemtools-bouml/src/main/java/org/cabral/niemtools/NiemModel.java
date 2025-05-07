@@ -64,6 +64,7 @@ class NiemModel {
 
 	static final String ABSTRACT_TYPE_NAME = "abstract";
 	static final String ANY_ELEMENT_NAME = "any";
+	//static final String ASSOCIATION_TYPE_NAME = "AssociationType";
 	static final String AUGMENTATION_TYPE_NAME = "AugmentationType";
 	//static final String AUGMENTATION_POINT_NAME = "AugmentationPoint";
 	static final String CODELIST_DEFINITION_DELIMITER = "=";
@@ -71,7 +72,7 @@ class NiemModel {
 	private static final String HASH_DELIMITER = ",";
 	static final String LOCAL_PREFIX = "local";
 	static final String LOCAL_URI = "local";
-	private static final String OBJECT_TYPE_NAME = "ObjectType";
+	static final String OBJECT_TYPE_NAME = "ObjectType";
 	private static final String SIMPLE_OBJECT_ATTRIBUTE_GROUP = "@SimpleObjectAttributeGroup";
 	static Map<String, List<UmlClassInstance>> Substitutions = new HashMap<>();
 	static final String URI_PROPERTY = "URI";
@@ -532,9 +533,9 @@ class NiemModel {
 		if (sourceType.description() != null)
 			type.set_Description(sourceType.description());
 		type.set_PropertyValue(URI_PROPERTY, getURI(sourceType));
-		String codeList = sourceType.propertyValue(NiemUmlClass.CODELIST_PROPERTY);
+		String codeList = NiemUmlClass.getCodeList(sourceType);
 		if (codeList != null)
-			type.set_PropertyValue(NiemUmlClass.CODELIST_PROPERTY, codeList);
+			NiemUmlClass.setCodeList(type, codeList);
 		types.put(getURI(type), type);
 
 		// copy and relate to base type
@@ -548,7 +549,7 @@ class NiemModel {
 
 		// copy elements and attributes in type
 		for (UmlItem item : sourceType.children())
-			if (NiemUmlClass.isAttribute(item)) {
+			if (NamespaceModel.isAttribute(item)) {
 				UmlClassInstance sourceElement = NiemUmlClass.getReferenceModel().getElementByURI(getURI(item));
 				if (sourceElement == null) {
 					Log.trace("copyType: error - no element for uri " + getURI(item) + " in reference model");
@@ -1113,7 +1114,7 @@ class NiemModel {
 				}
 				if (element != null)
 					if (!codeList.equals(""))
-						element.set_PropertyValue(NiemUmlClass.CODELIST_PROPERTY, codeList);
+						NiemUmlClass.setCodeList(element, codeList);
 			}
 		return ns;
 	}
@@ -1501,7 +1502,7 @@ class NiemModel {
 					}
 					String codeList = importCodeList(elist);
 					if (!codeList.equals(""))
-						type.set_PropertyValue(NiemUmlClass.CODELIST_PROPERTY, codeList);
+						NiemUmlClass.setCodeList(type, codeList);
 				}
 			}
 

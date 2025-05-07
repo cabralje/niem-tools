@@ -79,6 +79,8 @@ public class NiemUmlClass {
 	static final String NILLABLE_PROPERTY = "isNillable";
 	static final String PREFIX_PROPERTY = "prefix";
 	static final String SUBSTITUTION_PROPERTY = "substitutesFor";
+	static final String SUBSTITUTION_TYPE_PROPERTY = "substitutesIn";
+	static final String SUBSTITUTION_MULTIPLICITY_PROPERTY = "subMultiplicity";
 	static final String CODELIST_PROPERTY = "codeList";
 	static final String FILE_PATH_PROPERTY = "path";
 	static final String MESSAGE_ELEMENT_PROPERTY = "messageElement";
@@ -155,6 +157,15 @@ public class NiemUmlClass {
 	 */
 	static NiemModel getExtensionModel() {
 		return ExtensionModel;
+	}
+
+	/**
+	 * @param type
+	 * @return codelist associated with the type
+	 */
+
+	static String getCodeList(UmlItem type) {
+		return type.propertyValue(CODELIST_PROPERTY);
 	}
 
 	/**
@@ -275,14 +286,6 @@ public class NiemUmlClass {
 	}
 
 	/**
-	 * @param item
-	 * @return true if the UML item is an attribute or attribute group
-	 */
-	static boolean isAttribute(UmlItem item) {
-		return NamespaceModel.getName(item).startsWith(NamespaceModel.ATTRIBUTE_PREFIX);
-	}
-
-	/**
 	 * @param elementName
 	 * @return true if an element exists in reference model 
 	 */
@@ -385,11 +388,8 @@ public class NiemUmlClass {
 	/** creates NIEM subset and extension models
 	 * 
 	 */
-	// TODO createSubsetAndExtension: export attributes
 	// TODO createSubsetAndExtension: add facets properties
-	// TODO createSubsetAndExtension: include comment when codelists are truncated
 	// FIXME createSubsetAndExtension: handle error "target not allowed, must be a package, any view or a use case"
-	// TODO createSubsetAndExtension: add augmentation type and multiplicity properties
 	//@SuppressWarnings("unchecked")
 	public void createSubsetAndExtension() {
 
@@ -486,7 +486,7 @@ public class NiemUmlClass {
 			// Copy code list
 			if (codeList != null && !codeList.equals("")) {
 				Log.debug("createSubsetAndExtension: adding code list " + codeList + " to type " + typeName);
-				type.set_PropertyValue(CODELIST_PROPERTY, codeList);
+				setCodeList(type, codeList);
 			}
 		}
 		Log.stop("createSubsetAndExtension - add base types");
@@ -554,10 +554,13 @@ public class NiemUmlClass {
 
 				if (isNillable)
 					element.set_PropertyValue(NILLABLE_PROPERTY, "true");
-				if (headElement != null && substitution && representation)
+				if (headElement != null && substitution && representation) {
 					element.set_PropertyValue(SUBSTITUTION_PROPERTY, headElement);
+					element.set_PropertyValue(SUBSTITUTION_TYPE_PROPERTY, typeName);
+					element.set_PropertyValue(SUBSTITUTION_MULTIPLICITY_PROPERTY, multiplicity);
+				}
 				if (codeList != null && !codeList.equals("") && (!substitution || representation))
-					element.set_PropertyValue(CODELIST_PROPERTY, codeList);
+					setCodeList(element, codeList);
 			}
 		}
 		Log.stop("createSubsetAndExtension - add elements");
@@ -880,7 +883,7 @@ public class NiemUmlClass {
                                         String elementName = NamespaceModel.getPrefixedName(element);
                                         if (elementName.equals(anyElement))
                                             continue;
-                                        if (isAttribute(element)) {
+                                        if (NamespaceModel.isAttribute(element)) {
                                             elementName = NamespaceModel.getPrefixedAttributeName(NamespaceModel.getPrefix(elementName), elementName);
                                             Log.debug("exportWantlist: export attribute " + elementName);
                                             // fw.write("<w:Attribute w:name=\"" + elementName + "\"/>\n");
@@ -913,7 +916,7 @@ public class NiemUmlClass {
                                         // continue;
                                         
                                         // attribute groups are not supported in wantlists
-                                        if (isAttribute(type))
+                                        if (NamespaceModel.isAttribute(type))
                                             continue;
                                         
                                         fw.write("<w:Type w:name=\"" + typeName + "\" w:isRequested=\"true\">\n");
@@ -936,7 +939,7 @@ public class NiemUmlClass {
                                                             + " for " + typeName + "/" + elementName);
                                                 }
                                                 
-                                                if (isAttribute(attribute)) {
+                                                if (NamespaceModel.isAttribute(attribute)) {
                                                     elementName = NamespaceModel.getPrefixedName(NamespaceModel.getPrefix(elementName),
                                                             NamespaceModel.filterAttributePrefix(NamespaceModel.getName(elementName)));
                                                     Log.debug("exportWantlist: export attribute " + elementName);
@@ -1031,7 +1034,6 @@ public class NiemUmlClass {
 	 */
 	// TODO importSchemaDir: improve performance - multithreading?
 	// TODO importSchemaDir: mark truncated code lists
-	// TODO importSchemaDir: remap niem-xs: to xs:
 	// TODO importSchemaDir: import augmentations/substitutionGroups
 	// TODO importSchemaDir: import facets other than enumerations
 	public void importSchemaDir(String dir, Boolean includeEnums) throws IOException {
@@ -1159,4 +1161,15 @@ public class NiemUmlClass {
 			for(UmlItem c : ch)
 				removeStereotype(c);
 	}	
+
+
+		/**
+	 * @param type
+	 * @param codelist
+	 * @return set codelist associated with the type
+	 */
+
+	 static void setCodeList(UmlItem item, String codelist) {
+		item.set_PropertyValue(CODELIST_PROPERTY, codelist);
+	}
 }
