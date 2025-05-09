@@ -17,7 +17,6 @@ import fr.bouml.UmlAttribute;
 import fr.bouml.UmlClass;
 import fr.bouml.UmlClassInstance;
 import fr.bouml.UmlClassView;
-import fr.bouml.UmlCom;
 import fr.bouml.UmlItem;
 import fr.bouml.anItemKind;
 
@@ -104,7 +103,7 @@ public class CmfWriter {
 				for (UmlItem item2 : item.children())
 					// export subset and extension classes
 					if (item2 != null && item2.kind() == anItemKind.aClass) {
-						Log.trace("exportCmfModel: exporting class " + NamespaceModel.getName(item2));
+						Log.debug("exportCmfModel: exporting class " + NamespaceModel.getName(item2));
 						cmfClasses.add(exportCmfClass((UmlClass) item2));
 					}
 			}
@@ -135,8 +134,7 @@ public class CmfWriter {
 	void exportCmf(String cmfDir) throws IOException {
 
 		Log.start("exportCmf");
-		UmlCom.message("Generating NIEM meta models");
-
+		Log.trace("Generating CMF model " + cmfVersion);
 
 		String cmfUri = CMF_URI + cmfVersion + "/";
 		String headerCmf = 	"<Model "
@@ -167,7 +165,7 @@ public class CmfWriter {
 			}	
 
 		} catch (IOException e) {
-			Log.trace("exportCmf - error exporting CMF model " + e.toString());
+			Log.debug("exportCmf - error exporting CMF model " + e.toString());
 		}
 		Log.stop("exportCmf");
 	}
@@ -203,7 +201,7 @@ public class CmfWriter {
 		if (baseType != null && 
 		(baseType == NiemUmlClass.getSubsetModel().getAbstractType() || baseType == NiemUmlClass.getExtensionModel().getAbstractType())) {
 			classIds.add(id);
-			Log.trace("exportCmfClass: exported abstract class " + typeName);
+			Log.debug("exportCmfClass: exported abstract class " + typeName);
 			return tagId("Class", id, 
 				exportCmfComponent(type) 
 				+ CmfWriter.this.tag("AbstractIndicator","true"));
@@ -212,14 +210,14 @@ public class CmfWriter {
 		// datatype
 		if (prefix.equals(NiemModel.XSD_PREFIX) || prefix.equals(NiemModel.PROXY_PREFIX)) {
 			dataTypeIds.add(id);
-			Log.trace("exportCmfClass: exported datatype " + typeName);
+			Log.debug("exportCmfClass: exported datatype " + typeName);
 			return exportCmfDatatype(type);
 		}
 
 		// restriction
 		if (!isClass(type)) {
 			dataTypeIds.add(id);
-			Log.trace("exportCmfClass: exported restriction class " + typeName);
+			Log.debug("exportCmfClass: exported restriction class " + typeName);
 			return exportCmfRestrictionType(type);
 		}
 
@@ -245,8 +243,10 @@ public class CmfWriter {
 			}
 
 
-		Log.trace("exportCmfClass: exported complex class " + typeName);
+		Log.debug("exportCmfClass: exported complex class " + typeName);
 		classCmf = exportCmfComponent(type);
+		if (isOlderCmfVersion(cmfVersion, "1.0"))
+			classCmf += tag("AugmentableIndicator","true");
 		String baseTypePrefix = NamespaceModel.getPrefix(baseType);
 		if (!baseTypePrefix.equals(NiemModel.STRUCTURES_PREFIX))
 			classCmf += tagRef(subclassName, NamespaceModel.getPrefixedName(baseType));
@@ -294,7 +294,7 @@ public class CmfWriter {
 
  		String id = NamespaceModel.getPrefixedName(type);
 		 if (id.endsWith(XmlWriter.SIMPLE_TYPE_NAME)) {
-			Log.trace("exportCmfRestrictionType: skipping simple type " + id);
+			Log.debug("exportCmfRestrictionType: skipping simple type " + id);
 		 	return "";
 		 }
 		String typeName = NamespaceModel.getName(type);
@@ -302,7 +302,7 @@ public class CmfWriter {
 		String restrictionCmf = exportCmfComponent(type);
 		UmlClass baseType = getCmfBaseType(type);
 		if (baseType == null)
-			Log.trace("exportCmfClass: unable to find base type for " + typeName);
+			Log.debug("exportCmfClass: unable to find base type for " + typeName);
 		else {
 			//if (isOlderCmfVersion(cmfVersion, "1.0"))
 			//	restrictionCmf += tagHead("RestrictionOf");
@@ -339,7 +339,7 @@ public class CmfWriter {
 					enumeration += CmfWriter.this.tag(documentationName, codeDescription);
 				restrictionCmf += CmfWriter.this.tag(facetName, enumeration);
 				if (++codeValues > MAX_ENUMS) {
-					Log.trace("exportCmfDatatype: warning - truncated enumerations in class " + id );
+					Log.debug("exportCmfDatatype: warning - truncated enumerations in class " + id );
 					break;
 				}
 			}					
@@ -389,7 +389,7 @@ public class CmfWriter {
 		String description = classview.description();
 		if (description == null || description.equals(""))
 			description = "Namespace for " + prefix + " schema";
-		Log.trace("exportCmf: adding namespace " + prefix);
+		Log.debug("exportCmf: adding namespace " + prefix);
 		if (tagIds.contains(prefix))
 			return tagRef("Namespace",prefix);
 		tagIds.add(prefix);
@@ -412,7 +412,7 @@ public class CmfWriter {
 						NiemModel model = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName)) ? NiemUmlClass.getSubsetModel() : NiemUmlClass.getExtensionModel();
 						UmlClass type = model.getType(NamespaceModel.getSchemaURI(typeName), typeName);
 						if (type == null) {
-							Log.trace("exportCmfNamespace: unable to find type " + typeName);
+							Log.debug("exportCmfNamespace: unable to find type " + typeName);
 							continue;
 						}
 						String typePrefix = NamespaceModel.getPrefix(type);
@@ -496,7 +496,7 @@ public class CmfWriter {
 				propertyCmf+= tagRef("Datatype",baseTypeName); 
 			if (NamespaceModel.isAttribute(elementName))
 				propertyCmf += CmfWriter.this.tag("AttributeIndicator","true");
-			Log.trace("exportCmfProperty: exported data property " + elementName);
+			Log.debug("exportCmfProperty: exported data property " + elementName);
 			return tagId(dataPropertyName, id, propertyCmf);
 		} else {
 			// object property
@@ -509,7 +509,7 @@ public class CmfWriter {
 					propertyCmf += tagRef("SubPropertyOf", NamespaceModel.getPrefixedName(headElement));
 				}
 		}
-		Log.trace("exportCmfProperty: exported object property " + elementName);
+		Log.debug("exportCmfProperty: exported object property " + elementName);
 		return tagId(objectPropertyName, id, propertyCmf);
 
 	}
@@ -536,7 +536,7 @@ public class CmfWriter {
 			NiemModel model = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(baseTypeName)) ? NiemUmlClass.getSubsetModel() : NiemUmlClass.getExtensionModel();
 			baseType = model.getType(NamespaceModel.getSchemaURI(baseTypeName), baseTypeName);
 			if (baseType == null) {
-				Log.trace("getBaseType: unable to replace proxy type " + proxyTypeName + " with type " + baseTypeName);
+				Log.debug("getBaseType: unable to replace proxy type " + proxyTypeName + " with type " + baseTypeName);
 				return null;
 			}
 		}
@@ -616,7 +616,7 @@ public class CmfWriter {
 	 * @param tagId
 	 * @param tagRef	
 	 * @param content
-	 * @return XML start tag
+	 * @return XML tagged content
 	 */
 	String tag(String tag, String id, String ref, String content) {
 		String tagString = "<" + tag;
@@ -653,7 +653,6 @@ public class CmfWriter {
 	/**
 	 * @param tag
 	 * @param id
-	 * @param content
 	 * @return XML reference tag
 	 */
 	String tagRef(String tag, String id) {
@@ -664,7 +663,7 @@ public class CmfWriter {
 	 * @param tag
 	 * @param id
 	 * @param content
-	 * @return XML reference tag
+	 * @return XML reference tag with content
 	 */
 	String tagRef(String tag, String id, String content) {
 		return tag(tag, null, id, content);
