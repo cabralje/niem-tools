@@ -121,6 +121,7 @@ public class XmlWriter {
 	// XML
 	static final String XSI_PREFIX = "xsi";
 	static final String XSI_URI = XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
+	static final String XML_LANG_PREFIX = "xml:lang";
 	static final String XML_LANG = "en-US";
 
 	private final Set<String> CodeListNamespaces = new HashSet<>();
@@ -888,7 +889,7 @@ public class XmlWriter {
 	 */
 	private void writeXmlAttribute(FileWriter fw, String name, String value) {
 		try {
-			fw.write(" " + name + "=\"" + value + "\"");
+			fw.write(xmlAttribute(name, value));
 		} catch (IOException e) {
 			Log.trace("xmlAttribute: error " + e.toString());
 		}
@@ -901,13 +902,28 @@ public class XmlWriter {
 	 */
 	static public void writeXmlNs(FileWriter fw, String prefix, String value) {
 		try {
-			if (prefix.equals(""))
-				fw.write(" " + NamespaceModel.NAMESPACE_ATTRIBUTE + "=\"" + value + "\"");
-			else
-				fw.write(" " + NamespaceModel.NAMESPACE_ATTRIBUTE + ":" + prefix + "=\"" + value + "\"");
+			fw.write(xmlNs(prefix, value));
 		} catch (IOException e) {
 			Log.trace("xmlNS: error " + e.toString());
 		}
 	}
 
+		/** format an XML name value pair
+	 * @param name
+	 * @param value
+	 */
+	private String xmlAttribute(String name, String value) {
+	return " " + name + "=\"" + value + "\"";
+	}
+
+	/** format an XML namespace attribute
+	 * @param prefix
+	 * @param value
+	 */
+	static public String xmlNs(String prefix, String value) {
+	if (prefix.equals(""))
+		return " " + NamespaceModel.NAMESPACE_ATTRIBUTE + "=\"" + value + "\"";
+	else
+		return " " + NamespaceModel.NAMESPACE_ATTRIBUTE + ":" + prefix + "=\"" + value + "\"";
+	}
 }

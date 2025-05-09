@@ -9,17 +9,20 @@ public class TestHarness {
 	
 	public static void main(String argv[]) {
 
+		int boumlPort = 0;
 		if (argv.length >= 1)
 		{
-			int boumlPort = Integer.parseInt(argv[argv.length - 1]);
+			boumlPort = Integer.parseInt(argv[argv.length - 1]);
 			
-			try {
-                            try (FileWriter out = new FileWriter(filename)) {
-                                out.write(Integer.toString(boumlPort));
-                            }
-			} catch (IOException e) {
-				// nothing to do
+
+		}
+
+		try {
+			try (FileWriter out = new FileWriter(filename)) {
+				out.write(Integer.toString(boumlPort));
 			}
+		} catch (IOException e) {
+		// nothing to do
 		}
 		System.exit(0);
 	}

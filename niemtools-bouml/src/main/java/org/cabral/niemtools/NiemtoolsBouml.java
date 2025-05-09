@@ -46,6 +46,7 @@ public class NiemtoolsBouml
 			File file = new File(TestHarness.filename);
 			String buffer = new String(Files.readAllBytes(file.toPath()));
 			boumlPort = Integer.parseInt(buffer);
+			Log.debug("Port: " + boumlPort + "\n");
 			
 			// delete file - BOUML ports are one-time use
 			file.delete();
@@ -57,9 +58,11 @@ public class NiemtoolsBouml
 				boumlPort = Integer.parseInt(argv[argv.length - 1]);
 		}
 		
+		System.out.println("Connecting to BOUML on port " + boumlPort);
+
 		if (boumlPort != 0) {
 			
-			System.out.println("Connecting to BOUML on port " + boumlPort);
+
 			UmlCom.connect(boumlPort);
 			Log.debug("Port: " + boumlPort + "\n");
 			Log.debug("Classpath: " + System.getProperty("java.class.path") + "\n");
@@ -248,8 +251,9 @@ public class NiemtoolsBouml
 		String xmlExampleDir = (root.propertyValue("exportXML").equals("true")) ? properties.getProperty("xmlExampleDir") : null;
 		String jsonExampleDir = (root.propertyValue("exportJSON").equals("true")) ? properties.getProperty("jsonExampleDir") : null;
 		String cmfDir = (root.propertyValue("exportMetamodel").equals("true")) ? properties.getProperty("metamodelDir") : null;
+		String cmfVersion = "0.8";
 		
-		niemTools.exportSpecification(xsdDir, wsdlDir, jsonDir, openapiDir, xmlExampleDir, jsonExampleDir, cmfDir);
+		niemTools.exportSpecification(xsdDir, wsdlDir, jsonDir, openapiDir, xmlExampleDir, jsonExampleDir, cmfDir, cmfVersion);
 		Log.stop("generateModels");
 	}
 

@@ -671,17 +671,11 @@ public class NiemUmlClass {
 	 * @param openapiDir
 	 */
 	//@SuppressWarnings("unchecked")
-	public void exportSpecification(String xmlDir, String wsdlDir, String jsonDir, String openapiDir, String xmlExampleDir, String jsonExampleDir, String cmfDir) {
+	public void exportSpecification(String xmlDir, String wsdlDir, String jsonDir, String openapiDir, String xmlExampleDir, String jsonExampleDir, String cmfDir, String cmfVersion) {
 
 		Log.start("exportSpecification");
 		Log.trace("Generating Specification");
-		
-		XmlWriter xmlWriter = new XmlWriter(xmlDir);
-		JsonWriter jsonWriter = new JsonWriter(jsonDir);
-		CommonModelFormatWriter cmfWriter = new CommonModelFormatWriter(cmfDir);
-		
-		TreeSet<String> jsonDefinitions = new TreeSet<>();
-		TreeSet<String> jsonDefinitions2 = new TreeSet<>();
+	
 		/*
 		 * cacheExternalSchemas(); cacheModel(referencePackage);
 		 * cacheModel(subsetPackage); cacheModel(extensionPackage);
@@ -689,6 +683,7 @@ public class NiemUmlClass {
 
 		// export code lists for extension elements
 
+		XmlWriter xmlWriter = new XmlWriter(xmlDir);
 		if (xmlDir != null) {
 			xmlWriter.exportCodeLists(ExtensionModel);
 			xmlWriter.exportCodeLists(SubsetModel);
@@ -791,6 +786,8 @@ public class NiemUmlClass {
 			}
 		}
 
+		TreeSet<String> jsonDefinitions = new TreeSet<>();
+		TreeSet<String> jsonDefinitions2 = new TreeSet<>();
 		if (jsonDir != null)
 			jsonDefinitions.addAll(SubsetModel.exportSchemas(null, jsonDir));
 		jsonDefinitions.addAll(ExtensionModel.exportSchemas(xmlDir, jsonDir));
@@ -804,6 +801,7 @@ public class NiemUmlClass {
             }
 			
 		if (xmlDir != null) {
+
 			try {
 				xmlWriter.exportMpdCatalog(messages.keySet(), xmlExampleDir);
 			} catch (IOException e) {
@@ -818,14 +816,19 @@ public class NiemUmlClass {
 		}
 		if (jsonDir != null)
 			try {
-				if (openapiDir != null)
+				if (openapiDir != null) {
+					JsonWriter jsonWriter = new JsonWriter(jsonDir);
 					jsonWriter.exportOpenApi(openapiDir, ports, messageNamespaces, jsonDefinitions2);
+				}
 			} catch (IOException e) {
 				Log.trace("exportSpecification: error exporting OpenAPI files " + e.toString());
 			} 
 		if (cmfDir != null)
 			try {
-				cmfWriter.exportCMF(cmfDir);
+				CmfWriter cmfWriter = new CmfWriter(cmfDir, cmfVersion);
+				cmfWriter.exportCmf(cmfDir);
+				cmfWriter = new CmfWriter(cmfDir, "1.0");
+				cmfWriter.exportCmf(cmfDir);
 			} catch (IOException e) {
 				Log.trace("exportSpecification: error exporting common model format files " + e.toString());
 			}
