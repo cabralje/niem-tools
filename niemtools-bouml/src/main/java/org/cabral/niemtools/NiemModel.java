@@ -57,7 +57,7 @@ class NiemModel {
 
     private static final Boolean IMPORT_CODE_DESCRIPTIONS = true;
     // private static final Boolean _IMPORT_CODE_DESCRIPTIONS = false;
-    private static final Integer MAX_ENUMS = 250;
+    private static final Integer MAX_ENUMS = 300;
     //private static final Integer MAX_ENUMS = 20;
     private static final Integer MAX_FACETS = 1000;
     static final String ABSTRACT_TYPE_NAME = "abstract";
@@ -75,8 +75,6 @@ class NiemModel {
     private static final String SIMPLE_OBJECT_ATTRIBUTE_GROUP = "@SimpleObjectAttributeGroup";
     static Map<String, List<UmlClassInstance>> Substitutions = new HashMap<>();
 
-    static final String XML_PREFIX = XMLConstants.XML_NS_PREFIX;
-    static final String XML_URI = XMLConstants.XML_NS_URI;
     private static final String[] XML_TYPE_NAMES = {"anyURI", "base64Binary", "boolean", "byte", "date", "dateTime",
         "decimal", "double", "duration", "ENTITIES", "ENTITY", "float", "gDay", "gMonth", "gMonthDay", "gYear",
         "gYearMonth", "hexBinary", "ID", "IDREF", "IDREFS", "int", "integer", "language", "long", "Name", "NCName",
@@ -85,7 +83,6 @@ class NiemModel {
         "unsignedLong", "unsignedShort"};
 
     static final String XSD_PREFIX = "xs";
-    static final String XSD_URI = XMLConstants.W3C_XML_SCHEMA_NS_URI;
     static final String PROXY_PREFIX = "niem-xs";
     //static final String PROXY_URI = "https://docs.oasis-open.org/niemopen/ns/model/adapters/niem-xs/6.0/";
     static final String STRUCTURES_PREFIX = "structures";
@@ -461,17 +458,17 @@ class NiemModel {
             abstractType = addType(LOCAL_URI,
                     NamespaceModel.getPrefixedName(LOCAL_PREFIX, ABSTRACT_TYPE_NAME), null, null);
             // add XML namespace, simple types and any element
-            NamespaceModel.getNamespaceClassView(this, XML_PREFIX, XML_URI);
+            NamespaceModel.getNamespaceClassView(this, XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
             for (String typeName : XML_TYPE_NAMES)
-                addType(XSD_URI, NamespaceModel.getPrefixedName(XSD_PREFIX, typeName), null, null);
-            addElement(XSD_URI, NamespaceModel.getPrefixedName(XSD_PREFIX, ANY_ELEMENT_NAME), null, null, null);
+                addType(XMLConstants.W3C_XML_SCHEMA_NS_URI, NamespaceModel.getPrefixedName(XSD_PREFIX, typeName), null, null);
+            addElement(XMLConstants.W3C_XML_SCHEMA_NS_URI, NamespaceModel.getPrefixedName(XSD_PREFIX, ANY_ELEMENT_NAME), null, null, null);
         } else if (this == NiemUmlClass.getSubsetModel()) {
             abstractType = copyType(NamespaceModel.getPrefixedName(LOCAL_PREFIX, ABSTRACT_TYPE_NAME));
             augmentationType = copyType(NamespaceModel.getPrefixedName(STRUCTURES_PREFIX, AUGMENTATION_TYPE_NAME));
             objectType = copyType(NamespaceModel.getPrefixedName(STRUCTURES_PREFIX, OBJECT_TYPE_NAME));
             simpleObjectAttributeGroup = copyType(
                     NamespaceModel.getPrefixedName(STRUCTURES_PREFIX, SIMPLE_OBJECT_ATTRIBUTE_GROUP));
-            NamespaceModel.getNamespaceClassView(null, XSD_PREFIX, XSD_URI);
+            NamespaceModel.getNamespaceClassView(null, XSD_PREFIX, XMLConstants.W3C_XML_SCHEMA_NS_URI);
             copyElement(NamespaceModel.getPrefixedName(XSD_PREFIX, ANY_ELEMENT_NAME));
             copyType("xs:NCName"); // JSON-LD @id is type xs:NCName
         } else if (this == NiemUmlClass.getExtensionModel()) {
@@ -1216,7 +1213,7 @@ class NiemModel {
                     if (baseTypeSchemaURI == null)
                         baseTypeSchemaURI = NamespaceModel.getSchemaURI(baseTypeName);
                     if (baseTypeName != null && baseTypeSchemaURI == null && NamespaceModel.getPrefix(baseTypeName) == null) {
-                        baseTypeSchemaURI = XSD_URI;
+                        baseTypeSchemaURI = XMLConstants.W3C_XML_SCHEMA_NS_URI;
                         baseTypeName = NamespaceModel.getPrefixedName(XSD_PREFIX, baseTypeName);
                     }
                     baseType = getType(baseTypeSchemaURI, baseTypeName);
@@ -1291,7 +1288,7 @@ class NiemModel {
                     if (baseTypeSchemaURI == null)
                         baseTypeSchemaURI = NamespaceModel.getSchemaURI(baseTypeName);
                     if (baseTypeName != null && baseTypeSchemaURI == null && NamespaceModel.getPrefix(baseTypeName) == null) {
-                        baseTypeSchemaURI = XSD_URI;
+                        baseTypeSchemaURI = XMLConstants.W3C_XML_SCHEMA_NS_URI;
                         baseTypeName = NamespaceModel.getPrefixedName(XSD_PREFIX, baseTypeName);
                     }
                 }

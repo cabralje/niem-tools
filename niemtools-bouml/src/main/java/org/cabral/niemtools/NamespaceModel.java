@@ -362,8 +362,8 @@ public class NamespaceModel {
                 String attributeNodeName = attributeNode.getNodeName();
                 String schemaURI = attributeNode.getNodeValue();
                 // parser filters "xml" namespace definition so it is hardcoded
-                if (schemaURI.equals(NiemModel.XML_URI))
-                    attributeNodeName = XMLConstants.XMLNS_ATTRIBUTE + NAMESPACE_DELIMITER + NiemModel.XML_PREFIX;
+                if (schemaURI.equals(XMLConstants.XML_NS_URI))
+                    attributeNodeName = XMLConstants.XMLNS_ATTRIBUTE + NAMESPACE_DELIMITER + XMLConstants.XML_NS_PREFIX;
                 Log.debug("importNamespaces: processing attribute " + attributeNodeName);
                 if (attributeNodeName.startsWith(XMLConstants.XMLNS_ATTRIBUTE) && !attributeNodeName.equals(XMLConstants.XMLNS_ATTRIBUTE)) {
 

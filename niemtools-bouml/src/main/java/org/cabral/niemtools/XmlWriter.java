@@ -493,7 +493,7 @@ public class XmlWriter {
                 wsdl.write("<definitions targetNamespace=\"" + WSDLURI + "/" + portName + "\"");
                 writeXmlNs(wsdl, WSDL_PREFIX, WSDLURI + "/" + portName);
                 writeXmlNs(wsdl, WRAPPER_PREFIX, WRAPPERURI);
-                writeXmlNs(wsdl, "xsd", NiemModel.XSD_URI);
+                writeXmlNs(wsdl, "xsd", XMLConstants.W3C_XML_SCHEMA_NS_URI);
                 writeXmlNs(wsdl, SOAP_PREFIX, SOAP_URI);
                 writeXmlNs(wsdl, WSDL_SCHEMA_PREFIX, WSDL_SCHEMA_URI);
                 writeXmlNs(wsdl, "", WSDL_SCHEMA_URI);
@@ -764,7 +764,7 @@ public class XmlWriter {
                             }
                         }
                         if (!nsSchemaURI2.equals(nsSchemaURI) && !nsSchemaURI2.equals(NiemModel.LOCAL_URI)
-                                && !nsSchemaURI2.equals(NiemModel.XSD_URI)) {
+                                && !nsSchemaURI2.equals(XMLConstants.W3C_XML_SCHEMA_NS_URI)) {
                             if (p3 != null) {
                                 xml.write("<xs:import namespace=\"" + nsSchemaURI2.replace('\\', '/') + "\" schemaLocation=\"" + p3.toString().replace('\\', '/')
                                         + "\"/>");
