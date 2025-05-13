@@ -1,7 +1,7 @@
 package fr.bouml;
 
 
-import java.util.*;
+import java.util.Hashtable;
 /**
  *  Base class of all the classes representing browser's objects.
  * 
@@ -20,7 +20,7 @@ import java.util.*;
  *  call 'system' internal operations even by error, the 'system' internal
  *  parts are declared 'private' rather than 'public' or 'protected'.
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings("all")
 abstract class UmlBaseItem {
   /**
    *  return a constant identifier, it is unique within a given

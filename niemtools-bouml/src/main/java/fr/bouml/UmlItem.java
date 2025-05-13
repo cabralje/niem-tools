@@ -22,7 +22,7 @@ import org.cabral.niemtools.NiemUmlClass;
  * 
  *  You can modify it as you want (except the constructor)
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings("all")
 public abstract class UmlItem extends UmlBaseItem implements Comparable {
   public UmlItem(long id, String n){ super(id, n); known = false; }
 

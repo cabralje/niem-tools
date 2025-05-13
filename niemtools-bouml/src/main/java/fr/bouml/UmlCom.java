@@ -1,8 +1,10 @@
 package fr.bouml;
 
 
-import java.io.*;
-import java.net.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 
 /**
  *  This class manages the communications
@@ -31,6 +33,8 @@ import java.net.*;
  *  
  *  you must NOT call the others
  */
+
+ @SuppressWarnings("all")
 public class UmlCom {
   /**
    *  does the connexion
