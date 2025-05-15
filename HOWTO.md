@@ -8,14 +8,7 @@
 
 ---
 
-## 2. Configure Properties
-
-- Copy the `niemtools.properties` file to your home directory.
-- Edit the target file locations to match your environment.
-
----
-
-## 3. Create a NIEM IEPD Project
+## 2. Create a NIEM Message Specification Project
 
 ### a.
 - Copy the `BOUML-niem` template **OR**
@@ -24,6 +17,14 @@
 - Create a blank BOUML project.
 - Right-click on the root package.
 - Select **"Import project"** and choose the **"niem-profile"** BOUML project.
+
+---
+
+## 3. Configure the Project
+
+- Right click on the root package
+- Select the properties tab
+- Edit the options to match your environment.
 
 ---
 
