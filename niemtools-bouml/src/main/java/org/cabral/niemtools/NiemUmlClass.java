@@ -376,7 +376,7 @@ public class NiemUmlClass {
         super();
 
         // set IEPD configuration defaults
-        ConfigurationDialog.init();
+        //ConfigurationDialog.init();
     }
 
     /**
@@ -686,7 +686,7 @@ public class NiemUmlClass {
     public void exportCsv(String directory, String filename) {
         Log.start("exportCsv");
         UmlCom.message("Generating NIEM Mapping CSV ...");
-        Log.trace("Generating NIEM Mapping CSV");
+        Log.trace("Generating NIEM Mapping CSV in " + directory + filename);
         NamespaceModel.cacheExternalSchemas();
 
         UmlItem.directory = directory;
@@ -712,7 +712,7 @@ public class NiemUmlClass {
         HtmlWriter htmlWriter = new HtmlWriter();
 
         UmlCom.message("Generating NIEM Mapping HTML ...");
-        Log.trace("Generating NIEM Mapping HTML");
+        Log.trace("Generating NIEM Mapping HTML om " + directory + filename);
         NamespaceModel.cacheExternalSchemas();
         // cache NIEM namespaces, elements and types
         // cacheModel(referencePackage);
@@ -880,7 +880,7 @@ public class NiemUmlClass {
         } catch (IOException e) {
             Log.trace("exportSpecification: error exporting OpenAPI files " + e.toString());
         }
-        if (cmfDir != null)
+        if (cmfDir != null && cmfVersion != null)
 			try {
             CmfWriter cmfWriter = new CmfWriter(cmfDir, cmfVersion);
             cmfWriter.exportCmf(cmfDir);
@@ -903,7 +903,7 @@ public class NiemUmlClass {
 
         Log.start("exportWantlist");
         UmlCom.message("Generating NIEM Wantlist ...");
-        Log.trace("Generating NIEM Wantlist");
+        Log.trace("Generating NIEM Wantlist in " + dir + "\\" + filename);
         //XmlWriter xmlWriter = new XmlWriter(dir);
 
         // createSubset();
@@ -1154,6 +1154,7 @@ public class NiemUmlClass {
                             return FileVisitResult.CONTINUE;
                         }
                         NiemModel.recompileXPaths(doc);
+
                     } catch (IOException | SAXException | ParserConfigurationException e) {
                         Log.debug("importSchemaDir: ignoring file " + filename);
                         return FileVisitResult.CONTINUE;

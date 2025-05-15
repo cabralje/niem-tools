@@ -82,9 +82,7 @@ class ConfigurationDialog extends JDialog {
     static final String IEPD_TERMS_URL_PROPERTY = "IEPDTermsOfService";
     private static final String IEPD_URI_DEFAULT = "http://local";
     static final String IEPD_URI_PROPERTY = "IEPDURI";
-
     private static final String IEPD_VERSION_DEFAULT = "1.0";
-
     static final String IEPD_VERSION_PROPERTY = "IEPDVersion";
 
     private static final long serialVersionUID = 1L;

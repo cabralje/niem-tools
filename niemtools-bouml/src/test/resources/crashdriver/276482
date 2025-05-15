@@ -1,0 +1,346 @@
+format 224
+"NIEMExtension" // NIEM::NIEMExtension
+  revision 1
+  modified_by 2 "JamesCabral"
+  // class settings
+  
+  classdiagramsettings member_max_width 0 end
+  
+  classcompositediagramsettings end
+  
+  usecasediagramsettings end
+  
+  sequencediagramsettings end
+  
+  collaborationdiagramsettings end
+  
+  objectdiagramsettings end
+  
+  objectcompositediagramsettings end
+  
+  componentdiagramsettings
+   end
+  
+  deploymentdiagramsettings
+   end
+  
+  statediagramsettings
+   end
+  
+  activitydiagramsettings
+   end
+  
+  classview 567554 "exch"
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    sequencediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    
+    activitydiagramsettings
+     end
+    ncouples 3
+    key "URI" value "http://cabral.org/crashdriver/exch"
+    key "prefix" value "exch"
+    key "path" value "exch.xsd"
+    class 21037442 "CrashDriverInfoType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://cabral.org/crashdriver/exch,CrashDriverInfoType"
+      comment "A data type for a collection of legal charges associated with the driver of a vehicle in a crash."
+      classrelation 8472834 // <generalisation>
+	relation 8472834 ---|>
+	  a public
+	    classrelation_ref 8472834 // <generalisation>
+	  b parent class_ref 21035778 // ObjectType
+      end
+
+      attribute 32352002 "j:Charge"
+	private type class_ref 20001026 // ChargeType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,Charge"
+	key "isNillable" value "true"
+	comment "A formal allegation that a specific person has committed a specific offense."
+      end
+
+      attribute 32352642 "j:Crash"
+	private type class_ref 20005506 // CrashType
+	multiplicity "1,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,Crash"
+	key "isNillable" value "true"
+	comment "A traffic accident."
+      end
+
+      attribute 32354818 "nc:Metadata"
+	private type class_ref 20917378 // MetadataType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,Metadata"
+	key "isNillable" value "true"
+	comment "Information that further qualifies primary data; data about data."
+      end
+
+      attribute 32355202 "hs:ParentChildAssociation"
+	private type class_ref 19949570 // ParentChildAssociationType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,ParentChildAssociation"
+	key "isNillable" value "true"
+	comment "An association between a child and a person who is in a parent role toward that child."
+      end
+
+      attribute 32355714 "j:PersonChargeAssociation"
+	private type class_ref 20033538 // PersonChargeAssociationType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,PersonChargeAssociation"
+	key "isNillable" value "true"
+	comment "An association between a person and a charge issued to that person."
+      end
+
+      attribute 32356354 "hs:PersonOtherKinAssociation"
+	private type class_ref 19951618 // PersonOtherKinAssociationType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,PersonOtherKinAssociation"
+	key "isNillable" value "true"
+	comment "A directed association that describes the kinship or other close personal relationship between the source object and the target object. The relationship between a parent and a child should be captured using the ParentChildAssociation"
+      end
+
+      attribute 32356610 "nc:PersonUnionAssociation"
+	private type class_ref 20923394 // PersonUnionAssociationType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonUnionAssociation"
+	key "isNillable" value "true"
+	comment "An association between two persons who are in a state of union with each other."
+      end
+
+      attribute 32356866 "priv:PrivacyMetadata"
+	private type class_ref 21043202 // PrivacyMetadataType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "http://cabral.org/crashdriver/priv,PrivacyMetadata"
+      end
+    end
+
+    classinstance 49753986 "CrashDriverInfo"
+      type class_ref 21037442 // CrashDriverInfoType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "URI" value "http://cabral.org/crashdriver/exch,CrashDriverInfo"
+      key "messageElement" value "CrashDriverInfo"
+      comment "A collection of legal charges associated with the driver of a vehicle in a crash."
+    end
+
+    classinstance 49757826 "PersonFictionalCharacterIndicator"
+      type class_ref 21035906 // boolean
+      attributes
+        end
+      relations
+        end
+      ncouples 4
+      key "URI" value "http://cabral.org/crashdriver/exch,PersonFictionalCharacterIndicator"
+      key "substitutesFor" value "nc:PersonAugmentationPoint"
+      key "substitutesIn" value "nc:PersonType"
+      key "subMultiplicity" value "0,unbounded"
+      comment "True if this person is a fictional character in a literary work; false otherwise."
+    end
+  end
+
+  classview 568194 "priv"
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    sequencediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    
+    activitydiagramsettings
+     end
+    ncouples 3
+    key "URI" value "http://cabral.org/crashdriver/priv"
+    key "prefix" value "priv"
+    key "path" value "priv.xsd"
+    class 21043074 "PrivacyCodeType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://cabral.org/crashdriver/priv,PrivacyCodeType"
+      classrelation 8472962 // <generalisation>
+	relation 8472962 ---|>
+	  a public
+	    classrelation_ref 8472962 // <generalisation>
+	  b parent class_ref 21038338 // token
+      end
+
+      classrelation 8473090 // <directional aggregation>
+	relation 8473090 o-->
+	  a role_name "" private
+	    classrelation_ref 8473090 // <directional aggregation>
+	  b parent class_ref 21036418 // @SimpleObjectAttributeGroup
+      end
+    end
+
+    class 21043202 "PrivacyMetadataType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://cabral.org/crashdriver/priv,PrivacyMetadataType"
+      classrelation 8473218 // <generalisation>
+	relation 8473218 ---|>
+	  a public
+	    classrelation_ref 8473218 // <generalisation>
+	  b parent class_ref 21035778 // ObjectType
+      end
+
+      attribute 32356738 "priv:PrivacyCode"
+	private type class_ref 21043074 // PrivacyCodeType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "http://cabral.org/crashdriver/priv,PrivacyCode"
+      end
+    end
+
+    classinstance 49758978 "PrivacyCode"
+      type class_ref 21043074 // PrivacyCodeType
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "http://cabral.org/crashdriver/priv,PrivacyCode"
+    end
+
+    classinstance 49759106 "PrivacyMetadata"
+      type class_ref 21043202 // PrivacyMetadataType
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "http://cabral.org/crashdriver/priv,PrivacyMetadata"
+    end
+
+    classinstance 49759234 "@privacyMetadataRef"
+      type class_ref 21038082 // IDREFS
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "http://cabral.org/crashdriver/priv,@privacyMetadataRef"
+    end
+  end
+end

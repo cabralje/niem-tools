@@ -39,11 +39,13 @@ import java.util.TreeSet;
 import javax.xml.XMLConstants;
 
 import fr.bouml.UmlAttribute;
+import fr.bouml.UmlBasePackage;
 import fr.bouml.UmlClass;
 import fr.bouml.UmlClassInstance;
 import fr.bouml.UmlClassView;
 import fr.bouml.UmlItem;
 import fr.bouml.UmlOperation;
+import fr.bouml.UmlPackage;
 import fr.bouml.UmlParameter;
 import fr.bouml.UmlRelation;
 import fr.bouml.aRelationKind;
@@ -123,6 +125,33 @@ public class XmlWriter {
     static final String XML_LANG_PREFIX = "xml:lang";
     static final String XML_LANG = "en-US";
 
+    private static final String IEPD_CHANGE_LOG_FILE_DEFAULT = "changelog.txt";
+    static final String IEPD_CHANGE_LOG_FILE_PROPERTY = "IEPDChangeLogFile";
+    private static final String IEPD_CONTACT_DEFAULT = "Contact";
+    static final String IEPD_CONTACT_PROPERTY = "IEPDContact";
+    private static final String IEPD_EMAIL_DEFAULT = "email@example.com";
+    static final String IEPD_EMAIL_PROPERTY = "IEPDEmail";
+    private static final String IEPD_EXTERNAL_SCHEMAS_DEFAULT = "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,"
+            + "cbc=urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonBasicComponents-2.1.xsd,"
+            + "ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd";
+    // IEPD Properties
+    static final String IEPD_EXTERNAL_SCHEMAS_PROPERTY = "externalSchemas";
+    private static final String IEPD_LICENSE_URL_DEFAULT = "https://opensource.org/licenses/BSD-3-Clause";
+    static final String IEPD_LICENSE_URL_PROPERTY = "IEPDLicense";
+    private static final String IEPD_NAME_DEFAULT = "IEPD";
+    static final String IEPD_NAME_PROPERTY = "IEPDName";
+    private static final String IEPD_ORGANIZATION_DEFAULT = "Organization";
+    static final String IEPD_ORGANIZATION_PROPERTY = "IEPDOrganization";
+    private static final String IEPD_READ_ME_FILE_DEFAULT = "readme.txt";
+    static final String IEPD_READ_ME_FILE_PROPERTY = "IEPDReadMeFile";
+    private static final String IEPD_STATUS_DEFAULT = "Draft";
+    static final String IEPD_STATUS_PROPERTY = "IEPDStatus";
+    private static final String IEPD_TERMS_URL_DEFAULT = "example.com/terms";
+    static final String IEPD_TERMS_URL_PROPERTY = "IEPDTermsOfService";
+    private static final String IEPD_URI_DEFAULT = "http://local";
+    static final String IEPD_URI_PROPERTY = "IEPDURI";
+    private static final String IEPD_VERSION_DEFAULT = "1.0";
+    static final String IEPD_VERSION_PROPERTY = "IEPDVersion";
     private final Set<String> CodeListNamespaces = new HashSet<>();
 
     private final String directory;
@@ -142,7 +171,7 @@ public class XmlWriter {
      */
     void exportCodeLists(NiemModel model) {
 
-        String version = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_VERSION_PROPERTY);
+        String version = UmlBasePackage.getProject().propertyValue(IEPD_VERSION_PROPERTY);
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         String today = dateFormat.format(date);
@@ -240,13 +269,12 @@ public class XmlWriter {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         String today = dateFormat.format(date);
-
-        Log.trace("Generating MPD catalog");
+        UmlPackage root = UmlBasePackage.getProject();
+        Log.trace("Generating MPD catalog in " + directory);
         File file = Paths.get(directory, MPD_CATALOG_FILE).toFile();
         File parentFile = file.getParentFile();
-        if (parentFile != null) {
+        if (parentFile != null)
             parentFile.mkdirs();
-        }
         try (FileWriter xml = new FileWriter(file)) {
             xml.write(XmlWriter.XML_HEADER);
             xml.write("<c:Catalog");
@@ -266,16 +294,16 @@ public class XmlWriter {
             xml.write(">");
             xml.write("<c:MPD c:mpdURI=\"" + NamespaceModel.getExtensionSchema("") + "\"");
             writeXmlAttribute(xml, "c:mpdClassURIList", MPD_URI + "#MPD " + MPD_URI + "#IEPD");
-            xml.write(" c:mpdName=\"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_NAME_PROPERTY) + "\" c:mpdVersionID=\""
-                    + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_VERSION_PROPERTY) + "\">");
+            xml.write(" c:mpdName=\"" + root.propertyValue(IEPD_NAME_PROPERTY) + "\" c:mpdVersionID=\""
+                    + root.propertyValue(IEPD_VERSION_PROPERTY) + "\">");
             xml.write("<c:MPDInformation>" + "<c:AuthoritativeSource>" + "<nc:EntityOrganization>" + "<nc:OrganizationName>"
-                    + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_ORGANIZATION_PROPERTY) + "</nc:OrganizationName>"
+                    + root.propertyValue(IEPD_ORGANIZATION_PROPERTY) + "</nc:OrganizationName>"
                     + "<nc:OrganizationPrimaryContactInformation>" + "<nc:ContactEmailID>"
-                    + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_EMAIL_PROPERTY) + "</nc:ContactEmailID>" + "<nc:ContactWebsiteURI>"
-                    + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CONTACT_PROPERTY) + "</nc:ContactWebsiteURI>"
+                    + root.propertyValue(IEPD_EMAIL_PROPERTY) + "</nc:ContactEmailID>" + "<nc:ContactWebsiteURI>"
+                    + root.propertyValue(IEPD_CONTACT_PROPERTY) + "</nc:ContactWebsiteURI>"
                     + "</nc:OrganizationPrimaryContactInformation>" + "</nc:EntityOrganization>"
                     + "</c:AuthoritativeSource>" + "<c:CreationDate>" + today + "</c:CreationDate>" + "<c:StatusText>"
-                    + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_STATUS_PROPERTY) + "</c:StatusText>" + "</c:MPDInformation>");
+                    + root.propertyValue(IEPD_STATUS_PROPERTY) + "</c:StatusText>" + "</c:MPDInformation>");
             Path p2 = Paths.get(directory, MPD_CATALOG_FILE).getParent();
             for (String message : messages) {
                 UmlClassInstance element;
@@ -304,7 +332,7 @@ public class XmlWriter {
                 xml.write("</c:IEPConformanceTarget>");
             }
             Path p4;
-            String path4 = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_READ_ME_FILE_PROPERTY);
+            String path4 = root.propertyValue("projectDir") + root.propertyValue(IEPD_READ_ME_FILE_PROPERTY);
             try {
                 p4 = p2.relativize(Paths.get(path4));
                 path4 = p4.toString();
@@ -312,7 +340,7 @@ public class XmlWriter {
                 Log.trace("exportMpdCatalog: No relative path 2 from " + p2.toString() + " to " + path4 + " " + e1.toString());
             }
             Path p5;
-            String path5 = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CHANGE_LOG_FILE_PROPERTY);
+            String path5 = root.propertyValue("projectDir") + root.propertyValue(IEPD_CHANGE_LOG_FILE_PROPERTY);
             try {
                 p5 = p2.relativize(Paths.get(path5));
                 path5 = p5.toString();
@@ -336,8 +364,8 @@ public class XmlWriter {
             for (String codeList : CodeListNamespaces) {
                 xml.write("<c:BusinessRulesArtifact c:pathURI=\"" + codeList + GC_FILE_TYPE + "\"/>\n");
             }
-            xml.write("<c:ReadMe c:pathURI=\"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_READ_ME_FILE_PROPERTY) + "\"/>");
-            xml.write("<c:MPDChangeLog c:pathURI=\"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CHANGE_LOG_FILE_PROPERTY) + "\"/>");
+            xml.write("<c:ReadMe c:pathURI=\"" + root.propertyValue(IEPD_READ_ME_FILE_PROPERTY) + "\"/>");
+            xml.write("<c:MPDChangeLog c:pathURI=\"" + root.propertyValue(IEPD_CHANGE_LOG_FILE_PROPERTY) + "\"/>");
             xml.write("</c:MPD></c:Catalog>");
         }
         Log.debug("exportMPDCatalog: done generating MPD catalog");
@@ -353,8 +381,9 @@ public class XmlWriter {
      */
     void exportWSDL(String wsdlDir, Map<String, UmlClass> ports, Set<String> messageNamespaces) throws IOException {
 
-        String WSDLURI = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + WSDL_SUFFIX;
-        String WRAPPERURI = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + "/" + MESSAGE_WRAPPERS_FILE_NAME;
+        UmlPackage root = UmlBasePackage.getProject();
+        String WSDLURI = root.propertyValue(IEPD_URI_PROPERTY) + WSDL_SUFFIX;
+        String WRAPPERURI = root.propertyValue(IEPD_URI_PROPERTY) + "/" + MESSAGE_WRAPPERS_FILE_NAME;
 
         Log.trace("Generating document/literal wrapper schema");
         TreeSet<String> xmlTypes = new TreeSet<>();
@@ -572,7 +601,7 @@ public class XmlWriter {
      */
     void exportXmlCatalog() throws IOException {
         FileWriter xml;
-        Log.trace("Generating XML catalog");
+        Log.trace("Generating XML catalog in " + directory + "\\" + XML_CATALOG_FILE);
         File file = Paths.get(directory, XML_CATALOG_FILE).toFile();
         File parentFile = file.getParentFile();
         if (parentFile != null) {
@@ -701,6 +730,7 @@ public class XmlWriter {
      */
     void exportXmlSchema(String filename, String nsSchemaURI, TreeSet<String> xmlTypes, TreeSet<String> xmlElements,
             Set<String> schemaNamespaces) {
+        UmlPackage root = UmlBasePackage.getProject();
         try {
             Log.debug("exportXMLSchema: exporting " + filename);
             File file = new File(filename);
@@ -725,7 +755,7 @@ public class XmlWriter {
                         NDR_URI + CT_EXTENSION);
                 writeXmlAttribute(xml, "elementFormDefault", "qualified");
                 writeXmlAttribute(xml, "attributeFormDefault", "unqualified");
-                writeXmlAttribute(xml, "version", NiemUmlClass.getProperty(ConfigurationDialog.IEPD_VERSION_PROPERTY));
+                writeXmlAttribute(xml, "version", root.propertyValue(IEPD_VERSION_PROPERTY));
                 // close top level element
                 xml.write("""
                                   >

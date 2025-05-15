@@ -57,7 +57,7 @@ class NiemModel {
 
     private static final Boolean IMPORT_CODE_DESCRIPTIONS = true;
     // private static final Boolean _IMPORT_CODE_DESCRIPTIONS = false;
-    private static final Integer MAX_ENUMS = 300;
+    static final Integer MAX_ENUMS = 300;
     //private static final Integer MAX_ENUMS = 20;
     private static final Integer MAX_FACETS = 1000;
     static final String ABSTRACT_TYPE_NAME = "abstract";
@@ -114,12 +114,17 @@ class NiemModel {
     private static XPathExpression baseTypeXPath = null;
     private static XPathExpression elementRefXPath = null;
     private static XPathExpression typeNameXPath = null;
+    static Integer maxEnums = MAX_ENUMS;
     
     public NiemModel() {
         super();
-        //recompileXPaths();
     }
 
+    /**
+     * recompile XPaths
+     * @param Document
+     * 
+     */
     public static void recompileXPaths(Document doc) {
         try {
             if (xPath != null) {
@@ -1095,10 +1100,12 @@ class NiemModel {
         if (length == 0)
             return codeList;
         String truncated = "false";
-        if (length > MAX_ENUMS) {
+        int me = maxEnums;
+        
+        if (length > maxEnums) {
             if (type != null)
-                Log.trace("importCodeList: error - truncated code list " + type.name() + " from " + length + " to " + MAX_ENUMS);
-            length = MAX_ENUMS;
+                Log.trace("importCodeList: error - truncated code list " + type.name() + " from " + length + " to " + maxEnums);
+            length = maxEnums;
             truncated = "true";
         }
         if (type != null)
@@ -1620,7 +1627,7 @@ class NiemModel {
 
         String truncated = "false";
         if (length > MAX_FACETS) {
-            Log.trace("importFacets: error - truncated facet restrictions on " + type.name() + " from " + length + " to " + MAX_ENUMS);
+            Log.trace("importFacets: error - truncated facet restrictions on " + type.name() + " from " + length + " to " + MAX_FACETS);
             length = MAX_FACETS;
             truncated = "true";
         }

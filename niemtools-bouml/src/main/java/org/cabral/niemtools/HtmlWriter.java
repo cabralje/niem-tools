@@ -28,6 +28,7 @@ public class HtmlWriter {
         try {
             // Write rest of header
             File file = Paths.get(directory, filename + HTML_FILE_TYPE).toFile();
+            Log.trace("exportHtml: path " + file.getAbsolutePath());
             File parentFile = file.getParentFile();
             if (parentFile != null)
                 parentFile.mkdirs();

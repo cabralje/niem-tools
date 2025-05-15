@@ -1,12 +1,8 @@
 package org.cabral.niemtools;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.Properties;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -64,44 +60,57 @@ public class NiemtoolsBouml {
         UmlCom.connect(boumlPort);
         Log.debug("Port: " + boumlPort + "\n");
         Log.debug("Classpath: " + System.getProperty("java.class.path") + "\n");
+        UmlPackage root;
+        UmlItem target;
+        NiemUmlClass niemTools;
 
         try {
             //UmlCom.trace("<b>BOUML NIEM tools</b> release 0.1<br />");
-            UmlPackage root = UmlBasePackage.getProject();
-            String propFile = System.getProperty("user.home") + "/" + root.name() + ".properties";
+            root = UmlBasePackage.getProject();
+            //String propFile = System.getProperty("user.home") + "/" + root.name() + ".properties";
 
             Log.start("memo_ref");
             UmlCom.message("Memorize references ...");
-            UmlItem target = UmlCom.targetItem();
+            target = UmlCom.targetItem();
             target.memo_ref();
             Log.stop("memo_ref");
+        } catch (Exception e) {
+            System.out.print("Exception: " + e.getMessage());
+            return;
+        }
 
+        try {
             // create PIM and PSM
-            NiemUmlClass niemTools = new NiemUmlClass();
+            niemTools = new NiemUmlClass();
 
             //load properties
-            String command = argv[0];
-            Properties properties = new Properties();
-            FileReader in;
-            try {
-                in = new FileReader(propFile);
-                properties.load(in);
-                in.close();
-            } catch (FileNotFoundException e) {
-                Log.trace("Properties file " + propFile + " does not exist.");
-                command = "configure";
-            } catch (IOException ex) {
-            }
+            //Properties properties = new Properties();
+            //FileReader in;
+            //try {
+            //    in = new FileReader(propFile);
+            //    properties.load(in);
+            //    in.close();
+            //} catch (FileNotFoundException e) {
+            //    Log.trace("Properties file " + propFile + " does not exist.");
+            //    command = "configure";
+            //} catch (IOException ex) {
+            //}
+        } catch (Exception e) {
+            System.out.print("Exception: " + e.getMessage());
+            return;
+        }
 
+        try {
+            String command = argv[0];
             switch (command) {
                 case "configure":
-                    ConfigurationDialog configDialog = new ConfigurationDialog(root, properties);
-                    configDialog.setVisible(true); // Ensure the dialog is displayed
+                    //ConfigurationDialog configDialog = new ConfigurationDialog(root, properties);
+                    //configDialog.setVisible(true); // Ensure the dialog is displayed
                     break;
 
                 case "importSchema":
                     //niemTools.cacheModels();
-                    importSchema(niemTools, properties);
+                    importSchema(root, niemTools);
                     break;
 
                 case "import":
@@ -133,18 +142,18 @@ public class NiemtoolsBouml {
                     if (!niemTools.verifyNIEM())
                         break;
                     niemTools.cacheModels(false);
-                    generateModels(root, target, niemTools, properties);
+                    generateModels(root, target, niemTools);
             }
             // store properties
-            try {
-                Log.trace("Storing properties to " + propFile);
-                try (FileWriter out = new FileWriter(propFile)) {
-                    properties.setProperty("htmlDir", root.propertyValue("html dir"));
-                    properties.store(out, "BOUML NiemTools plugout settings");
-                }
-            } catch (IOException e) {
-                Log.trace("Unable to write properties to " + propFile);
-            }
+            //try {
+            //    Log.trace("Storing properties to " + propFile);
+            //    try (FileWriter out = new FileWriter(propFile)) {
+            //        properties.setProperty("htmlDir", root.propertyValue("html dir"));
+            //        properties.store(out, "BOUML NiemTools plugout settings");
+            //    }
+            //} catch (IOException e) {
+            //    Log.trace("Unable to write properties to " + propFile);
+            //}
         } catch (IOException e) {
             Log.trace("IOException: " + e.getMessage());
         } catch (NumberFormatException e) {
@@ -175,14 +184,87 @@ public class NiemtoolsBouml {
      * @throws IOException
      */
 
-    private static void generateModels(UmlPackage root, UmlItem target, NiemUmlClass niemTools, Properties properties)
+    private static void generateModels(UmlPackage root, UmlItem target, NiemUmlClass niemTools)
             throws IOException {
         Log.start("generateModels");
+
+                // Configure generation options
+        JFileChooser fc = null;
+        String projectDir = root.propertyValue("projectDir");
+        if (projectDir == null || projectDir.equals("")) {
+            fc = new JFileChooser();
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            fc.setDialogTitle("Project directory where artifacts will be generated");
+            if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
+                return;
+        }
+        if (fc != null) {
+            projectDir = fc.getSelectedFile().getAbsolutePath();
+            root.set_PropertyValue("projectDir", projectDir);
+        }
+        String xsdDir = null, xmlExampleDir = null, wsdlDir = null, jsonDir = null, jsonExampleDir = null, openapiDir = null, cmfDir = null;
+        String exportXML = root.propertyValue("exportXML");
+        if (exportXML == null) {
+            exportXML = "true";
+            root.set_PropertyValue("exportXML", exportXML);
+        }
+        if (exportXML.equals("true")) {
+            //xsdDir = root.propertyValue("xsdDir");
+            //xmlExampleDir = root.propertyValue("xmlExampleDir");
+            xsdDir = projectDir + "\\schema";
+            xmlExampleDir = projectDir + "\\examples"; 
+        }
+        
+        String exportWSDL = root.propertyValue("exportWSDL");
+        if (exportWSDL == null) {
+            exportWSDL = "true";
+            root.set_PropertyValue("exportWSDL", exportWSDL);
+        }
+        if (exportWSDL.equals("true")) {
+            //wsdlDir = root.propertyValue("wsdlDir");
+            wsdlDir = projectDir + "/WS-SIP";
+        }
+        String exportJSON = root.propertyValue("exportJSON");
+        if (exportJSON == null) {
+            exportJSON = "true";
+            root.set_PropertyValue("exportJSON", exportJSON);
+        }
+        if (exportJSON.equals("true")) {
+            // jsonDir = root.propertyValue("jsonDir");
+            // jsonExampleDir = root.propertyValue("jsonExampleDir");
+            jsonDir = projectDir + "\\json\\schema";
+            jsonExampleDir = projectDir + "\\json\\examples";
+        }
+        String exportOpenAPI = root.propertyValue("exportOpenAPI");
+        if (exportOpenAPI == null) {
+            exportOpenAPI = "true";
+            root.set_PropertyValue("exportOpenAPI", exportOpenAPI);
+        }
+        if (exportOpenAPI.equals("true")) {
+            // openapiDir = root.propertyValue("openapiDir");
+            openapiDir = projectDir + "\\json";
+        }
+        String cmfVersion = root.propertyValue("cmfVersion");
+        if (cmfVersion == null) {
+            cmfVersion = CmfWriter.CMF_VERSION;
+            root.set_PropertyValue("cmfVersion", cmfVersion);
+        }
+        if (cmfVersion != null && !cmfVersion.equals("")) {
+            // cmfDir = root.propertyValue("cmfDir");
+            cmfDir = projectDir + "\\cmf";
+        }
+        String modelDir = root.propertyValue("html dir");
+        if (modelDir == null || modelDir.equals("")) {
+            modelDir = projectDir + "\\model";
+            root.set_PropertyValue("html dir", modelDir);
+        }
+
         // Generate UML Model HTML documentation
         if (root.propertyValue("exportHTML").equals("true")) {
             Log.trace("Generating HTML documentation");
             //	target.set_dir(argv.length - 1, argv);
-            String[] params = {root.propertyValue("html dir")};
+            //String[] params = {root.propertyValue("html dir")};
+            String[] params = {modelDir};
             target.set_dir(1, params);
             //target.set_dir(0,null);
             UmlItem.frame();
@@ -201,10 +283,10 @@ public class NiemtoolsBouml {
         }
 
         // Generate NIEM Mapping HTML
-        niemTools.exportHtml(root.propertyValue("html dir"), "niem-mapping");
+        niemTools.exportHtml(modelDir, "niem-mapping");
 
         // Generate NIEM Mapping CSV
-        niemTools.exportCsv(root.propertyValue("html dir"), "niem-mapping.csv");
+        niemTools.exportCsv(modelDir, "niem-mapping.csv");
 
         // Clearing NIEM Models
         niemTools.deleteNIEM(false);
@@ -215,19 +297,12 @@ public class NiemtoolsBouml {
         niemTools.createSubsetAndExtension();
 
         // Generate NIEM Wantlist instance
-        niemTools.exportWantlist(root.propertyValue("html dir"), "wantlist.xml");
+        niemTools.exportWantlist(modelDir, "wantlist.xml");
 
-        // Generate extension schema
-        niemTools.cacheModels(false); // cache substitutions
-        String xsdDir = (root.propertyValue("exportXML").equals("true")) ? properties.getProperty("xsdDir") : null;
-        String wsdlDir = (root.propertyValue("exportWSDL").equals("true")) ? properties.getProperty("wsdlDir") : null;
-        String jsonDir = (root.propertyValue("exportJSON").equals("true")) ? properties.getProperty("jsonDir") : null;
-        String openapiDir = (root.propertyValue("exportOpenAPI").equals("true")) ? properties.getProperty("openapiDir") : null;
-        String xmlExampleDir = (root.propertyValue("exportXML").equals("true")) ? properties.getProperty("xmlExampleDir") : null;
-        String jsonExampleDir = (root.propertyValue("exportJSON").equals("true")) ? properties.getProperty("jsonExampleDir") : null;
-        String cmfDir = (root.propertyValue("exportMetamodel").equals("true")) ? properties.getProperty("metamodelDir") : null;
-        String cmfVersion = "0.8";
+        // Cache subsitutions
+        niemTools.cacheModels(false);
 
+        // Generate schemas
         niemTools.exportSpecification(xsdDir, wsdlDir, jsonDir, openapiDir, xmlExampleDir, jsonExampleDir, cmfDir, cmfVersion);
         Log.stop("generateModels");
     }
@@ -236,7 +311,7 @@ public class NiemtoolsBouml {
      * @param root
      * @param niemTools
      */
-    private static void importMapping(UmlPackage root, NiemUmlClass niemTools) {
+    public static void importMapping(UmlPackage root, NiemUmlClass niemTools) {
         Log.start("importMapping");
         niemTools.deleteMapping();
         JFileChooser fc2 = new JFileChooser(root.propertyValue("html dir"));
@@ -254,23 +329,37 @@ public class NiemtoolsBouml {
      * @param properties
      * @throws IOException
      */
-    private static void importSchema(NiemUmlClass niemTools, Properties properties) throws IOException {
+    public static void importSchema(UmlPackage root, NiemUmlClass niemTools) throws IOException {
         Log.start("importSchema");
-        JFileChooser fc;
         // Create PIM
         //NiemTools.createPIM(root);
+
+        String maxEnumsString = root.propertyValue("maxEnums");
+        Integer maxEnums = null;
+        if (maxEnumsString != null && !maxEnumsString.equals("")) {
+            try {
+                maxEnums = Integer.valueOf(maxEnumsString);
+            } catch (NumberFormatException | NullPointerException e) {
+            }
+        }
+        if (maxEnums == null) {
+            maxEnums = NiemModel.MAX_ENUMS;
+            root.set_PropertyValue("maxEnums", maxEnums.toString());
+        }
+        NiemModel.maxEnums = maxEnums;
 
         // Import schema
         // in java it is very complicated to select
         // a directory through a dialog, and the dialog
         // is very slow and ugly
-        fc = new JFileChooser(properties.getProperty("niemDir"));
+        JFileChooser fc = new JFileChooser(root.propertyValue("niemDir"));
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fc.setDialogTitle("Directory of the schema to be imported");
         if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
             return;
         String directory = fc.getSelectedFile().getAbsolutePath();
-        properties.setProperty("niemDir", directory);
+        root.set_PropertyValue("niemDir", directory);
+
         niemTools.deleteNIEM(true);
         niemTools.createNIEM();
         niemTools.cacheModels(true);

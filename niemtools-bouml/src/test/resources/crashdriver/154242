@@ -1,0 +1,38 @@
+format 224
+"NIEM" // NIEM
+  revision 51
+  modified_by 2 "JamesCabral"
+  // class settings
+  
+  classdiagramsettings member_max_width 0 end
+  
+  classcompositediagramsettings end
+  
+  usecasediagramsettings end
+  
+  sequencediagramsettings end
+  
+  collaborationdiagramsettings end
+  
+  objectdiagramsettings end
+  
+  objectcompositediagramsettings end
+  
+  componentdiagramsettings
+   end
+  
+  deploymentdiagramsettings
+   end
+  
+  statediagramsettings
+   end
+  
+  activitydiagramsettings
+   end
+  
+  package_ref 260610 // NIEMReference
+
+  package_ref 276354 // NIEMSubset
+
+  package_ref 276482 // NIEMExtension
+end

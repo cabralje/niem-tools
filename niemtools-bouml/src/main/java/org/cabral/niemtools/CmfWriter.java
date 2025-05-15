@@ -26,6 +26,7 @@ public class CmfWriter {
     private static final String CMF_PREFIX = "cmf";
     private static final String CMF_FILE_TYPE = ".cmf";
     private static final String CMF_FILE = "model";
+    static final String CMF_VERSION = "0.8";
     //@SuppressWarnings("unused")
 
     private final Set<String> tagIds = new HashSet<>();
@@ -33,7 +34,7 @@ public class CmfWriter {
     private final Set<String> classIds = new HashSet<>();
 //	private List<UmlClassInstance> substitutionElements = new ArrayList<UmlClassInstance>();
 
-    private String cmfVersion = "1.0";
+    private String cmfVersion = CMF_VERSION;
     private String documentationName = "DocumentationText";
     private String objectPropertyName = "ObjectProperty";
     private String dataPropertyName = "DataProperty";
@@ -131,10 +132,10 @@ public class CmfWriter {
      * @param cmfDir
      * @param messages
      */
-    void exportCmf(String cmfDir) throws IOException {
+    public void exportCmf(String cmfDir) throws IOException {
 
         Log.start("exportCmf");
-        Log.trace("Generating CMF model " + cmfVersion);
+        Log.trace("Generating CMF model " + cmfVersion + " in " + cmfDir);
 
         String cmfUri = CMF_URI + cmfVersion + "/";
         String headerCmf = "<Model "

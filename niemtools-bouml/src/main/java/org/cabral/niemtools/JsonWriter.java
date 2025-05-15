@@ -36,6 +36,7 @@ import java.util.TreeSet;
 import javax.xml.XMLConstants;
 
 import fr.bouml.UmlAttribute;
+import fr.bouml.UmlBasePackage;
 import fr.bouml.UmlClass;
 import fr.bouml.UmlClassInstance;
 import fr.bouml.UmlItem;
@@ -653,7 +654,7 @@ public class JsonWriter {
         //jsonNamespaces.add("\n" + getJsonPair(XmlWriter.CT_PREFIX, XmlWriter.CT_URI + "#"));
         //jsonNamespaces.add("\n" + getJsonPair(XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI + "#"));
         // generate OpenAPI definitions
-        Log.trace("Generating OpenAPIs");
+        Log.trace("Generating OpenAPIs in " + openapiDir);
         for (UmlClass port : ports.values()) {
             String portName = port.name();
             String portPath = port.propertyValue(INTERFACE_PATH_PROPERTY);
@@ -666,6 +667,7 @@ public class JsonWriter {
 
             // get directory path
             Path openapiPath = Paths.get(openapiDir, portName + OPENAPI_FILE_TYPE);
+            Log.trace("exoirtOpenAPI: path " + openapiPath.toString());
 
             for (UmlItem item : port.children()) {
                 if (item.kind() == anItemKind.anOperation) {
@@ -974,6 +976,7 @@ public class JsonWriter {
             }
             // write OpenAPI file
             jsonDefinitions.addAll(jsonProperties);
+            UmlBasePackage root = UmlBasePackage.getProject();
             try {
                 File file = openapiPath.toFile();
                 File parentFile = file.getParentFile();
@@ -985,18 +988,18 @@ public class JsonWriter {
                             + // jsonContext + ",\n" +
                             "  \"openapi\": \"" + OPENAPI_VERSION + "\",\n"
                                     + "  \"info\": {\n"
-                                    + "    \"version\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_VERSION_PROPERTY) + "\",\n"
+                                    + "    \"version\": \"" + root.propertyValue(XmlWriter.IEPD_VERSION_PROPERTY) + "\",\n"
                                             + "    \"title\": \"" + portName + "\",\n"
                                                     + "    \"description\": \"" + port.description() + "\",\n"
-                                                            + "    \"termsOfService\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_TERMS_URL_PROPERTY) + "\",\n"
+                                                            + "    \"termsOfService\": \"" + root.propertyValue(XmlWriter.IEPD_TERMS_URL_PROPERTY) + "\",\n"
                                                                     + "    \"contact\": {\n"
-                                                                    + "      \"name\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_ORGANIZATION_PROPERTY) + "\",\n"
-                                                                            + "      \"email\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_EMAIL_PROPERTY) + "\",\n"
-                                                                                    + "      \"url\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CONTACT_PROPERTY) + "\"\n"
+                                                                    + "      \"name\": \"" + root.propertyValue(XmlWriter.IEPD_ORGANIZATION_PROPERTY) + "\",\n"
+                                                                            + "      \"email\": \"" + root.propertyValue(XmlWriter.IEPD_EMAIL_PROPERTY) + "\",\n"
+                                                                                    + "      \"url\": \"" + root.propertyValue(XmlWriter.IEPD_CONTACT_PROPERTY) + "\"\n"
                                                                                             + "    },\n"
                                                                                             + "    \"license\": {\n"
-                                                                                            + "      \"name\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY) + "\",\n"
-                                                                                                    + "      \"url\": \"" + NiemUmlClass.getProperty(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY) + "\"\n"
+                                                                                            + "      \"name\": \"" + root.propertyValue(XmlWriter.IEPD_LICENSE_URL_PROPERTY) + "\",\n"
+                                                                                                    + "      \"url\": \"" + root.propertyValue(XmlWriter.IEPD_LICENSE_URL_PROPERTY) + "\"\n"
                                                                                                             + "    }\n"
                                                                                                             + "  },\n"
                                                                                                             + "  \"host\": \"host.example.com\",\n"

@@ -34,6 +34,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import fr.bouml.UmlBasePackage;
 import fr.bouml.UmlClassView;
 import fr.bouml.UmlItem;
 import fr.bouml.anItemKind;
@@ -77,7 +78,7 @@ public class NamespaceModel {
      *
      */
     static void cacheExternalSchemas() {
-        String externalSchemas = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_EXTERNAL_SCHEMAS_PROPERTY);
+        String externalSchemas = UmlBasePackage.getProject().propertyValue(XmlWriter.IEPD_EXTERNAL_SCHEMAS_PROPERTY);
         String[] external = externalSchemas.split(",");
         for (String external1 : external) {
             String[] part = external1.split("=");
@@ -116,7 +117,7 @@ public class NamespaceModel {
      * @return an extension schema URI as a String
      */
     static String getExtensionSchema(String prefix) {
-        return NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY) + "/" + prefix;
+        return UmlBasePackage.getProject().propertyValue(XmlWriter.IEPD_URI_PROPERTY) + "/" + prefix;
     }
 
     /**
