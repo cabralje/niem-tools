@@ -1,0 +1,3519 @@
+format 224
+"NIEMSubset" // NIEM::NIEMSubset
+  revision 1
+  modified_by 2 "JamesCabral"
+  // class settings
+  
+  classdiagramsettings member_max_width 0 end
+  
+  classcompositediagramsettings end
+  
+  usecasediagramsettings end
+  
+  sequencediagramsettings end
+  
+  collaborationdiagramsettings end
+  
+  objectdiagramsettings end
+  
+  objectcompositediagramsettings end
+  
+  componentdiagramsettings
+   end
+  
+  deploymentdiagramsettings
+   end
+  
+  statediagramsettings
+   end
+  
+  activitydiagramsettings
+   end
+  
+  classview 760066 "local"
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    sequencediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    
+    activitydiagramsettings
+     end
+    ncouples 2
+    key "URI" value "local"
+    key "prefix" value "local"
+    class 23683074 "abstract"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "local,abstract"
+    end
+  end
+
+  classview 760194 "structures"
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    sequencediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    
+    activitydiagramsettings
+     end
+    ncouples 3
+    key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/"
+    key "prefix" value "structures"
+    key "path" value "niem/utility/structures.xsd"
+    comment "The structures namespace provides base types and other components for definition of NIEM-conformant XML schemas."
+    class 23683202 "AugmentationType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,AugmentationType"
+      comment "A data type for a set of properties to be applied to a base type."
+    end
+
+    class 23683330 "ObjectType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,ObjectType"
+      comment "A data type for a thing with its own lifespan that has some existence."
+      attribute 48436226 "structures:@appliesToParent"
+	private type class_ref 23344258 // boolean
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@appliesToParent"
+	comment "True if this element is a property of its parent; false if it appears only to support referencing."
+      end
+
+      attribute 48436354 "structures:@id"
+	private type class_ref 23346306 // ID
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@id"
+	comment "A document-relative identifier for an XML element."
+      end
+
+      attribute 48436482 "structures:@ref"
+	private type class_ref 23346434 // IDREF
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@ref"
+	comment "A document-relative reference to an XML element."
+      end
+
+      attribute 48436610 "structures:@uri"
+	private type class_ref 23344002 // anyURI
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@uri"
+	comment "An internationalized resource identifier or uniform resource identifier for a node or object."
+      end
+    end
+
+    classinstance 55741954 "@appliesToParent"
+      type class_ref 23344258 // boolean
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@appliesToParent"
+      comment "True if this element is a property of its parent; false if it appears only to support referencing."
+    end
+
+    classinstance 55742082 "@id"
+      type class_ref 23346306 // ID
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@id"
+      comment "A document-relative identifier for an XML element."
+    end
+
+    classinstance 55742210 "@ref"
+      type class_ref 23346434 // IDREF
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@ref"
+      comment "A document-relative reference to an XML element."
+    end
+
+    classinstance 55742338 "@uri"
+      type class_ref 23344002 // anyURI
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@uri"
+      comment "An internationalized resource identifier or uniform resource identifier for a node or object."
+    end
+
+    class 23683970 "@SimpleObjectAttributeGroup"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@SimpleObjectAttributeGroup"
+      attribute 48436738 "structures:@id"
+	private type class_ref 23346306 // ID
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@id"
+	comment "A document-relative identifier for an XML element."
+      end
+
+      attribute 48436866 "structures:@ref"
+	private type class_ref 23346434 // IDREF
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@ref"
+	comment "A document-relative reference to an XML element."
+      end
+
+      attribute 48436994 "structures:@uri"
+	private type class_ref 23344002 // anyURI
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@uri"
+	comment "An internationalized resource identifier or uniform resource identifier for a node or object."
+      end
+    end
+
+    class 23684738 "AssociationType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,AssociationType"
+      comment "A data type for a relationship between two or more objects, including any properties of that relationship."
+      attribute 48437122 "structures:@appliesToParent"
+	private type class_ref 23344258 // boolean
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@appliesToParent"
+	comment "True if this element is a property of its parent; false if it appears only to support referencing."
+      end
+
+      attribute 48437250 "structures:@id"
+	private type class_ref 23346306 // ID
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@id"
+	comment "A document-relative identifier for an XML element."
+      end
+
+      attribute 48437378 "structures:@ref"
+	private type class_ref 23346434 // IDREF
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@ref"
+	comment "A document-relative reference to an XML element."
+      end
+
+      attribute 48437506 "structures:@uri"
+	private type class_ref 23344002 // anyURI
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/,@uri"
+	comment "An internationalized resource identifier or uniform resource identifier for a node or object."
+      end
+    end
+  end
+
+  classview 760322 "xs"
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    sequencediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    
+    activitydiagramsettings
+     end
+    ncouples 2
+    key "URI" value "http://www.w3.org/2001/XMLSchema"
+    key "prefix" value "xs"
+    class 23683458 "boolean"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://www.w3.org/2001/XMLSchema,boolean"
+    end
+
+    class 23683586 "ID"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://www.w3.org/2001/XMLSchema,ID"
+    end
+
+    class 23683714 "IDREF"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://www.w3.org/2001/XMLSchema,IDREF"
+    end
+
+    class 23683842 "anyURI"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://www.w3.org/2001/XMLSchema,anyURI"
+    end
+
+    classinstance 55742466 "any"
+      type class_ref 23343874 // abstract
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "http://www.w3.org/2001/XMLSchema,any"
+    end
+
+    class 23684098 "NCName"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://www.w3.org/2001/XMLSchema,NCName"
+    end
+
+    class 23685506 "string"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://www.w3.org/2001/XMLSchema,string"
+    end
+
+    class 23685634 "IDREFS"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://www.w3.org/2001/XMLSchema,IDREFS"
+    end
+
+    class 23685890 "token"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://www.w3.org/2001/XMLSchema,token"
+    end
+
+    class 23687810 "date"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://www.w3.org/2001/XMLSchema,date"
+    end
+
+    class 23689090 "decimal"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "http://www.w3.org/2001/XMLSchema,decimal"
+    end
+  end
+
+  classview 760450 "nc"
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    sequencediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    
+    activitydiagramsettings
+     end
+    ncouples 3
+    key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/"
+    key "prefix" value "nc"
+    key "path" value "niem/niem-core.xsd"
+    comment "NIEM Core."
+    class 23684226 "ActivityType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,ActivityType"
+      comment "A data type for a single or set of related actions, events, or process steps."
+      classrelation 6832258 // <generalisation>
+	relation 6832258 ---|>
+	  a public
+	    classrelation_ref 6832258 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+
+      attribute 48442754 "nc:ActivityDate"
+	private type class_ref 23631106 // DateType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,ActivityDate"
+	key "isNillable" value "true"
+	comment "A date of an activity."
+      end
+
+      attribute 48442882 "nc:ActivityLocation"
+	private type class_ref 23644162 // LocationType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,ActivityLocation"
+	key "isNillable" value "true"
+	comment "A location of an activity."
+      end
+    end
+
+    class 23684354 "DateType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,DateType"
+      comment "A data type for a calendar date."
+      classrelation 6832386 // <generalisation>
+	relation 6832386 ---|>
+	  a public
+	    classrelation_ref 6832386 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+
+      attribute 48444418 "nc:DateRepresentation"
+	private type class_ref 23343874 // abstract
+	multiplicity "1,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,DateRepresentation"
+	key "isNillable" value ""
+	comment "A data concept for a representation of a date."
+      end
+    end
+
+    class 23684482 "LocationType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LocationType"
+      comment "A data type for geospatial location."
+      classrelation 6832514 // <generalisation>
+	relation 6832514 ---|>
+	  a public
+	    classrelation_ref 6832514 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+
+      attribute 48445442 "nc:LocationGeospatialCoordinateAbstract"
+	private type class_ref 23343874 // abstract
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LocationGeospatialCoordinateAbstract"
+	key "isNillable" value ""
+	comment "A data concept for a geospatial location."
+      end
+    end
+
+    class 23684610 "AssociationType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,AssociationType"
+      comment "A data type for an association, connection, relationship, or involvement somehow linking people, things, and/or activities together."
+      classrelation 6832642 // <generalisation>
+	relation 6832642 ---|>
+	  a public
+	    classrelation_ref 6832642 // <generalisation>
+	  b parent class_ref 23684738 // AssociationType
+      end
+    end
+
+    class 23685250 "TextType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,TextType"
+      comment "A data type for a character string."
+      classrelation 6833282 // <generalisation>
+	relation 6833282 ---|>
+	  a public
+	    classrelation_ref 6833282 // <generalisation>
+	  b parent class_ref 23685378 // string
+      end
+
+      attribute 48437634 "nc:@metadataRef"
+	private type class_ref 23346562 // IDREFS
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@metadataRef"
+	comment "A list of metadata objects that apply to a node or object represented by an XML element."
+      end
+
+      attribute 48437762 "nc:@partialIndicator"
+	private type class_ref 23344258 // boolean
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@partialIndicator"
+	comment "True if only partial information was available to the information source at the time when the data was captured in the system; false otherwise."
+      end
+
+      attribute 48437890 "nc:@truncationIndicator"
+	private type class_ref 23344258 // boolean
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@truncationIndicator"
+	comment "True if the length of a string is greater than the length of the field within which the string was stored in the exporting system; false otherwise."
+      end
+
+      attribute 48438786 "nc:@valueEmptyReasonCode"
+	private type class_ref 23636098 // EmptyReasonCodeSimpleType
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@valueEmptyReasonCode"
+	comment "A reason why a data value was not provided."
+      end
+
+      attribute 48438914 "nc:@valueEmptyReasonText"
+	private type class_ref 23348738 // string
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@valueEmptyReasonText"
+	comment "A reason why a data value was not provided."
+      end
+
+      attribute 48439042 "xml:@lang"
+	private type class_ref 23348738 // string
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "http://www.w3.org/XML/1998/namespace,@lang"
+	key "codeList" value "; "
+	comment "
+    
+     
+      lang (as an attribute name)
+      
+       denotes an attribute whose value
+       is a language code for the natural language of the content of
+       any element; its value is inherited.  This name is reserved
+       by virtue of its definition in the XML specification.
+     
+    
+    
+     Notes
+     
+      Attempting to install the relevant ISO 2- and 3-letter
+      codes as the enumerated possible values is probably never
+      going to be a realistic possibility.  
+     
+     
+      See BCP 47 at 
+       http://www.rfc-editor.org/rfc/bcp/bcp47.txt
+      and the IANA language subtag registry at
+      
+       http://www.iana.org/assignments/language-subtag-registry
+      for further information.
+     
+     
+      The union allows for the 'un-declaration' of xml:lang with
+      the empty string.
+     
+    
+   "
+      end
+    end
+
+    classinstance 55742594 "@metadataRef"
+      type class_ref 23346562 // IDREFS
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@metadataRef"
+      comment "A list of metadata objects that apply to a node or object represented by an XML element."
+    end
+
+    classinstance 55742722 "@partialIndicator"
+      type class_ref 23344258 // boolean
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@partialIndicator"
+      comment "True if only partial information was available to the information source at the time when the data was captured in the system; false otherwise."
+    end
+
+    classinstance 55742850 "@truncationIndicator"
+      type class_ref 23344258 // boolean
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@truncationIndicator"
+      comment "True if the length of a string is greater than the length of the field within which the string was stored in the exporting system; false otherwise."
+    end
+
+    class 23685762 "EmptyReasonCodeSimpleType"
+      visibility package stereotype "enum_pattern"
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 2
+      key "isTruncated" value "false"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,EmptyReasonCodeSimpleType"
+      comment "A data type for a reason why a data value was not provided."
+      classrelation 6833410 // <generalisation>
+	relation 6833410 ---|>
+	  a public
+	    classrelation_ref 6833410 // <generalisation>
+	  b parent class_ref 23685890 // token
+      end
+
+      attribute 48438018 "inapplicable"
+	private explicit_type ""
+	init_value "inapplicable"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "There is no value."
+      end
+
+      attribute 48438146 "missing"
+	private explicit_type ""
+	init_value "missing"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "The correct value is not readily available to the sender of this data. Furthermore, a correct value may not exist."
+      end
+
+      attribute 48438274 "other"
+	private explicit_type ""
+	init_value "other"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Other reason."
+      end
+
+      attribute 48438402 "template"
+	private explicit_type ""
+	init_value "template"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "The value will be available later (pending)."
+      end
+
+      attribute 48438530 "unknown"
+	private explicit_type ""
+	init_value "unknown"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "The correct value is not known to, and not computable by, the sender of this data. However, a correct value probably exists."
+      end
+
+      attribute 48438658 "withheld"
+	private explicit_type ""
+	init_value "withheld"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "The value is not divulged."
+      end
+    end
+
+    classinstance 55742978 "@valueEmptyReasonCode"
+      type class_ref 23636098 // EmptyReasonCodeSimpleType
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@valueEmptyReasonCode"
+      comment "A reason why a data value was not provided."
+    end
+
+    classinstance 55743106 "@valueEmptyReasonText"
+      type class_ref 23348738 // string
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@valueEmptyReasonText"
+      comment "A reason why a data value was not provided."
+    end
+
+    class 23686018 "PersonType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonType"
+      comment "A data type for a human being."
+      classrelation 6833538 // <generalisation>
+	relation 6833538 ---|>
+	  a public
+	    classrelation_ref 6833538 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+
+      attribute 48446466 "nc:PersonAugmentationPoint"
+	private type class_ref 23343874 // abstract
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonAugmentationPoint"
+	key "isNillable" value ""
+	comment "An augmentation point for PersonType."
+      end
+
+      attribute 48446594 "nc:PersonBirthDate"
+	private type class_ref 23631106 // DateType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonBirthDate"
+	key "isNillable" value "true"
+	comment "A date a person was born."
+      end
+
+      attribute 48447106 "nc:PersonName"
+	private type class_ref 23650690 // PersonNameType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonName"
+	key "isNillable" value "true"
+	comment "A combination of names and/or titles by which a person is known."
+      end
+    end
+
+    class 23686530 "IncidentType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,IncidentType"
+      comment "A data type for an occurrence or an event that may require a response."
+      classrelation 6833922 // <generalisation>
+	relation 6833922 ---|>
+	  a public
+	    classrelation_ref 6833922 // <generalisation>
+	  b parent class_ref 23684226 // ActivityType
+      end
+    end
+
+    class 23687042 "VehicleType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,VehicleType"
+      comment "A data type for a conveyance designed to carry an operator, passengers and/or cargo, over land."
+      classrelation 6834690 // <generalisation>
+	relation 6834690 ---|>
+	  a public
+	    classrelation_ref 6834690 // <generalisation>
+	  b parent class_ref 23687170 // ConveyanceType
+      end
+    end
+
+    class 23687170 "ConveyanceType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,ConveyanceType"
+      comment "A data type for a means of transport from place to place."
+      classrelation 6834562 // <generalisation>
+	relation 6834562 ---|>
+	  a public
+	    classrelation_ref 6834562 // <generalisation>
+	  b parent class_ref 23687298 // ItemType
+      end
+    end
+
+    class 23687298 "ItemType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,ItemType"
+      comment "A data type for an article or thing."
+      classrelation 6834434 // <generalisation>
+	relation 6834434 ---|>
+	  a public
+	    classrelation_ref 6834434 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+    end
+
+    class 23687554 "InjuryType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,InjuryType"
+      comment "A data type for a form of harm or damage sustained by a person."
+      classrelation 6835074 // <generalisation>
+	relation 6835074 ---|>
+	  a public
+	    classrelation_ref 6835074 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+
+      attribute 48444930 "nc:InjuryDescriptionText"
+	private type class_ref 23658754 // TextType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,InjuryDescriptionText"
+	key "isNillable" value "true"
+	comment "A description of an injury."
+      end
+
+      attribute 48445058 "nc:InjurySeverityAbstract"
+	private type class_ref 23343874 // abstract
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,InjurySeverityAbstract"
+	key "isNillable" value ""
+	comment "A data concept for a severity of an injury received by a person involved into a Traffic Accident."
+      end
+
+      attribute 48448002 "priv:@privacyMetadataRef"
+	private type class_ref 23685634 // IDREFS
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "http://local/priv,@privacyMetadataRef"
+      end
+    end
+
+    class 23687682 "MetadataType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,MetadataType"
+      comment "A data type for information that further qualifies primary data; data about data."
+      classrelation 6835202 // <generalisation>
+	relation 6835202 ---|>
+	  a public
+	    classrelation_ref 6835202 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+
+      attribute 48444290 "nc:MetadataAugmentationPoint"
+	private type class_ref 23343874 // abstract
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,MetadataAugmentationPoint"
+	key "isNillable" value ""
+	comment "An augmentation point for nc:MetadataType."
+      end
+
+      attribute 48448130 "nc:ReportedDate"
+	private type class_ref 23631106 // DateType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,ReportedDate"
+	key "isNillable" value "true"
+	comment "A date information was observed, measured, identified, or became known."
+      end
+    end
+
+    class 23688066 "LicenseType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LicenseType"
+      comment "A data type for an authorization issued to a person granting certain privileges."
+      classrelation 6835458 // <generalisation>
+	relation 6835458 ---|>
+	  a public
+	    classrelation_ref 6835458 // <generalisation>
+	  b parent class_ref 23688194 // IdentificationType
+      end
+    end
+
+    class 23688194 "IdentificationType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,IdentificationType"
+      comment "A data type for a representation of an identity."
+      classrelation 6835330 // <generalisation>
+	relation 6835330 ---|>
+	  a public
+	    classrelation_ref 6835330 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+
+      attribute 48444802 "nc:IdentificationID"
+	private type class_ref 23355394 // string
+	multiplicity "1,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,IdentificationID"
+	key "isNillable" value "true"
+	comment "An identifier."
+      end
+    end
+
+    class 23688322 "LatitudeCoordinateType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LatitudeCoordinateType"
+      comment "A data type for a measurement of the angular distance between a point on the Earth and the Equator."
+      classrelation 6835714 // <generalisation>
+	relation 6835714 ---|>
+	  a public
+	    classrelation_ref 6835714 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+
+      attribute 48445314 "nc:LatitudeDegreeValue"
+	private type class_ref 23642498 // LatitudeDegreeType
+	multiplicity "1,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LatitudeDegreeValue"
+	key "isNillable" value "true"
+	comment "A value that specifies the degree of a latitude. The value comes from a restricted range between -90 (inclusive) and +90 (inclusive)."
+      end
+    end
+
+    class 23688450 "LongitudeCoordinateType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LongitudeCoordinateType"
+      comment "A data type for a measurement of the angular distance between a point on the Earth and the Prime Meridian."
+      classrelation 6835842 // <generalisation>
+	relation 6835842 ---|>
+	  a public
+	    classrelation_ref 6835842 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+
+      attribute 48445570 "nc:LongitudeDegreeValue"
+	private type class_ref 23644546 // LongitudeDegreeType
+	multiplicity "1,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LongitudeDegreeValue"
+	key "isNillable" value "true"
+	comment "A value that specifies the degree of a longitude. The value comes from a restricted range between -180 (inclusive) and +180 (inclusive)."
+      end
+    end
+
+    class 23688834 "LatitudeDegreeType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LatitudeDegreeType"
+      comment "A data type for a degree of latitude."
+      classrelation 6836482 // <generalisation>
+	relation 6836482 ---|>
+	  a public
+	    classrelation_ref 6836482 // <generalisation>
+	  b parent class_ref 23688962 // LatitudeDegreeSimpleType
+      end
+
+      classrelation 6836610 // <directional aggregation>
+	relation 6836610 o-->
+	  a role_name "" private
+	    classrelation_ref 6836610 // <directional aggregation>
+	  b parent class_ref 23662082 // @SimpleObjectAttributeGroup
+      end
+    end
+
+    class 23688962 "LatitudeDegreeSimpleType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 2
+      key "isTruncated" value "false"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LatitudeDegreeSimpleType"
+      comment "A data type for a degree of latitude."
+      classrelation 6836354 // <generalisation>
+	relation 6836354 ---|>
+	  a public
+	    classrelation_ref 6836354 // <generalisation>
+	  b parent class_ref 23689090 // decimal
+      end
+    end
+
+    class 23689218 "Location2DGeospatialCoordinateType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,Location2DGeospatialCoordinateType"
+      comment "A data type for a location identified by latitude and longitude."
+      classrelation 6836738 // <generalisation>
+	relation 6836738 ---|>
+	  a public
+	    classrelation_ref 6836738 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+    end
+
+    class 23689346 "LongitudeDegreeType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LongitudeDegreeType"
+      comment "A data type for a degree of longitude."
+      classrelation 6836994 // <generalisation>
+	relation 6836994 ---|>
+	  a public
+	    classrelation_ref 6836994 // <generalisation>
+	  b parent class_ref 23689474 // LongitudeDegreeSimpleType
+      end
+
+      classrelation 6837122 // <directional aggregation>
+	relation 6837122 o-->
+	  a role_name "" private
+	    classrelation_ref 6837122 // <directional aggregation>
+	  b parent class_ref 23662082 // @SimpleObjectAttributeGroup
+      end
+    end
+
+    class 23689474 "LongitudeDegreeSimpleType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 2
+      key "isTruncated" value "false"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LongitudeDegreeSimpleType"
+      comment "A data type for a degree of longitude."
+      classrelation 6836866 // <generalisation>
+	relation 6836866 ---|>
+	  a public
+	    classrelation_ref 6836866 // <generalisation>
+	  b parent class_ref 23689090 // decimal
+      end
+    end
+
+    class 23689602 "PersonAssociationType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonAssociationType"
+      comment "A data type for an association between people."
+      classrelation 6837250 // <generalisation>
+	relation 6837250 ---|>
+	  a public
+	    classrelation_ref 6837250 // <generalisation>
+	  b parent class_ref 23684610 // AssociationType
+      end
+    end
+
+    class 23689730 "PersonNameTextType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonNameTextType"
+      comment "A data type for a name by which a person is known, referred, or addressed."
+      classrelation 6837506 // <generalisation>
+	relation 6837506 ---|>
+	  a public
+	    classrelation_ref 6837506 // <generalisation>
+	  b parent class_ref 23689858 // ProperNameTextType
+      end
+
+      attribute 48439938 "nc:@personNameInitialIndicator"
+	private type class_ref 23344258 // boolean
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@personNameInitialIndicator"
+	comment "True if value represents the first letter or initials of a persons name; false otherwise."
+      end
+    end
+
+    class 23689858 "ProperNameTextType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,ProperNameTextType"
+      comment "A data type for a word or phrase by which a person or thing is known, referred, or addressed."
+      classrelation 6837378 // <generalisation>
+	relation 6837378 ---|>
+	  a public
+	    classrelation_ref 6837378 // <generalisation>
+	  b parent class_ref 23685250 // TextType
+      end
+    end
+
+    classinstance 55743362 "@personNameInitialIndicator"
+      type class_ref 23344258 // boolean
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@personNameInitialIndicator"
+      comment "True if value represents the first letter or initials of a persons name; false otherwise."
+    end
+
+    class 23689986 "PersonNameType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonNameType"
+      comment "A data type for a combination of names and/or titles by which a person is known."
+      classrelation 6837634 // <generalisation>
+	relation 6837634 ---|>
+	  a public
+	    classrelation_ref 6837634 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+
+      attribute 48440066 "nc:@personNameCommentText"
+	private type class_ref 23348738 // string
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@personNameCommentText"
+	comment "A comment about a kind of name for a person."
+      end
+
+      attribute 48446850 "nc:PersonGivenName"
+	private type class_ref 23650562 // PersonNameTextType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonGivenName"
+	key "isNillable" value "true"
+	comment "A first name of a person."
+      end
+
+      attribute 48446978 "nc:PersonMiddleName"
+	private type class_ref 23650562 // PersonNameTextType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonMiddleName"
+	key "isNillable" value "true"
+	comment "A middle name of a person."
+      end
+
+      attribute 48447490 "nc:PersonSurName"
+	private type class_ref 23650562 // PersonNameTextType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonSurName"
+	key "isNillable" value "true"
+	comment "A last name or family name of a person."
+      end
+    end
+
+    classinstance 55743490 "@personNameCommentText"
+      type class_ref 23348738 // string
+      attributes
+        end
+      relations
+        end
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@personNameCommentText"
+      comment "A comment about a kind of name for a person."
+    end
+
+    class 23690498 "PersonUnionAssociationType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonUnionAssociationType"
+      comment "A data type for an association between two persons who are in a state of union with each other."
+      classrelation 6838274 // <generalisation>
+	relation 6838274 ---|>
+	  a public
+	    classrelation_ref 6838274 // <generalisation>
+	  b parent class_ref 23689602 // PersonAssociationType
+      end
+    end
+
+    classinstance 55743618 "ActivityDate"
+      type class_ref 23631106 // DateType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,ActivityDate"
+      comment "A date of an activity."
+    end
+
+    classinstance 55743746 "ActivityLocation"
+      type class_ref 23644162 // LocationType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,ActivityLocation"
+      comment "A location of an activity."
+    end
+
+    classinstance 55745154 "MetadataAugmentationPoint"
+      type class_ref 23343874 // abstract
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value ""
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,MetadataAugmentationPoint"
+      comment "An augmentation point for nc:MetadataType."
+    end
+
+    classinstance 55745410 "DateRepresentation"
+      type class_ref 23343874 // abstract
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value ""
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,DateRepresentation"
+      comment "A data concept for a representation of a date."
+    end
+
+    classinstance 55745538 "Date"
+      type class_ref 23352194 // date
+      attributes
+        end
+      relations
+        end
+      ncouples 5
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,Date"
+      key "isNillable" value "true"
+      key "substitutesFor" value "nc:DateRepresentation"
+      key "substitutesIn" value "nc:DateType"
+      key "subMultiplicity" value "1,1"
+      comment "A full date."
+    end
+
+    classinstance 55745922 "GeographicCoordinateLatitude"
+      type class_ref 23642242 // LatitudeCoordinateType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,GeographicCoordinateLatitude"
+      comment "A measurement of the angular distance between a point on the Earth and the Equator."
+    end
+
+    classinstance 55746050 "GeographicCoordinateLongitude"
+      type class_ref 23644290 // LongitudeCoordinateType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,GeographicCoordinateLongitude"
+      comment "A measurement of the angular distance between a point on the Earth and the Prime Meridian."
+    end
+
+    classinstance 55746178 "IdentificationID"
+      type class_ref 23355394 // string
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,IdentificationID"
+      comment "An identifier."
+    end
+
+    classinstance 55746306 "InjuryDescriptionText"
+      type class_ref 23658754 // TextType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,InjuryDescriptionText"
+      comment "A description of an injury."
+    end
+
+    classinstance 55746434 "InjurySeverityAbstract"
+      type class_ref 23343874 // abstract
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value ""
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,InjurySeverityAbstract"
+      comment "A data concept for a severity of an injury received by a person involved into a Traffic Accident."
+    end
+
+    classinstance 55746946 "LatitudeDegreeValue"
+      type class_ref 23642498 // LatitudeDegreeType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LatitudeDegreeValue"
+      comment "A value that specifies the degree of a latitude. The value comes from a restricted range between -90 (inclusive) and +90 (inclusive)."
+    end
+
+    classinstance 55747074 "LocationGeospatialCoordinateAbstract"
+      type class_ref 23343874 // abstract
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value ""
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LocationGeospatialCoordinateAbstract"
+      comment "A data concept for a geospatial location."
+    end
+
+    classinstance 55747202 "Location2DGeospatialCoordinate"
+      type class_ref 23643522 // Location2DGeospatialCoordinateType
+      attributes
+        end
+      relations
+        end
+      ncouples 5
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,Location2DGeospatialCoordinate"
+      key "isNillable" value "true"
+      key "substitutesFor" value "nc:LocationGeospatialCoordinateAbstract"
+      key "substitutesIn" value "nc:LocationType"
+      key "subMultiplicity" value ""
+      comment "A location identified by a latitude and longitude."
+    end
+
+    classinstance 55747330 "LongitudeDegreeValue"
+      type class_ref 23644546 // LongitudeDegreeType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,LongitudeDegreeValue"
+      comment "A value that specifies the degree of a longitude. The value comes from a restricted range between -180 (inclusive) and +180 (inclusive)."
+    end
+
+    classinstance 55747458 "Metadata"
+      type class_ref 23645570 // MetadataType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,Metadata"
+      comment "Information that further qualifies primary data; data about data."
+    end
+
+    classinstance 55747842 "Person"
+      type class_ref 23651458 // PersonType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,Person"
+      comment "A human being."
+    end
+
+    classinstance 55747970 "PersonAugmentationPoint"
+      type class_ref 23343874 // abstract
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value ""
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonAugmentationPoint"
+      comment "An augmentation point for PersonType."
+    end
+
+    classinstance 55748226 "PersonBirthDate"
+      type class_ref 23631106 // DateType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonBirthDate"
+      comment "A date a person was born."
+    end
+
+    classinstance 55748610 "PersonGivenName"
+      type class_ref 23650562 // PersonNameTextType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonGivenName"
+      comment "A first name of a person."
+    end
+
+    classinstance 55748738 "PersonMiddleName"
+      type class_ref 23650562 // PersonNameTextType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonMiddleName"
+      comment "A middle name of a person."
+    end
+
+    classinstance 55748866 "PersonName"
+      type class_ref 23650690 // PersonNameType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonName"
+      comment "A combination of names and/or titles by which a person is known."
+    end
+
+    classinstance 55749378 "PersonSurName"
+      type class_ref 23650562 // PersonNameTextType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonSurName"
+      comment "A last name or family name of a person."
+    end
+
+    classinstance 55749506 "PersonUnionAssociation"
+      type class_ref 23651586 // PersonUnionAssociationType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,PersonUnionAssociation"
+      comment "An association between two persons who are in a state of union with each other."
+    end
+
+    classinstance 55750018 "ReportedDate"
+      type class_ref 23631106 // DateType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,ReportedDate"
+      comment "A date information was observed, measured, identified, or became known."
+    end
+  end
+
+  classview 760578 "j"
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    sequencediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    
+    activitydiagramsettings
+     end
+    ncouples 3
+    key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/"
+    key "prefix" value "j"
+    key "path" value "niem/domains/justice.xsd"
+    comment "Justice domain 6.0 / GJXDM 8.0"
+    class 23684866 "ChargeType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,ChargeType"
+      comment "A data type for a formal allegation that a specific person has committed a specific offense."
+      classrelation 6832770 // <generalisation>
+	relation 6832770 ---|>
+	  a public
+	    classrelation_ref 6832770 // <generalisation>
+	  b parent class_ref 23683330 // ObjectType
+      end
+
+      attribute 48443266 "j:ChargeDescriptionText"
+	private type class_ref 23658754 // TextType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,ChargeDescriptionText"
+	key "isNillable" value "true"
+	comment "A plain language description of a charge."
+      end
+
+      attribute 48443394 "j:ChargeFelonyIndicator"
+	private type class_ref 23351938 // boolean
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,ChargeFelonyIndicator"
+	key "isNillable" value "true"
+	comment "True if a charge refers to a felony offense; false otherwise."
+      end
+
+      attribute 48445698 "nc:@metadataRef"
+	private type class_ref 23346562 // IDREFS
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@metadataRef"
+	comment "A list of metadata objects that apply to a node or object represented by an XML element."
+      end
+    end
+
+    class 23685122 "PersonChargeAssociationType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,PersonChargeAssociationType"
+      comment "A data type for an association between a person and a charge."
+      classrelation 6832898 // <generalisation>
+	relation 6832898 ---|>
+	  a public
+	    classrelation_ref 6832898 // <generalisation>
+	  b parent class_ref 23684610 // AssociationType
+      end
+
+      attribute 48443138 "j:Charge"
+	private type class_ref 23535362 // ChargeType
+	multiplicity "1,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,Charge"
+	key "isNillable" value "true"
+	comment "A formal allegation that a specific person has committed a specific offense."
+      end
+
+      attribute 48445186 "j:JuvenileAsAdultIndicator"
+	private type class_ref 23351938 // boolean
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,JuvenileAsAdultIndicator"
+	key "isNillable" value "true"
+	comment "True if a juvenile is to be processed as an adult; false otherwise."
+      end
+
+      attribute 48445954 "nc:@metadataRef"
+	private type class_ref 23346562 // IDREFS
+	multiplicity "0,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 1
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,@metadataRef"
+	comment "A list of metadata objects that apply to a node or object represented by an XML element."
+      end
+
+      attribute 48446338 "nc:Person"
+	private type class_ref 23651458 // PersonType
+	multiplicity "1,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/niem-core/6.0/,Person"
+	key "isNillable" value "true"
+	comment "A human being."
+      end
+    end
+
+    class 23686402 "DrivingIncidentType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,DrivingIncidentType"
+      comment "A data type for details of an incident involving a vehicle."
+      classrelation 6834050 // <generalisation>
+	relation 6834050 ---|>
+	  a public
+	    classrelation_ref 6834050 // <generalisation>
+	  b parent class_ref 23686530 // IncidentType
+      end
+    end
+
+    class 23686658 "CrashType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CrashType"
+      comment "A data type for a traffic accident."
+      classrelation 6834178 // <generalisation>
+	relation 6834178 ---|>
+	  a public
+	    classrelation_ref 6834178 // <generalisation>
+	  b parent class_ref 23686402 // DrivingIncidentType
+      end
+
+      attribute 48443906 "j:CrashPerson"
+	private type class_ref 23539714 // CrashPersonType
+	multiplicity "1,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CrashPerson"
+	key "isNillable" value "true"
+	comment "A person involved in a traffic accident."
+      end
+
+      attribute 48444162 "j:CrashVehicle"
+	private type class_ref 23540098 // CrashVehicleType
+	multiplicity "1,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CrashVehicle"
+	key "isNillable" value "true"
+	comment "A motor vehicle involved in a traffic accident."
+      end
+    end
+
+    class 23686786 "CrashDriverType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CrashDriverType"
+      comment "A data type for a motor vehicle driver involved in a traffic accident."
+      classrelation 6834306 // <generalisation>
+	relation 6834306 ---|>
+	  a public
+	    classrelation_ref 6834306 // <generalisation>
+	  b parent class_ref 23686018 // PersonType
+      end
+
+      attribute 48444546 "j:DriverLicense"
+	private type class_ref 23544578 // DriverLicenseType
+	multiplicity "1,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,DriverLicense"
+	key "isNillable" value "true"
+	comment "A license issued to a person granting driving privileges."
+      end
+    end
+
+    class 23686914 "CrashVehicleType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CrashVehicleType"
+      comment "A data type for a motor vehicle involved in a traffic accident."
+      classrelation 6834818 // <generalisation>
+	relation 6834818 ---|>
+	  a public
+	    classrelation_ref 6834818 // <generalisation>
+	  b parent class_ref 23687042 // VehicleType
+      end
+
+      attribute 48443778 "j:CrashDriver"
+	private type class_ref 23539074 // CrashDriverType
+	multiplicity "1,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CrashDriver"
+	key "isNillable" value "true"
+	comment "A motor vehicle driver involved into a traffic accident."
+      end
+    end
+
+    class 23687426 "CrashPersonType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CrashPersonType"
+      comment "A data type for any person involved in a traffic accident."
+      classrelation 6834946 // <generalisation>
+	relation 6834946 ---|>
+	  a public
+	    classrelation_ref 6834946 // <generalisation>
+	  b parent class_ref 23686018 // PersonType
+      end
+
+      attribute 48444034 "j:CrashPersonInjury"
+	private type class_ref 23639810 // InjuryType
+	multiplicity "1,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CrashPersonInjury"
+	key "isNillable" value "true"
+	comment "An injury received by a person involved in a traffic accident."
+      end
+    end
+
+    class 23687938 "DriverLicenseType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,DriverLicenseType"
+      comment "A data type for a license issued to a person granting driving privileges."
+      classrelation 6835586 // <generalisation>
+	relation 6835586 ---|>
+	  a public
+	    classrelation_ref 6835586 // <generalisation>
+	  b parent class_ref 23688066 // LicenseType
+      end
+
+      attribute 48444674 "j:DriverLicenseCardIdentification"
+	private type class_ref 23639042 // IdentificationType
+	multiplicity "1,1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,DriverLicenseCardIdentification"
+	key "isNillable" value "true"
+	comment "An identification that is affixed to the raw materials (card stock, laminate, etc.) used in producing driver licenses and ID cards. The numbers are issued by the material's manufacturer and provide a unique reference to a card within a jurisdiction."
+      end
+    end
+
+    classinstance 55743874 "Charge"
+      type class_ref 23535362 // ChargeType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,Charge"
+      comment "A formal allegation that a specific person has committed a specific offense."
+    end
+
+    classinstance 55744002 "ChargeDescriptionText"
+      type class_ref 23658754 // TextType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,ChargeDescriptionText"
+      comment "A plain language description of a charge."
+    end
+
+    classinstance 55744130 "ChargeFelonyIndicator"
+      type class_ref 23351938 // boolean
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,ChargeFelonyIndicator"
+      comment "True if a charge refers to a felony offense; false otherwise."
+    end
+
+    classinstance 55744386 "Crash"
+      type class_ref 23539842 // CrashType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,Crash"
+      comment "A traffic accident."
+    end
+
+    classinstance 55744514 "CrashDriver"
+      type class_ref 23539074 // CrashDriverType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CrashDriver"
+      comment "A motor vehicle driver involved into a traffic accident."
+    end
+
+    classinstance 55744770 "CrashPerson"
+      type class_ref 23539714 // CrashPersonType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CrashPerson"
+      comment "A person involved in a traffic accident."
+    end
+
+    classinstance 55744898 "CrashPersonInjury"
+      type class_ref 23639810 // InjuryType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CrashPersonInjury"
+      comment "An injury received by a person involved in a traffic accident."
+    end
+
+    classinstance 55745026 "CrashVehicle"
+      type class_ref 23540098 // CrashVehicleType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CrashVehicle"
+      comment "A motor vehicle involved in a traffic accident."
+    end
+
+    classinstance 55745282 "CriminalInformationIndicator"
+      type class_ref 23351938 // boolean
+      attributes
+        end
+      relations
+        end
+      ncouples 5
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,CriminalInformationIndicator"
+      key "substitutesFor" value "nc:MetadataAugmentationPoint"
+      key "substitutesIn" value "nc:MetadataType"
+      key "subMultiplicity" value "0,unbounded"
+      comment "True if the information specified is classified as criminal information; false if it is not classified as criminal information."
+    end
+
+    classinstance 55745666 "DriverLicense"
+      type class_ref 23544578 // DriverLicenseType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,DriverLicense"
+      comment "A license issued to a person granting driving privileges."
+    end
+
+    classinstance 55745794 "DriverLicenseCardIdentification"
+      type class_ref 23639042 // IdentificationType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,DriverLicenseCardIdentification"
+      comment "An identification that is affixed to the raw materials (card stock, laminate, etc.) used in producing driver licenses and ID cards. The numbers are issued by the material's manufacturer and provide a unique reference to a card within a jurisdiction."
+    end
+
+    classinstance 55746562 "InjurySeverityCode"
+      type class_ref 23375746 // AccidentSeverityCodeType
+      attributes
+        end
+      relations
+        end
+      ncouples 5
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,InjurySeverityCode"
+      key "isNillable" value "true"
+      key "substitutesFor" value "nc:InjurySeverityAbstract"
+      key "substitutesIn" value "nc:InjuryType"
+      key "subMultiplicity" value "0,unbounded"
+      comment "A severity of an injury received by a person, such as in a traffic accident or crash."
+    end
+
+    classinstance 55746690 "IntelligenceInformationIndicator"
+      type class_ref 23351938 // boolean
+      attributes
+        end
+      relations
+        end
+      ncouples 5
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,IntelligenceInformationIndicator"
+      key "substitutesFor" value "nc:MetadataAugmentationPoint"
+      key "substitutesIn" value "nc:MetadataType"
+      key "subMultiplicity" value "0,unbounded"
+      comment "True if the information specified is intelligence information; false otherwise."
+    end
+
+    classinstance 55746818 "JuvenileAsAdultIndicator"
+      type class_ref 23351938 // boolean
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,JuvenileAsAdultIndicator"
+      comment "True if a juvenile is to be processed as an adult; false otherwise."
+    end
+
+    classinstance 55748098 "PersonAdultIndicator"
+      type class_ref 23351938 // boolean
+      attributes
+        end
+      relations
+        end
+      ncouples 5
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,PersonAdultIndicator"
+      key "substitutesFor" value "nc:PersonAugmentationPoint"
+      key "substitutesIn" value "nc:PersonType"
+      key "subMultiplicity" value "1,1"
+      comment "True if person is considered an adult, based on age/emancipation/etc.; false otherwise."
+    end
+
+    classinstance 55748354 "PersonChargeAssociation"
+      type class_ref 23567874 // PersonChargeAssociationType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/justice/6.0/,PersonChargeAssociation"
+      comment "An association between a person and a charge issued to that person."
+    end
+  end
+
+  classview 760834 "niem-xs"
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    sequencediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    
+    activitydiagramsettings
+     end
+    ncouples 3
+    key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/adapters/niem-xs/6.0/"
+    key "prefix" value "niem-xs"
+    key "path" value "niem/adapters/niem-xs.xsd"
+    comment "Proxy types that carry dictionary metadata and have XML data type simple contents."
+    class 23685378 "string"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/adapters/niem-xs/6.0/,string"
+      comment "A data type for character strings in XML."
+      classrelation 6833026 // <generalisation>
+	relation 6833026 ---|>
+	  a public
+	    classrelation_ref 6833026 // <generalisation>
+	  b parent class_ref 23685506 // string
+      end
+
+      classrelation 6833154 // <directional aggregation>
+	relation 6833154 o-->
+	  a role_name "" private
+	    classrelation_ref 6833154 // <directional aggregation>
+	  b parent class_ref 23662082 // @SimpleObjectAttributeGroup
+      end
+    end
+
+    class 23690882 "boolean"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/adapters/niem-xs/6.0/,boolean"
+      comment "A data type for binary-valued logic (true/false)."
+      classrelation 6838914 // <generalisation>
+	relation 6838914 ---|>
+	  a public
+	    classrelation_ref 6838914 // <generalisation>
+	  b parent class_ref 23683458 // boolean
+      end
+
+      classrelation 6839042 // <directional aggregation>
+	relation 6839042 o-->
+	  a role_name "" private
+	    classrelation_ref 6839042 // <directional aggregation>
+	  b parent class_ref 23662082 // @SimpleObjectAttributeGroup
+      end
+    end
+
+    class 23691010 "date"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/adapters/niem-xs/6.0/,date"
+      comment "A data type for a calendar date with the format CCYY-MM-DD."
+      classrelation 6839170 // <generalisation>
+	relation 6839170 ---|>
+	  a public
+	    classrelation_ref 6839170 // <generalisation>
+	  b parent class_ref 23687810 // date
+      end
+
+      classrelation 6839298 // <directional aggregation>
+	relation 6839298 o-->
+	  a role_name "" private
+	    classrelation_ref 6839298 // <directional aggregation>
+	  b parent class_ref 23662082 // @SimpleObjectAttributeGroup
+      end
+    end
+  end
+
+  classview 760962 "xml"
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    sequencediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    
+    activitydiagramsettings
+     end
+    ncouples 3
+    key "URI" value "http://www.w3.org/XML/1998/namespace"
+    key "prefix" value "xml"
+    key "path" value "niem/external/xml.xsd"
+    comment "
+   
+    About the XML namespace
+
+    
+     
+      This schema document describes the XML namespace, in a form
+      suitable for import by other schema documents.
+     
+     
+      See 
+      http://www.w3.org/XML/1998/namespace.html and
+      
+      http://www.w3.org/TR/REC-xml for information 
+      about this namespace.
+     
+     
+      Note that local names in this namespace are intended to be
+      defined only by the World Wide Web Consortium or its subgroups.
+      The names currently defined in this namespace are listed below.
+      They should not be used with conflicting semantics by any Working
+      Group, specification, or document instance.
+     
+        
+      See further below in this document for more information about how to refer to this schema document from your own
+      XSD schema documents and about the
+      namespace-versioning policy governing this schema document.
+     
+    
+   
+  "
+    classinstance 55743234 "@lang"
+      type class_ref 23348738 // string
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "codeList" value "; "
+      key "URI" value "http://www.w3.org/XML/1998/namespace,@lang"
+      comment "
+    
+     
+      lang (as an attribute name)
+      
+       denotes an attribute whose value
+       is a language code for the natural language of the content of
+       any element; its value is inherited.  This name is reserved
+       by virtue of its definition in the XML specification.
+     
+    
+    
+     Notes
+     
+      Attempting to install the relevant ISO 2- and 3-letter
+      codes as the enumerated possible values is probably never
+      going to be a realistic possibility.  
+     
+     
+      See BCP 47 at 
+       http://www.rfc-editor.org/rfc/bcp/bcp47.txt
+      and the IANA language subtag registry at
+      
+       http://www.iana.org/assignments/language-subtag-registry
+      for further information.
+     
+     
+      The union allows for the 'un-declaration' of xml:lang with
+      the empty string.
+     
+    
+   "
+    end
+  end
+
+  classview 761090 "hs"
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    sequencediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    
+    activitydiagramsettings
+     end
+    ncouples 3
+    key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/"
+    key "prefix" value "hs"
+    key "path" value "niem/domains/hs.xsd"
+    comment "Human Services"
+    class 23686146 "ChildType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,ChildType"
+      comment "A data type for information about a person who has not yet reached the age of legal majority (i.e., adulthood)."
+      classrelation 6833666 // <generalisation>
+	relation 6833666 ---|>
+	  a public
+	    classrelation_ref 6833666 // <generalisation>
+	  b parent class_ref 23686018 // PersonType
+      end
+    end
+
+    class 23686274 "ParentChildAssociationType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,ParentChildAssociationType"
+      comment "A data type for an association between a child and a person who is in a parent role toward that child."
+      classrelation 6833794 // <generalisation>
+	relation 6833794 ---|>
+	  a public
+	    classrelation_ref 6833794 // <generalisation>
+	  b parent class_ref 23684610 // AssociationType
+      end
+
+      attribute 48443522 "hs:Child"
+	private type class_ref 23497858 // ChildType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,Child"
+	key "isNillable" value "true"
+	comment "A person who was an unmarried minor at the time of his or her involvement in a judicial proceeding or non-judicial program."
+      end
+
+      attribute 48446082 "hs:Parent"
+	private type class_ref 23651458 // PersonType
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,Parent"
+	key "isNillable" value "true"
+	comment "A father or mother of a person."
+      end
+    end
+
+    class 23690114 "PersonOtherKinAssociationType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,PersonOtherKinAssociationType"
+      comment "A data type for a relationship that is a kinship or other close personal association between the source object and the target object. The relationship between a parent and a child should be captured using the ParentChildAssociation"
+      classrelation 6837762 // <generalisation>
+	relation 6837762 ---|>
+	  a public
+	    classrelation_ref 6837762 // <generalisation>
+	  b parent class_ref 23684610 // AssociationType
+      end
+
+      attribute 48447234 "hs:PersonOtherKinAssociationCategoryAbstract"
+	private type class_ref 23343874 // abstract
+	multiplicity "0,unbounded"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	ncouples 2
+	key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,PersonOtherKinAssociationCategoryAbstract"
+	key "isNillable" value ""
+	comment "A data concept for describing the kinship or other close personal relationship that exists from the source person to the target person."
+      end
+    end
+
+    class 23690242 "PersonOtherKinAssociationCodeType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,PersonOtherKinAssociationCodeType"
+      comment "A data type for describing the nature of the kinship or other close personal relationship from a source person to a target person"
+      classrelation 6838018 // <generalisation>
+	relation 6838018 ---|>
+	  a public
+	    classrelation_ref 6838018 // <generalisation>
+	  b parent class_ref 23690370 // PersonOtherKinAssociationCodeSimpleType
+      end
+
+      classrelation 6838146 // <directional aggregation>
+	relation 6838146 o-->
+	  a role_name "" private
+	    classrelation_ref 6838146 // <directional aggregation>
+	  b parent class_ref 23662082 // @SimpleObjectAttributeGroup
+      end
+    end
+
+    class 23690370 "PersonOtherKinAssociationCodeSimpleType"
+      visibility package stereotype "enum_pattern"
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 2
+      key "isTruncated" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,PersonOtherKinAssociationCodeSimpleType"
+      comment "A data type for describing the nature of the kinship or other close personal relationship from a source person to a target person"
+      classrelation 6837890 // <generalisation>
+	relation 6837890 ---|>
+	  a public
+	    classrelation_ref 6837890 // <generalisation>
+	  b parent class_ref 23685890 // token
+      end
+
+      attribute 48440194 "AuthorityFigure"
+	private explicit_type ""
+	init_value "Authority Figure"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Authority Figure"
+      end
+
+      attribute 48440322 "Babysitter"
+	private explicit_type ""
+	init_value "Babysitter"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Babysitter"
+      end
+
+      attribute 48440450 "Brother"
+	private explicit_type ""
+	init_value "Brother"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Brother"
+      end
+
+      attribute 48440578 "BrotherInLaw"
+	private explicit_type ""
+	init_value "Brother-In-Law"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Brother-In-Law"
+      end
+
+      attribute 48440706 "Clergy"
+	private explicit_type ""
+	init_value "Clergy"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Clergy"
+      end
+
+      attribute 48440834 "Coach"
+	private explicit_type ""
+	init_value "Coach"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Coach"
+      end
+
+      attribute 48440962 "DomesticPartner"
+	private explicit_type ""
+	init_value "Domestic Partner"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Domestic Partner"
+      end
+
+      attribute 48441090 "FatherinLaw"
+	private explicit_type ""
+	init_value "Father-in-Law"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Father-in-Law"
+      end
+
+      attribute 48441218 "Fiance"
+	private explicit_type ""
+	init_value "Fiance"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Fiance"
+      end
+
+      attribute 48441346 "Fiancee"
+	private explicit_type ""
+	init_value "Fiancee"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Fiancee"
+      end
+
+      attribute 48441474 "FictiveKin"
+	private explicit_type ""
+	init_value "Fictive Kin"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Fictive Kin"
+      end
+
+      attribute 48441602 "Godfather"
+	private explicit_type ""
+	init_value "Godfather"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Godfather"
+      end
+
+      attribute 48441730 "Godmother"
+	private explicit_type ""
+	init_value "Godmother"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Godmother"
+      end
+
+      attribute 48441858 "Granddaughter"
+	private explicit_type ""
+	init_value "Granddaughter"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Granddaughter"
+      end
+
+      attribute 48441986 "Grandson"
+	private explicit_type ""
+	init_value "Grandson"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Grandson"
+      end
+
+      attribute 48442114 "GreatGranddaughter"
+	private explicit_type ""
+	init_value "Great-Granddaughter"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Great-Granddaughter"
+      end
+
+      attribute 48442242 "GreatGrandson"
+	private explicit_type ""
+	init_value "Great-Grandson"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Great-Grandson"
+      end
+
+      attribute 48442370 "MaternalAunt"
+	private explicit_type ""
+	init_value "Maternal Aunt"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Maternal Aunt"
+      end
+
+      attribute 48442498 "MaternalFemaleCousin"
+	private explicit_type ""
+	init_value "Maternal Female Cousin"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Maternal Female Cousin"
+      end
+
+      attribute 48442626 "MaternalGrandfather"
+	private explicit_type ""
+	init_value "Maternal Grandfather"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Maternal Grandfather"
+      end
+    end
+
+    classinstance 55744258 "Child"
+      type class_ref 23497858 // ChildType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,Child"
+      comment "A person who was an unmarried minor at the time of his or her involvement in a judicial proceeding or non-judicial program."
+    end
+
+    classinstance 55747586 "Parent"
+      type class_ref 23651458 // PersonType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,Parent"
+      comment "A father or mother of a person."
+    end
+
+    classinstance 55747714 "ParentChildAssociation"
+      type class_ref 23510274 // ParentChildAssociationType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,ParentChildAssociation"
+      comment "An association between a child and a person who is in a parent role toward that child."
+    end
+
+    classinstance 55748994 "PersonOtherKinAssociationCategoryAbstract"
+      type class_ref 23343874 // abstract
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value ""
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,PersonOtherKinAssociationCategoryAbstract"
+      comment "A data concept for describing the kinship or other close personal relationship that exists from the source person to the target person."
+    end
+
+    classinstance 55749122 "PersonOtherKinAssociationCategoryCode"
+      type class_ref 23512194 // PersonOtherKinAssociationCodeType
+      attributes
+        end
+      relations
+        end
+      ncouples 5
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,PersonOtherKinAssociationCategoryCode"
+      key "isNillable" value "true"
+      key "substitutesFor" value "hs:PersonOtherKinAssociationCategoryAbstract"
+      key "substitutesIn" value "hs:PersonOtherKinAssociationType"
+      key "subMultiplicity" value "0,unbounded"
+      comment "A code list that describes the nature of the kinship or other close personal relationship from a source person to a target person."
+    end
+
+    classinstance 55749250 "PersonOtherKinAssociation"
+      type class_ref 23512322 // PersonOtherKinAssociationType
+      attributes
+        end
+      relations
+        end
+      ncouples 2
+      key "isNillable" value "true"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/domains/humanServices/6.0/,PersonOtherKinAssociation"
+      comment "A directed association that describes the kinship or other close personal relationship between the source object and the target object. The relationship between a parent and a child should be captured using the ParentChildAssociation"
+    end
+  end
+
+  classview 761218 "aamva_d20"
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    sequencediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    
+    activitydiagramsettings
+     end
+    ncouples 3
+    key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/codes/aamva_d20/6.0/"
+    key "prefix" value "aamva_d20"
+    key "path" value "niem/codes/aamva_d20.xsd"
+    comment "Motor vehicle administration codes from the Data Dictionary for Traffic Record Systems, maintained by AAMVA, the American Association of Motor Vehicle Administrators."
+    class 23688578 "AccidentSeverityCodeType"
+      visibility package 
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 1
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/codes/aamva_d20/6.0/,AccidentSeverityCodeType"
+      comment "A data type for severity levels of an accident."
+      classrelation 6836098 // <generalisation>
+	relation 6836098 ---|>
+	  a public
+	    classrelation_ref 6836098 // <generalisation>
+	  b parent class_ref 23688706 // AccidentSeverityCodeSimpleType
+      end
+
+      classrelation 6836226 // <directional aggregation>
+	relation 6836226 o-->
+	  a role_name "" private
+	    classrelation_ref 6836226 // <directional aggregation>
+	  b parent class_ref 23662082 // @SimpleObjectAttributeGroup
+      end
+    end
+
+    class 23688706 "AccidentSeverityCodeSimpleType"
+      visibility package stereotype "enum_pattern"
+      cpp_decl ""
+      java_decl ""
+      php_decl ""
+      python_2_2 python_decl ""
+      idl_decl ""
+      explicit_switch_type ""
+      mysql_decl ""
+      
+      ncouples 2
+      key "isTruncated" value "false"
+      key "URI" value "https://docs.oasis-open.org/niemopen/ns/model/codes/aamva_d20/6.0/,AccidentSeverityCodeSimpleType"
+      comment "A data type for severity levels of an accident."
+      classrelation 6835970 // <generalisation>
+	relation 6835970 ---|>
+	  a public
+	    classrelation_ref 6835970 // <generalisation>
+	  b parent class_ref 23685890 // token
+      end
+
+      attribute 48439170 "1"
+	private explicit_type ""
+	init_value "1"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Fatal Accident"
+      end
+
+      attribute 48439298 "2"
+	private explicit_type ""
+	init_value "2"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Incapacitating Injury Accident"
+      end
+
+      attribute 48439426 "3"
+	private explicit_type ""
+	init_value "3"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Non-incapacitating Evident Injury"
+      end
+
+      attribute 48439554 "4"
+	private explicit_type ""
+	init_value "4"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Possible Injury Accident"
+      end
+
+      attribute 48439682 "5"
+	private explicit_type ""
+	init_value "5"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Non-injury Accident"
+      end
+
+      attribute 48439810 "9"
+	private explicit_type ""
+	init_value "9"
+	cpp_decl ""
+	java_decl ""
+	php_decl ""
+	python_decl ""
+	idl_decl ""
+	mysql_decl ""
+	MysqlColumn
+	comment "Unknown"
+      end
+    end
+  end
+end
