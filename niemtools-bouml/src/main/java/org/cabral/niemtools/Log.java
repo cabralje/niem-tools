@@ -1,6 +1,6 @@
 package org.cabral.niemtools;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import fr.bouml.UmlCom;
 
@@ -13,7 +13,7 @@ public class Log {
     //private static final Boolean PROFILE = true;
     private static final Boolean PROFILE = false;
 
-    private static final HashMap<String, Long> timer = new HashMap<>();
+    private static final ConcurrentHashMap<String, Long> timer = new ConcurrentHashMap<>();
 
     /**
      * outputs debugging information

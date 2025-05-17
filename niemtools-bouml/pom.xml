@@ -7,7 +7,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
-        <exec.mainClass>org.cabral.niemtools.NiemtoolsBouml</exec.mainClass>
+        <exec.mainClass>org.cabral.niemtools.BoumlPlugout</exec.mainClass>
     </properties>
     <build>
         <finalName>niemtools-bouml</finalName>

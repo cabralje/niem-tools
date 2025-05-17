@@ -1,8 +1,6 @@
 window_sizes 2288 1538 702 1580 1266 203
 cleanlooks_style
 show_stereotypes
-selected 
-  package_ref 129 // crashdriver
 open
   usecaseview_ref 134658 // Use Cases
   classview_ref 179330 // Interfaces and Operations

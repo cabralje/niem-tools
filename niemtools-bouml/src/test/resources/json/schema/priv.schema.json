@@ -1,0 +1,79 @@
+{
+"$id" : "http://local/priv"
+,
+"$schema" : "https://json-schema.org/draft/2019-09/schema"
+,
+"type" : "object"
+,
+"additionalProperties" : false,
+"@context" : {
+
+"appinfo" : "https://docs.oasis-open.org/niemopen/ns/model/appinfo/6.0/#"
+,
+
+"ct" : "https://docs.oasis-open.org/niemopen/ns/specification/conformanceTargets/6.0/#"
+,
+
+"priv" : "http://local/priv#"
+,
+
+"structures" : "https://docs.oasis-open.org/niemopen/ns/model/structures/6.0/#"
+,
+
+"xs" : "http://www.w3.org/2001/XMLSchema#"
+},
+"definitions": {
+"priv:PrivacyCode": {
+"$ref": "./niem/xs.schema.json#/definitions/xs:token"
+}
+,
+"priv:PrivacyCodeType": {
+"additionalProperties" : false,"properties": {
+"@id": {
+"$ref": "./niem/xs.schema.json#/definitions/xs:NCName"
+},"structures:uri": {
+"description": "An internationalized resource identifier or uniform resource identifier for a node or object.","$ref": "./niem/structures.schema.json#/definitions/structures:uri"
+}
+},"type": "object"
+}
+,
+"priv:PrivacyMetadata": {
+"$ref": "#/definitions/priv:PrivacyMetadataType"
+}
+,
+"priv:PrivacyMetadataType": {
+"additionalProperties" : false,"properties": {
+"@id": {
+"$ref": "./niem/xs.schema.json#/definitions/xs:NCName"
+},"priv:PrivacyCode": {
+"oneOf": [{
+"$ref": "#/definitions/priv:PrivacyCode"
+},
+{
+"items": {
+"$ref": "#/definitions/priv:PrivacyCode"
+},
+
+"minItems": 0,
+"type": "array"
+}
+]
+},"structures:appliesToParent": {
+"description": "True if this element is a property of its parent; false if it appears only to support referencing.","$ref": "./niem/structures.schema.json#/definitions/structures:appliesToParent"
+},"structures:uri": {
+"description": "An internationalized resource identifier or uniform resource identifier for a node or object.","$ref": "./niem/structures.schema.json#/definitions/structures:uri"
+}
+},"type": "object"
+}
+,
+"priv:privacyMetadataRef": {
+"$ref": "./niem/xs.schema.json#/definitions/xs:IDREFS"
+}
+
+},
+"properties" : {
+
+},
+"required" : [
+]
+}

@@ -12,7 +12,7 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
-import org.cabral.niemtools.NiemUmlClass;
+import org.cabral.niemtools.NiemUmlModel;
 
 
 
@@ -348,7 +348,7 @@ public static void ref_indexes() throws IOException
 
   public static void generate_indexes() throws IOException
   {		
-	NiemUmlClass.hideReferenceModel();
+	NiemUmlModel.hideReferenceModel();
 		
     UmlClass.generate_index();
     UmlOperation.generate_index();
@@ -464,11 +464,11 @@ public static void ref_indexes() throws IOException
     fw.write("</html>");
     fw.close();
   
-    UmlCom.trace("document with frame produced in <i>"
-  	       + directory + "/index-withframe.html");
+    //UmlCom.trace("document with frame produced in <i>"
+  	//       + directory + "/index-withframe.html");
   
-    UmlCom.trace("document without frame produced in <i>"
-  	       + directory + "/index.html");
+    //UmlCom.trace("document without frame produced in <i>"
+  	//       + directory + "/index.html");
   }
 
   /**

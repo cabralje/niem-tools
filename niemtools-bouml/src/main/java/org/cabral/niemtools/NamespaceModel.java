@@ -22,10 +22,10 @@ package org.cabral.niemtools;
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.XMLConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -34,7 +34,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import fr.bouml.UmlBasePackage;
 import fr.bouml.UmlClassView;
 import fr.bouml.UmlItem;
 import fr.bouml.anItemKind;
@@ -43,10 +42,10 @@ public class NamespaceModel {
 
     private static final String ATTRIBUTE_PREFIX = "@";
     private static final Set<String> externalPrefixes = new HashSet<>();
-    private static final Map<String, String> externalSchemaURL = new HashMap<>();
+    private static final Map<String, String> externalSchemaURL = new ConcurrentHashMap<>();
     private static final String NAMESPACE_DELIMITER = ":";
-    private static final Map<String, Namespace> Namespaces = new HashMap<>();
-    private static final Map<String, String> Prefixes = new HashMap<>();
+    private static final Map<String, Namespace> Namespaces = new ConcurrentHashMap<>();
+    private static final Map<String, String> Prefixes = new ConcurrentHashMap<>();
 
 
     /**
@@ -78,7 +77,7 @@ public class NamespaceModel {
      *
      */
     static void cacheExternalSchemas() {
-        String externalSchemas = UmlBasePackage.getProject().propertyValue(XmlWriter.IEPD_EXTERNAL_SCHEMAS_PROPERTY);
+        String externalSchemas = NiemUmlModel.getProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS);
         String[] external = externalSchemas.split(",");
         for (String external1 : external) {
             String[] part = external1.split("=");
@@ -117,7 +116,7 @@ public class NamespaceModel {
      * @return an extension schema URI as a String
      */
     static String getExtensionSchema(String prefix) {
-        return UmlBasePackage.getProject().propertyValue(XmlWriter.IEPD_URI_PROPERTY) + "/" + prefix;
+        return NiemUmlModel.getProperty(ProjectProperties.EXPORT_URI) + "/" + prefix;
     }
 
     /**
@@ -182,10 +181,10 @@ public class NamespaceModel {
         }
         // select reference, subset or extension model
         if (model == null)
-            model = isNiemPrefix(prefix) ? NiemUmlClass.getSubsetModel() : NiemUmlClass.getExtensionModel();
+            model = isNiemPrefix(prefix) ? NiemUmlModel.getSubsetModel() : NiemUmlModel.getExtensionModel();
 
         // return classview if it exists
-        UmlClassView namespaceClassView = (model == NiemUmlClass.getReferenceModel()) ? ns.getReferenceClassView() : ns.getNsClassView();
+        UmlClassView namespaceClassView = (model == NiemUmlModel.getReferenceModel()) ? ns.getReferenceClassView() : ns.getNsClassView();
         if (namespaceClassView != null)
             return namespaceClassView;
 
@@ -204,26 +203,26 @@ public class NamespaceModel {
                 prefix3 = prefix2 + conflictCounter++;
             }
         }
-        namespaceClassView.set_PropertyValue(NiemUmlClass.URI_PROPERTY, schemaURI);
+        namespaceClassView.set_PropertyValue(NiemUmlModel.URI_PROPERTY, schemaURI);
         Log.debug("getNamespaceClassView: added class view " + namespaceClassView.name());
 
-        namespaceClassView.set_PropertyValue(NiemUmlClass.PREFIX_PROPERTY, prefix2);
+        namespaceClassView.set_PropertyValue(NiemUmlModel.PREFIX_PROPERTY, prefix2);
 
-        if (model == NiemUmlClass.getReferenceModel())
+        if (model == NiemUmlModel.getReferenceModel())
             ns.setReferenceClassView(namespaceClassView); 
         else {
             ns.setNsClassView(namespaceClassView);
-            if (model == NiemUmlClass.getExtensionModel()) {
+            if (model == NiemUmlModel.getExtensionModel()) {
                 ns.setNsClassView(namespaceClassView);
                 ns.setFilepath(prefix2 + XmlWriter.XSD_FILE_TYPE);
-                namespaceClassView.set_PropertyValue(NiemUmlClass.FILE_PATH_PROPERTY, ns.getFilepath());
+                namespaceClassView.set_PropertyValue(NiemUmlModel.FILE_PATH_PROPERTY, ns.getFilepath());
             } else {
                 UmlClassView referenceClassView = ns.getReferenceClassView();
                 if (referenceClassView != null) {
                     namespaceClassView.set_Description(referenceClassView.description());
-                    String filepath = referenceClassView.propertyValue(NiemUmlClass.FILE_PATH_PROPERTY);
+                    String filepath = referenceClassView.propertyValue(NiemUmlModel.FILE_PATH_PROPERTY);
                     if (filepath != null)
-                        namespaceClassView.set_PropertyValue(NiemUmlClass.FILE_PATH_PROPERTY, filepath);
+                        namespaceClassView.set_PropertyValue(NiemUmlModel.FILE_PATH_PROPERTY, filepath);
                     else
                         Log.debug("getNamespaceClassView: error - no filepath for " + referenceClassView.name());
                 }
@@ -259,7 +258,7 @@ public class NamespaceModel {
             case anItemKind._aClassInstance:
                 return getPrefix(item.parent());
             case anItemKind._aClassView:
-                String prefix = item.propertyValue(NiemUmlClass.PREFIX_PROPERTY);
+                String prefix = item.propertyValue(NiemUmlModel.PREFIX_PROPERTY);
                 if (prefix != null)
                     return filterPrefix(prefix);
             default:
@@ -369,7 +368,7 @@ public class NamespaceModel {
                 if (attributeNodeName.startsWith(XMLConstants.XMLNS_ATTRIBUTE) && !attributeNodeName.equals(XMLConstants.XMLNS_ATTRIBUTE)) {
 
                     String prefix = attributeNodeName.substring(6);
-                    UmlClassView classView = getNamespaceClassView(NiemUmlClass.getReferenceModel(), prefix, schemaURI);
+                    UmlClassView classView = getNamespaceClassView(NiemUmlModel.getReferenceModel(), prefix, schemaURI);
 
                     // get target namespace description
                     if (schemaURI.equals(targetSchemaURI) && classView != null)
@@ -378,7 +377,7 @@ public class NamespaceModel {
             }
             ns = getNamespace(targetSchemaURI);
             if (ns == null) {
-                UmlClassView classView = getNamespaceClassView(NiemUmlClass.getReferenceModel(), targetSchemaURI, targetSchemaURI);
+                UmlClassView classView = getNamespaceClassView(NiemUmlModel.getReferenceModel(), targetSchemaURI, targetSchemaURI);
                 ns = getNamespace(targetSchemaURI);
                 if (classView != null)
                     classView.set_Description(NiemModel.schemaDocumentationXPath.evaluate(doc));
@@ -420,6 +419,8 @@ public class NamespaceModel {
         if (isExternalPrefix(prefix))
             return false;
         String schemaURI = Prefixes.get(prefix);
+        if (schemaURI == null)
+            return false;
         Namespace ns = Namespaces.get(schemaURI);
         if (ns == null)
             return false;

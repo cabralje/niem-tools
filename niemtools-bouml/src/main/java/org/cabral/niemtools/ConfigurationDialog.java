@@ -24,18 +24,17 @@ package org.cabral.niemtools;
  */
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashSet;
-import java.util.Properties;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -49,104 +48,26 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
-
-import fr.bouml.UmlPackage;
 
 class ConfigurationDialog extends JDialog {
 
-    private static final String IEPD_CHANGE_LOG_FILE_DEFAULT = "changelog.txt";
-    static final String IEPD_CHANGE_LOG_FILE_PROPERTY = "IEPDChangeLogFile";
-    private static final String IEPD_CONTACT_DEFAULT = "Contact";
-    static final String IEPD_CONTACT_PROPERTY = "IEPDContact";
-    private static final String IEPD_EMAIL_DEFAULT = "email@example.com";
-    static final String IEPD_EMAIL_PROPERTY = "IEPDEmail";
-    private static final String IEPD_EXTERNAL_SCHEMAS_DEFAULT = "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,"
-            + "cbc=urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonBasicComponents-2.1.xsd,"
-            + "ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd";
-    // IEPD Properties
-    static final String IEPD_EXTERNAL_SCHEMAS_PROPERTY = "externalSchemas";
-    private static final String IEPD_LICENSE_URL_DEFAULT = "https://opensource.org/licenses/BSD-3-Clause";
-    static final String IEPD_LICENSE_URL_PROPERTY = "IEPDLicense";
-    private static final String IEPD_NAME_DEFAULT = "IEPD";
-    static final String IEPD_NAME_PROPERTY = "IEPDName";
-    private static final String IEPD_ORGANIZATION_DEFAULT = "Organization";
-    static final String IEPD_ORGANIZATION_PROPERTY = "IEPDOrganization";
-    private static final String IEPD_READ_ME_FILE_DEFAULT = "readme.txt";
-    static final String IEPD_READ_ME_FILE_PROPERTY = "IEPDReadMeFile";
-    private static final String IEPD_STATUS_DEFAULT = "Draft";
-    static final String IEPD_STATUS_PROPERTY = "IEPDStatus";
-    private static final String IEPD_TERMS_URL_DEFAULT = "example.com/terms";
-    static final String IEPD_TERMS_URL_PROPERTY = "IEPDTermsOfService";
-    private static final String IEPD_URI_DEFAULT = "http://local";
-    static final String IEPD_URI_PROPERTY = "IEPDURI";
-    private static final String IEPD_VERSION_DEFAULT = "1.0";
-    static final String IEPD_VERSION_PROPERTY = "IEPDVersion";
+    private final ProjectProperties properties;
+    private final GridBagConstraints labelLayout;
+    private final GridBagConstraints fieldLayout;
 
-    private static final long serialVersionUID = 1L;
-
-    private static class FilePanel extends JPanel {
-
-        private static final long serialVersionUID = 1L;
-        String value = "";
-
-        /**
-         * @param name
-         * @param initialValue
-         * @param columns
-         * @param fileType
-         */
-        FilePanel(String name, String initialValue, int columns, int fileType) {
-
-            if (initialValue != null) {
-                value = initialValue;
-            }
-
-            // add field label
-            if (name != null) {
-                add(new JLabel(name));
-            }
-
-            // add text field
-            JTextField textField1 = new JTextField(value, columns);
-            textField1.addActionListener((ActionEvent e) -> {
-                value = textField1.getText();
-            });
-            add(textField1);
-
-            // add field button
-            JButton button1 = new JButton("Browse...");
-            button1.addActionListener((ActionEvent e) -> {
-                JFileChooser fc = new JFileChooser(value);
-                fc.setFileSelectionMode(fileType);
-                if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION) {
-                    return;
-                }
-                value = fc.getSelectedFile().getAbsolutePath();
-                textField1.setText(value);
-            });
-            add(button1);
-        }
-    }
+    private String command = null;
 
     private static class LineWrapCellRenderer extends JTextArea implements TableCellRenderer {
 
-        private static final long serialVersionUID = 1L;
-
-        /**
-         *
-         */
         LineWrapCellRenderer() {
             setLineWrap(true);
             setWrapStyleWord(true);
             setFont(new Font(Font.DIALOG, Font.PLAIN, 25));
         }
-
-        /* (non-Javadoc)
-		 * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
-         */
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
@@ -161,243 +82,303 @@ class ConfigurationDialog extends JDialog {
         }
     }
 
-    private static class ToggleBox extends JCheckBox {
+    @FunctionalInterface
+    public interface SimpleDocumentListener extends DocumentListener {
+        void update(DocumentEvent e);
 
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * @param name
-         * @param initialValue
-         * @param panel
-         */
-        ToggleBox(String name, String initialValue, JPanel panel) {
-            super(name, (initialValue == null || !initialValue.equals("false")));
-            panel.setVisible(this.isSelected());
-            addItemListener((ItemEvent e) -> {
-                panel.setVisible(((JCheckBox) (e.getItem())).isSelected());
-            });
+        @Override
+        default void insertUpdate(DocumentEvent e) {
+            update(e);
+        }
+        @Override
+        default void removeUpdate(DocumentEvent e) {
+            update(e);
+        }
+        @Override
+        default void changedUpdate(DocumentEvent e) {
+            update(e);
         }
     }
 
-    /**
-     * initialize IEPD properties
-     */
-    static void init() {
-
-        // set IEPD configuration defaults
-        setPropertyDefault(IEPD_URI_PROPERTY, IEPD_URI_DEFAULT);
-        setPropertyDefault(IEPD_NAME_PROPERTY, IEPD_NAME_DEFAULT);
-        setPropertyDefault(IEPD_VERSION_PROPERTY, IEPD_VERSION_DEFAULT);
-        setPropertyDefault(IEPD_STATUS_PROPERTY, IEPD_STATUS_DEFAULT);
-        setPropertyDefault(IEPD_ORGANIZATION_PROPERTY, IEPD_ORGANIZATION_DEFAULT);
-        setPropertyDefault(IEPD_CONTACT_PROPERTY, IEPD_CONTACT_DEFAULT);
-        setPropertyDefault(IEPD_EMAIL_PROPERTY, IEPD_EMAIL_DEFAULT);
-        setPropertyDefault(IEPD_LICENSE_URL_PROPERTY, IEPD_LICENSE_URL_DEFAULT);
-        setPropertyDefault(IEPD_TERMS_URL_PROPERTY, IEPD_TERMS_URL_DEFAULT);
-        setPropertyDefault(IEPD_READ_ME_FILE_PROPERTY, IEPD_READ_ME_FILE_DEFAULT);
-        setPropertyDefault(IEPD_CHANGE_LOG_FILE_PROPERTY, IEPD_CHANGE_LOG_FILE_DEFAULT);
-        setPropertyDefault(IEPD_EXTERNAL_SCHEMAS_PROPERTY, IEPD_EXTERNAL_SCHEMAS_DEFAULT);
-
+    private JPanel labeledField(String name, String property, int fieldColumns) {
+        
+        JPanel panel = new JPanel();
+        JLabel label = new JLabel(name, SwingConstants.RIGHT);
+        panel.add(label, labelLayout);
+        JTextField field = new JTextField(properties.getProperty(property), fieldColumns);
+        field.getDocument().addDocumentListener((SimpleDocumentListener) e -> {
+            properties.setProperty(property, field.getText());
+        });
+        panel.add(field, fieldLayout);
+        return panel;
     }
 
-    /**
-     * sets a project property
-     */
-    /**
-     * @param propertyName
-     * @param propertyValue
-     */
-    private static void setPropertyDefault(String propertyName, String propertyValue) {
-        UmlPackage root = UmlPackage.getProject();
-        if (root.propertyValue(propertyName) == null) {
-            root.set_PropertyValue(propertyName, propertyValue);
-        }
+    private JPanel checkedField(String name, String boxProperty, String fieldProperty, int fieldColumns) {
+        
+        JPanel panel = new JPanel();
+        JCheckBox box = new JCheckBox(name, properties.getProperty(boxProperty).equals("true"));
+        box.addItemListener((ItemEvent e) -> {
+            properties.setProperty(boxProperty, String.valueOf(box.isSelected()));
+        });
+        panel.add(box, labelLayout);
+        JTextField field = new JTextField(properties.getProperty(fieldProperty), fieldColumns);
+        field.getDocument().addDocumentListener((SimpleDocumentListener) e -> {
+            properties.setProperty(fieldProperty, field.getText());
+        });
+        panel.add(field, fieldLayout);
+        return panel;
+    }
+    
+    private JButton button(String name) {
+        JButton button = new JButton(name);
+        button.setAlignmentX(CENTER_ALIGNMENT);
+        button.setAlignmentY(CENTER_ALIGNMENT);
+        button.addActionListener((ActionEvent e) -> {
+            // Find the parent JTabbedPane and set the selected tab to "Import Reference Model"
+            Component c = button;
+            while (c != null && !(c instanceof JTabbedPane)) {
+                c = c.getParent();
+            }
+            if (c instanceof JTabbedPane tabbedPane) {
+                int index = tabbedPane.indexOfTab(name);
+                if (index != -1)
+                    tabbedPane.setSelectedIndex(index);
+            }
+        });
+        return button;
     }
 
+    private JButton commandButton(String name, String command) {
+        JButton button = new JButton(name);
+        button.setAlignmentX(CENTER_ALIGNMENT);
+        button.setAlignmentY(CENTER_ALIGNMENT);
+        button.addActionListener((ActionEvent e) -> {
+            // Find the parent JTabbedPane and set the selected tab to "Import Reference Model"
+            Component c = button;
+            while (c != null && !(c instanceof ConfigurationDialog)) {
+                c = c.getParent();
+            }
+            if (c instanceof ConfigurationDialog dialog) {
+                dialog.command = command;
+                setVisible(false);
+            }
+        });
+        return button;
+    }
+
+    private static final String MAIN_TAB = "Modeling Workflow";
+    private static final String IMPORT_TAB = "Import Reference Model";
+    private static final String EXPORT_TAB = "Generate Specification";
+    private static final String METADATA_TAB = "Configure Metadata";
+    private static final String EXTERNAL_TAB = "Configure External Schemas";
     /**
      * @param root
-     * @param properties
      */
-    ConfigurationDialog(UmlPackage root, Properties properties) {
-        // create dialog
-        super(new JFrame(), "Niem-tools Configuration", true);
-        setSize(1400, 700);
-        int fieldColumns = 50;
+    ConfigurationDialog(ProjectProperties inputProperties) {
 
-        // add IEPD panel
-        JPanel iepdPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints labelLayout = new GridBagConstraints();
+        // create dialog
+        super(new JFrame(), "Niemtools Configuration", true);
+        properties = inputProperties;
+        setSize(800,800);
+
+        // configure layouts
+        labelLayout = new GridBagConstraints();
         labelLayout.gridx = 0;
         labelLayout.ipady = 20;
-        GridBagConstraints fieldLayout = new GridBagConstraints();
+        fieldLayout = new GridBagConstraints();
         fieldLayout.gridx = 1;
         fieldLayout.ipadx = 1000;
         labelLayout.ipady = 20;
         fieldLayout.weightx = 1.0;
 
-        iepdPanel.add(new JLabel("Name"), labelLayout);
-        JTextField nameField = new JTextField(NiemUmlClass.getProperty(ConfigurationDialog.IEPD_NAME_PROPERTY),
-                fieldColumns);
-        iepdPanel.add(nameField, fieldLayout);
+    }
 
-        iepdPanel.add(new JLabel("URI"), labelLayout);
-        JTextField uriField = new JTextField(NiemUmlClass.getProperty(ConfigurationDialog.IEPD_URI_PROPERTY),
-                fieldColumns);
-        iepdPanel.add(uriField, fieldLayout);
+    String showDialog() {
 
-        iepdPanel.add(new JLabel("Version"), labelLayout);
-        JTextField versionField = new JTextField(NiemUmlClass.getProperty(ConfigurationDialog.IEPD_VERSION_PROPERTY),
-                fieldColumns);
-        iepdPanel.add(versionField, fieldLayout);
+        // add overview panel
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        JPanel mainPanel1 = new JPanel();
+        mainPanel1.setLayout(new BoxLayout(mainPanel1, BoxLayout.Y_AXIS));
 
-        iepdPanel.add(new JLabel("Status"), labelLayout);
-        JTextField statusField = new JTextField(NiemUmlClass.getProperty(ConfigurationDialog.IEPD_STATUS_PROPERTY),
-                fieldColumns);
-        iepdPanel.add(statusField, fieldLayout);
+        mainPanel1.add(button(IMPORT_TAB));
+        mainPanel1.add(button(EXPORT_TAB));
+        mainPanel1.add(button(METADATA_TAB));
+        mainPanel1.add(button(EXTERNAL_TAB));
+        mainPanel1.setAlignmentX(CENTER_ALIGNMENT);
+        mainPanel1.setAlignmentY(CENTER_ALIGNMENT);
+        mainPanel.add(mainPanel1, BorderLayout.CENTER);
 
-        iepdPanel.add(new JLabel("Organization"), labelLayout);
-        JTextField organizationField = new JTextField(
-                NiemUmlClass.getProperty(ConfigurationDialog.IEPD_ORGANIZATION_PROPERTY), fieldColumns);
-        iepdPanel.add(organizationField, fieldLayout);
+        // add IEPD panel
+        JPanel iepdPanel = new JPanel(new BorderLayout());
+        int fieldColumns = 30;
+        
+        JPanel iepdPanel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        iepdPanel1.add(labeledField("Name", ProjectProperties.IEPD_NAME, fieldColumns));
+        iepdPanel1.add(labeledField("URI", ProjectProperties.EXPORT_URI, fieldColumns));
+        iepdPanel1.add(labeledField("Version", ProjectProperties.IEPD_VERSION, fieldColumns)); 
+        iepdPanel1.add(labeledField("Status", ProjectProperties.IEPD_STATUS, fieldColumns));
+        iepdPanel1.add(labeledField("Organization", ProjectProperties.IEPD_ORGANIZATION, fieldColumns));
+        iepdPanel1.add(labeledField("Contact", ProjectProperties.IEPD_CONTACT, fieldColumns));
+        iepdPanel1.add(labeledField("Email", ProjectProperties.IEPD_EMAIL, fieldColumns));
+        iepdPanel1.add(labeledField("License URL", ProjectProperties.IEPD_LICENSE_URL, fieldColumns));
+        iepdPanel1.add(labeledField("Terms of Use URL", ProjectProperties.IEPD_TERMS_URL, fieldColumns));
+        iepdPanel1.add(labeledField("ChangeLog File", ProjectProperties.IEPD_CHANGE_LOG_FILE, fieldColumns));
+        iepdPanel1.add(labeledField("Readme File", ProjectProperties.IEPD_READ_ME_FILE, fieldColumns));
+        iepdPanel.add(iepdPanel1, BorderLayout.CENTER);
 
-        iepdPanel.add(new JLabel("Contact"), labelLayout);
-        JTextField contactField = new JTextField(NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CONTACT_PROPERTY),
-                fieldColumns);
-        iepdPanel.add(contactField, fieldLayout);
+        // add import panel
+        JPanel importPanel = new JPanel(new BorderLayout());
+        JPanel importPanel1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        iepdPanel.add(new JLabel("Email"), labelLayout);
-        JTextField emailField = new JTextField(NiemUmlClass.getProperty(ConfigurationDialog.IEPD_EMAIL_PROPERTY),
-                fieldColumns);
-        iepdPanel.add(emailField, fieldLayout);
-
-        iepdPanel.add(new JLabel("License URL"), labelLayout);
-        JTextField licenseField = new JTextField(
-                NiemUmlClass.getProperty(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY), fieldColumns);
-        licenseField.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(final FocusEvent evt) {
-                String value = licenseField.getText();
-                if (value.startsWith("http"))
-					try {
-                    @SuppressWarnings("unused")
-                    URL url = new URL(value);
-                } catch (MalformedURLException e1) {
-                    Log.trace("main: URL " + value + " is malformed");
-                }
-            }
+        // add reference model directory
+        JPanel referenceModelPanel = new JPanel();
+        referenceModelPanel.add(new JLabel("Reference Model Directory"));
+        JTextField textField = new JTextField(properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR), 60);
+        textField.getDocument().addDocumentListener((SimpleDocumentListener) e -> {
+            properties.setProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR, textField.getText());
         });
-        iepdPanel.add(licenseField, fieldLayout);
-
-        iepdPanel.add(new JLabel("Terms of Use URL"), labelLayout);
-        JTextField termsField = new JTextField(NiemUmlClass.getProperty(ConfigurationDialog.IEPD_TERMS_URL_PROPERTY),
-                fieldColumns);
-        termsField.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(final FocusEvent evt) {
-                String value = termsField.getText();
-                if (value.startsWith("http"))
-					try {
-                    @SuppressWarnings("unused")
-                    URL url = new URL(value);
-                } catch (MalformedURLException e1) {
-                    Log.trace("URL " + value + " is malformed");
-                }
-            }
+        referenceModelPanel.add(textField);
+        JButton button = new JButton("Browse...");
+        button.addActionListener((ActionEvent e) -> {
+            JFileChooser fc = new JFileChooser(properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR));
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
+                return;
+            String value = fc.getSelectedFile().getAbsolutePath();
+            textField.setText(value);
+            properties.setProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR, textField.getText());
         });
-        iepdPanel.add(termsField, fieldLayout);
+        referenceModelPanel.add(button);
+        importPanel.add(referenceModelPanel, BorderLayout.NORTH);
 
-        iepdPanel.add(new JLabel("ChangeLog File"), labelLayout);
-        ConfigurationDialog.FilePanel changelogPanel = new FilePanel(null,
-                NiemUmlClass.getProperty(ConfigurationDialog.IEPD_CHANGE_LOG_FILE_PROPERTY), fieldColumns,
-                JFileChooser.FILES_ONLY);
-        iepdPanel.add(changelogPanel, fieldLayout);
+        // add import options
+        importPanel1.add(labeledField("Include domains", ProjectProperties.IMPORT_INCLUDE_DOMAINS, fieldColumns));
+        importPanel1.add(labeledField("Exclude domains", ProjectProperties.IMPORT_EXCLUDE_DOMAINS, fieldColumns));
+        importPanel1.add(labeledField("Exclude codes", ProjectProperties.IMPORT_EXCLUDE_CODES, fieldColumns));
+        importPanel1.add(labeledField("Maximum facets", ProjectProperties.IMPORT_MAX_FACETS, fieldColumns));
+        importPanel.add(importPanel1, BorderLayout.CENTER);
 
-        iepdPanel.add(new JLabel("ReadMe File"), labelLayout);
-        ConfigurationDialog.FilePanel readmePanel = new FilePanel(null,
-                NiemUmlClass.getProperty(ConfigurationDialog.IEPD_READ_ME_FILE_PROPERTY), fieldColumns,
-                JFileChooser.FILES_ONLY);
-        iepdPanel.add(readmePanel, fieldLayout);
+        // add import button
+        JButton importButton = commandButton("Import Reference Model","importSchema");
+        importPanel.add(importButton, BorderLayout.SOUTH);
 
-        // add model panel
-        JPanel modelPanel = new JPanel(new GridBagLayout());
+        // add export panel
+        JPanel exportPanel = new JPanel(new BorderLayout());
 
-        ConfigurationDialog.FilePanel htmlPanel = new FilePanel("Directory", root.propertyValue("html dir"),
-                fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-        ConfigurationDialog.ToggleBox htmlBox = new ToggleBox("HTML", root.propertyValue("exportHTML"), htmlPanel);
-        modelPanel.add(htmlBox, labelLayout);
-        fieldLayout.gridy = 0;
-        modelPanel.add(htmlPanel, fieldLayout);
+        // add project directory
+        JPanel exportPanel1 = new JPanel();
+        exportPanel1.setLayout(new BoxLayout(exportPanel1, BoxLayout.Y_AXIS));
 
-        ConfigurationDialog.FilePanel xsdPanel = new FilePanel("Directory", properties.getProperty("xsdDir", root.propertyValue("html dir")),
-                fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-        ConfigurationDialog.ToggleBox xsdBox = new ToggleBox("XML Schema", root.propertyValue("exportXML"), xsdPanel);
-        modelPanel.add(xsdBox, labelLayout);
-        fieldLayout.gridy = 1;
-        modelPanel.add(xsdPanel, fieldLayout);
+        JPanel projectPanel = new JPanel();
+        projectPanel.add(new JLabel("Project Directory"));
+        JTextField textField1 = new JTextField(properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR), 60);
+        textField1.getDocument().addDocumentListener((SimpleDocumentListener) e -> {
+            properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, textField1.getText());
+            String modelDir = textField1.getText()+ File.separator + ProjectProperties.getDefaults().getProperty(ProjectProperties.EXPORT_MODEL_DIR);
+            properties.setProperty(ProjectProperties.EXPORT_MODEL_DIR, modelDir);
+            properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, modelDir + File.separator + ProjectProperties.getDefaults().getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
+        });
+        projectPanel.add(textField1);
+        JButton button1 = new JButton("Browse...");
+        button1.addActionListener((ActionEvent e) -> {
+            JFileChooser fc = new JFileChooser(properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR));
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
+                return;
+            String value = fc.getSelectedFile().getAbsolutePath();
+            textField1.setText(value);
+            properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, textField1.getText());
+        });
+        projectPanel.add(button1);
+        exportPanel1.add(projectPanel);
 
-        ConfigurationDialog.FilePanel xmlExamplePanel = new FilePanel("Directory", properties.getProperty("xmlExampleDir", root.propertyValue("html dir")),
-                fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-        modelPanel.add(new JLabel("XML Examples"), labelLayout);
-        fieldLayout.gridy = 2;
-        modelPanel.add(xmlExamplePanel, fieldLayout);
+        JPanel modelPanel = new JPanel();
+        modelPanel.add(new JLabel("Model Directory"));
+        JTextField textField2 = new JTextField(properties.getProperty(ProjectProperties.EXPORT_MODEL_DIR), 60);
+        textField1.getDocument().addDocumentListener((SimpleDocumentListener) e -> {
+            properties.setProperty(ProjectProperties.EXPORT_MODEL_DIR, textField2.getText());
+            properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, textField2.getText() + File.separator + ProjectProperties.getDefaults().getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
+        });
+        modelPanel.add(textField2);
+        JButton button2 = new JButton("Browse...");
+        button1.addActionListener((ActionEvent e) -> {
+            JFileChooser fc = new JFileChooser(properties.getProperty(ProjectProperties.EXPORT_MODEL_DIR));
+            fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
+                return;
+            String value = fc.getSelectedFile().getAbsolutePath();
+            textField2.setText(value);
+            properties.setProperty(ProjectProperties.EXPORT_MODEL_DIR, textField2.getText());
+        });
+        modelPanel.add(button2);
+        exportPanel1.add(modelPanel);
 
-        ConfigurationDialog.FilePanel wsdlPanel = new FilePanel("Directory", properties.getProperty("wsdlDir", root.propertyValue("html dir")),
-                fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-        ConfigurationDialog.ToggleBox wsdlBox = new ToggleBox("WSDL", root.propertyValue("exportWSDL"), wsdlPanel);
-        modelPanel.add(wsdlBox, labelLayout);
-        fieldLayout.gridy = 3;
-        modelPanel.add(wsdlPanel, fieldLayout);
+        JPanel mappingPanel = new JPanel();
+        mappingPanel.add(new JLabel("Mapping File"));
+        JTextField textField3 = new JTextField(properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE), 60);
+        textField1.getDocument().addDocumentListener((SimpleDocumentListener) e -> {
+            properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, textField3.getText());
+        });
+        mappingPanel.add(textField3);
+        JButton button3 = new JButton("Browse...");
+        button1.addActionListener((ActionEvent e) -> {
+            JFileChooser fc = new JFileChooser(properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
+            fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            if (fc.showOpenDialog(new JFrame()) != JFileChooser.APPROVE_OPTION)
+                return;
+            String value = fc.getSelectedFile().getAbsolutePath();
+            textField3.setText(value);
+            properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, textField3.getText());
+        });
+        mappingPanel.add(button3);
+        exportPanel1.add(mappingPanel);
+        exportPanel.add(exportPanel1, BorderLayout.NORTH);
 
-        ConfigurationDialog.FilePanel jsonPanel = new FilePanel("Directory", properties.getProperty("jsonDir", root.propertyValue("html dir")),
-                fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-        ConfigurationDialog.ToggleBox jsonBox = new ToggleBox("JSON Schema", root.propertyValue("exportJSON"), jsonPanel);
-        modelPanel.add(jsonBox, labelLayout);
-        fieldLayout.gridy = 4;
-        modelPanel.add(jsonPanel, fieldLayout);
+        fieldColumns = 20;
+        // add checked text fields
+        JPanel exportPanel2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        //exportPanel2.add(checkedField("Generate HTML", ProjectProperties.EXPORT_HTML, ProjectProperties.EXPORT_MODEL_DIR, 50));
+        //exportPanel2.add(labeledField("Mapping File", ProjectProperties.EXPORT_MAPPING_FILE, 50));
+        exportPanel2.add(checkedField("Generate CMF", ProjectProperties.EXPORT_CMF, ProjectProperties.EXPORT_CMF_DIR, fieldColumns));
+        exportPanel2.add(labeledField("CMF Version", ProjectProperties.EXPORT_CMF_VERSION, fieldColumns));
+        exportPanel2.add(checkedField("Generate XML Schema", ProjectProperties.EXPORT_XSD, ProjectProperties.EXPORT_XSD_DIR, fieldColumns));
+        exportPanel2.add(labeledField("Generate XML Examples", ProjectProperties.EXPORT_XML_DIR, fieldColumns));
+        exportPanel2.add(checkedField("Generate JSON Schema", ProjectProperties.EXPORT_JSON, ProjectProperties.EXPORT_JSON_SCHEMA_DIR, fieldColumns));
+        exportPanel2.add(labeledField("Generate JSON Examples", ProjectProperties.EXPORT_JSON_DIR, fieldColumns));
+        exportPanel2.add(checkedField("Generate WSDL", ProjectProperties.EXPORT_WSDL, ProjectProperties.EXPORT_WSDL_DIR, fieldColumns));
+        exportPanel2.add(checkedField("Generate OpenAPI", ProjectProperties.EXPORT_OPENAPI, ProjectProperties.EXPORT_OPENAPI_DIR, fieldColumns));
+        exportPanel2.add(labeledField("Wantlist File", ProjectProperties.EXPORT_WANTLIST_FILE, fieldColumns));
+        //ProjectProperties.IMPORT_CODE_DESCRIPTIONS
+        exportPanel.add(exportPanel2, BorderLayout.CENTER);
 
-        ConfigurationDialog.FilePanel jsonExamplePanel = new FilePanel("Directory", properties.getProperty("jsonExampleDir", root.propertyValue("html dir")),
-                fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-        modelPanel.add(new JLabel("JSON Examples"), labelLayout);
-        fieldLayout.gridy = 5;
-        modelPanel.add(jsonExamplePanel, fieldLayout);
+        // add mapping button
+        JPanel exportPanel3 = new JPanel();
+        JButton mappingButton = commandButton("Import mapping file","import");
+        exportPanel3.add(mappingButton);
 
-        ConfigurationDialog.FilePanel openapiPanel = new FilePanel("Directory", properties.getProperty("openapiDir", root.propertyValue("html dir")),
-                fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-        ConfigurationDialog.ToggleBox openapiBox = new ToggleBox("OpenAPI", root.propertyValue("exportOpenAPI"),
-                openapiPanel);
-        modelPanel.add(openapiBox, labelLayout);
-        fieldLayout.gridy = 6;
-        modelPanel.add(openapiPanel, fieldLayout);
-
-        ConfigurationDialog.FilePanel metamodelPanel = new FilePanel("Directory", properties.getProperty("metamodelDir", root.propertyValue("html dir")),
-                fieldColumns, JFileChooser.DIRECTORIES_ONLY);
-        ConfigurationDialog.ToggleBox metamodelBox = new ToggleBox("Metamodel", root.propertyValue("exportMetamodel"),
-                metamodelPanel);
-        modelPanel.add(metamodelBox, labelLayout);
-        fieldLayout.gridy = 7;
-        modelPanel.add(metamodelPanel, fieldLayout);
+        // add export button
+        JButton exportButton = commandButton("Generate Specification","export");
+        exportPanel3.add(exportButton);
+        exportPanel.add(exportPanel3, BorderLayout.SOUTH);
 
         // Add external panel
         JPanel externalPanel = new JPanel(new BorderLayout());
-        String[] externalNamespaces = NiemUmlClass.getProperty(ConfigurationDialog.IEPD_EXTERNAL_SCHEMAS_PROPERTY)
-                .split(",");
+        String[] externalNamespaces = properties.getProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS).split(",");
         int row = 0;
         String[][] data = new String[externalNamespaces.length][3];
         for (String namespace : externalNamespaces) {
             String[] parts = namespace.split("=");
-            if (parts.length == 3) {
+            if (parts.length == 3)
                 data[row++] = parts;
-            }
         }
         DefaultTableModel model = new DefaultTableModel(data, new String[]{"Prefix", "Namespace", "URL"});
         JTable table = new JTable(model);
-        Font font = new Font(Font.DIALOG, Font.PLAIN, 25);
+        Font font = new Font(Font.DIALOG, Font.PLAIN, 10);
         table.setFont(font);
-        Font font2 = new Font(Font.DIALOG, Font.BOLD, 25);
-        JTableHeader header = table.getTableHeader();
-        header.setFont(font2);
+        Font font2 = new Font(Font.DIALOG, Font.BOLD, 10);
+        table.getTableHeader().setFont(font2);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table.getColumnModel().getColumn(0).setMinWidth(100);
+        //table.getColumnModel().getColumn(0).setMinWidth(100);
         table.getColumnModel().getColumn(0).setMaxWidth(100);
         table.setDefaultRenderer(Object.class, new LineWrapCellRenderer());
         JScrollPane scrollPanel = new JScrollPane(table);
@@ -411,9 +392,11 @@ class ConfigurationDialog extends JDialog {
 
         // add panels
         JTabbedPane dialogPanel = new JTabbedPane();
-        dialogPanel.addTab("IEPD metadata", iepdPanel);
-        dialogPanel.addTab("Model generation", modelPanel);
-        dialogPanel.addTab("External Namespaces", externalPanel);
+        dialogPanel.addTab(MAIN_TAB, mainPanel);
+        dialogPanel.addTab(IMPORT_TAB, importPanel);
+        dialogPanel.addTab(EXPORT_TAB, exportPanel);
+        dialogPanel.addTab(METADATA_TAB, iepdPanel);
+        dialogPanel.addTab(EXTERNAL_TAB, externalPanel);
         add(dialogPanel);
 
         // add frame button
@@ -428,37 +411,19 @@ class ConfigurationDialog extends JDialog {
         setVisible(true);
 
         try {
-            // save model values
-            root.set_PropertyValue("html dir", htmlPanel.value);
-            root.set_PropertyValue("exportHTML", String.valueOf(htmlBox.isSelected()));
-            root.set_PropertyValue("exportXML", String.valueOf(xsdBox.isSelected()));
-            root.set_PropertyValue("exportWSDL", String.valueOf(wsdlBox.isSelected()));
-            root.set_PropertyValue("exportJSON", String.valueOf(jsonBox.isSelected()));
-            root.set_PropertyValue("exportOpenAPI", String.valueOf(openapiBox.isSelected()));
-            root.set_PropertyValue("exportMetamodel", String.valueOf(metamodelBox.isSelected()));
-            properties.setProperty("xsdDir", xsdPanel.value);
-            properties.setProperty("xmlExampleDir", xmlExamplePanel.value);
-            properties.setProperty("wsdlDir", wsdlPanel.value);
-            properties.setProperty("jsonDir", jsonPanel.value);
-            properties.setProperty("jsonExampleDir", jsonExamplePanel.value);
-            properties.setProperty("openapiDir", openapiPanel.value);
-            properties.setProperty("metamodelDir", metamodelPanel.value);
             LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<>();
             // DefaultTableModel model = table.getModel();
             for (int i = 0; i < model.getRowCount(); i++) {
                 String prefix = "", namespace = "", url = "";
                 Object prefixValue = model.getValueAt(i, 0);
-                if (prefixValue != null) {
+                if (prefixValue != null)
                     prefix = prefixValue.toString();
-                }
                 Object namespaceValue = model.getValueAt(i, 1);
-                if (namespaceValue != null) {
+                if (namespaceValue != null)
                     namespace = namespaceValue.toString();
-                }
                 Object urlValue = model.getValueAt(i, 2);
-                if (urlValue != null) {
+                if (urlValue != null)
                     url = urlValue.toString();
-                }
                 if (url.startsWith("http"))
 					try {
                     @SuppressWarnings("unused")
@@ -467,26 +432,15 @@ class ConfigurationDialog extends JDialog {
                     Log.trace("URL " + url + " is malformed");
                 }
                 if (prefix != null && !prefix.equals("") && namespace != null && !namespace.equals("")
-                        && !url.equals("")) {
+                        && !url.equals(""))
                     externalSchemas2.add(prefix + "=" + namespace + "=" + url);
-                }
             }
-            root.set_PropertyValue(ConfigurationDialog.IEPD_EXTERNAL_SCHEMAS_PROPERTY, String.join(",", externalSchemas2));
+            properties.setProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS, String.join(",", externalSchemas2));
 
-            // save IEPD values
-            root.set_PropertyValue(ConfigurationDialog.IEPD_NAME_PROPERTY, nameField.getText());
-            root.set_PropertyValue(ConfigurationDialog.IEPD_URI_PROPERTY, uriField.getText());
-            root.set_PropertyValue(ConfigurationDialog.IEPD_VERSION_PROPERTY, versionField.getText());
-            root.set_PropertyValue(ConfigurationDialog.IEPD_STATUS_PROPERTY, statusField.getText());
-            root.set_PropertyValue(ConfigurationDialog.IEPD_ORGANIZATION_PROPERTY, organizationField.getText());
-            root.set_PropertyValue(ConfigurationDialog.IEPD_CONTACT_PROPERTY, contactField.getText());
-            root.set_PropertyValue(ConfigurationDialog.IEPD_EMAIL_PROPERTY, emailField.getText());
-            root.set_PropertyValue(ConfigurationDialog.IEPD_LICENSE_URL_PROPERTY, licenseField.getText());
-            root.set_PropertyValue(ConfigurationDialog.IEPD_TERMS_URL_PROPERTY, termsField.getText());
-            root.set_PropertyValue(ConfigurationDialog.IEPD_CHANGE_LOG_FILE_PROPERTY, changelogPanel.value);
-            root.set_PropertyValue(ConfigurationDialog.IEPD_READ_ME_FILE_PROPERTY, readmePanel.value);
         } catch (RuntimeException e1) {
             Log.trace("ConfigurationDialog: exception " + e1.toString());
         }
+
+        return command;
     }
 }

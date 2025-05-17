@@ -1,6 +1,6 @@
 format 224
 "Messages" // UML::Messages
-  revision 22
+  revision 25
   modified_by 2 "JamesCabral"
   // class settings
   
@@ -65,7 +65,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo"
       key "niem-profile:niem:Type" value "exch:CrashDriverInfoType"
       key "niem-profile:niem:Property" value ""
@@ -75,6 +75,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a collection of legal charges associated with the driver of a vehicle in a crash."
       classrelation 1962882 // Crash (<directional aggregation>)
 	relation 1962882 o-->
@@ -82,7 +83,7 @@ format 224
 	  a role_name "Crash" multiplicity "1" private
 	    classrelation_ref 1962882 // Crash (<directional aggregation>)
 	  b parent class_ref 1567106 // Crash
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash"
 	key "niem-profile:niem:Type" value "exch:CrashDriverInfoType"
 	key "niem-profile:niem:Property" value "j:Crash"
@@ -92,6 +93,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1963010 // Charge (<directional aggregation>)
@@ -100,7 +102,7 @@ format 224
 	  a role_name "Charge" multiplicity "*" private
 	    classrelation_ref 1963010 // Charge (<directional aggregation>)
 	  b parent class_ref 1567234 // Charge
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Charge"
 	key "niem-profile:niem:Type" value "exch:CrashDriverInfoType"
 	key "niem-profile:niem:Property" value "j:Charge"
@@ -110,6 +112,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1963138 // PersonChargeAssociation (<directional aggregation>)
@@ -118,7 +121,7 @@ format 224
 	  a role_name "PersonChargeAssociation" multiplicity "*" private
 	    classrelation_ref 1963138 // PersonChargeAssociation (<directional aggregation>)
 	  b parent class_ref 1567490 // PersonChargeAssociation
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:PersonChargeAssociation"
 	key "niem-profile:niem:Type" value "exch:CrashDriverInfoType"
 	key "niem-profile:niem:Property" value "j:PersonChargeAssociation"
@@ -128,6 +131,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1963394 // Metadata (<directional aggregation>)
@@ -136,7 +140,7 @@ format 224
 	  a role_name "Metadata" multiplicity "*" private
 	    classrelation_ref 1963394 // Metadata (<directional aggregation>)
 	  b parent class_ref 1567618 // Metadata
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/nc\"etadata"
 	key "niem-profile:niem:Type" value "exch:CrashDriverInfoType"
 	key "niem-profile:niem:Property" value "nc:Metadata"
@@ -146,6 +150,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1963522 // PrivacyMetadata (<directional aggregation>)
@@ -154,7 +159,7 @@ format 224
 	  a role_name "PrivacyMetadata" multiplicity "*" private
 	    classrelation_ref 1963522 // PrivacyMetadata (<directional aggregation>)
 	  b parent class_ref 1567746 // PrivacyMetadata
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/priv:PrivacyMetadata"
 	key "niem-profile:niem:Type" value "exch:CrashDriverInfoType"
 	key "niem-profile:niem:Property" value "priv:PrivacyMetadata"
@@ -164,6 +169,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1977730 // PersonUnionAssociation (<directional aggregation>)
@@ -172,7 +178,7 @@ format 224
 	  a role_name "PersonUnionAssociation" multiplicity "*" private
 	    classrelation_ref 1977730 // PersonUnionAssociation (<directional aggregation>)
 	  b parent class_ref 1592834 // PersonUnionAssociation
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/nc:PersonUnionAssociation"
 	key "niem-profile:niem:Type" value "exch:CrashDriverInfoType"
 	key "niem-profile:niem:Property" value "nc:PersonUnionAssociation"
@@ -182,6 +188,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1977858 // ParentChildAssociation (<directional aggregation>)
@@ -190,7 +197,7 @@ format 224
 	  a role_name "ParentChildAssociation" multiplicity "*" private
 	    classrelation_ref 1977858 // ParentChildAssociation (<directional aggregation>)
 	  b parent class_ref 1592962 // ParentChildAssociation
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/hs:ParentChildAssociation"
 	key "niem-profile:niem:Type" value "exch:CrashDriverInfoType"
 	key "niem-profile:niem:Property" value "hs:ParentChildAssociation"
@@ -200,6 +207,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1977986 // PersonOtherKinAssoication (<directional aggregation>)
@@ -208,7 +216,7 @@ format 224
 	  a role_name "PersonOtherKinAssoication" multiplicity "*" private
 	    classrelation_ref 1977986 // PersonOtherKinAssoication (<directional aggregation>)
 	  b parent class_ref 1593090 // PersonOtherKinAssociation
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/hs:PersonOtherKinAssociation"
 	key "niem-profile:niem:Type" value "exch:CrashDriverInfoType"
 	key "niem-profile:niem:Property" value "hs:PersonOtherKinAssociation"
@@ -218,6 +226,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -231,7 +240,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash"
       key "niem-profile:niem:Type" value "j:CrashType"
       key "niem-profile:niem:Property" value ""
@@ -241,6 +250,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a traffic accident."
       classrelation 1970306 // CrashVehicle (<directional aggregation>)
 	relation 1970306 o-->
@@ -248,7 +258,7 @@ format 224
 	  a role_name "CrashVehicle" multiplicity "1..*" private
 	    classrelation_ref 1970306 // CrashVehicle (<directional aggregation>)
 	  b parent class_ref 1574274 // CrashVehicle
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashVehicle"
 	key "niem-profile:niem:Type" value "j:CrashType"
 	key "niem-profile:niem:Property" value "j:CrashVehicle"
@@ -258,6 +268,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1970818 // CrashPerson (<directional aggregation>)
@@ -266,7 +277,7 @@ format 224
 	  a role_name "CrashPerson" multiplicity "1..*" private
 	    classrelation_ref 1970818 // CrashPerson (<directional aggregation>)
 	  b parent class_ref 1574658 // CrashPerson
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson"
 	key "niem-profile:niem:Type" value "j:CrashType"
 	key "niem-profile:niem:Property" value "j:CrashPerson"
@@ -276,6 +287,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1978882 // <generalisation>
@@ -296,7 +308,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Charge"
       key "niem-profile:niem:Type" value "j:ChargeType"
       key "niem-profile:niem:Property" value ""
@@ -306,6 +318,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       attribute 2006914 "ChargeDescriptionText"
 	private explicit_type "string"
 	multiplicity "*"
@@ -317,7 +330,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Charge/j:ChargeDescriptionText"
 	key "niem-profile:niem:Type" value "j:ChargeType"
 	key "niem-profile:niem:Property" value "j:ChargeDescriptionText"
@@ -327,6 +340,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       attribute 2007042 "ChargeFelonyIndicator"
@@ -340,7 +354,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Charge/j:ChargeFelonyIndicator"
 	key "niem-profile:niem:Type" value "j:ChargeType"
 	key "niem-profile:niem:Property" value "j:ChargeFelonyIndicator"
@@ -350,6 +364,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1978370 // Metadata (<directional aggregation>)
@@ -358,7 +373,7 @@ format 224
 	  a role_name "Metadata" multiplicity "0..1" private
 	    classrelation_ref 1978370 // Metadata (<directional aggregation>)
 	  b parent class_ref 1567618 // Metadata
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Charge/@nc:metadataRef"
 	key "niem-profile:niem:Type" value "j:ChargeType"
 	key "niem-profile:niem:Property" value "nc:@metadataRef"
@@ -368,6 +383,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -381,7 +397,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson"
       key "niem-profile:niem:Type" value "nc:PersonType"
       key "niem-profile:niem:Property" value ""
@@ -391,6 +407,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a human being."
       classrelation 1970690 // PersonName (<directional aggregation>)
 	relation 1970690 o-->
@@ -398,7 +415,7 @@ format 224
 	  a role_name "PersonName" multiplicity "*" private
 	    classrelation_ref 1970690 // PersonName (<directional aggregation>)
 	  b parent class_ref 1574530 // PersonName
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson/nc:PersonName"
 	key "niem-profile:niem:Type" value "nc:PersonType"
 	key "niem-profile:niem:Property" value "nc:PersonName"
@@ -408,6 +425,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       attribute 2006530 "PersonFictionalCharacterIndicator"
@@ -420,7 +438,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson/exch:PersonFictionalCharacterIndicator"
 	key "niem-profile:niem:Type" value "nc:PersonType"
 	key "niem-profile:niem:Property" value "nc:PersonAugmentationPoint, (exch:PersonFictionalCharacterIndicator)"
@@ -430,6 +448,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
 	comment "True if this person is a fictional character in a literary work; false otherwise."
       end
 
@@ -439,7 +458,7 @@ format 224
 	  a role_name "PersonAugmentation" multiplicity "1" private
 	    classrelation_ref 4631810 // PersonAugmentation (<directional aggregation>)
 	  b parent class_ref 8722050 // PersonAugmentation
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson"
 	key "niem-profile:niem:Type" value "nc:PersonType"
 	key "niem-profile:niem:Property" value "nc:PersonAugmentationPoint"
@@ -449,6 +468,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 4683650 // PersonBirthDate (<directional aggregation>)
@@ -457,7 +477,7 @@ format 224
 	  a role_name "PersonBirthDate" multiplicity "*" private
 	    classrelation_ref 4683650 // PersonBirthDate (<directional aggregation>)
 	  b parent class_ref 1594114 // Date
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson/nc:PersonBirthDate"
 	key "niem-profile:niem:Type" value "nc:PersonType"
 	key "niem-profile:niem:Property" value "nc:PersonBirthDate"
@@ -467,6 +487,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -480,7 +501,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:PersonChargeAssociation"
       key "niem-profile:niem:Type" value "j:PersonChargeAssociationType"
       key "niem-profile:niem:Property" value ""
@@ -490,6 +511,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for an association between a person and a charge."
       classrelation 1963650 // Person (<directional aggregation>)
 	relation 1963650 o-->
@@ -497,7 +519,7 @@ format 224
 	  a role_name "Person" multiplicity "1" private
 	    classrelation_ref 1963650 // Person (<directional aggregation>)
 	  b parent class_ref 1567362 // Person
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:PersonChargeAssociation/nc:Person"
 	key "niem-profile:niem:Type" value "j:PersonChargeAssociationType"
 	key "niem-profile:niem:Property" value "nc:Person"
@@ -507,6 +529,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1963778 // Charge (<directional aggregation>)
@@ -515,7 +538,7 @@ format 224
 	  a role_name "Charge" multiplicity "1" private
 	    classrelation_ref 1963778 // Charge (<directional aggregation>)
 	  b parent class_ref 1567234 // Charge
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:PersonChargeAssociation/j:Charge"
 	key "niem-profile:niem:Type" value "j:PersonChargeAssociationType"
 	key "niem-profile:niem:Property" value "j:Charge"
@@ -525,6 +548,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       attribute 1998978 "JuvenileAsAdultIndicator"
@@ -538,7 +562,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:PersonChargeAssociation/j:JuvenileAsAdultIndicator"
 	key "niem-profile:niem:Type" value "j:PersonChargeAssociationType"
 	key "niem-profile:niem:Property" value "j:JuvenileAsAdultIndicator"
@@ -548,6 +572,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1979138 // Metadata (<directional aggregation>)
@@ -556,7 +581,7 @@ format 224
 	  a role_name "Metadata" multiplicity "0..1" private
 	    classrelation_ref 1979138 // Metadata (<directional aggregation>)
 	  b parent class_ref 1567618 // Metadata
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:PersonChargeAssociation/@nc:metadataRef"
 	key "niem-profile:niem:Type" value "j:PersonChargeAssociationType"
 	key "niem-profile:niem:Property" value "nc:@metadataRef"
@@ -566,6 +591,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1979906 // <generalisation>
@@ -586,7 +612,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/nc:Metadata"
       key "niem-profile:niem:Type" value "nc:MetadataType"
       key "niem-profile:niem:Property" value ""
@@ -596,6 +622,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for information that further qualifies primary data; data about data."
       classrelation 1980930 // ReportedDate (<directional aggregation>)
 	relation 1980930 o-->
@@ -603,7 +630,7 @@ format 224
 	  a role_name "ReportedDate" multiplicity "*" private
 	    classrelation_ref 1980930 // ReportedDate (<directional aggregation>)
 	  b parent class_ref 1594114 // Date
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/nc:Metadata"
 	key "niem-profile:niem:Type" value "nc:MetadataType"
 	key "niem-profile:niem:Property" value "nc:ReportedDate"
@@ -613,6 +640,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 4631682 // MetadataAugmentation (<directional aggregation>)
@@ -621,7 +649,7 @@ format 224
 	  a role_name "MetadataAugmentation" private
 	    classrelation_ref 4631682 // MetadataAugmentation (<directional aggregation>)
 	  b parent class_ref 8721922 // MetadataAugmentation
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/nc:Metadata"
 	key "niem-profile:niem:Type" value "nc:MetadataType"
 	key "niem-profile:niem:Property" value "nc:MetadataAugmentationPoint"
@@ -631,6 +659,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -644,7 +673,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/priv:PrivacyMetadata"
       key "niem-profile:niem:Type" value "priv:PrivacyMetadataType"
       key "niem-profile:niem:Property" value ""
@@ -654,13 +683,14 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       classrelation 4422274 // PrivacyCode (<directional aggregation>)
 	relation 4422274 o-->
 	  stereotype "niem-profile:niem"
 	  a role_name "PrivacyCode" multiplicity "*" private
 	    classrelation_ref 4422274 // PrivacyCode (<directional aggregation>)
 	  b parent class_ref 8487298 // PrivacyCode
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/priv:PrivacyMetadata/priv:PrivacyCode"
 	key "niem-profile:niem:Type" value "priv:PrivacyMetadataType"
 	key "niem-profile:niem:Property" value "priv:PrivacyCode"
@@ -670,6 +700,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -683,7 +714,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashVehicle"
       key "niem-profile:niem:Type" value "j:CrashVehicleType"
       key "niem-profile:niem:Property" value ""
@@ -693,6 +724,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a motor vehicle involved in a traffic accident."
       classrelation 1978626 // CrashDriver (<directional aggregation>)
 	relation 1978626 o-->
@@ -700,7 +732,7 @@ format 224
 	  a role_name "CrashDriver" multiplicity "1" private
 	    classrelation_ref 1978626 // CrashDriver (<directional aggregation>)
 	  b parent class_ref 1593346 // CrashDriver
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashVehicle/j:CrashDriver"
 	key "niem-profile:niem:Type" value "j:CrashVehicleType"
 	key "niem-profile:niem:Property" value "j:CrashDriver"
@@ -710,6 +742,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -723,7 +756,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/nc:ActivityLocation"
       key "niem-profile:niem:Type" value "nc:LocationType"
       key "niem-profile:niem:Property" value ""
@@ -733,13 +766,14 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       classrelation 1980546 // LocationGeographicCoordinate (<directional aggregation>)
 	relation 1980546 o-->
 	  stereotype "niem-profile:niem"
 	  a role_name "LocationGeographicCoordinate" multiplicity "*" private
 	    classrelation_ref 1980546 // LocationGeographicCoordinate (<directional aggregation>)
 	  b parent class_ref 1594498 // Location2DGeospatialCoordinate
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/nc:ActivityLocation/nc:Location2DGeospatialCoordinate"
 	key "niem-profile:niem:Type" value "nc:LocationType"
 	key "niem-profile:niem:Property" value "nc:LocationGeospatialCoordinateAbstract, (nc:Location2DGeospatialCoordinate) "
@@ -749,6 +783,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -762,7 +797,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson/nc:PersonName"
       key "niem-profile:niem:Type" value "nc:PersonNameType"
       key "niem-profile:niem:Property" value ""
@@ -772,6 +807,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a combination of names and/or titles by which a person is known."
       attribute 2006018 "PersonGivenName"
 	private explicit_type "string"
@@ -784,7 +820,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson/nc:PersonName/nc:PersonGivenName"
 	key "niem-profile:niem:Type" value "nc:PersonNameType"
 	key "niem-profile:niem:Property" value "nc:PersonGivenName"
@@ -794,6 +830,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       attribute 2006146 "PersonMiddleName"
@@ -807,7 +844,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson/nc:PersonName/nc:PersonMiddleName"
 	key "niem-profile:niem:Type" value "nc:PersonNameType"
 	key "niem-profile:niem:Property" value "nc:PersonMiddleName"
@@ -817,6 +854,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       attribute 2006274 "PersonSurName"
@@ -830,7 +868,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson/nc:PersonName/nc:PersonSurName"
 	key "niem-profile:niem:Type" value "nc:PersonNameType"
 	key "niem-profile:niem:Property" value "nc:PersonSurName"
@@ -840,6 +878,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       attribute 2023298 "PersonNameComment"
@@ -853,7 +892,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson/nc:PersonName/@nc:personNameCommentText"
 	key "niem-profile:niem:Type" value "nc:PersonNameType"
 	key "niem-profile:niem:Property" value "nc:@personNameCommentText"
@@ -863,6 +902,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -876,7 +916,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson"
       key "niem-profile:niem:Type" value "j:CrashPersonType"
       key "niem-profile:niem:Property" value ""
@@ -886,6 +926,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for any person involved in a traffic accident."
       classrelation 1980418 // CrashPersonInjury (<directional aggregation>)
 	relation 1980418 o-->
@@ -893,7 +934,7 @@ format 224
 	  a role_name "CrashPersonInjury" multiplicity "1..*" private
 	    classrelation_ref 1980418 // CrashPersonInjury (<directional aggregation>)
 	  b parent class_ref 1594370 // Injury
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/j:CrashPersonInjury"
 	key "niem-profile:niem:Type" value "j:CrashPersonType"
 	key "niem-profile:niem:Property" value "j:CrashPersonInjury"
@@ -903,6 +944,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -916,7 +958,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashVehicle/j:CrashDriver/j:DriverLicense"
       key "niem-profile:niem:Type" value "j:DriverLicenseType"
       key "niem-profile:niem:Property" value ""
@@ -926,6 +968,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a license issued to a person granting driving privileges."
       classrelation 1979010 // <generalisation>
 	relation 1979010 ---|>
@@ -940,7 +983,7 @@ format 224
 	  a role_name "DriverLicenseCardIdentification" multiplicity "1" private
 	    classrelation_ref 1980162 // DriverLicenseCardIdentification (<directional aggregation>)
 	  b parent class_ref 1594242 // Identification
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashVehicle/j:CrashDriver/j:DriverLicense/j:DriverLicenseCardIdentification"
 	key "niem-profile:niem:Type" value "j:DriverLicenseType"
 	key "niem-profile:niem:Property" value "j:DriverLicenseCardIdentification"
@@ -950,6 +993,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -963,7 +1007,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/nc:PersonUnionAssociation"
       key "niem-profile:niem:Type" value "nc:PersonUnionAssociationType"
       key "niem-profile:niem:Property" value ""
@@ -973,6 +1017,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       classrelation 1979778 // <generalisation>
 	relation 1979778 ---|>
 	  a public
@@ -998,7 +1043,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/hs:ParentChildAssociation"
       key "niem-profile:niem:Type" value "hs:ParentChildAssociationType"
       key "niem-profile:niem:Property" value ""
@@ -1008,6 +1053,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for an association between a child and a person who is in a parent role toward that child."
       classrelation 1978114 // Child (<directional aggregation>)
 	relation 1978114 o-->
@@ -1015,7 +1061,7 @@ format 224
 	  a role_name "Child" multiplicity "*" private
 	    classrelation_ref 1978114 // Child (<directional aggregation>)
 	  b parent class_ref 1593218 // Child
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/hs:ParentChildAssociation/hs:Child"
 	key "niem-profile:niem:Type" value "hs:ParentChildAssociationType"
 	key "niem-profile:niem:Property" value "hs:Child"
@@ -1025,6 +1071,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1978242 // Parent (<directional aggregation>)
@@ -1033,7 +1080,7 @@ format 224
 	  a role_name "Parent" multiplicity "*" private
 	    classrelation_ref 1978242 // Parent (<directional aggregation>)
 	  b parent class_ref 1567362 // Person
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/hs:ParentChildAssociation/hs:Parent"
 	key "niem-profile:niem:Type" value "hs:ParentChildAssociationType"
 	key "niem-profile:niem:Property" value "hs:Parent"
@@ -1043,6 +1090,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1979650 // <generalisation>
@@ -1063,7 +1111,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/hs:PersonOtherKinAssociation"
       key "niem-profile:niem:Type" value "hs:PersonOtherKinAssociationType"
       key "niem-profile:niem:Property" value ""
@@ -1073,6 +1121,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       attribute 2022274 "PersonOtherKinAssociationCode"
 	private explicit_type "string"
 	multiplicity "*"
@@ -1084,7 +1133,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/hs:PersonOtherKinAssociation/hs:PersonOtherKinAssociationCategoryCode"
 	key "niem-profile:niem:Type" value "hs:PersonOtherKinAssociationType"
 	key "niem-profile:niem:Property" value "hs:PersonOtherKinAssociationCategoryAbstract, (hs:PersonOtherKinAssociationCategoryCode)"
@@ -1094,6 +1143,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
 	comment "A data type for describing the nature of the kinship or other close personal relationship from a source person to a target person.
     "
       end
@@ -1109,7 +1159,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/hs:ParentChildAssociation/hs:Child"
       key "niem-profile:niem:Type" value "hs:ChildType"
       key "niem-profile:niem:Property" value ""
@@ -1119,6 +1169,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for information about a person who has not yet reached the age of legal majority (i.e., adulthood)."
     end
 
@@ -1132,7 +1183,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashVehicle/j:CrashDriver"
       key "niem-profile:niem:Type" value "j:CrashDriverType"
       key "niem-profile:niem:Property" value ""
@@ -1142,6 +1193,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a motor vehicle driver involved in a traffic accident."
       classrelation 1978498 // <generalisation>
 	relation 1978498 ---|>
@@ -1156,7 +1208,7 @@ format 224
 	  a role_name "DriverLicense" multiplicity "1" private
 	    classrelation_ref 1978754 // DriverLicense (<directional aggregation>)
 	  b parent class_ref 1574786 // DriverLicense
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashVehicle/j:CrashDriver/j:DriverLicense"
 	key "niem-profile:niem:Type" value "j:CrashDriverType"
 	key "niem-profile:niem:Property" value "j:DriverLicense"
@@ -1166,6 +1218,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -1179,7 +1232,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash"
       key "niem-profile:niem:Type" value "j:DrivingIncidentType"
       key "niem-profile:niem:Property" value ""
@@ -1189,6 +1242,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for details of an incident involving a vehicle."
       classrelation 1979394 // <generalisation>
 	relation 1979394 ---|>
@@ -1208,7 +1262,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashVehicle/j:CrashDriver/j:DriverLicense"
       key "niem-profile:niem:Type" value "j:DriverLicenseType"
       key "niem-profile:niem:Property" value ""
@@ -1218,6 +1272,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for an authorization issued to a driver granting driving privileges."
     end
 
@@ -1231,7 +1286,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash"
       key "niem-profile:niem:Type" value "nc:ActivityType"
       key "niem-profile:niem:Property" value ""
@@ -1241,6 +1296,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a single or set of related actions, events, or process steps."
       classrelation 1979266 // ActivityLiocation (<directional aggregation>)
 	relation 1979266 o-->
@@ -1248,7 +1304,7 @@ format 224
 	  a role_name "ActivityLiocation" multiplicity "*" private
 	    classrelation_ref 1979266 // ActivityLiocation (<directional aggregation>)
 	  b parent class_ref 1574402 // Location
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/nc:ActivityLocation"
 	key "niem-profile:niem:Type" value "nc:ActivityType"
 	key "niem-profile:niem:Property" value "nc:ActivityLocation"
@@ -1258,6 +1314,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1980034 // ActivityDate (<directional aggregation>)
@@ -1266,7 +1323,7 @@ format 224
 	  a role_name "ActivityDate" multiplicity "*" private
 	    classrelation_ref 1980034 // ActivityDate (<directional aggregation>)
 	  b parent class_ref 1594114 // Date
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/nc:ActivityDate"
 	key "niem-profile:niem:Type" value "nc:ActivityType"
 	key "niem-profile:niem:Property" value "nc:ActivityDate"
@@ -1276,6 +1333,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -1289,7 +1347,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash"
       key "niem-profile:niem:Type" value "nc:IncidentType"
       key "niem-profile:niem:Property" value ""
@@ -1299,6 +1357,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for an occurrence or an event that may require a response."
       classrelation 1979522 // <generalisation>
 	relation 1979522 ---|>
@@ -1318,7 +1377,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:PersonChargeAssociation"
       key "niem-profile:niem:Type" value "nc:AssociationType"
       key "niem-profile:niem:Property" value ""
@@ -1328,6 +1387,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for an association, connection, relationship, or involvement somehow linking people, things, and/or activities together."
     end
 
@@ -1341,7 +1401,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson/nc:PersonBirthDate"
       key "niem-profile:niem:Type" value "nc:DateType"
       key "niem-profile:niem:Property" value ""
@@ -1351,6 +1411,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a calendar date."
       attribute 2022658 "DateRepresentation"
 	private explicit_type "date"
@@ -1363,7 +1424,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson/nc:PersonBirthDate/nc:DateRepresentation"
 	key "niem-profile:niem:Type" value "nc:DateType"
 	key "niem-profile:niem:Property" value "nc:DateRepresentation, (nc:Date)"
@@ -1373,6 +1434,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -1386,7 +1448,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashVehicle/j:CrashDriver/j:DriverLicense/j:DriverLicenseCardIdentification"
       key "niem-profile:niem:Type" value "nc:IdentificationType"
       key "niem-profile:niem:Property" value ""
@@ -1396,6 +1458,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a representation of an identity."
       attribute 2022786 "IdentificationID"
 	private explicit_type "string"
@@ -1408,7 +1471,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashVehicle/j:CrashDriver/j:DriverLicense/j:DriverLicenseCardIdentification/nc:IdentificationID"
 	key "niem-profile:niem:Type" value "nc:IdentificationType"
 	key "niem-profile:niem:Property" value "nc:IdentificationID"
@@ -1418,6 +1481,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -1431,7 +1495,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/j:CrashPersonInjury"
       key "niem-profile:niem:Type" value "nc:InjuryType"
       key "niem-profile:niem:Property" value ""
@@ -1441,6 +1505,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a form of harm or damage sustained by a person."
       attribute 2022914 "InjuryDescriptionText"
 	private explicit_type "string"
@@ -1453,7 +1518,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/j:CrashPersonInjury/nc:InjuryDescriptionText"
 	key "niem-profile:niem:Type" value "nc:InjuryType"
 	key "niem-profile:niem:Property" value "nc:InjuryDescriptionText"
@@ -1463,6 +1528,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       attribute 2023042 "InjurySeverityCode"
@@ -1476,7 +1542,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/j:CrashPersonInjury/j:InjurySeverityCode"
 	key "niem-profile:niem:Type" value "nc:InjuryType"
 	key "niem-profile:niem:Property" value "nc:InjurySeverityAbstract, (j:InjurySeverityCode)"
@@ -1486,6 +1552,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 2088322 // privacyMetadataRef (<directional aggregation>)
@@ -1494,7 +1561,7 @@ format 224
 	  a role_name "privacyMetadataRef" multiplicity "0..1" private
 	    classrelation_ref 2088322 // privacyMetadataRef (<directional aggregation>)
 	  b parent class_ref 1567746 // PrivacyMetadata
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/j:CrashPersonInjury/@priv:privacyMetadataRef"
 	key "niem-profile:niem:Type" value "nc:InjuryType"
 	key "niem-profile:niem:Property" value "priv:@privacyMetadataRef"
@@ -1504,6 +1571,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -1517,7 +1585,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/nc:ActivityLocation/nc:Location2DGeospatialCoordinate"
       key "niem-profile:niem:Type" value "nc:Location2DGeospatialCoordinateType"
       key "niem-profile:niem:Property" value ""
@@ -1527,6 +1595,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a location identified by latitude and longitude."
       classrelation 1980674 // GeographicCoordinateLongitude (<directional aggregation>)
 	relation 1980674 o-->
@@ -1534,7 +1603,7 @@ format 224
 	  a role_name "GeographicCoordinateLongitude" multiplicity "1" private
 	    classrelation_ref 1980674 // GeographicCoordinateLongitude (<directional aggregation>)
 	  b parent class_ref 1594626 // LongitudeDegree
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/nc:ActivityLocation/nc:Location2DGeospatialCoordinate/nc:GeographicCoordinateLongitude"
 	key "niem-profile:niem:Type" value ""
 	key "niem-profile:niem:Property" value "nc:GeographicCoordinateLongitude"
@@ -1544,6 +1613,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       classrelation 1980802 // GeographicCoordinateLatitude (<directional aggregation>)
@@ -1552,7 +1622,7 @@ format 224
 	  a role_name "GeographicCoordinateLatitude" multiplicity "1" private
 	    classrelation_ref 1980802 // GeographicCoordinateLatitude (<directional aggregation>)
 	  b parent class_ref 1594754 // LatitudeDegree
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/nc:ActivityLocation/nc:Location2DGeospatialCoordinate/nc:GeographicCoordinateLatitude"
 	key "niem-profile:niem:Type" value ""
 	key "niem-profile:niem:Property" value "nc:GeographicCoordinateLatitude"
@@ -1562,6 +1632,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -1575,7 +1646,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/nc:ActivityLocation/nc:Location2DGeospatialCoordinate/nc:GeographicCoordinateLongitude"
       key "niem-profile:niem:Type" value "nc:LongitudeCoordinateType"
       key "niem-profile:niem:Property" value "nc:LongitudeDegreeValue"
@@ -1585,6 +1656,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a degree of longitude."
     end
 
@@ -1598,7 +1670,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/nc:ActivityLocation/nc:Location2DGeospatialCoordinate/nc:GeographicCoordinateLatitude/nc:LatitudeDegreeValue"
       key "niem-profile:niem:Type" value "nc:LatitudeCoordinateType"
       key "niem-profile:niem:Property" value "nc:LatitudeDegreeValue"
@@ -1608,6 +1680,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for a degree of latitude."
     end
 
@@ -1621,7 +1694,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/nc:PersonUnionAssociation"
       key "niem-profile:niem:Type" value "nc:PersonAssociationType"
       key "niem-profile:niem:Property" value ""
@@ -1631,6 +1704,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       comment "A data type for an association between people."
       classrelation 1981058 // <generalisation>
 	relation 1981058 ---|>
@@ -1650,7 +1724,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/priv:PrivacyMetadata/priv:PrivacyCode"
       key "niem-profile:niem:Type" value "priv:PrivacyCodeType"
       key "niem-profile:niem:Property" value ""
@@ -1660,6 +1734,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
     end
 
     classinstance 20516738 "CrashDriverInfo"
@@ -1692,7 +1767,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/nc:Metadata"
       key "niem-profile:niem:Type" value "nc:MetadataType"
       key "niem-profile:niem:Property" value "nc:MetadataAugmentationPoint"
@@ -1702,6 +1777,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       attribute 6760706 "CriminalInformationIndicator"
 	private explicit_type "boolean"
 	multiplicity "*"
@@ -1713,7 +1789,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/nc:Metadata/j:CriminalInformationIndicator"
 	key "niem-profile:niem:Type" value "nc:MetadataType"
 	key "niem-profile:niem:Property" value "nc:MetadataAugmentationPoint, (j:CriminalInformationIndicator)"
@@ -1723,6 +1799,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
 
       attribute 6760834 "IntelligenceInformationIndicator"
@@ -1736,7 +1813,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/nc:Metadata/j:IntelligenceInformationIndicator"
 	key "niem-profile:niem:Type" value "nc:MetadataType"
 	key "niem-profile:niem:Property" value "nc:MetadataAugmentationPoint, (j:IntelligenceInformationIndicator)"
@@ -1746,6 +1823,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
 
@@ -1759,7 +1837,7 @@ format 224
       explicit_switch_type ""
       mysql_decl ""
       
-      ncouples 9
+      ncouples 10
       key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson"
       key "niem-profile:niem:Type" value "nc:PersonType"
       key "niem-profile:niem:Property" value "nc:PersonAugmentationPoint"
@@ -1769,6 +1847,7 @@ format 224
       key "niem-profile:niem:OldXPath" value ""
       key "niem-profile:niem:OldMultiplicity" value ""
       key "niem-profile:niem:Notes" value ""
+      key "niem-profile:niem:" value ""
       attribute 6760962 "PersonAdultIndicator"
 	private explicit_type "boolean"
 	multiplicity "1"
@@ -1780,7 +1859,7 @@ format 224
 	idl_decl ""
 	mysql_decl ""
 	MysqlColumn
-	ncouples 9
+	ncouples 10
 	key "niem-profile:niem:XPath" value "exch:CrashDriverInfo/j:Crash/j:CrashPerson/nc:RoleOfPerson/j:PersonAugmentation/j:PersonAdultIndicator"
 	key "niem-profile:niem:Type" value "nc:PersonType"
 	key "niem-profile:niem:Property" value "nc:PersonAugmentationPoint, (j:PersonAdultIndicator)"
@@ -1790,6 +1869,7 @@ format 224
 	key "niem-profile:niem:OldXPath" value ""
 	key "niem-profile:niem:OldMultiplicity" value ""
 	key "niem-profile:niem:Notes" value ""
+	key "niem-profile:niem:" value ""
       end
     end
   end

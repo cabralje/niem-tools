@@ -3,7 +3,6 @@ package org.cabral.niemtools;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,21 +23,21 @@ public class HtmlWriter {
      * @param directory
      * @param filename
      */
-    void exportHtml(String directory, String filename) {
+    void exportMappingHtml(String filename) {
         try {
             // Write rest of header
-            File file = Paths.get(directory, filename + HTML_FILE_TYPE).toFile();
-            Log.trace("exportHtml: path " + file.getAbsolutePath());
+            File file = new File(filename);
+            Log.debug("exportMappingHtml: path " + file.getAbsolutePath());
             File parentFile = file.getParentFile();
             if (parentFile != null)
                 parentFile.mkdirs();
             try (FileWriter fw = new FileWriter(file)) {
                 fw.write("<html>");
-                fw.write("<head><title>" + NiemUmlClass.MAPPING_SPREADSHEET_TITLE
+                fw.write("<head><title>" + NiemUmlModel.MAPPING_SPREADSHEET_TITLE
                         + "</title><link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" /></head>"
-                        + "<body><div class = \"title\">" + NiemUmlClass.MAPPING_SPREADSHEET_TITLE + "</div>"
+                        + "<body><div class = \"title\">" + NiemUmlModel.MAPPING_SPREADSHEET_TITLE + "</div>"
                         + "<table style=\"table-layout: fixed; width: 100%\"><tr bgcolor=\"#f0f0f0\">");
-                for (String[] column : NiemUmlClass.getNiemMap())
+                for (String[] column : NiemUmlModel.getNiemMap())
                     fw.write("<td style=\"word-wrap: break-word\">" + column[0] + "</td>");
                 fw.write("</tr>\n");
 
@@ -46,20 +45,28 @@ public class HtmlWriter {
                 Iterator<UmlItem> it = (UmlClass.classes.iterator());
                 while (it.hasNext()) {
                     UmlItem thisClass = it.next();
-                    if (NiemUmlClass.isNiemUml(thisClass)) {
+                    if (thisClass == null) {
+                        Log.trace("exportHtml: null class");    
+                        continue;
+                    }
+                    if (NiemUmlModel.isNiemUml(thisClass)) {
                         writeLineHtml(fw, thisClass);
 
                         // Show NIEM Mapping for Attributes and Relations
-                        for (UmlItem item : thisClass.children())
-                            if (NiemUmlClass.isNiemUml(item))
-                                writeLineHtml(fw, item);
+                       // if (!NiemUmlModel.isEnumeration(thisClass))
+                            for (UmlItem item : thisClass.children())
+                            //    if (NiemUmlModel.isNiemUml(item) && !NiemUmlModel.isFacet(item))
+                                if (NiemUmlModel.isNiemUml(item))
+                                    writeLineHtml(fw, item);
                     }
                 }
                 fw.write("</table>\n");
                 fw.write("</body></html>");
             }
         } catch (IOException e) {
-            Log.trace("exportHtml: error " + e.toString());
+            Log.trace("exportMappingHtml: error " + e.toString());
+        } catch (Exception e) {
+            Log.trace("exportMappingHtml: error " + e.toString());
         }
     }
 
@@ -158,7 +165,13 @@ public class HtmlWriter {
                 }
             }
             fw.write("</td><td>");
+        } catch (IOException e) {
+            Log.trace("writeLineHtml: error " + e.toString());
+        } catch (Exception e) {
+            Log.trace("writeLineHtml: error " + e.toString());
+        }
 
+        try {
             // Export Description
             if (item.description() != null)
                 fw.write(item.description());
@@ -167,7 +180,7 @@ public class HtmlWriter {
             // Export NIEM Mapping
             int columnIndex;
             // String oldValue, container;
-            int mapLength = NiemUmlClass.getNiemMap().length;
+            int mapLength = NiemUmlModel.getNiemMap().length;
             String[] column = new String[mapLength];
             String extensionBGColor = "#ffd700";
             String defaultBGColor = "#ffffff";
@@ -177,9 +190,9 @@ public class HtmlWriter {
             String defaultFGColor = "#000000";
             String fgcolor, bgcolor;
 
-            if (NiemUmlClass.isNiemUml(item)) {
+            if (NiemUmlModel.isNiemUml(item)) {
                 for (columnIndex = 5; columnIndex < mapLength; columnIndex++) {
-                    column[columnIndex] = (item.propertyValue(NiemUmlClass.getNiemProperty(columnIndex)));
+                    column[columnIndex] = (item.propertyValue(NiemUmlModel.getNiemProperty(columnIndex)));
                     column[columnIndex] = (column[columnIndex] != null) ? column[columnIndex].trim() : "";
                 }
 
@@ -192,92 +205,122 @@ public class HtmlWriter {
 				 * }
                  */
                 // export XPath
-                String XPath = column[5].trim();
-                String oldXPath = column[10].trim();
-                // bgcolor = (extension) ? extensionBGColor : defaultBGColor;
-                bgcolor = defaultBGColor;
-                fgcolor = (XPath.equals(oldXPath)) ? defaultFGColor : changedFGColor;
-                fw.write(getColumnHtml(XPath, bgcolor, fgcolor, true));
-
+                try {
+                    String XPath = column[5].trim();
+                    String oldXPath = column[10].trim();
+                    // bgcolor = (extension) ? extensionBGColor : defaultBGColor;
+                    bgcolor = defaultBGColor;
+                    fgcolor = (XPath.equals(oldXPath)) ? defaultFGColor : changedFGColor;
+                    fw.write(getColumnHtml(XPath, bgcolor, fgcolor, true));
+                } catch (Exception e) {
+                    Log.trace("writeLineHtml: error writing XPath " + e.toString());
+                }
+                
                 // export Type
                 String typeName = column[6].trim();
                 String typePrefix = NamespaceModel.getPrefix(typeName);
                 bgcolor = defaultBGColor;
                 fgcolor = defaultFGColor;
-                if (!typeName.equals("")) {
-                    if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName)) && !NiemUmlClass.isNiemType(typeName)) {
-                        fgcolor = invalidFGColor;
-                        Log.trace("writeLineHtml: type " + typeName + " is not in the NIEM reference model");
+                try {
+                    if (typeName != null && !typeName.equals("")) {
+                        if (typePrefix == null) {
+                            fgcolor = invalidFGColor;
+                            Log.trace("writeLineHtml: type " + typeName + " has no prefix");
+                            return;
+                        }
+                        if (NamespaceModel.isNiemPrefix(typePrefix) && !NiemUmlModel.isNiemType(typeName)) {
+                            fgcolor = invalidFGColor;
+                            Log.trace("writeLineHtml: type " + typeName + " is not in the NIEM reference model");
+                        }
+                        if (!NamespaceModel.isNiemPrefix(typePrefix) && !NamespaceModel.isExternalPrefix(typePrefix))
+                            bgcolor = extensionBGColor;
                     }
-                    if (!NamespaceModel.isNiemPrefix(typePrefix) && !NamespaceModel.isExternalPrefix(typePrefix))
-                        bgcolor = extensionBGColor;
-
+                    fw.write(getColumnHtml(typeName, bgcolor, fgcolor, true));
+                } catch (Exception e) {
+                    Log.trace("writeLineHtml: error writing type " + typeName + " " + e.toString());
                 }
-                fw.write(getColumnHtml(typeName, bgcolor, fgcolor, true));
 
                 // export Property
-                String elementLine = column[7];
-                fgcolor = defaultFGColor;
-                bgcolor = defaultBGColor;
-                if (!elementLine.equals("")) {
-                    String[] elementNames = elementLine.split(",");
-                    for (String elementName : elementNames) {
-                        elementName = elementName.trim();
-                        Matcher mat = Pattern.compile("\\((.*?)\\)").matcher(elementName);
-                        if (!mat.find()) {
-                            String prefix = NamespaceModel.getPrefix(elementName);
-                            if (NamespaceModel.isNiemPrefix(typePrefix) && NamespaceModel.isNiemPrefix(prefix)
-                                    && !NamespaceModel.isAttribute(elementName) && !NiemUmlClass.isNiemElementInType(typeName, elementName)) {
-                                fgcolor = invalidFGColor;
-                                Log.trace("writeLineHtml: element " + elementName + " is not in type " + typeName + " in the NIEM reference model");
+                try {
+                    String elementLine = column[7];
+                    fgcolor = defaultFGColor;
+                    bgcolor = defaultBGColor;
+                    if (!elementLine.equals("")) {
+                        String[] elementNames = elementLine.split(",");
+                        for (String elementName : elementNames) {
+                            elementName = elementName.trim();
+                            Matcher mat = Pattern.compile("\\((.*?)\\)").matcher(elementName);
+                            if (!mat.find()) {
+                                String prefix = NamespaceModel.getPrefix(elementName);
+                                if (NamespaceModel.isNiemPrefix(typePrefix) && NamespaceModel.isNiemPrefix(prefix)
+                                        && !NamespaceModel.isAttribute(elementName) && !NiemUmlModel.isNiemElementInType(typeName, elementName)) {
+                                    fgcolor = invalidFGColor;
+                                    Log.trace("writeLineHtml: element " + elementName + " is not in type " + typeName + " in the NIEM reference model");
+                                }
+                                prefix = NamespaceModel.getPrefix(elementLine);
+                                if (!NamespaceModel.isNiemPrefix(prefix) && !NamespaceModel.isExternalPrefix(prefix))
+                                    bgcolor = extensionBGColor;
                             }
-                            prefix = NamespaceModel.getPrefix(elementLine);
-                            if (!NamespaceModel.isNiemPrefix(prefix) && !NamespaceModel.isExternalPrefix(prefix))
-                                bgcolor = extensionBGColor;
                         }
                     }
+                    fw.write(getColumnHtml(elementLine, bgcolor, fgcolor, true));
+                } catch (Exception e) { 
+                    Log.trace("writeLineHtml: error writing element " + e.toString());
                 }
-                fw.write(getColumnHtml(elementLine, bgcolor, fgcolor, true));
 
                 // export BaseType
-                String baseType = column[8].trim();
-                String basePrefix = NamespaceModel.getPrefix(baseType);
-                bgcolor = defaultBGColor;
-                fgcolor = defaultFGColor;
-                if (!baseType.equals("") && !NiemModel.isAbstract(baseType)) {
-                    if (!NamespaceModel.isNiemPrefix(basePrefix) && !NamespaceModel.isExternalPrefix(basePrefix))
-                        bgcolor = extensionBGColor;
-                    if (NamespaceModel.isNiemPrefix(basePrefix) && !NiemUmlClass.isNiemType(baseType))
-                        fgcolor = invalidFGColor;
+                try {
+                    String baseType = column[8].trim();
+                    String basePrefix = NamespaceModel.getPrefix(baseType);
+                    bgcolor = defaultBGColor;
+                    fgcolor = defaultFGColor;
+                    if (!baseType.equals("") && !NiemModel.isAbstract(baseType)) {
+                        if (!NamespaceModel.isNiemPrefix(basePrefix) && !NamespaceModel.isExternalPrefix(basePrefix))
+                            bgcolor = extensionBGColor;
+                        if (NamespaceModel.isNiemPrefix(basePrefix) && !NiemUmlModel.isNiemType(baseType))
+                            fgcolor = invalidFGColor;
+                    }
+                    fw.write(getColumnHtml(baseType, bgcolor, fgcolor, true));
+                } catch (Exception e) {
+                    Log.trace("writeLineHtml: error writing base type " + e.toString());
                 }
-                fw.write(getColumnHtml(baseType, bgcolor, fgcolor, true));
 
                 // export Multiplicity
-                bgcolor = defaultBGColor;
-                String multiplicity = column[9];
-                fgcolor = (multiplicity.equals(column[11])) ? defaultFGColor : changedFGColor;
-                String minOccurs = NiemUmlClass.getMinOccurs(multiplicity);
-                String maxOccurs = NiemUmlClass.getMaxOccurs(multiplicity);
                 try {
-                    if (Integer.parseInt(minOccurs) < 0)
-                        throw new NumberFormatException();
-                    if (!maxOccurs.equals("unbounded") && (Integer.parseInt(maxOccurs) < 1))
-                        throw new NumberFormatException();
-                } catch (NumberFormatException e) {
-                    fgcolor = invalidFGColor;
-                    Log.trace("writeLineHtml: illegal multiplicity " + multiplicity + " in type " + typeName);
+                    bgcolor = defaultBGColor;
+                    String multiplicity = column[9];
+                    fgcolor = (multiplicity.equals(column[11])) ? defaultFGColor : changedFGColor;
+                    String minOccurs = NiemUmlModel.getMinOccurs(multiplicity);
+                    String maxOccurs = NiemUmlModel.getMaxOccurs(multiplicity);
+                    try {
+                        if (Integer.parseInt(minOccurs) < 0)
+                            throw new NumberFormatException();
+                        if (!maxOccurs.equals("unbounded") && (Integer.parseInt(maxOccurs) < 1))
+                            throw new NumberFormatException();
+                    } catch (NumberFormatException e) {
+                        fgcolor = invalidFGColor;
+                        Log.trace("writeLineHtml: illegal multiplicity " + multiplicity + " in type " + typeName);
+                    }
+                    fw.write(getColumnHtml(column[9], bgcolor, fgcolor, false));
+                } catch (Exception e) {
+                    Log.trace("writeLineHtml: error writing multiplicity " + e.toString());
                 }
-                fw.write(getColumnHtml(column[9], bgcolor, fgcolor, false));
 
                 // export Old XPath, Multiplicity, Mapping Notes, code list
-                fgcolor = defaultFGColor;
-                fw.write(getColumnHtml(column[10], bgcolor, fgcolor, true));
-                fw.write(getColumnHtml(column[11], bgcolor, fgcolor, false));
-                fw.write(getColumnHtml(column[12], bgcolor, fgcolor, true));
-                fw.write(getColumnHtml(column[13], bgcolor, fgcolor, true));
+                try {
+                    fgcolor = defaultFGColor;
+                    fw.write(getColumnHtml(column[10], bgcolor, fgcolor, true));
+                    fw.write(getColumnHtml(column[11], bgcolor, fgcolor, false));
+                    fw.write(getColumnHtml(column[12], bgcolor, fgcolor, true));
+                    fw.write(getColumnHtml(column[13], bgcolor, fgcolor, true));
+                } catch (Exception e) {
+                    Log.trace("writeLineHtml: error writing old XPath, multiplicity, mapping notes, code list " + e.toString());
+                }
             }
             fw.write("</tr>");
         } catch (IOException e) {
+            Log.trace("writeLineHtml: error " + e.toString());
+        } catch (Exception e) {
             Log.trace("writeLineHtml: error " + e.toString());
         }
     }

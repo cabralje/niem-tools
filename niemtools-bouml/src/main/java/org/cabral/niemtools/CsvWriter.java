@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Iterator;
 
 import com.opencsv.CSVWriter;
@@ -27,7 +26,7 @@ public class CsvWriter {
      * @return
      */
     String[] getItemCsv(UmlItem item) {
-        String[] nextLine = new String[NiemUmlClass.getNiemMap().length];
+        String[] nextLine = new String[NiemUmlModel.getNiemMap().length];
         try {
             // Export Class and Property
             switch (item.kind().value()) {
@@ -80,9 +79,9 @@ public class CsvWriter {
         nextLine[4] = item.description();
 
         // Export NIEM Mapping
-        if (NiemUmlClass.isNiemUml(item))
-            for (int column = 5; column < NiemUmlClass.getNiemMap().length; column++)
-                nextLine[column] = item.propertyValue(NiemUmlClass.getNiemProperty(column));
+        if (NiemUmlModel.isNiemUml(item))
+            for (int column = 5; column < NiemUmlModel.getNiemMap().length; column++)
+                nextLine[column] = item.propertyValue(NiemUmlModel.getNiemProperty(column));
 
         return nextLine;
     }
@@ -95,9 +94,9 @@ public class CsvWriter {
      * @param filename
      */
     //@SuppressWarnings("unchecked")
-    void exportCsv(String directory, String filename) {
-        File file = Paths.get(directory, filename).toFile();
-
+    void exportCsv(String filename) {
+        //File file = Paths.get(directory, filename).toFile();
+        File file = new File(filename);
         try {
             File parentFile = file.getParentFile();
             if (parentFile != null)
@@ -109,7 +108,7 @@ public class CsvWriter {
             } finally {
 
                 // Write header
-                final String[][] map = NiemUmlClass.getNiemMap();
+                final String[][] map = NiemUmlModel.getNiemMap();
                 String[] nextLine = new String[map.length];
                 for (int column = 0; column < map.length; column++)
                     nextLine[column] = map[column][0];
@@ -126,7 +125,7 @@ public class CsvWriter {
                 while (it.hasNext()) {
                     UmlItem thisClass = it.next();
                     Log.debug("exportCsv: " + thisClass.name());
-                    if (!NiemUmlClass.isNiemUml(thisClass))
+                    if (!NiemUmlModel.isNiemUml(thisClass))
                         continue;
                     nextLine = getItemCsv(thisClass);
                     Log.debug("exportCsv: write line");
@@ -135,7 +134,7 @@ public class CsvWriter {
 
                     // Export NIEM Mapping for Attributes and Relations
                     for (UmlItem item : thisClass.children()) {
-                        if (!NiemUmlClass.isNiemUml(item))
+                        if (!NiemUmlModel.isNiemUml(item))
                             continue;
                         nextLine = getItemCsv(item);
                         Log.debug("exportCsv: write line");

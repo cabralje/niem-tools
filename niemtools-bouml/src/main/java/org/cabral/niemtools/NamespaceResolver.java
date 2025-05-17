@@ -22,9 +22,9 @@ package org.cabral.niemtools;
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -37,8 +37,8 @@ import org.w3c.dom.NodeList;
 public class NamespaceResolver implements NamespaceContext {
 
     private static final String DEFAULT_NS = "DEFAULT";
-    private final Map<String, String> prefix2Uri = new HashMap<>();
-    private final Map<String, String> uri2Prefix = new HashMap<>();
+    private final Map<String, String> prefix2Uri = new ConcurrentHashMap<>();
+    private final Map<String, String> uri2Prefix = new ConcurrentHashMap<>();
 
     /**
      * This constructor parses the document and stores all namespaces it can

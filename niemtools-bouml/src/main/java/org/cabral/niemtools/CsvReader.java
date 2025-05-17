@@ -3,9 +3,9 @@ package org.cabral.niemtools;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
@@ -20,15 +20,16 @@ public class CsvReader {
     /**
      * @param filename
      */
+    // TODO importCsv: import non-nillable elements
     void importCsv(String filename) {
         // cache UML classes
-        Map<String, UmlClass> UMLClasses = new HashMap<>();
-        Map<String, UmlClassInstance> UMLInstances = new HashMap<>();
+        Map<String, UmlClass> UMLClasses = new ConcurrentHashMap<>();
+        Map<String, UmlClassInstance> UMLInstances = new ConcurrentHashMap<>();
         //@SuppressWarnings("unchecked")
         Iterator<UmlItem> it = UmlItem.all.iterator();
         while (it.hasNext()) {
             UmlItem item = it.next();
-            if (NiemUmlClass.isNiemUml(item)) {
+            if (NiemUmlModel.isNiemUml(item)) {
                 if (item.kind() == anItemKind.aClass) {
                     UmlClass c = (UmlClass) item;
                     if (!UMLClasses.containsKey(c.name()))
@@ -59,7 +60,7 @@ public class CsvReader {
             Log.debug("importCsv: header read");
 
             // read mappings
-            int mapLength = NiemUmlClass.getNiemMap().length;
+            int mapLength = NiemUmlModel.getNiemMap().length;
             while ((nextLine = reader.readNext()) != null) {
                 String className = nextLine[0].trim();
                 String attributeName = nextLine[1].trim();
@@ -72,14 +73,14 @@ public class CsvReader {
                             Log.debug("importCsv: importing NIEM mapping for " + className);
                             for (int column = 5; column < mapLength
                                     && column < nextLine.length; column++)
-                                type.set_PropertyValue(NiemUmlClass.getNiemProperty(column), nextLine[column]);
+                                type.set_PropertyValue(NiemUmlModel.getNiemProperty(column), nextLine[column]);
                         } else {
                             // import NIEM Mapping to attribute
                             for (UmlItem item : type.children())
-                                if (NiemUmlClass.isNiemUml(item)&& (item.name().equals(attributeName)))
+                                if (NiemUmlModel.isNiemUml(item)&& (item.name().equals(attributeName)))
                                     for (int column = 5; column < mapLength
                                             && column < nextLine.length; column++)
-                                        item.set_PropertyValue(NiemUmlClass.getNiemProperty(column), nextLine[column]);
+                                        item.set_PropertyValue(NiemUmlModel.getNiemProperty(column), nextLine[column]);
                         }
                     }
                 } else if (!attributeName.equals("")) {
@@ -88,7 +89,7 @@ public class CsvReader {
                         // import NIEM mapping to class
                         Log.debug("importCsv: importing NIEM mapping for " + attributeName);
                         for (int column = 5; column < mapLength && column < nextLine.length; column++)
-                            element.set_PropertyValue(NiemUmlClass.getNiemProperty(column), nextLine[column]);
+                            element.set_PropertyValue(NiemUmlModel.getNiemProperty(column), nextLine[column]);
                     }
                 }
             }

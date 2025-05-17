@@ -1,6 +1,6 @@
 format 224
 "crashdriver"
-  revision 28
+  revision 40
   modified_by 2 "JamesCabral"
 
 
@@ -44,31 +44,46 @@ format 224
 
   mark_for_import
   
-  ncouples 24
-  key "IEPDURI" value "http://cabral.org/crashdriver"
-  key "IEPDName" value "Crash Driver Message Specification"
-  key "IEPDVersion" value "1.0"
-  key "IEPDStatus" value "Draft"
-  key "IEPDOrganization" value "NIEMOpen"
-  key "IEPDContact" value "Jim Cabral"
-  key "IEPDEmail" value "jim@cabral.org"
+  ncouples 39
+  key "ExportExternalSchemas" value "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,cbc=urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonBasicComponents-2.1.xsd,ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd"
+  key "IEPDEmail" value "email@example.com"
+  key "ImportExcludeCodes" value "ncic"
   key "IEPDLicense" value "https://opensource.org/licenses/BSD-3-Clause"
+  key "IEPDStatus" value "Draft"
+  key "ExportJSONSchemaDir" value "json\\schema"
+  key "ExportCMF" value "true"
+  key "html dir" value "C:\\Users\\JamesCabral\\git\\niem-tools\\niemtools-bouml\\src\\test\\model"
+  key "ExportCMFDir" value "cmf"
+  key "ExportCMFVersion" value "0.8"
+  key "ExportURI" value "http://local"
+  key "IEPDVersion" value "1.0"
   key "IEPDTermsOfService" value "example.com/terms"
+  key "ImportReferenceModelDir" value "C:\\Users\\JamesCabral\\git\\niem-model\\xsd"
+  key "ImportMaxFacets" value "20"
+  key "ExportHTML" value "true"
+  key "ExportXMLDir" value "examples"
+  key "niem-mapping" value "C:\\Users\\JamesCabral\\git\\niem-tools\\niemtools-bouml\\src\\test\\resources\\model\\niem-mapping.csv"
+  key "ExportXSDDir" value "schema"
+  key "ImportIncludeDomains" value "justice. hs"
   key "IEPDReadMeFile" value "readme.txt"
+  key "ExportJSONDir" value "json\\examples"
+  key "IEPDName" value "NIEM Message Specification"
+  key "ExportWSDL" value "true"
+  key "ExportProjectDir" value "C:\\Users\\JamesCabral\\git\\niem-tools\\niemtools-bouml\\src\\test"
+  key "IEPDCatalogFile" value "mpd-catalog.xml"
+  key "ExportOpenAPI" value "true"
+  key "ImportExcludeDomains" value ""
+  key "ExportJSON" value "true"
+  key "IEPDOrganization" value "Organization Name"
+  key "ExportXSD" value "true"
+  key "IEPDContact" value "Contact Name"
+  key "ExportOpenAPIDir" value "json"
+  key "ExportWantlistFile" value "model\\wantlist"
+  key "ImportCodeDescriptions" value "true"
   key "IEPDChangeLogFile" value "changelog.txt"
-  key "externalSchemas" value "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,cbc=urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonBasicComponents-2.1.xsd,ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd"
-  key "html dir" value "C:\\Users\\JamesCabral\\git\\niem-tools\\niemtools-bouml\\src\\test\\resources\\model"
-  key "exportHTML" value "true"
-  key "exportXML" value "true"
-  key "exportWSDL" value "false"
-  key "exportJSON" value "false"
-  key "exportOpenAPI" value "false"
-  key "exportMetamodel" value "true"
-  key "maxEnums" value "20"
-  key "cmfVersion" value "1.0"
-  key "" value ""
-  key "niemDor" value "C:\\Users\\JamesCabral\\git\\niem-model\\xsd"
-  key "projectDir" value "C:\\Users\\JamesCabral\\git\\niem-tools\\niemtools-bouml\\src\\test\\resources"
+  key "ExportWSDLDir" value "WS-SIP"
+  key "IEPDConformanceFile" value "conformance-assertion.pdf"
+  key "C:\\Users\\JamesCabral\\git\\niem-tools\\niemtools-bouml\\src\\test\\resources\\model\\niem-mapping.csv" value "niem-mapping.csv"
   package_ref 141058 // UML
 
   package_ref 154242 // NIEM
