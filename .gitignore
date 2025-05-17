@@ -56,4 +56,4 @@ buildNumber.properties
 # Built Visual Studio Code Extensions
 *.vsix
 
-.vscode/launch.json
+niemtools-bouml/src/test/resources/*

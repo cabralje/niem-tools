@@ -1,6 +1,6 @@
 format 224
 "crashdriver"
-  revision 40
+  revision 41
   modified_by 2 "JamesCabral"
 
 
@@ -52,7 +52,7 @@ format 224
   key "IEPDStatus" value "Draft"
   key "ExportJSONSchemaDir" value "json\\schema"
   key "ExportCMF" value "true"
-  key "html dir" value "C:\\Users\\JamesCabral\\git\\niem-tools\\niemtools-bouml\\src\\test\\model"
+  key "html dir" value "C:\\Users\\JamesCabral\\git\\niem-tools\\niemtools-bouml\\src\\test\\resources\\model"
   key "ExportCMFDir" value "cmf"
   key "ExportCMFVersion" value "0.8"
   key "ExportURI" value "http://local"
@@ -69,7 +69,7 @@ format 224
   key "ExportJSONDir" value "json\\examples"
   key "IEPDName" value "NIEM Message Specification"
   key "ExportWSDL" value "true"
-  key "ExportProjectDir" value "C:\\Users\\JamesCabral\\git\\niem-tools\\niemtools-bouml\\src\\test"
+  key "ExportProjectDir" value "C:\\Users\\JamesCabral\\git\\niem-tools\\niemtools-bouml\\src\\test\\resources"
   key "IEPDCatalogFile" value "mpd-catalog.xml"
   key "ExportOpenAPI" value "true"
   key "ImportExcludeDomains" value ""

@@ -1,9 +1,4 @@
 // 'tool' "the executable" "displayed string" {target}+
-tool "Add NIEM Stereotype" "java -cp C:/Users/jim.cabral/git/niem-tools/* com.infotrack.niemtools.Main addStereotype" Class Operation Attribute Generalisation Realize Dependency Association DirectionalAssociation Aggregation AggregationByValue DirectionalAggregation DirectionalAggregationByValue Port RolePart Connector ExtraMember ClassInstance
-tool "Remove NIEM Stereotype" "java -cp C:/Users/jim.cabral/git/niem-tools/* com.infotrack.niemtools.Main removeStereotype" Class Operation Attribute Generalisation Realize Dependency Association DirectionalAssociation Aggregation AggregationByValue DirectionalAggregation DirectionalAggregationByValue Port RolePart Connector ExtraMember ClassInstance
-tool "Sort" "java -cp C:/Users/jim.cabral/git/niem-tools/* com.infotrack.niemtools.Main sort" Project Package UseCaseView ClassView ComponentView DeploymentView UseCaseDiagram
-tool "Configure NIEM modeling" "java -cp C:/Users/jim.cabral/git/niem-tools/* com.infotrack.niemtools.Main configure" Project
-tool "Import NIEM reference model" "java -cp C:/Users/jim.cabral/git/niem-tools/* com.infotrack.niemtools.Main importSchema" Project
-tool "Import NIEM mapping" "java -cp C:/Users/jim.cabral/git/niem-tools/* com.infotrack.niemtools.Main import" Project
-tool "Generate NIEM models" "java -cp C:/Users/jim.cabral/git/niem-tools/* com.infotrack.niemtools.Main export" Project
-tool "Export XMI 2.x" "gxmi2" Project
+tool "Add NIEM Stereotype" "java org.cabral.niemTools.BoumlPlugout addStereotype" Class Operation Attribute Generalisation Realize Dependency Association DirectionalAssociation Aggregation AggregationByValue DirectionalAggregation DirectionalAggregationByValue Port RolePart Connector ExtraMember ClassInstance
+tool "Remove NIEM Stereotype" "java org.cabral.niemTools.BoumlPlugout removeStereotype" Class Operation Attribute Generalisation Realize Dependency Association DirectionalAssociation Aggregation AggregationByValue DirectionalAggregation DirectionalAggregationByValue Port RolePart Connector ExtraMember ClassInstance
+tool "Launch NIEMtools" "java org.cabral.niemTools.BoumlPlugout configure" Project Package UseCaseView ClassView ComponentView DeploymentView UseCaseDiagram

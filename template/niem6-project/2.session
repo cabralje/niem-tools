@@ -1,0 +1,10 @@
+window_sizes 2700 1596 675 2019 1311 216
+cleanlooks_style
+show_stereotypes
+selected 
+package_ref 129 // niem6-project
+open
+  
+package_ref 154242 // NIEM
+end
+end

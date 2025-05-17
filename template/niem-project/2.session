@@ -1,0 +1,12 @@
+window_sizes 2565 1526 641 1918 1241 216
+cleanlooks_style
+selected 
+  package_ref 129 // bouml-niem
+open
+  classview_ref 179330 // Interfaces and Operations
+  
+  package_ref 147586 // Messages
+  
+  package_ref 147714 // Base Classes
+end
+end
