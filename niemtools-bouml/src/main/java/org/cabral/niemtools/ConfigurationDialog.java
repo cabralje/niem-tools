@@ -129,10 +129,10 @@ class ConfigurationDialog extends JDialog {
         return panel;
     }
     
-    private JButton button(String name) {
+    private JButton navigationButton(String name, String tab) {
         JButton button = new JButton(name);
-        button.setAlignmentX(CENTER_ALIGNMENT);
-        button.setAlignmentY(CENTER_ALIGNMENT);
+        //button.setAlignmentX(CENTER_ALIGNMENT);
+        //button.setAlignmentY(CENTER_ALIGNMENT);
         button.addActionListener((ActionEvent e) -> {
             // Find the parent JTabbedPane and set the selected tab to "Import Reference Model"
             Component c = button;
@@ -140,7 +140,7 @@ class ConfigurationDialog extends JDialog {
                 c = c.getParent();
             }
             if (c instanceof JTabbedPane tabbedPane) {
-                int index = tabbedPane.indexOfTab(name);
+                int index = tabbedPane.indexOfTab(tab);
                 if (index != -1)
                     tabbedPane.setSelectedIndex(index);
             }
@@ -150,8 +150,8 @@ class ConfigurationDialog extends JDialog {
 
     private JButton commandButton(String name, String command) {
         JButton button = new JButton(name);
-        button.setAlignmentX(CENTER_ALIGNMENT);
-        button.setAlignmentY(CENTER_ALIGNMENT);
+        //button.setAlignmentX(CENTER_ALIGNMENT);
+        //button.setAlignmentY(CENTER_ALIGNMENT);
         button.addActionListener((ActionEvent e) -> {
             // Find the parent JTabbedPane and set the selected tab to "Import Reference Model"
             Component c = button;
@@ -166,11 +166,11 @@ class ConfigurationDialog extends JDialog {
         return button;
     }
 
-    private static final String MAIN_TAB = "Modeling Workflow";
-    private static final String IMPORT_TAB = "Import Reference Model";
-    private static final String EXPORT_TAB = "Generate Specification";
-    private static final String METADATA_TAB = "Configure Metadata";
-    private static final String EXTERNAL_TAB = "Configure External Schemas";
+    private static final String MAIN_TAB = "Home";
+    private static final String IMPORT_TAB = "NIEM";
+    private static final String EXPORT_TAB = "Publish";
+    private static final String METADATA_TAB = "Metadata";
+    private static final String EXTERNAL_TAB = "External Schemas";
     /**
      * @param root
      */
@@ -197,16 +197,11 @@ class ConfigurationDialog extends JDialog {
 
         // add overview panel
         JPanel mainPanel = new JPanel(new BorderLayout());
-        JPanel mainPanel1 = new JPanel();
-        mainPanel1.setLayout(new BoxLayout(mainPanel1, BoxLayout.Y_AXIS));
-
-        mainPanel1.add(button(IMPORT_TAB));
-        mainPanel1.add(button(EXPORT_TAB));
-        mainPanel1.add(button(METADATA_TAB));
-        mainPanel1.add(button(EXTERNAL_TAB));
-        mainPanel1.setAlignmentX(CENTER_ALIGNMENT);
-        mainPanel1.setAlignmentY(CENTER_ALIGNMENT);
-        mainPanel.add(mainPanel1, BorderLayout.CENTER);
+        mainPanel.add(navigationButton("Configure NIEM Message Specification Metadata", METADATA_TAB), BorderLayout.NORTH);
+        mainPanel.add(navigationButton("Import NIEM Reference Model", IMPORT_TAB), BorderLayout.WEST);
+        mainPanel.add(navigationButton("Publish NIEM Message Specification", EXPORT_TAB), BorderLayout.CENTER);
+        mainPanel.add(commandButton("Import NIEM mapping","import"), BorderLayout.EAST);
+        mainPanel.add(navigationButton("Configure External Schemas", EXTERNAL_TAB), BorderLayout.SOUTH);
 
         // add IEPD panel
         JPanel iepdPanel = new JPanel(new BorderLayout());

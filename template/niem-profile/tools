@@ -1,4 +1,6 @@
 // 'tool' "the executable" "displayed string" {target}+
 tool "Add NIEM Stereotype" "java org.cabral.niemTools.BoumlPlugout addStereotype" Class Operation Attribute Generalisation Realize Dependency Association DirectionalAssociation Aggregation AggregationByValue DirectionalAggregation DirectionalAggregationByValue Port RolePart Connector ExtraMember ClassInstance
 tool "Remove NIEM Stereotype" "java org.cabral.niemTools.BoumlPlugout removeStereotype" Class Operation Attribute Generalisation Realize Dependency Association DirectionalAssociation Aggregation AggregationByValue DirectionalAggregation DirectionalAggregationByValue Port RolePart Connector ExtraMember ClassInstance
-tool "Launch NIEMtools" "java org.cabral.niemTools.BoumlPlugout configure" Project Package UseCaseView ClassView ComponentView DeploymentView UseCaseDiagram
+tool "Launch NIEMtools" "java org.cabral.niemTools.BoumlPlugout configure" Project
+tool "Add NIEM stereotype" "java org.cabral.niemTools.BoumlPlugout addStereotype" Package ClassView
+tool "Remove NIEM stereotype" "java org.cabral.niemTools.BoumlPlugout removeStereotype" Package ClassView

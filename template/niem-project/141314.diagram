@@ -1,7 +1,7 @@
-format 212
+format 224
 
 classcanvas 128002 class_ref 212610 // Message1
   classdiagramsettings member_max_width 0 end
-  xyz 398 244 2000
+  xyzwh 242 296 2000 327 107
 end
 end

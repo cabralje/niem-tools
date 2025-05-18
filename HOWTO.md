@@ -1,33 +1,23 @@
-# HOWTO: niem-tools BOUML Plugout
+# HOWTO: niem-tools BoUML Plugout
 ---
+## 1. Install BoUML
+- Download and install the latest version of [BoUML](https://bouml.fr) for Windows. Mac or Linux.
+---
+## 2. Install niem-tools
 
-## 1. Setup Environment
-
-- Run 'mvn package' or download a copy of `opencsv-5.10.jar` from [Sourceforge](https://sourceforge.net/projects/opencsv/files/opencsv/).
+- Download [niemtools-bar](niemtools-bouml/target/niemtools-bouml.jar)
+- Download [opencsv-5.11.jar](https://sourceforge.net/projects/opencsv/files/opencsv/5.11/opencsv-5.11.jar/download)
 - Add `niemtools-bouml.jar` and `opencsv-5.10.jar` to the system environment property `CLASSPATH`.
-
 ---
-
-## 2. Create a NIEM Message Specification Project
-
-### a.
-- Copy the `BOUML-niem` template **OR**
-
-### b.
-- Create a blank BOUML project.
-- Right-click on the root package.
-- Select **"Import project"** and choose the **"niem-profile"** BOUML project.
-
+## 3. Setup niem-tools template
+- Download [niem-project](template) template
+- Start BouML
+- Click on "Miscellaneous->Set Environment"
+- Under "Template Project", select the location of the `niem-project` template
 ---
-
-## 3. Configure the Project
-
-- Right click on the root package
-- Select the properties tab
-- Edit the options to match your environment.
-
+## 4. Create a NIEM Message Specification Project
+-- In BoUML, click on "Project->Create from Template"---
 ---
-
 ## 4. Model the Exchange Content (Data)
 
 ### a.

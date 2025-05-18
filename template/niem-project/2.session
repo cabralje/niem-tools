@@ -1,11 +1,15 @@
-window_sizes 2565 1526 641 1918 1241 216
+window_sizes 2700 1596 675 2019 1311 216
 cleanlooks_style
-selected 
-  package_ref 129 // bouml-niem
+diagrams
+  active  classdiagram_ref 141314 // Message1
+    1615 1048 100 A4 0 0
+end
+show_stereotypes
+selected classview_ref 179586 // Message1
 open
+  usecaseview_ref 134658 // Use Cases
   classview_ref 179330 // Interfaces and Operations
-  
-  package_ref 147586 // Messages
+  class_ref 212610 // Message1
   
   package_ref 147714 // Base Classes
 end
