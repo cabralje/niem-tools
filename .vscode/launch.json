@@ -6,14 +6,22 @@
     "configurations": [
         {
             "type": "java",
-            "name": "NiemtoolsBouml",
+            "name": "Generate specification",
             "request": "launch",
             "mainClass": "org.cabral.niemtools.BoumlPlugout",
             "sourcePaths": ["${workspaceFolder}/niemtools-bouml/src/main/java"],
             "classPaths": ["${workspaceFolder}/niemtools-bouml/target/classes",
                             "${workspaceFolder}/niemtools-bouml/target/*"],
-            //"projectName": "niemtools-bouml",
-            //"args": "importSchema",
+            "args": "export"
+        },
+        {
+            "type": "java",
+            "name": "Configure",
+            "request": "launch",
+            "mainClass": "org.cabral.niemtools.BoumlPlugout",
+            "sourcePaths": ["${workspaceFolder}/niemtools-bouml/src/main/java"],
+            "classPaths": ["${workspaceFolder}/niemtools-bouml/target/classes",
+                            "${workspaceFolder}/niemtools-bouml/target/*"],
             "args": "configure"
         }
     ]

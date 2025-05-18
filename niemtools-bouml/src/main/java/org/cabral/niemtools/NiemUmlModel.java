@@ -723,7 +723,7 @@ public class NiemUmlModel {
     public void exportMappingHtml() {
         Log.start("exportHtml");
 
-        String directory = properties.getProperty(ProjectProperties.EXPORT_MODEL_DIR);
+        //String directory = properties.getProperty(ProjectProperties.EXPORT_MODEL_DIR);
         String filename = properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE).replace(".csv",".html");
         HtmlWriter htmlWriter = new HtmlWriter();
 
@@ -748,24 +748,29 @@ public class NiemUmlModel {
     public void exportSpecification() {
 
         Log.start("exportSpecification");
-        Log.trace("Generating Specification");
 
         /*
 		 * cacheExternalSchemas(); cacheModel(referencePackage);
 		 * cacheModel(subsetPackage); cacheModel(extensionPackage);
          */
         // export code lists for extension elements
+        String exportCmf = properties.getProperty(ProjectProperties.EXPORT_CMF);
+        String exportXsd = properties.getProperty(ProjectProperties.EXPORT_XSD);
+        String exportJson = properties.getProperty(ProjectProperties.EXPORT_JSON);
+        String exportWsdl = properties.getProperty(ProjectProperties.EXPORT_WSDL);
+        String exportOpenApi = properties.getProperty(ProjectProperties.EXPORT_OPENAPI);
+
         String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
                         properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
         XmlWriter xmlWriter = new XmlWriter(xmlDir);
 
-        if (xmlDir != null) {
+        if (exportXsd.equals("true")){
             xmlWriter.exportCodeLists(ExtensionModel);
             xmlWriter.exportCodeLists(SubsetModel);
         }
 
         try {
-            if (xmlDir != null) {
+            if (exportXsd.equals("true")){
                 // export catalog file
                 xmlWriter.exportXmlCatalog();
             }
@@ -878,30 +883,27 @@ public class NiemUmlModel {
                 jsonDefinitions2.add(definition2);
         }
 
-        if (xmlDir != null) {
-
-            String xmlExampleDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                                   properties.getProperty(ProjectProperties.EXPORT_XML_DIR);
+        if (exportXsd.equals("true")) {
             try {
 
                 xmlWriter.exportMpdCatalog(messages.keySet(), properties);
             } catch (IOException e) {
                 Log.trace("exportSpecification: error exporting MPD catalog " + e.toString());
             }
-            String wsdlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                             properties.getProperty(ProjectProperties.EXPORT_WSDL_DIR);
-            if (wsdlDir != null)
+   
+            if (exportWsdl.equals("true")) {
 				try {
-                xmlWriter.exportWSDL(wsdlDir, ports, messageNamespaces, properties);
-            } catch (IOException e) {
-                Log.trace("exportSpecification: error exporting WSDL " + e.toString());
+                    String wsdlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                             properties.getProperty(ProjectProperties.EXPORT_WSDL_DIR);     
+                    xmlWriter.exportWSDL(wsdlDir, ports, messageNamespaces, properties);
+                } catch (IOException e) {
+                    Log.trace("exportSpecification: error exporting WSDL " + e.toString());
+                }
             }
         }
-        if (jsonDir != null) {
-            String openapiDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                                properties.getProperty(ProjectProperties.EXPORT_OPENAPI_DIR);
+        if (exportJson.equals("true")) {
 			try {
-                if (openapiDir != null) {
+                if (exportOpenApi.equals("true")) {
                     JsonWriter jsonWriter = new JsonWriter(jsonDir);
                     jsonWriter.exportOpenApi(properties, ports, messageNamespaces, jsonDefinitions2);
                 }
@@ -909,19 +911,23 @@ public class NiemUmlModel {
                 Log.trace("exportSpecification: error exporting OpenAPI files " + e.toString());
             }
         }
-        String cmfDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                        properties.getProperty(ProjectProperties.EXPORT_CMF_DIR);
-        String cmfVersion = properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION);
-        if (cmfDir != null && cmfVersion != null)
-			try {
-            CmfWriter cmfWriter = new CmfWriter(cmfDir, cmfVersion);
-            cmfWriter.exportCmf(cmfDir);
-            cmfWriter = new CmfWriter(cmfDir, "1.0");
-            cmfWriter.exportCmf(cmfDir);
-        } catch (IOException e) {
-            Log.trace("exportSpecification: error exporting common model format files " + e.toString());
+        if (exportCmf.equals("true")) {
+            String cmfDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                            properties.getProperty(ProjectProperties.EXPORT_CMF_DIR);
+            String cmfVersion = properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION);
+            if (cmfDir != null && cmfVersion != null)
+                try {
+                CmfWriter cmfWriter = new CmfWriter(cmfDir, "1.0");
+                cmfWriter.exportCmf(cmfDir);
+                if (!cmfVersion.equals("1.0")) {
+                    cmfWriter = new CmfWriter(cmfDir, cmfVersion);
+                    cmfWriter.exportCmf(cmfDir);
+                }
+            } catch (IOException e) {
+                Log.trace("exportSpecification: error exporting common model format files " + e.toString());
+            }
+            Log.stop("exportSpecification");
         }
-        Log.stop("exportSpecification");
     }
 
     /**

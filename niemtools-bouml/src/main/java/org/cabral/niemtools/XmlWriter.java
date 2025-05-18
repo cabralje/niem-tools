@@ -609,7 +609,7 @@ public class XmlWriter {
         String elementSchema = "<xs:element name=\"" + elementName + "\"";
         UmlClass baseType = NiemModel.getBaseType(element);
         if (baseType != null) {
-            if (baseType == NiemUmlModel.getSubsetModel().getAbstractType())
+            if (NiemModel.isAbstract(NamespaceModel.getName(baseType)))
                 elementSchema += " abstract=\"true\""; 
             else
                 elementSchema += " type=\"" + NamespaceModel.getPrefixedName(baseType) + "\"";
@@ -652,7 +652,7 @@ public class XmlWriter {
         String elementSchema = "<xs:attribute name=\"" + NamespaceModel.filterAttributePrefix(elementName) + "\"";
         UmlClass baseType = NiemModel.getBaseType(element);
         if (baseType != null) {
-            if (baseType == NiemUmlModel.getSubsetModel().getAbstractType())
+            if (NiemModel.isAbstract(NamespaceModel.getName(baseType)))
                 elementSchema += " abstract=\"true\""; 
             else
                 elementSchema += " type=\"" + NamespaceModel.getPrefixedName(baseType) + "\"";
@@ -814,17 +814,16 @@ public class XmlWriter {
                     String codeDescription = attribute.description();
                     String facet;
                     String name = attribute.name();
-                    if (!NiemUmlModel.isFacet(attribute)) {
+                    if (!NiemUmlModel.isFacet(attribute))
                         name = "enumeration";
-                        facet = "<xs:" + name + " value=\"" + codeValue + "\">";                        
-                        if (!codeDescription.equals(""))
-                            facet += "<xs:annotation><xs:documentation>" + codeDescription
-                                    + "</xs:documentation>\n" + "</xs:annotation>\n";
-                        facet += "</xs:" + name + ">\n";
-                        xmlEnumerations.add(facet);
+                    facet = "<xs:" + name + " value=\"" + codeValue + "\">";                        
+                    if (!codeDescription.equals(""))
+                        facet += "<xs:annotation><xs:documentation>" + codeDescription
+                                + "</xs:documentation>\n" + "</xs:annotation>\n";
+                    facet += "</xs:" + name + ">\n";
+                    xmlEnumerations.add(facet);
                     }
                 }
-            }
         }
 
         // type.sortChildren();
@@ -841,7 +840,7 @@ public class XmlWriter {
                     if (NiemUmlModel.isFacet(attribute))
                         continue;
                     NiemModel model = NiemUmlModel.getModel(NiemModel.getURI(attribute));
-                    UmlClassInstance element = model.getElementByURI(NiemModel.getURI(attribute));
+                    UmlClassInstance element = model.getReferencedElement(attribute);
                     if (element == null)
                         continue;
                     String elementName = NamespaceModel.getPrefixedName(element);
@@ -878,7 +877,7 @@ public class XmlWriter {
         if (augmentationPoint != null) {
             // if (complexContent) {
             NiemModel model = NiemUmlModel.getModel(NiemModel.getURI(augmentationPoint));
-            UmlClassInstance element = model.getElementByURI(NiemModel.getURI(augmentationPoint));
+            UmlClassInstance element = model.getReferencedElement(augmentationPoint);
             xmlElementsInType.add(exportXmlElementInTypeSchema(element, augmentationPoint.multiplicity(), null));
         }
 

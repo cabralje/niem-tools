@@ -521,7 +521,7 @@ public class JsonWriter {
                 if (item4.kind() == anItemKind.anAttribute) {
                     UmlAttribute attribute = (UmlAttribute) item4;
                     NiemModel model2 = NiemUmlModel.getModel(NiemModel.getURI(attribute));
-                    UmlClassInstance element = model2.getElementByURI(NiemModel.getURI(attribute));
+                    UmlClassInstance element = model2.getReferencedElement(attribute);
                     if (element == null) {
                         continue;
                     }
@@ -542,7 +542,7 @@ public class JsonWriter {
                         // relax minoccurs if substitutions
                         String multiplicity2 = "0," + NiemUmlModel.getMaxOccurs(multiplicity);
                         // add head element if not abstract
-                        if ((elementBaseType != model.getAbstractType())) {
+                        if (elementBaseType != null && !NiemModel.isAbstract(NamespaceModel.getName(elementBaseType))) {
                             String jsonElementInType = exportJsonElementInTypeSchema(type, element, multiplicity2,
                                     elementIsAttribute);
                             if (jsonElementInType != null)
@@ -558,7 +558,7 @@ public class JsonWriter {
                                     jsonElementsInType.add(jsonElementInType);
                             }
                         }
-                    } else if ((elementBaseType != model.getAbstractType())) {
+                    } else if (elementBaseType != null && !NiemModel.isAbstract(NamespaceModel.getName(elementBaseType))) {
                         String jsonElementInType = exportJsonElementInTypeSchema(type, element, multiplicity,
                                 elementIsAttribute);
                         if (jsonElementInType != null)
@@ -578,14 +578,14 @@ public class JsonWriter {
                                 continue;
                             UmlAttribute attribute = (UmlAttribute) item5;
                             NiemModel model2 = NiemUmlModel.getModel(NiemModel.getURI(attribute));
-                            UmlClassInstance element = model2.getElementByURI(NiemModel.getURI(attribute));
+                            UmlClassInstance element = model2.getReferencedElement(attribute);
                             if (element == null || !NamespaceModel.isAttribute(element))
                                 continue;
                             String elementName = NamespaceModel.getPrefixedName(element);
                             UmlClass elementBaseType = NiemModel.getBaseType(element);
                             String multiplicity = attribute.multiplicity();
                             String minOccurs = NiemUmlModel.getMinOccurs(multiplicity);
-                            if (elementBaseType != model.getAbstractType()) {
+                            if (elementBaseType != null && !NiemModel.isAbstract(NamespaceModel.getName(elementBaseType))) {
                                 String jsonElementInType = exportJsonElementInTypeSchema(type, element,
                                         multiplicity, NamespaceModel.isAttribute(element));
                                 if (jsonElementInType != null)

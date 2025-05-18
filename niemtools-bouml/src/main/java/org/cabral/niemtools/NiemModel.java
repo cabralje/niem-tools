@@ -65,7 +65,7 @@ class NiemModel {
     static final String XSD_PREFIX = "xs";
     static final String XSD_URI = XMLConstants.W3C_XML_SCHEMA_NS_URI;
     static final String PROXY_PREFIX = "niem-xs";
-    static final String PROXY_URI = "https://docs.oasis-open.org/niemopen/ns/model/adapters/niem-xs/6.0/";
+    //static final String PROXY_URI = "https://docs.oasis-open.org/niemopen/ns/model/adapters/niem-xs/6.0/";
     static final String APPINFO_PREFIX = "appinfo";
     static final String APPINFO_URI = "https://docs.oasis-open.org/niemopen/ns/model/appinfo/6.0/";
     static final String CT_PREFIX = "ct";
@@ -189,7 +189,7 @@ class NiemModel {
                 baseType = classInstance.type();
                 break;
             case anItemKind._aClass:
-                if (item == NiemUmlModel.getSubsetModel().getAbstractType() || item == NiemUmlModel.getReferenceModel().getAbstractType()) {
+                if (isAbstract(NamespaceModel.getName(item))) {
                     return null;
                 }
                 UmlClass type = (UmlClass) item;
@@ -233,6 +233,13 @@ class NiemModel {
      * @return URI of an item as a String
      */
     static String getURI(UmlItem item) {
+        if (item.kind() == anItemKind.anAttribute) {
+            UmlAttribute attribute = (UmlAttribute) item;
+            if (attribute.stereotype().equals(NiemUmlModel.FACET_STEREOTYPE)) {
+                    Log.trace("getURI: facets do not have URIs" + item.name());
+                    return null;
+            }
+        }
         return item.propertyValue(NiemUmlModel.URI_PROPERTY);
     }
 
@@ -693,7 +700,7 @@ class NiemModel {
         // copy elements and attributes in type
         for (UmlItem item : sourceType.children()) {
             if (NamespaceModel.isAttribute(item)) {
-                UmlClassInstance sourceElement = NiemUmlModel.getReferenceModel().getElementByURI(getURI(item));
+                UmlClassInstance sourceElement = NiemUmlModel.getReferenceModel().getReferencedElement(item);
                 if (sourceElement == null) {
                     Log.trace("copyType: error - no element for uri " + getURI(item) + " in reference model");
                     continue;
@@ -812,7 +819,7 @@ class NiemModel {
                         for (UmlItem item2 : type.children()) {
                             if (item2.kind() == anItemKind.anAttribute) {
                                 NiemModel model2 = NiemUmlModel.getModel(getURI(item2));
-                                UmlClassInstance element = model2.getElementByURI(getURI(item2));
+                                UmlClassInstance element = model2.getReferencedElement(item2);
                                 if (element != null)
                                     schemaNamespaces.add(NamespaceModel.getPrefix(element));
                             }
@@ -867,7 +874,7 @@ class NiemModel {
                             xmlElement = xmlWriter.exportXmlElementSchema(element);
                         if (xmlElement != null)
                             xmlElements.add(xmlElement);
-                        if (baseType != NiemUmlModel.getSubsetModel().getAbstractType()) {
+                        if (baseType != null && !NiemModel.isAbstract(NamespaceModel.getName(baseType))) {
                             schemaNamespaces.add(NamespaceModel.getPrefix(element));
                             if (exportJSON.equals("true")) {
                                 jsonElement = jsonWriter.exportJsonElementSchema(element, prefix);
@@ -886,7 +893,7 @@ class NiemModel {
                 }
             }
 
-            // export XML file
+            // export XSDs
             if (exportXML.equals("true")) {
                 // Open XSD file for each extension schema and write header
                 Log.debug("exportSchemas: schema " + xmlDir + "/" + prefix + XmlWriter.XSD_FILE_TYPE);
@@ -895,6 +902,7 @@ class NiemModel {
                     Log.trace("exportSchemas: error - no path for schema " + nsSchemaURI);
                     continue;
                 }
+                Log.trace("Generating XSD for extension schema " + prefix);
                 String filename = Paths.get(xmlDir, ns.getFilepath()).toString();
                 Log.debug("exportSchemas: referenced namespaces in " + filename + ": " + schemaNamespaces.toString());
                 xmlWriter.exportXmlSchema(filename, nsSchemaURI, xmlTypes, xmlElements, schemaNamespaces, properties);
@@ -1037,6 +1045,21 @@ class NiemModel {
     }
 
     /**
+     * @param item
+     * @return a referenced element in model as a UmlClassInstance
+     */
+    UmlClassInstance getReferencedElement(UmlItem item) {
+        if (item.kind() != anItemKind.anAttribute)
+            return null;
+        String itemURI = getURI(item);
+        if (itemURI == null) {
+            Log.trace("getReferencedElement: error - no URI for " + item.name());
+            return null;
+        }
+        return getElementByURI(itemURI);
+    }
+
+    /**
      * get an element in type and check the multiplicity
      *
      * @param type
@@ -1138,7 +1161,7 @@ class NiemModel {
         String truncated = "false";
         //int me = maxEnums;
         String maxEnumsString = NiemUmlModel.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
-        int maxEnums = Integer.valueOf(maxEnumsString);
+        Integer maxEnums = Integer.valueOf(maxEnumsString);
         if (length > maxEnums) {
             if (type != null)
                 Log.trace("importCodeList: truncated code list " + type.name() + " from " + length + " to " + maxEnums);
@@ -1664,7 +1687,7 @@ class NiemModel {
 
         String truncated = "false";
         String maxEnumsString = NiemUmlModel.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
-        int maxEnums = Integer.valueOf(maxEnumsString);
+        Integer maxEnums = Integer.valueOf(maxEnumsString);
         if (length > maxEnums) {
             Log.trace("importFacets: truncated facet restrictions on " + type.name() + " from " + length + " to " + maxEnums);
             length = maxEnums;
@@ -1803,7 +1826,9 @@ class NiemModel {
                     } catch (XPathExpressionException e) {
                         Log.trace(filename2 + "importTypes: error - cannot import facets " + e.toString());
                     }
-                    importFacets(type, elist2);
+                    String  facets = importFacets(type, elist2);
+                    if (!facets.equals(""))
+                        type.set_Stereotype(NiemUmlModel.ENUM_STEREOTYPE);
                 }
             }
         }
