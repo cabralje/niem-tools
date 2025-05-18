@@ -5,12 +5,12 @@
 ---
 ## 2. Install niem-tools
 
-- Download [niemtools-bar](niemtools-bouml/target/niemtools-bouml.jar)
+- Download [niemtools-bouml.jar](niemtools-bouml/target/niemtools-bouml.jar)
 - Download [opencsv-5.11.jar](https://sourceforge.net/projects/opencsv/files/opencsv/5.11/opencsv-5.11.jar/download)
 - Add `niemtools-bouml.jar` and `opencsv-5.10.jar` to the system environment property `CLASSPATH`.
 ---
 ## 3. Setup niem-tools template
-- Download [niem-project](template) template
+- Download [niem-project](template/niem-project) template
 - Start BouML
 - Click on "Miscellaneous->Set Environment"
 - Under "Template Project", select the location of the `niem-project` template
