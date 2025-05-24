@@ -6,8 +6,9 @@
         }
     ],
     "python.testing.pytestArgs": [
-        "niemtools-bouml"
+        "niemtools"
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

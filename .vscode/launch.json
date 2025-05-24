@@ -1,28 +1,44 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
     "configurations": [
         {
-            "type": "java",
             "name": "Generate specification",
+            "type": "java",
             "request": "launch",
-            "mainClass": "org.cabral.niemtools.BoumlPlugout",
-            "sourcePaths": ["${workspaceFolder}/niemtools-bouml/src/main/java"],
-            "classPaths": ["${workspaceFolder}/niemtools-bouml/target/classes",
-                            "${workspaceFolder}/niemtools-bouml/target/*"],
-            "args": "export"
+            "mainclass": "org.cabral.niemtools.BoumlPlugout",
+            "sourcePaths": ["${workspaceFolder}/src/main/java"],
+            "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/*"],
+            "args": "publish"
         },
         {
+            "name": "Publish UML",
             "type": "java",
-            "name": "Configure",
             "request": "launch",
-            "mainClass": "org.cabral.niemtools.BoumlPlugout",
-            "sourcePaths": ["${workspaceFolder}/niemtools-bouml/src/main/java"],
-            "classPaths": ["${workspaceFolder}/niemtools-bouml/target/classes",
-                            "${workspaceFolder}/niemtools-bouml/target/*"],
-            "args": "configure"
-        }
+            "mainclass": "org.cabral.niemtools.BoumlPlugout",
+            "sourcePaths": ["${workspaceFolder}/src/main/java"],
+            "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/*"],
+            "args": "publishUML"
+        },
+                {
+            "name": "Import mapping",
+            "type": "java",
+            "request": "launch",
+            "mainclass": "org.cabral.niemtools.BoumlPlugout",
+            "sourcePaths": ["${workspaceFolder}/src/main/java"],
+            "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/*"],
+            "args": "importMapping"
+        },
+                        {
+            "name": "Publish XSD",
+            "type": "java",
+            "request": "launch",
+            "mainclass": "org.cabral.niemtools.BoumlPlugout",
+            "sourcePaths": ["${workspaceFolder}/src/main/java"],
+            "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/*"],
+            "args": "publishXSD"
+        },
     ]
 }
