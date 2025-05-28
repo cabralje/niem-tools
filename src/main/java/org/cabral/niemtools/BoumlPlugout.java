@@ -169,11 +169,12 @@ public class BoumlPlugout {
                     // Next steps
                     UmlCom.trace("\nNEXT STEP: Select 'Validate NIEM mapping'");
                     
-                } catch (Exception e) {
+                } catch (HeadlessException e) {
                     Log.trace("Exception: " + e.getMessage());
                     System.exit(1);
                 }
                 break;
+
 
             case "validateMapping":
                 // Clearing NIEM Models
@@ -206,8 +207,8 @@ public class BoumlPlugout {
                     String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
                         properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
                     XmlWriter xmlWriter = new XmlWriter(xmlDir);
-                    xmlWriter.exportCodeLists(model.getExtensionModel());
-                    xmlWriter.exportCodeLists(model.getSubsetModel());
+                    xmlWriter.exportCodeLists(NiemUmlModel.getExtensionModel());
+                    xmlWriter.exportCodeLists(NiemUmlModel.getSubsetModel());
 
                     // Generate extension schemas
 
@@ -216,11 +217,12 @@ public class BoumlPlugout {
 
                     // Next steps
                     UmlCom.trace("\nNEXT STEP: Select 'Publish Message Specification'");
-                } catch (Exception e) {
+                } catch (IOException e) {
                     Log.trace("Exception: " + e.getMessage());
                     System.exit(1);
                 }
                 break;
+
 
             case "publishJSON":
                 // Generate subset and extension schemas

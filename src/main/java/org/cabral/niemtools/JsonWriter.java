@@ -46,7 +46,6 @@ import fr.bouml.UmlTypeSpec;
 import fr.bouml.aRelationKind;
 import fr.bouml.anItemKind;
 
-@SuppressWarnings("unchecked")
 public class JsonWriter {
 
     // JSON schema defaults

@@ -12,7 +12,7 @@ niemtools_test = "org.cabral.niemtools.TestHarness"
 niemtools_args = "export"
 
 # configure paths
-niemtools_path = "C:/Users/JamesCabral/git/niem-tools/niemtools-bouml/"
+niemtools_path = "C:/Users/JamesCabral/git/niem-tools/"
 niemtools_classpath = "target/*"
 bouml_exec = r"C:/Program Files (x86)/Bouml/bouml.exe"
 bouml_project_path = "src/test/resources/crashdriver/"

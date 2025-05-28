@@ -3,8 +3,8 @@ package org.cabral.niemtools;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.opencsv.CSVReader;
@@ -25,10 +25,9 @@ public class CsvReader {
         // cache UML classes
         Map<String, UmlClass> UMLClasses = new ConcurrentHashMap<>();
         Map<String, UmlClassInstance> UMLInstances = new ConcurrentHashMap<>();
-        //@SuppressWarnings("unchecked")
-        Iterator<UmlItem> it = UmlItem.all.iterator();
-        while (it.hasNext()) {
-            UmlItem item = it.next();
+        @SuppressWarnings("unchecked")
+        Vector<UmlItem> all = UmlItem.all;
+        for (UmlItem item : all) {
             if (NiemUmlModel.isNiemUml(item)) {
                 if (item.kind() == anItemKind.aClass) {
                     UmlClass c = (UmlClass) item;
@@ -44,11 +43,14 @@ public class CsvReader {
         try {
             FileReader fr = new FileReader(filename);
             Log.debug("importCsv: file read");
-            CSVReader reader;
+            CSVReader reader = null;
             try {
                 reader = new CSVReader(fr);
             } catch (NoClassDefFoundError e) {
                 Log.trace("importCsv: error - Exception" + e.toString());
+                if (reader != null) {
+                    reader.close();
+                }
                 return;
             }
             Log.debug("importCsv: file parsed");

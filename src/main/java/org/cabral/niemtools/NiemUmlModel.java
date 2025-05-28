@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -138,7 +139,7 @@ public class NiemUmlModel {
     private static final NiemModel ExtensionModel = new NiemModel();
 
     // globals
-    final UmlPackage project;
+    //final UmlPackage project;
     final ProjectProperties properties;
 
     /**
@@ -365,7 +366,7 @@ public class NiemUmlModel {
      */
     public NiemUmlModel(UmlPackage project, ProjectProperties properties) {
         super();
-        this.project = project;
+        //this.project = project;
         this.properties = properties;
     }
 
@@ -416,6 +417,7 @@ public class NiemUmlModel {
     // TODO createSubsetAndExtension: add facets properties
     // TODO createSubsetAndExtension: ensure all NIEM types and elements are in the reference model
     //@SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
     public void createSubsetAndExtension() {
 
         Log.start("createSubsetAndExtension");
@@ -425,7 +427,8 @@ public class NiemUmlModel {
         Log.start("createSubsetAndExtension - add types");
         // add types to subset and extension
         Log.debug("createSubsetAndExtension: copy subset types and create extension types");
-        Iterator<UmlItem> it = UmlItem.all.iterator();
+        Vector<UmlItem> all = UmlItem.all;
+        Iterator<UmlItem> it = all.iterator();
         while (it.hasNext()) {
             UmlItem item = it.next();
 
@@ -617,7 +620,8 @@ public class NiemUmlModel {
     //@SuppressWarnings("unchecked")
     public void deleteMapping() {
         Log.trace("Deleting NIEM Mapping");
-        Iterator<UmlItem> it = UmlItem.all.iterator();
+        Vector<UmlItem> all = UmlItem.all;
+        Iterator<UmlItem> it = all.iterator();
         while (it.hasNext()) {
             UmlItem item = it.next();
             if (isNiemUml(item) && item.kind() != anItemKind.aClassInstance)

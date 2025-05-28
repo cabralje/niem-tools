@@ -31,7 +31,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.LinkedHashSet;
 
 import javax.swing.JButton;
@@ -416,7 +415,7 @@ class ConfigurationDialog extends JDialog {
                 if (url.startsWith("http"))
 					try {
                     URI uri = new URI(url);
-                    URL url2 = uri.toURL();
+                    uri.toURL();
                 } catch (URISyntaxException | MalformedURLException e1) {
                     Log.trace("URL " + url + " is malformed");
                 }

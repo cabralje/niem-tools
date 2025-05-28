@@ -25,6 +25,7 @@ package org.cabral.niemtools;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -305,6 +306,7 @@ class NiemModel {
      * @return an element in type added to reference model or extension as a
      * UmlAttribute
      */
+    @SuppressWarnings("unchecked")
     UmlAttribute addElementInType(UmlClass type, UmlClassInstance element, String multiplicity) {
 
         // return null if element or type do not exist
@@ -336,7 +338,7 @@ class NiemModel {
         //elementInType.set_Type(element.type());
 
         // copy properties
-        Map<String, String> properties = element.properties();
+        Hashtable<String, String> properties = element.properties();
         for (String key : properties.keySet())
             elementInType.set_PropertyValue(key, properties.get(key));
 
@@ -527,6 +529,7 @@ class NiemModel {
      * @return an element copied from reference model to subset as a
      * UmlClassInstance
      */
+    @SuppressWarnings("unchecked")
     UmlClassInstance copyElement(String elementName) {
 
         // return subset element if it exists
@@ -571,7 +574,7 @@ class NiemModel {
 
         // copy properties
         String uri = getURI(schemaURI, elementName);
-        Map<String, String> properties = sourceElement.properties();
+        Hashtable<String, String> properties = sourceElement.properties();
         for (String key : properties.keySet())
             element.set_PropertyValue(key, key.equals(NiemUmlModel.URI_PROPERTY) ? uri : properties.get(key));
         //String uri = getURI(schemaURI, elementName);
@@ -597,6 +600,7 @@ class NiemModel {
      * @return an element in type copied from reference model to subset as a
      * UmlAttribute
      */
+    @SuppressWarnings("unchecked")
     UmlAttribute copyElementInType(UmlClass type, UmlClassInstance element, String multiplicity) {
         String elementInTypeName = NamespaceModel.getPrefixedName(element);
         String typeName = NamespaceModel.getPrefixedName(type);
@@ -618,7 +622,7 @@ class NiemModel {
             relateElementInType(attribute, element);
 
             // copy properties
-            Map<String, String> properties = element.properties();
+            Hashtable<String, String> properties = element.properties();
             for (String key : properties.keySet())
                 attribute.set_PropertyValue(key, properties.get(key));
             //attribute.set_PropertyValue(URI_PROPERTY, getURI(element));
@@ -631,6 +635,7 @@ class NiemModel {
      * @param typeName
      * @return a type copied from the reference model to subset as a UmlClass
      */
+    @SuppressWarnings("unchecked")
     UmlClass copyType(String typeName) {
 
         if ((typeName == null) || (typeName.isEmpty()))
@@ -678,7 +683,7 @@ class NiemModel {
             type.set_BaseType(baseTypeSpec);
 
         // copy type properties
-        Map<String, String> properties = sourceType.properties();
+        Hashtable<String, String> properties = sourceType.properties();
         for (String key : properties.keySet())
             type.set_PropertyValue(key, properties.get(key));
         //type.set_PropertyValue(URI_PROPERTY, getURI(sourceType));

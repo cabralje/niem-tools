@@ -159,7 +159,7 @@ public class NamespaceResolver implements NamespaceContext {
      */
     //@SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public Iterator getPrefixes(String namespaceURI) {
+    public Iterator<String> getPrefixes(String namespaceURI) {
         // Not implemented
         return null;
     }

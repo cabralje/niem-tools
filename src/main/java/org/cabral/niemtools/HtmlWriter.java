@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,7 +43,9 @@ public class HtmlWriter {
                 fw.write("</tr>\n");
 
                 // Show NIEM Mappings for Classes
-                Iterator<UmlItem> it = (UmlClass.classes.iterator());
+                @SuppressWarnings("unchecked")
+                Vector<UmlItem> classes = UmlClass.classes;
+                Iterator<UmlItem> it = (classes.iterator());
                 while (it.hasNext()) {
                     UmlItem thisClass = it.next();
                     if (thisClass == null) {
@@ -212,7 +215,7 @@ public class HtmlWriter {
                     bgcolor = defaultBGColor;
                     fgcolor = (XPath.equals(oldXPath)) ? defaultFGColor : changedFGColor;
                     fw.write(getColumnHtml(XPath, bgcolor, fgcolor, true));
-                } catch (Exception e) {
+                } catch (IOException e) {
                     Log.trace("writeLineHtml: error writing XPath " + e.toString());
                 }
                 
@@ -236,7 +239,7 @@ public class HtmlWriter {
                             bgcolor = extensionBGColor;
                     }
                     fw.write(getColumnHtml(typeName, bgcolor, fgcolor, true));
-                } catch (Exception e) {
+                } catch (IOException e) {
                     Log.trace("writeLineHtml: error writing type " + typeName + " " + e.toString());
                 }
 
@@ -264,7 +267,7 @@ public class HtmlWriter {
                         }
                     }
                     fw.write(getColumnHtml(elementLine, bgcolor, fgcolor, true));
-                } catch (Exception e) { 
+                } catch (IOException e) { 
                     Log.trace("writeLineHtml: error writing element " + e.toString());
                 }
 
@@ -281,7 +284,7 @@ public class HtmlWriter {
                             fgcolor = invalidFGColor;
                     }
                     fw.write(getColumnHtml(baseType, bgcolor, fgcolor, true));
-                } catch (Exception e) {
+                } catch (IOException e) {
                     Log.trace("writeLineHtml: error writing base type " + e.toString());
                 }
 
@@ -302,7 +305,7 @@ public class HtmlWriter {
                         Log.trace("writeLineHtml: illegal multiplicity " + multiplicity + " in type " + typeName);
                     }
                     fw.write(getColumnHtml(column[9], bgcolor, fgcolor, false));
-                } catch (Exception e) {
+                } catch (IOException e) {
                     Log.trace("writeLineHtml: error writing multiplicity " + e.toString());
                 }
 
@@ -313,7 +316,7 @@ public class HtmlWriter {
                     fw.write(getColumnHtml(column[11], bgcolor, fgcolor, false));
                     fw.write(getColumnHtml(column[12], bgcolor, fgcolor, true));
                     fw.write(getColumnHtml(column[13], bgcolor, fgcolor, true));
-                } catch (Exception e) {
+                } catch (IOException e) {
                     Log.trace("writeLineHtml: error writing old XPath, multiplicity, mapping notes, code list " + e.toString());
                 }
             }

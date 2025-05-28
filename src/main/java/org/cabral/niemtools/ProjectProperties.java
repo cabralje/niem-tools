@@ -138,6 +138,7 @@ public class ProjectProperties extends Properties {
      * Loads all properties from the BOUML project into this Properties object.
      */
     public void load() {
+        @SuppressWarnings("unchecked")
         Hashtable<String,String> projectProperties = project.properties();
         for (String propertyName : projectProperties.keySet()) {
             String value = projectProperties.get(propertyName);
