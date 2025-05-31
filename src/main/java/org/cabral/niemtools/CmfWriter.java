@@ -583,7 +583,7 @@ public class CmfWriter {
                 String uri = NiemModel.getURI(NamespaceModel.getSchemaURI(head), head);
                 UmlClassInstance headElement = NiemUmlModel.getModel(uri).getElementByURI(uri);
                 String headElementName = NamespaceModel.getPrefixedName(headElement);
-                if (!headElementName.contains(NiemModel.AUGMENTATION_POINT_NAME))
+                if (headElement != null && !headElementName.contains(NiemModel.AUGMENTATION_POINT_NAME))
                     propertyCmf += tagRef("SubPropertyOf", NamespaceModel.getPrefixedName(headElement));
             }
             propertyCmf += tagRef("Datatype", baseTypeName);
