@@ -18,6 +18,7 @@
 *.zip
 *.tar.gz
 *.rar
+*.bz2
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
@@ -56,5 +57,6 @@ buildNumber.properties
 # Built Visual Studio Code Extensions
 *.vsix
 
+# testing resources
 src/test/resources/**
-#target/surefire-reports/**
+target/surefire-reports/**
