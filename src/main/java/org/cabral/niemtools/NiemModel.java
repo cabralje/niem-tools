@@ -586,14 +586,11 @@ class NiemModel {
         //element.set_PropertyValue(URI_PROPERTY, uri);
         elements.put(uri, element);
 
-        // substitution group
-        //String substitutionGroup = sourceElement.propertyValue(NiemUmlClass.SUBSTITUTION_PROPERTY);
-        //if (substitutionGroup != null && !substitutionGroup.isEmpty())
-        //	element.set_PropertyValue(NiemUmlClass.SUBSTITUTION_PROPERTY, substitutionGroup);
-        // nillability
-        //String nillable = sourceElement.propertyValue(NiemUmlClass.NILLABLE_PROPERTY);
-        //if (nillable != null && !nillable.isEmpty())
-        //	element.set_PropertyValue(NiemUmlClass.NILLABLE_PROPERTY, nillable);
+        // copy substitution group head element if it exists
+        String substitutionGroup = sourceElement.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
+        if (substitutionGroup != null && !substitutionGroup.isEmpty())
+          copyElement(substitutionGroup);
+
         Log.debug("copyElement: element " + elementName + " copied to subset");
         return element;
     }

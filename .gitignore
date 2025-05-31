@@ -57,4 +57,4 @@ buildNumber.properties
 *.vsix
 
 src/test/resources/**
-target/surefire-reports/**
+#target/surefire-reports/**
