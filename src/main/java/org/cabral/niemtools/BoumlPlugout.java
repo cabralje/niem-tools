@@ -118,11 +118,6 @@ public class BoumlPlugout {
             UmlCom.trace("NEXT STEP: Select `Import Reference Model`");
             return;
         }
-        // Create NIEM models
-        model.createNIEM();
-
-        // Cache models
-        model.cacheModels(false);
 
         // Configure project directory
         String projectDirectory = model.properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
@@ -143,12 +138,21 @@ public class BoumlPlugout {
 
             case "publishUML":
                 try {
+                    // Create NIEM models
+                    //model.createNIEM();
+                    
+                    // Cache models
+                    //model.cacheModels(false);
+
                     // Generate HTML documentation
                     model.exportHtml(target);
+
                     // Generate NIEM Mapping HTML
                     model.exportMappingHtml();
+
                     // Generate NIEM Mapping CSV
                     model.exportMappingCsv();
+
                     // Next steps
                     UmlCom.trace("\nNEXT STEP: map content to NIEM in " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " and then select 'Import Mapping File'");
                 } catch (Exception e) {
@@ -159,6 +163,12 @@ public class BoumlPlugout {
 
             case "importMapping":
                 try {
+                    // Create NIEM models
+                    //model.createNIEM();
+
+                     // Cache models
+                    //model.cacheModels(false);
+
                     // Delete previous mapping
                     model.deleteMapping();
 
@@ -191,6 +201,13 @@ public class BoumlPlugout {
                 break;
 
             case "publishCMF":
+
+                // Create NIEM models
+                model.createNIEM();
+
+                // Cache models
+                model.cacheModels(false);
+
                 // Export CMF
                 model.exportCmf();
 
@@ -200,6 +217,13 @@ public class BoumlPlugout {
 
             case "publishXSD":
                 try {
+
+                    // Create NIEM models
+                    model.createNIEM();
+
+                    // Cache models
+                    model.cacheModels(false);
+
                     // Generate wantlist for the subset
                     model.exportWantlist();
 
@@ -225,6 +249,13 @@ public class BoumlPlugout {
 
 
             case "publishJSON":
+
+                // Create NIEM models
+                model.createNIEM();
+
+                // Cache models
+                model.cacheModels(false);
+
                 // Generate subset and extension schemas
 
                 // Next steps
@@ -234,6 +265,14 @@ public class BoumlPlugout {
 
             case "publishSpecification":
                 try {
+
+                    // Create NIEM models
+                    model.createNIEM();
+
+                    // Cache models
+                    model.cacheModels(false);
+
+                    // Generate message specification
                     model.exportSpecification();
                 } catch (Exception ex) {
                     Log.trace("Exception: " + ex.getMessage());

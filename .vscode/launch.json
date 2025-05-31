@@ -8,7 +8,7 @@
             "sourcePaths": ["${workspaceFolder}/src/main/java"],
             "classPaths": ["${workspaceFolder}/target/classes",
                             "${workspaceFolder}/target/*"],
-            "args": "publish"
+            "args": "publishSpecification"
         },
         {
             "name": "Publish UML",
@@ -30,7 +30,27 @@
                             "${workspaceFolder}/target/*"],
             "args": "importMapping"
         },
-                        {
+        {
+            "name": "Validate mapping",
+            "type": "java",
+            "request": "launch",
+            "mainclass": "org.cabral.niemtools.BoumlPlugout",
+            "sourcePaths": ["${workspaceFolder}/src/main/java"],
+            "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/*"],
+            "args": "validateMapping"
+        },
+                {
+            "name": "Publish CMF",
+            "type": "java",
+            "request": "launch",
+            "mainclass": "org.cabral.niemtools.BoumlPlugout",
+            "sourcePaths": ["${workspaceFolder}/src/main/java"],
+            "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/*"],
+            "args": "publishCMF"
+        },
+        {
             "name": "Publish XSD",
             "type": "java",
             "request": "launch",

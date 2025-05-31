@@ -627,9 +627,10 @@ public class CmfWriter {
             String proxyTypeName = NamespaceModel.getPrefixedName(baseType);
             baseTypeName = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NamespaceModel.getName(baseType));
             NiemModel model = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(baseTypeName)) ? NiemUmlModel.getSubsetModel() : NiemUmlModel.getExtensionModel();
-            baseType = model.getType(NamespaceModel.getSchemaURI(baseTypeName), baseTypeName);
+            //baseType = model.getType(NamespaceModel.getSchemaURI(baseTypeName), baseTypeName);
+            baseType = model.copyType(baseTypeName);
             if (baseType == null) {
-                Log.debug("getBaseType: unable to replace proxy type " + proxyTypeName + " with type " + baseTypeName);
+                Log.trace("getCmfBaseType: unable to replace proxy type " + proxyTypeName + " with type " + baseTypeName);
                 return null;
             }
         }
@@ -723,7 +724,7 @@ public class CmfWriter {
         if (id != null && !id.isEmpty())
             tagString += " " + NiemModel.STRUCTURES_PREFIX + ":id=\"" + id.replace(":", ".") + "\"";
         if (ref != null && !ref.isEmpty())
-            tagString += " " + NiemModel.STRUCTURES_PREFIX + ":ref=\"" + ref.replace(":", ".") + "\"";
+            tagString += " " + NiemModel.STRUCTURES_PREFIX + ":ref=\"" + ref.replace(":", ".") + "\" xsi:nill=\"true\"";
         if (content != null && !content.isEmpty())
             tagString += ">" + content + "</" + tag + ">"; 
         else 

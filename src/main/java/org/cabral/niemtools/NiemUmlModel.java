@@ -212,21 +212,32 @@ public class NiemUmlModel {
      * @return model for Umlitem item as a NiemModel
      */
     static NiemModel getModel(UmlItem item) {
-        UmlPackage modelPackage = null;
+        //UmlPackage modelPackage = null;
+        String modelPackageName = null;
         anItemKind kind = item.kind();
         if (kind == anItemKind.aClass || kind == anItemKind.aClassInstance)
-            modelPackage = (UmlPackage) (item.parent().parent()); 
+            modelPackageName = item.parent().parent().name(); 
         else if (kind == anItemKind.aClassView)
-            modelPackage = (UmlPackage) (item.parent());
-        if (modelPackage == ReferenceModel.getModelPackage())
-            return ReferenceModel; 
-        else if (modelPackage == SubsetModel.getModelPackage())
-            return SubsetModel; 
-        else if (modelPackage == ExtensionModel.getModelPackage())
-            return ExtensionModel;
-        Log.trace("getPrefix - error - no prefix for " + item.name());
-
-        return null;
+            modelPackageName = item.parent().name();
+        switch (modelPackageName) {
+            case NIEM_REFERENCE_PACKAGE:
+                return ReferenceModel;
+            case NIEM_SUBSET_PACKAGE:
+                return SubsetModel;
+            case NIEM_EXTENSION_PACKAGE:
+                return ExtensionModel;
+            default:
+                Log.trace("getModel - error - no model for " + item.name());
+                return null;
+        }
+        //if (modelPackage == ReferenceModel.getModelPackage())
+        //    return ReferenceModel; 
+        //else if (modelPackage == SubsetModel.getModelPackage())
+        //    return SubsetModel; 
+        //else if (modelPackage == ExtensionModel.getModelPackage())
+        //    return ExtensionModel;
+        //Log.trace("getModel - error - no model for " + item.name());
+        //return null;
     }
 
     /**
@@ -645,7 +656,7 @@ public class NiemUmlModel {
         if (deleteReferenceModel) {
             Log.debug("deleteSubset: deleting reference model");
             modelPackage = getPackage(pimPackage, NIEM_REFERENCE_PACKAGE, false);
-            ReferenceModel.setModelPackage(modelPackage);
+            //ReferenceModel.setModelPackage(modelPackage);
             if (modelPackage != null) {
                 modelPackage.deleteIt();
                 modelPackage.unload(true, true);
@@ -655,14 +666,14 @@ public class NiemUmlModel {
         // delete subset and extension models
         Log.debug("deleteSubset: deleting subset and extension model");
         modelPackage = getPackage(pimPackage, NIEM_SUBSET_PACKAGE, false);
-        SubsetModel.setModelPackage(modelPackage);
+        //SubsetModel.setModelPackage(modelPackage);
         if (modelPackage != null) {
             modelPackage.deleteIt();
             modelPackage.unload(true, true);
         }
 
         modelPackage = getPackage(pimPackage, NIEM_EXTENSION_PACKAGE, false);
-        ExtensionModel.setModelPackage(modelPackage);
+        //ExtensionModel.setModelPackage(modelPackage);
         if (modelPackage != null) {
             modelPackage.deleteIt();
             modelPackage.unload(true, true);

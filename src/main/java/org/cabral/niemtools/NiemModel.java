@@ -204,8 +204,8 @@ class NiemModel {
                     }
                 if (baseType == null) {
                     String prefix = NamespaceModel.getPrefix(item);
-                    if (prefix.equals(STRUCTURES_PREFIX) || prefix.equals(XSD_PREFIX))
-                        return null;
+                    //if (prefix.equals(STRUCTURES_PREFIX) || prefix.equals(XSD_PREFIX))
+                    //    return null;
                     if (NamespaceModel.getName(item).endsWith(AUGMENTATION_TYPE_NAME))
                         baseType = NiemUmlModel.getSubsetModel().getAugmentationType();
                 }
@@ -352,7 +352,12 @@ class NiemModel {
         relateElementInType(elementInType, element);
 
         // insert element in type list
-        List<UmlClassInstance> elementInTypeList = NiemUmlModel.getModel(type).getElementsInType(getURI(type));
+        NiemModel model = NiemUmlModel.getModel(type);
+        if (model == null) {
+            Log.trace("addElementInTypes: error - no model for type " + typeName);
+            return null;
+        }
+        List<UmlClassInstance> elementInTypeList = model.getElementsInType(getURI(type));
         if (!elementInTypeList.contains(element)) {
             elementInTypeList.add(element);
             Log.debug("addElementInTypes: inserted " + elementInTypeName + " to " + typeName);
@@ -499,11 +504,11 @@ class NiemModel {
         Log.debug("cacheModel: store caches and add simple and abstract types");
         if (this == NiemUmlModel.getReferenceModel()) {
             // add local namespace and abstract type
-            NamespaceModel.getNamespaceClassView(this, LOCAL_PREFIX, LOCAL_URI);
+            //NamespaceModel.getNamespaceClassView(this, LOCAL_PREFIX, LOCAL_URI);
             abstractType = addType(LOCAL_URI,
                     NamespaceModel.getPrefixedName(LOCAL_PREFIX, ABSTRACT_TYPE_NAME), null, null);
             // add XML namespace, simple types and any element
-            NamespaceModel.getNamespaceClassView(this, XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
+            //NamespaceModel.getNamespaceClassView(this, XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
             for (String typeName : XML_TYPE_NAMES)
                 addType(XSD_URI, NamespaceModel.getPrefixedName(XSD_PREFIX, typeName), null, null);
             addElement(XSD_URI, NamespaceModel.getPrefixedName(XSD_PREFIX, ANY_ELEMENT_NAME), null, null, null);
@@ -513,7 +518,7 @@ class NiemModel {
             objectType = copyType(NamespaceModel.getPrefixedName(STRUCTURES_PREFIX, OBJECT_TYPE_NAME));
             simpleObjectAttributeGroup = copyType(
                     NamespaceModel.getPrefixedName(STRUCTURES_PREFIX, SIMPLE_OBJECT_ATTRIBUTE_GROUP));
-            NamespaceModel.getNamespaceClassView(null, XSD_PREFIX, XSD_URI);
+            //NamespaceModel.getNamespaceClassView(null, XSD_PREFIX, XSD_URI);
             copyElement(NamespaceModel.getPrefixedName(XSD_PREFIX, ANY_ELEMENT_NAME));
             copyType("xs:NCName"); // JSON-LD @id is type xs:NCName
         } else if (this == NiemUmlModel.getExtensionModel()) {
