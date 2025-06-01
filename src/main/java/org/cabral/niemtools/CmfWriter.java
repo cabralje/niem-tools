@@ -509,9 +509,12 @@ public class CmfWriter {
                         if (prefix != null && typePrefix != null && prefix.equals(typePrefix))
                             continue;
                         augmentationCmf += "<AugmentationRecord>"
-                                + tagRef("Class", typeName)
-                                + tagRef("DataProperty", NamespaceModel.filterAttributePrefix(NamespaceModel.getPrefixedName(element)))
-                                + exportCmfMultiplicity(multiplicity)
+                                + tagRef("Class", typeName);
+                        if (isClass(type))
+                            augmentationCmf += tagRef("ObjectProperty", NamespaceModel.filterAttributePrefix(NamespaceModel.getPrefixedName(element)));
+                        else
+                            augmentationCmf += tagRef("DataProperty", NamespaceModel.filterAttributePrefix(NamespaceModel.getPrefixedName(element)));
+                        augmentationCmf += exportCmfMultiplicity(multiplicity)
                                 + tag("AugmentationIndex", String.valueOf(augmentations++))
                                 + "</AugmentationRecord>";
                     }
@@ -563,8 +566,8 @@ public class CmfWriter {
 
         tagIds.add(id);
         String elementName = NamespaceModel.getName(element);
-        //if (elementName.endsWith(NiemModel.AUGMENTATION_POINT_NAME))
-        //    return "";
+        if (elementName.endsWith(NiemModel.AUGMENTATION_POINT_NAME))
+            return "";
         Log.debug("exportCmfProperty: exporting property " + elementName);
 
         UmlClass baseType = getCmfBaseType(element);
@@ -584,7 +587,7 @@ public class CmfWriter {
                 String uri = NiemModel.getURI(NamespaceModel.getSchemaURI(head), head);
                 UmlClassInstance headElement = NiemUmlModel.getModel(uri).getElementByURI(uri);
                 String headElementName = NamespaceModel.getPrefixedName(headElement);
-                if (headElement != null && !headElementName.contains(NiemModel.AUGMENTATION_POINT_NAME))
+                if (headElement != null && !headElementName.endsWith(NiemModel.AUGMENTATION_POINT_NAME))
                     propertyCmf += tagRef("SubPropertyOf", NamespaceModel.getPrefixedName(headElement));
             }
             propertyCmf += tagRef("Datatype", baseTypeName);
@@ -602,7 +605,9 @@ public class CmfWriter {
             if (head != null) {
                 String uri = NiemModel.getURI(NamespaceModel.getSchemaURI(head), head);
                 UmlClassInstance headElement = NiemUmlModel.getModel(uri).getElementByURI(uri);
-                propertyCmf += tagRef("SubPropertyOf", NamespaceModel.getPrefixedName(headElement));
+                String headElementName = NamespaceModel.getPrefixedName(headElement);
+                if (headElement != null && !headElementName.endsWith(NiemModel.AUGMENTATION_POINT_NAME))
+                    propertyCmf += tagRef("SubPropertyOf", NamespaceModel.getPrefixedName(headElement));
             }
         }
         Log.debug("exportCmfProperty: exported object property " + elementName);
