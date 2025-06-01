@@ -326,8 +326,7 @@ class NiemModel {
             Log.debug("addElementInType: adding " + elementInTypeName + " to type " + typeName);
             elementInType = UmlAttribute.create(type, elementInTypeName);
         } catch (RuntimeException re) {
-            // trace("addElementInType: error - element " + elementInTypeName + " already
-            // exists in type " + type.name());
+            Log.trace("addElementInType: error - creating element " + elementInTypeName + " in type " + type.name());
             return null;
         }
 
@@ -1056,7 +1055,9 @@ class NiemModel {
      * @return a referenced element in model as a UmlClassInstance
      */
     UmlClassInstance getReferencedElement(UmlItem item) {
-        if (item.kind() != anItemKind.anAttribute)
+        anItemKind kind = item.kind();
+        //if (item.kind() != anItemKind.anAttribute)
+        if (item.kind() != anItemKind.anAttribute && item.kind() != anItemKind.aClassInstance)
             return null;
         String itemURI = getURI(item);
         if (itemURI == null) {

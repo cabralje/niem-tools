@@ -313,7 +313,8 @@ public class CmfWriter {
 
         try {
             Log.debug("exportCmfClass: exported complex class " + typeName);
-            classCmf = exportCmfComponent(type);
+            classCmf = exportCmfComponent(type)
+                    + tag("ReferenceCode", "NONE");
             if (isOlderCmfVersion(cmfVersion, "1.0")) {
                 classCmf += tag("AugmentableIndicator", "true");
             }
@@ -593,7 +594,9 @@ public class CmfWriter {
             return tagId(dataPropertyName, id, propertyCmf);
         } else {
             // object property
-            propertyCmf = exportCmfComponent(element) + tagRef("Class", NamespaceModel.getPrefixedName(baseType));
+            propertyCmf = exportCmfComponent(element) 
+                        + tag("ReferenceCode", "NONE")
+                        + tagRef("Class", NamespaceModel.getPrefixedName(baseType));
             // augmentation
             String head = element.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
             if (head != null) {
