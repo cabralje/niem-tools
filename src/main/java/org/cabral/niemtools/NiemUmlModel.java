@@ -809,7 +809,7 @@ public class NiemUmlModel {
     public void exportSpecification() {
 
         Log.start("exportSpecification");
-
+        Log.trace("Generating NIEM message specification");
         /*
 		 * cacheExternalSchemas(); cacheModel(referencePackage);
 		 * cacheModel(subsetPackage); cacheModel(extensionPackage);
@@ -818,6 +818,8 @@ public class NiemUmlModel {
         String exportCmf = properties.getProperty(ProjectProperties.EXPORT_CMF);
         String exportXsd = properties.getProperty(ProjectProperties.EXPORT_XSD);
         String exportJson = properties.getProperty(ProjectProperties.EXPORT_JSON);
+        String exportCmfToXsd = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
+        String exportCmfToJson = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
         String exportWsdl = properties.getProperty(ProjectProperties.EXPORT_WSDL);
         String exportOpenApi = properties.getProperty(ProjectProperties.EXPORT_OPENAPI);
 
@@ -831,7 +833,7 @@ public class NiemUmlModel {
         }
 
         try {
-            if (exportXsd.equals("true")){
+            if (exportXsd.equals("true") && exportCmfToXsd.equals("false")) {
                 // export catalog file
                 xmlWriter.exportXmlCatalog();
             }
@@ -946,13 +948,14 @@ public class NiemUmlModel {
         }
 
         if (exportXsd.equals("true")) {
-            try {
+            if (exportCmfToXsd.equals("false")) {
+                try {
 
-                xmlWriter.exportMpdCatalog(messages.keySet(), properties);
-            } catch (IOException e) {
-                Log.trace("exportSpecification: error exporting MPD catalog " + e.toString());
+                    xmlWriter.exportMpdCatalog(messages.keySet(), properties);
+                } catch (IOException e) {
+                    Log.trace("exportSpecification: error exporting MPD catalog " + e.toString());
+                }
             }
-   
             if (exportWsdl.equals("true")) {
 				try {
                     String wsdlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
@@ -964,17 +967,20 @@ public class NiemUmlModel {
             }
         }
         if (exportJson.equals("true")) {
-			try {
-                if (exportOpenApi.equals("true")) {
-                    JsonWriter jsonWriter = new JsonWriter(jsonDir);
-                    jsonWriter.exportOpenApi(properties, ports, messageNamespaces, jsonDefinitions2);
+            //if (exportCmfToJson.equals("false")) {
+                try {
+                    if (exportOpenApi.equals("true")) {
+                        JsonWriter jsonWriter = new JsonWriter(jsonDir);
+                        jsonWriter.exportOpenApi(properties, ports, messageNamespaces, jsonDefinitions2);
+                    }
+                } catch (IOException e) {
+                    Log.trace("exportSpecification: error exporting OpenAPI files " + e.toString());
                 }
-            } catch (IOException e) {
-                Log.trace("exportSpecification: error exporting OpenAPI files " + e.toString());
-            }
+            //}
         }
-        if (exportCmf.equals("true"))
-            exportCmf();
+        //if (exportCmf.equals("true"))
+        //    exportCmf();
+        Log.trace("exportSpecification: done generating NIEM message specification");
     }
 
     public void exportCmf() {

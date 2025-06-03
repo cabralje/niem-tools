@@ -1,6 +1,7 @@
 package org.cabral.niemtools;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -71,7 +72,7 @@ public class BoumlPlugoutTest {
                 "selectDirectoryProperty", NiemUmlModel.class, String.class, String.class);
             m.setAccessible(true);
             return (String) m.invoke(null, model, propertyName, dialogTitle);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
             // Acceptable in headless or test environments
             return null;
         }
@@ -83,7 +84,7 @@ public class BoumlPlugoutTest {
                 "selectFileProperty", NiemUmlModel.class, String.class, String.class);
             m.setAccessible(true);
             return (String) m.invoke(null, model, propertyName, dialogTitle);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
             // Acceptable in headless or test environments
             return null;
         }

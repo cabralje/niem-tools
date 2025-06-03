@@ -1,16 +1,4 @@
 package org.cabral.niemtools;
-import java.io.File;
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import fr.bouml.UmlAttribute;
-import fr.bouml.UmlClass;
-import fr.bouml.UmlClassInstance;
-import fr.bouml.UmlItem;
 
 public class CsvWriterTest {
 

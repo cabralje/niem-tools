@@ -357,113 +357,55 @@ public class BoumlPlugout {
                 
             case "publishXSD":
 
-                String exportCmfToXsd = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
-                // use cmftool to generate XSDs from CMF
-                if (exportCmfToXsd.equals("true")) {
-                    Log.trace("Exporting CMF to XSD using cmftool");
-                    // Export CMF to XSD
-                    String execCommandXsd =
-                        model.properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_XSD) + " " +
-                        model.properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                        model.properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " " +
-                        model.properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                        model.properties.getProperty(ProjectProperties.EXPORT_CMF_DIR) + File.separator +
-                        CmfWriter.getCmfFilename(model.properties.getProperty(ProjectProperties.EXPORT_CMF_FILE), 
-                            model.properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION)); 
-                    try {     
-                        exec(execCommandXsd);
-                    } catch (IOException | InterruptedException e) {
-                        Log.trace("Exception: " + e.getMessage());
-                        System.exit(1); 
-                    }
-
-                } else {
-                    // generate XSDs in niem-tools
-                    Log.trace("Exporting XSDs using niem-tools");
-                    try {
-                        
-                        // Create NIEM models
-                        model.createNIEM();
-                        
-                        // Cache models
-                        model.cacheModels(false);
-                        
-                        // Generate wantlist for the subset
-                        model.exportWantlist();
-                        
-                        // export code lists
-                        String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                                properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
-                        XmlWriter xmlWriter = new XmlWriter(xmlDir);
-                        xmlWriter.exportCodeLists(NiemUmlModel.getExtensionModel());
-                        xmlWriter.exportCodeLists(NiemUmlModel.getSubsetModel());
-                        
-                        // FIXME Generate XSD extension schemas
-                        
-                        // export XML catalog
-                        xmlWriter.exportXmlCatalog();
-                        
-                        // Next steps
-                        UmlCom.trace("\nNEXT STEP: Select 'Publish Message Specification'");
-                    } catch (IOException e) {
-                        Log.trace("Exception: " + e.getMessage());
-                        System.exit(1);
-                    }
-                }
+                publishXSD(model);
                 break;
                 
             case "publishJSON":
                 
-                String exportCmfToJson = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
-                // use cmftool to generate JSON schemas from CMF
-                if (exportCmfToJson.equals("true")) {
-                    Log.trace("Exporting CMF to JSON schema using cmftool");
-                    // Export CMF to XSD
-                    String execCommandXsd =
-                        model.properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_JSON) + " " +
-                        model.properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                        model.properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_DIR) + File.separator +
-                        JsonWriter.getJsonFilename(model.properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE)) + " " +
-                        model.properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                        model.properties.getProperty(ProjectProperties.EXPORT_CMF_DIR) + File.separator +
-                        CmfWriter.getCmfFilename(model.properties.getProperty(ProjectProperties.EXPORT_CMF_FILE), 
-                            model.properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION));          
-
-                    try {     
-                        exec(execCommandXsd);
-                    } catch (IOException | InterruptedException e) {
-                        Log.trace("Exception: " + e.getMessage());
-                        System.exit(1);
-                    }
-                } else {
-                    // generate JSON schema in niem-tools
-                    Log.trace("Exporting JSON schema using niem-tools");
-                    try {
-                        // Create NIEM models
-                        model.createNIEM();
-
-                        // Cache models
-                        model.cacheModels(false);
-                        
-                        // FIXME Generate JSON subset and extension schemas
-                        
-                        // Next steps
-                        UmlCom.trace("\nNEXT STEP: Select 'Publish Message Specification'");
-                    } catch (Exception e) {
-                        Log.trace("Exception: " + e.getMessage());
-                        System.exit(1);
-                    }
-                }
+                publishJSON(model);
                 break;
                 
             case "publishSpecification":
                 try {  
                     
-                    // Create NIEM models
+                    // Generate HTML documentation
+                    model.exportHtml(target);
+                    
+                    // Generate NIEM Mapping HTML
+                    model.exportMappingHtml();
+                    
+                    // Generate NIEM Mapping CSV
+                    model.exportMappingCsv();
+
+                    // Clearing NIEM Models
+                    model.deleteNIEM(false);
                     model.createNIEM();
+                    model.cacheModels(false);
+                
+                    // Generating NIEM Models
+                    model.createSubsetAndExtension();
                     
                     // Cache models
                     model.cacheModels(false);
+
+                    // Export CMF
+                    String exportCmf = model.properties.getProperty(ProjectProperties.EXPORT_CMF);
+                    if (exportCmf.equals("true")) {
+                        Log.trace("Exporting CMF");
+                        model.exportCmf();
+
+                        String exportXsd = model.properties.getProperty(ProjectProperties.EXPORT_XSD);
+                        if (exportXsd.equals("true")) {
+                            Log.trace("Exporting XSD");
+                            publishXSD(model);
+                        }
+
+                        String exportJson = model.properties.getProperty(ProjectProperties.EXPORT_JSON);
+                        if (exportJson.equals("true")) {
+                            Log.trace("Exporting JSON schema");
+                            publishJSON(model);
+                        }
+                    }
                     
                     // Generate message specification
                     model.exportSpecification();
@@ -471,10 +413,10 @@ public class BoumlPlugout {
                     Log.trace("Exception: " + ex.getMessage());
                     System.exit(1);
                 }
+                break;
                 
             default:
-                Log.trace("Error: Unrecognized command '" + command + "'.");
-                UmlCom.trace("Error: Unrecognized command '" + command + "'. Please check the available commands and try again.");
+                Log.trace("Error: Unrecognized command '" + command + "'. Please check the available commands and try again.");
                 break;
         }
         Log.trace("Done");
@@ -572,9 +514,125 @@ public class BoumlPlugout {
 
         // Wait for the command to complete
         exitCode = process.waitFor();
-        Log.trace("Command exited with code: " + exitCode);
+        Log.debug("Command exited with code: " + exitCode);
 
         return exitCode;
+    }
+    /** * Publish XSD schemas from the NiemUmlModel.
+     * 
+     * @param model
+     */
+    static void publishXSD(NiemUmlModel model) {
+        
+        String exportCmfToXsd = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
+
+        ProjectProperties properties = model.properties;
+        // use cmftool to generate XSDs from CMF
+        if (exportCmfToXsd.equals("true")) {
+            Log.trace("Exporting CMF to XSD using cmftool");
+            // Export CMF to XSD
+
+            String execCommandXsd =
+                properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_XSD) + " " +
+                properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " " +
+                properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                properties.getProperty(ProjectProperties.EXPORT_CMF_DIR) + File.separator +
+                CmfWriter.getCmfFilename(properties.getProperty(ProjectProperties.EXPORT_CMF_FILE), 
+                    properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION)); 
+            try {     
+                exec(execCommandXsd);
+            } catch (IOException | InterruptedException e) {
+                Log.trace("Exception: " + e.getMessage());
+                System.exit(1); 
+            }
+
+        } else {
+            // generate XSDs in niem-tools
+            Log.trace("Exporting XSDs using niem-tools");
+            try {
+                
+                // Create NIEM models
+                model.createNIEM();
+                
+                // Cache models
+                model.cacheModels(false);
+                
+                // Generate wantlist for the subset
+                model.exportWantlist();
+                
+                // export code lists
+                String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                        properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
+                XmlWriter xmlWriter = new XmlWriter(xmlDir);
+                xmlWriter.exportCodeLists(NiemUmlModel.getExtensionModel());
+                xmlWriter.exportCodeLists(NiemUmlModel.getSubsetModel());
+                
+                // Generate XSD extension schemas
+                model.exportSpecification();
+                
+                // export XML catalog
+                xmlWriter.exportXmlCatalog();
+                
+                // Next steps
+                UmlCom.trace("\nNEXT STEP: Select 'Publish Message Specification'");
+            } catch (IOException e) {
+                Log.trace("Exception: " + e.getMessage());
+                System.exit(1);
+            }
+        }   
+
+    }
+
+    /**
+     * Publish JSON schemas from the NiemUmlModel.
+     *
+     * @param model The NiemUmlModel instance.
+     */
+    static void publishJSON(NiemUmlModel model) {
+        String exportCmfToJson = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
+        ProjectProperties properties = model.properties;
+
+        // use cmftool to generate JSON schemas from CMF
+        if (exportCmfToJson.equals("true")) {
+            Log.trace("Exporting CMF to JSON schema using cmftool");
+            // Export CMF to XSD
+            String execCommandXsd =
+                properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_JSON) + " " +
+                properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_DIR) + File.separator +
+                JsonWriter.getJsonFilename(properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE)) + " " +
+                properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                properties.getProperty(ProjectProperties.EXPORT_CMF_DIR) + File.separator +
+                CmfWriter.getCmfFilename(properties.getProperty(ProjectProperties.EXPORT_CMF_FILE), 
+                    properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION));          
+
+            try {     
+                exec(execCommandXsd);
+            } catch (IOException | InterruptedException e) {
+                Log.trace("Exception: " + e.getMessage());
+                System.exit(1);
+            }
+        } else {
+            // generate JSON schema in niem-tools
+            Log.trace("Exporting JSON schema using niem-tools");
+            try {
+                // Create NIEM models
+                model.createNIEM();
+
+                // Cache models
+                model.cacheModels(false);
+                
+                // Generate JSON subset and extension schemas
+                model.exportSpecification();
+                
+                // Next steps
+                UmlCom.trace("\nNEXT STEP: Select 'Publish Message Specification'");
+            } catch (Exception e) {
+                Log.trace("Exception: " + e.getMessage());
+                System.exit(1);
+            }
+        }
     }
 }
 

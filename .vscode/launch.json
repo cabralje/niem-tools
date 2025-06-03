@@ -1,5 +1,15 @@
 {
     "configurations": [
+                {
+            "name": "Launch NIEMTools",
+            "type": "java",
+            "request": "launch",
+            "mainclass": "org.cabral.niemtools.BoumlPlugout",
+            "sourcePaths": ["${workspaceFolder}/src/main/java"],
+            "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/*"],
+            "args": ""
+        },
         {
             "name": "Generate specification",
             "type": "java",

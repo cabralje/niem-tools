@@ -1,4 +1,5 @@
 package org.cabral.niemtools;
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashSet;
 
 import static org.junit.Assert.assertEquals;
@@ -25,7 +26,7 @@ public class CmfWriterTest {
             assertTrue((Boolean) m.invoke(writer, "0.7", "1.0"));
             assertFalse((Boolean) m.invoke(writer, "1.0", "0.7"));
             assertFalse((Boolean) m.invoke(writer, "1.0", "1.0"));
-        } catch (Exception e) {
+        } catch (IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
             fail("Reflection failed: " + e.getMessage());
         }
     }
@@ -40,7 +41,7 @@ public class CmfWriterTest {
             Object result = m.invoke(writer);
             assertNotNull(result);
             assertTrue(result instanceof LinkedHashSet);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
             // Acceptable if dependencies are missing
         }
     }
@@ -83,7 +84,7 @@ public class CmfWriterTest {
             Mockito.when(mockClass.name()).thenReturn("TestClass");
             Object result = m.invoke(writer, mockClass);
             assertNotNull(result);
-        } catch (Exception e) {
+        } catch (IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
             // Acceptable if dependencies are missing
         }
     }
