@@ -1,5 +1,3 @@
-package org.cabral.niemtools;
-
 /*
  *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
  *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
@@ -22,6 +20,34 @@ package org.cabral.niemtools;
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+/**
+ * ConfigurationDialog is a modal dialog for configuring NIEMtools project properties.
+ * <p>
+ * This dialog provides a Swing-based user interface for editing various configuration
+ * options related to NIEM reference model import, mapping, export, and metadata.
+ * It organizes configuration options into multiple tabs, including:
+ * <ul>
+ *   <li>Home: Navigation to other configuration sections.</li>
+ *   <li>Reference Model: Options for importing NIEM reference models and configuring domains/codes.</li>
+ *   <li>Mapping: Project directory selection and mapping file management.</li>
+ *   <li>Publish: Export options for CMF, XSD, JSON, and related settings.</li>
+ *   <li>Metadata: Message specification metadata such as name, version, organization, etc.</li>
+ *   <li>External Schemas: Management of external namespace mappings.</li>
+ * </ul>
+ * <p>
+ * The dialog updates the provided {@link ProjectProperties} instance in real time as the user
+ * modifies fields. It also supports command-based actions (e.g., import, publish) that can be
+ * triggered by buttons, returning the selected command string via {@link #showDialog()}.
+ * <p>
+ * <b>Note:</b> This class is currently implemented using Swing. Consider porting to JavaFX for
+ * improved UI capabilities and maintainability.
+ *
+ * @author James E. Cabral Jr.
+ * @see ProjectProperties
+ */
+package org.cabral.niemtools;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
@@ -51,6 +77,15 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
+// NOTE: Consider porting this Swing-based ConfigurationDialog to JavaFX for the following reasons:
+// Benefits:
+// - JavaFX provides a modern UI toolkit with better styling capabilities using CSS.
+// - It supports advanced features like animations, WebView, and hardware acceleration.
+// - JavaFX is more suitable for modern applications and is actively maintained.
+// Challenges:
+// - The migration requires rewriting the UI components and event handling logic.
+// - JavaFX has a different threading model, requiring careful handling of UI updates.
+// - Dependencies on Swing-specific components or libraries may need to be replaced or adapted.
 class ConfigurationDialog extends JDialog {
 
     private final ProjectProperties properties;
@@ -59,20 +94,27 @@ class ConfigurationDialog extends JDialog {
 
     private static class LineWrapCellRenderer extends JTextArea implements TableCellRenderer {
 
+        private final java.util.Map<String, Integer> heightCache = new java.util.HashMap<>();
+
         LineWrapCellRenderer() {
             setLineWrap(true);
             setWrapStyleWord(true);
             setFont(new Font(Font.DIALOG, Font.PLAIN, 10));
         }
+
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
                 int row, int column) {
             if (value != null) {
                 setText(value.toString());
             }
-            setSize(table.getColumnModel().getColumn(column).getWidth(), getPreferredSize().height);
-            if (table.getRowHeight(row) != getPreferredSize().height) {
-                table.setRowHeight(row, getPreferredSize().height);
+            String cacheKey = row + ":" + column;
+            int columnWidth = table.getColumnModel().getColumn(column).getWidth();
+            setSize(columnWidth, getPreferredSize().height);
+
+            int preferredHeight = heightCache.computeIfAbsent(cacheKey, key -> getPreferredSize().height);
+            if (table.getRowHeight(row) != preferredHeight) {
+                table.setRowHeight(row, preferredHeight);
             }
             return this;
         }
@@ -119,19 +161,17 @@ class ConfigurationDialog extends JDialog {
         JPanel panel = new JPanel();
         panel.add(new JLabel(name, JLabel.RIGHT));
         JTextField field = new JTextField(properties.getProperty(property), fieldColumns);
-        field.getDocument().addDocumentListener((SimpleDocumentListener) e -> {
+        field.getDocument().addDocumentListener((SimpleDocumentListener) (DocumentEvent e) -> {
             properties.setProperty(property, field.getText());
         });
         panel.add(field);
         return panel;
     }
 
-    /**
-     * Creates a labeled field with the specified name, property, and number of
+     /* Creates a labeled field with the specified name, property, and number of
      * columns.
      * @param name
      * @param boxProperty
-     * @return
      */
     private JCheckBox checkedBox(String name, String boxProperty) {
         JCheckBox box = new JCheckBox(name, properties.getProperty(boxProperty).equals("true"));
@@ -152,9 +192,7 @@ class ConfigurationDialog extends JDialog {
         button.addActionListener((ActionEvent e) -> {
             // Find the parent JTabbedPane and set the selected tab to "Import Reference Model"
             Component c = button;
-            while (c != null && !(c instanceof JTabbedPane)) {
-                c = c.getParent();
-            }
+            c = findParentTabbedPane(c);
             if (c instanceof JTabbedPane tabbedPane) {
                 int index = tabbedPane.indexOfTab(tab);
                 if (index != -1)
@@ -162,6 +200,18 @@ class ConfigurationDialog extends JDialog {
             }
         });
         return button;
+    }
+
+    /**
+     * Utility method to find the parent JTabbedPane of a given component.
+     * @param component The starting component.
+     * @return The parent JTabbedPane, or null if not found.
+     */
+    private JTabbedPane findParentTabbedPane(Component component) {
+        while (component != null && !(component instanceof JTabbedPane)) {
+            component = component.getParent();
+        }
+        return (JTabbedPane) component;
     }
 
     /**
@@ -203,7 +253,7 @@ class ConfigurationDialog extends JDialog {
         // create dialog
         super(new JFrame(), "Niemtools Configuration", true);
         properties = inputProperties;
-        setSize(800,260);
+        setSize(850,350);
 
     }
 
@@ -255,6 +305,7 @@ class ConfigurationDialog extends JDialog {
             properties.setProperty(ProjectProperties.EXPORT_MODEL_DIR, modelDir);
             properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, modelDir + File.separator + ProjectProperties.getDefaults().getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
         });
+            //properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, modelDir + File.separator + ProjectProperties.getDefaults().getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
         projectPanel.add(textField1);
         JButton button1 = new JButton("Browse...");
         button1.addActionListener((ActionEvent e) -> {
@@ -292,9 +343,14 @@ class ConfigurationDialog extends JDialog {
         JPanel exportPanel1 = new JPanel(new BorderLayout());
         exportPanel1.add(label("Common Model Format (CMF)"), BorderLayout.NORTH);
         JPanel exportPanel1a = new JPanel(new BorderLayout());
-        exportPanel1a.add(labeledField("Directory", ProjectProperties.EXPORT_CMF_DIR, fieldColumns), BorderLayout.NORTH);
-        exportPanel1a.add(labeledField("Version", ProjectProperties.EXPORT_CMF_VERSION, fieldColumns), BorderLayout.CENTER);
-        exportPanel1a.add(checkedBox("Include CMF in Message Specification", ProjectProperties.EXPORT_CMF), BorderLayout.SOUTH);
+        JPanel exportPanel1b = new JPanel(new BorderLayout());
+        exportPanel1b.add(labeledField("Directory", ProjectProperties.EXPORT_CMF_DIR, fieldColumns), BorderLayout.NORTH);
+        exportPanel1b.add(labeledField("CMF File", ProjectProperties.EXPORT_CMF_FILE, fieldColumns), BorderLayout.NORTH);
+        exportPanel1b.add(labeledField("Version", ProjectProperties.EXPORT_CMF_VERSION, fieldColumns), BorderLayout.SOUTH);
+        JPanel exportPanel1c = new JPanel(new BorderLayout());
+        exportPanel1c.add(checkedBox("Include CMF in Message Specification", ProjectProperties.EXPORT_CMF), BorderLayout.SOUTH);
+        exportPanel1a.add(exportPanel1b, BorderLayout.NORTH);
+        exportPanel1a.add(exportPanel1c, BorderLayout.SOUTH);      
         exportPanel1.add(exportPanel1a, BorderLayout.CENTER);
         exportPanel1.add(commandButton("Publish CMF","publishCMF"), BorderLayout.SOUTH);
         exportPanel.add(exportPanel1, BorderLayout.WEST);
@@ -303,10 +359,16 @@ class ConfigurationDialog extends JDialog {
         JPanel exportPanel2 = new JPanel(new BorderLayout());
         exportPanel2.add(label("XML Schema (XSD)"), BorderLayout.NORTH);
         JPanel exportPanel2a = new JPanel(new BorderLayout());
-        exportPanel2a.add(labeledField("Directory", ProjectProperties.EXPORT_XSD_DIR, fieldColumns), BorderLayout.NORTH);
-        //exportPanel2a.add(labeledField("Wantlist File", ProjectProperties.EXPORT_WANTLIST_FILE, fieldColumns), BorderLayout.CENTER);
-        exportPanel2a.add(checkedBox("Include XSD in Message Specification", ProjectProperties.EXPORT_XSD), BorderLayout.CENTER);
-        exportPanel2a.add(checkedBox("Include WSDL in Message Specification", ProjectProperties.EXPORT_WSDL), BorderLayout.SOUTH);
+        JPanel exportPanel2b = new JPanel(new BorderLayout());
+        exportPanel2b.add(labeledField("Directory", ProjectProperties.EXPORT_XSD_DIR, fieldColumns), BorderLayout.NORTH);
+        exportPanel2b.add(labeledField("Wantlist File", ProjectProperties.EXPORT_WANTLIST_FILE, fieldColumns), BorderLayout.CENTER);
+        exportPanel2b.add(labeledField("cmfTool", ProjectProperties.EXPORT_CMFTOOL_TO_XSD, fieldColumns), BorderLayout.SOUTH);
+        JPanel exportPanel2c = new JPanel(new BorderLayout());
+        exportPanel2c.add(checkedBox("Include XSD in Message Specification", ProjectProperties.EXPORT_XSD), BorderLayout.NORTH);
+        exportPanel2c.add(checkedBox("Include WSDL in Message Specification", ProjectProperties.EXPORT_WSDL), BorderLayout.CENTER);
+        exportPanel2c.add(checkedBox("Use cmftool to generate XSDs from CMF", ProjectProperties.EXPORT_CMF_TO_XSD), BorderLayout.SOUTH);       
+        exportPanel2a.add(exportPanel2b, BorderLayout.NORTH);
+        exportPanel2a.add(exportPanel2c, BorderLayout.SOUTH);
         exportPanel2.add(exportPanel2a, BorderLayout.CENTER);
         exportPanel2.add(commandButton("Publish XSD","publishXSD"), BorderLayout.SOUTH);
         exportPanel.add(exportPanel2, BorderLayout.CENTER);
@@ -315,9 +377,16 @@ class ConfigurationDialog extends JDialog {
         JPanel exportPanel3 = new JPanel(new BorderLayout());
         exportPanel3.add(label("JSON Schema"), BorderLayout.NORTH);
         JPanel exportPanel3a = new JPanel(new BorderLayout());
-        exportPanel3a.add(labeledField("Directory", ProjectProperties.EXPORT_JSON_SCHEMA_DIR, fieldColumns), BorderLayout.NORTH);
-        exportPanel3a.add(checkedBox("Include JSON in Message Specification", ProjectProperties.EXPORT_JSON), BorderLayout.CENTER);
-        exportPanel3a.add(checkedBox("Include OpenAPI in Message Specification", ProjectProperties.EXPORT_OPENAPI), BorderLayout.SOUTH);
+        JPanel exportPanel3b = new JPanel(new BorderLayout());
+        exportPanel3b.add(labeledField("Directory", ProjectProperties.EXPORT_JSON_SCHEMA_DIR, fieldColumns), BorderLayout.NORTH);
+        exportPanel3b.add(labeledField("Schema File", ProjectProperties.EXPORT_JSON_SCHEMA_FILE, fieldColumns), BorderLayout.CENTER);
+        exportPanel3b.add(labeledField("cmfTool", ProjectProperties.EXPORT_CMFTOOL_TO_JSON, fieldColumns), BorderLayout.SOUTH);
+        JPanel exportPanel3c = new JPanel(new BorderLayout());
+        exportPanel3c.add(checkedBox("Include JSON in Message Specification", ProjectProperties.EXPORT_JSON), BorderLayout.NORTH);
+        exportPanel3c.add(checkedBox("Include OpenAPI in Message Specification", ProjectProperties.EXPORT_OPENAPI), BorderLayout.CENTER);
+        exportPanel3c.add(checkedBox("Use cmftool to generate JSON schema from  CMF", ProjectProperties.EXPORT_CMF_TO_JSON), BorderLayout.SOUTH);
+        exportPanel3a.add(exportPanel3b, BorderLayout.NORTH);
+        exportPanel3a.add(exportPanel3c, BorderLayout.SOUTH);
         exportPanel3.add(exportPanel3a, BorderLayout.CENTER);
         exportPanel3.add(commandButton("Publish JSON","publishJSON"), BorderLayout.SOUTH);
         exportPanel.add(exportPanel3, BorderLayout.EAST);
@@ -348,10 +417,11 @@ class ConfigurationDialog extends JDialog {
         metadataPanel3.add(labeledField("ChangeLog", ProjectProperties.IEPD_CHANGE_LOG_FILE, fieldColumns), BorderLayout.CENTER);
         metadataPanel3.add(labeledField("Readme", ProjectProperties.IEPD_READ_ME_FILE, fieldColumns), BorderLayout.SOUTH);
         metadataPanel.add(metadataPanel3, BorderLayout.EAST);
-
+        String externalSchemasProperty = properties.getProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS, "");
+        String[] externalNamespaces = externalSchemasProperty.isEmpty() ? new String[0] : externalSchemasProperty.split(",");
         // external schemas panel
         JPanel externalPanel = new JPanel(new BorderLayout());
-        String[] externalNamespaces = properties.getProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS).split(",");
+        //String[] externalNamespaces = properties.getProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS).split(",");
         int row = 0;
         String[][] data = new String[externalNamespaces.length][3];
         for (String namespace : externalNamespaces) {
@@ -359,7 +429,11 @@ class ConfigurationDialog extends JDialog {
             if (parts.length == 3)
                 data[row++] = parts;
         }
-        DefaultTableModel model = new DefaultTableModel(data, new String[]{"Prefix", "Namespace", "URL"});
+        String[] columnNames = {"Prefix", "Namespace", "URL"};
+        if (data.length > 0 && data[0].length != columnNames.length) {
+            throw new IllegalArgumentException("Data column count does not match the expected column structure.");
+        }
+        DefaultTableModel model = new DefaultTableModel(data, columnNames);
         JTable table = new JTable(model);
         Font font = new Font(Font.DIALOG, Font.PLAIN, 10);
         table.setFont(font);
@@ -414,10 +488,11 @@ class ConfigurationDialog extends JDialog {
                     url = urlValue.toString();
                 if (url.startsWith("http"))
 					try {
-                    URI uri = new URI(url);
-                    uri.toURL();
-                } catch (URISyntaxException | MalformedURLException e1) {
-                    Log.trace("URL " + url + " is malformed");
+                        URI uri = new URI(url);
+                        uri.toURL();
+                    } catch (MalformedURLException | URISyntaxException e1) {
+                        Log.trace("URL " + url + " is malformed" + e1.getMessage());
+                        throw new IllegalArgumentException("URL " + url + " is malformed", e1); 
                 }
                 if (prefix != null && !prefix.isEmpty() && namespace != null && !namespace.isEmpty()
                         && !url.isEmpty())
@@ -425,8 +500,9 @@ class ConfigurationDialog extends JDialog {
             }
             properties.setProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS, String.join(",", externalSchemas2));
 
-        } catch (RuntimeException e1) {
+        } catch (IllegalArgumentException | IllegalStateException e1) {
             Log.trace("ConfigurationDialog: exception " + e1.toString());
+            throw e1; // Rethrow the exception after logging
         }
 
         return command;

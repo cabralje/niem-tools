@@ -1,5 +1,3 @@
-package org.cabral.niemtools;
-
 /*
  *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
  *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
@@ -22,6 +20,40 @@ package org.cabral.niemtools;
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * The {@code NamespaceModel} class provides utility methods and data structures for managing
+ * XML namespaces, prefixes, and schema URIs within the context of NIEM (National Information Exchange Model)
+ * UML modeling. It supports caching, prefix filtering, namespace import/export, and integration with UML class views.
+ * <p>
+ * Key features include:
+ * <ul>
+ *   <li>Adding and retrieving namespaces and prefixes</li>
+ *   <li>Caching and resolving external schemas</li>
+ *   <li>Filtering and formatting XML tag and attribute names</li>
+ *   <li>Managing UML class views associated with namespaces</li>
+ *   <li>Importing namespaces from XML documents</li>
+ *   <li>Identifying infrastructure and NIEM-specific prefixes</li>
+ * </ul>
+ * <p>
+ * This class is intended for internal use within the NIEM UML modeling tools and assumes integration
+ * with supporting classes such as {@code NiemUmlModel}, {@code NiemModel}, {@code UmlClassView}, and {@code UmlItem}.
+ *
+ * <p>
+ * Thread safety: Uses concurrent data structures to support multi-threaded access.
+ *
+ * <p>
+ * Example usage:
+ * <pre>
+ *   Namespace ns = NamespaceModel.addNamespace("http://example.org/schema");
+ *   NamespaceModel.addPrefix("http://example.org/schema", "ex");
+ *   UmlClassView view = NamespaceModel.getNamespaceClassView(model, "ex", "http://example.org/schema");
+ * </pre>
+ *
+ * @author James Cabral
+ * @version 1.0
+ */
+package org.cabral.niemtools;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

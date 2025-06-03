@@ -1,5 +1,3 @@
-package org.cabral.niemtools;
-
 /*
  *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
  *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
@@ -22,6 +20,43 @@ package org.cabral.niemtools;
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+/**
+ * XmlWriter is a utility class for exporting NIEM (National Information Exchange Model)
+ * artifacts such as Genericode code lists, NIEM MPD catalogs, WSDL definitions, XML catalogs,
+ * and XML schemas. It provides methods to generate and write XML-based files for NIEM
+ * model elements, code lists, web service definitions, and related resources.
+ * <p>
+ * The class manages XML namespace declarations, schema imports, and file output for
+ * various NIEM-related artifacts. It supports code list enumeration, schema element and
+ * attribute generation, and WSDL message/port/binding creation.
+ * <p>
+ * Key features:
+ * <ul>
+ *   <li>Export Genericode code lists for NIEM enumerations</li>
+ *   <li>Export NIEM MPD (Model Package Description) catalogs</li>
+ *   <li>Export WSDL files for web service definitions</li>
+ *   <li>Export XML catalog files for schema resolution</li>
+ *   <li>Export XML schema files for NIEM namespaces</li>
+ *   <li>Utility methods for writing XML attributes and namespaces</li>
+ * </ul>
+ * <p>
+ * This class depends on several NIEM and UML model classes, and expects a directory
+ * path for output file generation.
+ *
+ * @author James Cabral
+ * @version 1.0
+ * @see NiemModel
+ * @see NiemUmlModel
+ * @see NamespaceModel
+ * @see UmlClass
+ * @see UmlClassInstance
+ * @see UmlAttribute
+ * @see UmlOperation
+ * @see ProjectProperties
+ */
+package org.cabral.niemtools;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -48,6 +83,7 @@ import fr.bouml.UmlParameter;
 import fr.bouml.UmlRelation;
 import fr.bouml.aRelationKind;
 import fr.bouml.anItemKind;
+
 
 public class XmlWriter {
 

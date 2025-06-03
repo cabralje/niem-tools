@@ -10,7 +10,7 @@ This is a quick HOWTO for getting started with using `BoUML` and `niemtools` to 
 6. [Publish NIEM message specification](#6-publish-niem-message-specification)
 
 ---
-## 1. Install BoUML and niem-tools
+## 1. Install BoUML, niem-tools and cmftool
 ### 1a.  Install BoUML
 * Download and install the latest version of [BoUML](https://bouml.fr) for Windows. Mac or Linux.
 ### 1b. Install niem-tools
@@ -20,12 +20,15 @@ This is a quick HOWTO for getting started with using `BoUML` and `niemtools` to 
 * Start BoUML.
 * Click on `Miscellaneous->Set Environment`.
 * Under `Template Project`, select the location of the `bouml/niem-project/niem-project.prj` BoUML project template in the `niemtools` download.
+### 1d. Install cmftool (recommended)
+* Download and extract [cmftool](https://github.com/niemopen/cmftool/tags)
+* Add the `bin` directory to your system path.
 ## 2. Model messages in UML
 ### 2a. Create a NIEM Message Specification Project
 * In BoUML, click on `Project -> Create from Template`.
 * Select the location for your BoUML project.
 ### 2b. Import the NIEM reference model
-* Download the release of the [NIEM reference model](https://niem.github.io/niem-releases/) to use.
+* Download the expand the release of the [NIEM reference model](https://github.com/niemopen/niem-model/tags) to use.
 * In Bouml, click on `Tools -> Import Reference Model`.
 * There are several options to control the NIEM domains and codes to be included in the model:
   * To import only specific NIEM domains, enter a comma-separated list domains to import under `Include domains`.
@@ -74,10 +77,10 @@ This is a quick HOWTO for getting started with using `BoUML` and `niemtools` to 
 ### 4b. Publish the XSD and/or JSON schema representation(s) of the NIEM model
 * There are several options for publishing representations of the NIEM model in XSD and/or JSON schema format, including
   * Upload the CMF to the [NIEM Toolbox](https://niemopen.github.io/niem-toolbox/) tool.
-  * Install and run [cmftool](https://github.com/niemopen/cmftool).
   * In BoUML, select `Tools -> Publish XSD` or `Tools -> Publish JSON`.
+    * To use `cmftool`, select the `Use cmftool to generate XSDs (or JSON) from CMF` options.
     * Extension schemas will be published in the `schema` folder.
-    * The NIEM subset wantlist for import into the [NIEM Subset Schema Generator Tool](https://tools.niem.gov/niemtools/ssgt/index.iepd) will be in the `schema\wantlist.xml` file.
+    * If `cmtool` is not used, the NIEM subset wantlist for import into the [NIEM Subset Schema Generator Tool](https://tools.niem.gov/niemtools/ssgt/index.iepd) will be in the `schema\wantlist.xml` file.
   * Use a XML/JSON editor (e.g. Oxygen, XMLSpy) to generate XML or JSON examples of each message from the schemas.
     * Validate the examples satisfy the data requirements modeled in step 2.
     * If necessary, repeat steps 3 and 4, until the examples are acceptable.

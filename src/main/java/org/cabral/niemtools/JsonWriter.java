@@ -1,5 +1,3 @@
-package org.cabral.niemtools;
-
 /*
  *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
  *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
@@ -22,6 +20,35 @@ package org.cabral.niemtools;
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * The {@code JsonWriter} class provides methods for exporting UML models to JSON Schema and OpenAPI definitions.
+ * <p>
+ * This class supports:
+ * <ul>
+ *   <li>Generating JSON Schema files for NIEM and extension schemas from UML models.</li>
+ *   <li>Exporting OpenAPI (Swagger) definitions for web service interfaces described in UML.</li>
+ *   <li>Mapping UML primitive and XML Schema types to JSON Schema types.</li>
+ *   <li>Handling JSON-LD context and namespace definitions.</li>
+ *   <li>Supporting multiplicity, required properties, and references between schema components.</li>
+ * </ul>
+ * <p>
+ * The class relies on NIEM UML and namespace models, and expects UML elements to be provided by the Bouml tool.
+ * <p>
+ * Usage:
+ * <pre>
+ *     JsonWriter writer = new JsonWriter(outputDirectory);
+ *     writer.exportJsonSchema(...);
+ *     writer.exportOpenApi(...);
+ * </pre>
+ * 
+ * @author James Cabral
+ * @version 1.0
+ * @see NiemUmlModel
+ * @see NamespaceModel
+ * @see ProjectProperties
+ */
+package org.cabral.niemtools;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -616,7 +643,6 @@ public class JsonWriter {
         // if (baseType != null)
         // jsonDefinition.add("\"$ref\": \"" +
         // exportJsonTypePointer(getPrefixedName(baseType), prefix) + "\"");
-        // TODO exportJsonTypeSchema: fix this
         jsonDefinition.add("\"type\": \"object\"");
         jsonDefinition.add("\"additionalProperties\" : " + anyJSON);
 
@@ -1098,6 +1124,10 @@ public class JsonWriter {
         String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
         boolean isNiem = NamespaceModel.getNamespace(schemaURI).getReferenceClassView() != null;
         return Paths.get(directory, (isNiem) ? NiemUmlModel.NIEM_DIR + "/" : "", prefix + JsonWriter.JSON_SCHEMA_FILE_TYPE);
+    }
+
+    static String getJsonFilename(String filename) {
+        return filename + JsonWriter.JSON_SCHEMA_FILE_TYPE;
     }
 
 }

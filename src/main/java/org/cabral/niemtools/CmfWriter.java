@@ -1,3 +1,57 @@
+/*
+ *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
+ *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
+ *   UML Platform Specific Model (PSM), the NIEM reference/subset/extension model, and a UML Platform Specific Model (NIEM), NIEM XML Schema.
+ *
+ *   NOTE: This plug_out requires that the BOUML project include a simple NIEM profile that provides the stereotypes required for mapping.
+ *   
+ *   Copyright (C) 2025 James E. Cabral Jr., jim@cabral.org, http://github.com/cabralje
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * The {@code CmfWriter} class is responsible for exporting NIEM extension and exchange schemas
+ * into the Common Model Format (CMF). It generates CMF XML files from UML models, handling
+ * namespaces, classes, properties, datatypes, restrictions, and augmentations according to
+ * the specified CMF version.
+ * <p>
+ * Key features include:
+ * <ul>
+ *   <li>Exporting NIEM subset and extension namespaces, classes, and properties to CMF.</li>
+ *   <li>Supporting multiple CMF versions, with logic to adjust tag names and structure for older versions.</li>
+ *   <li>Handling of datatypes, restrictions, enumerations, and augmentations.</li>
+ *   <li>Generation of XML content with appropriate IDs and references for CMF elements.</li>
+ *   <li>Utility methods for managing multiplicity, base types, and class/property distinctions.</li>
+ * </ul>
+ * <p>
+ * This class relies on several supporting classes, including {@code NiemUmlModel}, {@code NiemModel},
+ * {@code NamespaceModel}, and {@code XmlWriter}, as well as the Bouml UML API classes.
+ * <p>
+ * Usage example:
+ * <pre>
+ *     CmfWriter writer = new CmfWriter("outputDir", "1.0");
+ *     writer.exportCmf("outputDir", "MyModel");
+ * </pre>
+ * <p>
+ * Note: This class is intended for internal use within NIEM tools and assumes the presence of
+ * a properly initialized UML model.
+ *
+ * @author James Cabral
+ * @version 1.0
+ */
+
 package org.cabral.niemtools;
 
 import java.io.File;
@@ -26,7 +80,6 @@ public class CmfWriter {
     private static final String CMF_OLDURI = "http://reference.niem.gov/specification/cmf/";
     private static final String CMF_PREFIX = "cmf";
     private static final String CMF_FILE_TYPE = ".cmf";
-    private static final String CMF_FILE = "model";
     //@SuppressWarnings("unused")
 
     private final Set<String> tagIds = new HashSet<>();
@@ -162,13 +215,23 @@ public class CmfWriter {
     }
 
     /**
+     * 
+     * @param filename
+     * @param version
+     * @return
+     */
+    static public String getCmfFilename(String filename, String version) {
+        return filename + "-" + version + CMF_FILE_TYPE;
+    }
+
+    /**
      * @param cmfDir
      * @param messages
      */
-    public void exportCmf(String cmfDir) throws IOException {
+    public void exportCmf(String cmfDir, String cmfFile) throws IOException {
 
         Log.start("exportCmf");
-        String path1 = CMF_FILE + "-" + cmfVersion + CMF_FILE_TYPE;                
+        String path1 = getCmfFilename(cmfFile, cmfVersion);                
         Log.trace("Generating CMF model version " + cmfVersion + " in " + cmfDir + "\\" + path1);
 
         String cmfUri = CMF_URI + cmfVersion + "/";
@@ -552,7 +615,7 @@ public class CmfWriter {
      * @param element
      * @return CMF property definition
      */
-    // TODO exportCmfProperty: handle abstract properties
+    // FIXME cmftool generating duplicate augmentation points
     private String exportCmfProperty(UmlClassInstance element) {
         String id = NamespaceModel.filterAttributePrefix(NamespaceModel.getPrefixedName(element));
         if (id == null || id.isEmpty()) {

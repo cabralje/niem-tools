@@ -1,5 +1,3 @@
-package org.cabral.niemtools;
-
 /*
  *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
  *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
@@ -22,6 +20,43 @@ package org.cabral.niemtools;
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * The NiemUmlModel class provides methods and utilities for managing NIEM (National Information Exchange Model)
+ * UML models, including reference, subset, and extension models. It supports importing and exporting NIEM mapping
+ * spreadsheets, generating NIEM-compliant schemas and documentation, and managing stereotypes and properties
+ * associated with NIEM elements and types.
+ * <p>
+ * Key features include:
+ * <ul>
+ *   <li>Importing NIEM reference schemas and mapping spreadsheets (CSV format).</li>
+ *   <li>Exporting NIEM mapping spreadsheets (CSV/HTML), wantlists, and specification artifacts (XSD, JSON, WSDL, OpenAPI, CMF).</li>
+ *   <li>Creating and deleting NIEM subset and extension models within a UML project.</li>
+ *   <li>Managing stereotypes, code lists, and facets for NIEM UML items.</li>
+ *   <li>Supporting validation and lookup of NIEM elements and types.</li>
+ *   <li>Generating HTML documentation for UML models.</li>
+ * </ul>
+ * <p>
+ * This class relies on the BoUML Java API and several supporting classes (e.g., NiemModel, NamespaceModel, UmlItem, UmlClass, etc.).
+ * It is intended for use in tools that automate the creation, validation, and export of NIEM-conformant UML models.
+ *
+ * <p>
+ * Usage typically involves:
+ * <ol>
+ *   <li>Importing NIEM reference schemas using {@link #importSchemaDir(String)}.</li>
+ *   <li>Creating NIEM subset and extension models with {@link #createSubsetAndExtension()}.</li>
+ *   <li>Exporting mappings and specifications using the various export methods.</li>
+ *   <li>Managing stereotypes and properties for UML items as needed.</li>
+ * </ol>
+ *
+ * <p>
+ * Note: Many methods are static and operate on shared model instances for reference, subset, and extension models.
+ * Project-specific properties are managed via the {@link ProjectProperties} class.
+ *
+ * @author James Cabral
+ * @version 6.0
+ */
+package org.cabral.niemtools;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -38,7 +73,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Vector;
+//import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -219,17 +254,19 @@ public class NiemUmlModel {
             modelPackageName = item.parent().parent().name(); 
         else if (kind == anItemKind.aClassView)
             modelPackageName = item.parent().name();
-        switch (modelPackageName) {
-            case NIEM_REFERENCE_PACKAGE:
-                return ReferenceModel;
-            case NIEM_SUBSET_PACKAGE:
-                return SubsetModel;
-            case NIEM_EXTENSION_PACKAGE:
-                return ExtensionModel;
-            default:
-                Log.trace("getModel - error - no model for " + item.name());
-                return null;
-        }
+        if (modelPackageName != null)
+            switch (modelPackageName) {
+                case NIEM_REFERENCE_PACKAGE -> {
+                    return ReferenceModel;
+            }
+                case NIEM_SUBSET_PACKAGE -> {
+                    return SubsetModel;
+            }
+                case NIEM_EXTENSION_PACKAGE -> {
+                    return ExtensionModel;
+            }
+                default -> Log.trace("getModel - error - no model for " + item.name());
+            }
         //if (modelPackage == ReferenceModel.getModelPackage())
         //    return ReferenceModel; 
         //else if (modelPackage == SubsetModel.getModelPackage())
@@ -237,7 +274,7 @@ public class NiemUmlModel {
         //else if (modelPackage == ExtensionModel.getModelPackage())
         //    return ExtensionModel;
         //Log.trace("getModel - error - no model for " + item.name());
-        //return null;
+        return null;
     }
 
     /**
@@ -425,8 +462,8 @@ public class NiemUmlModel {
      * creates NIEM subset and extension models
      *
      */
-    // TODO createSubsetAndExtension: add facets properties
     // TODO createSubsetAndExtension: ensure all NIEM types and elements are in the reference model
+    // TODO allow namespaces with a "-" in the prefix (not supported by UmlAttribute)
     //@SuppressWarnings("unchecked")
     @SuppressWarnings("unchecked")
     public void createSubsetAndExtension() {
@@ -438,11 +475,8 @@ public class NiemUmlModel {
         Log.start("createSubsetAndExtension - add types");
         // add types to subset and extension
         Log.debug("createSubsetAndExtension: copy subset types and create extension types");
-        Vector<UmlItem> all = UmlItem.all;
-        Iterator<UmlItem> it = all.iterator();
-        while (it.hasNext()) {
-            UmlItem item = it.next();
-
+        java.util.Vector<UmlItem> all = (java.util.Vector<UmlItem>) UmlItem.all;
+        for (UmlItem item : all) {
             if (!isNiemUml(item))
                 continue;
 
@@ -461,21 +495,21 @@ public class NiemUmlModel {
             // skip elements in types
             if (elementName.isEmpty())
                 if (NiemModel.isAugmentation(typeName))
-                    description = "An augmentation type"; 
+                    description = "An augmentation type";
                 else 
                     description = item.description().trim();
 
             // add base type
-            if (!baseTypeName.isEmpty()) 
-                if (isNiemType(baseTypeName)) 
-                    SubsetModel.copyType(baseTypeName); 
+            if (!baseTypeName.isEmpty())
+                if (isNiemType(baseTypeName))
+                    SubsetModel.copyType(baseTypeName);
                 else 
                     ExtensionModel.addType(NamespaceModel.getSchemaURI(baseTypeName), baseTypeName, null, null);
 
             // add type
             if (!typeName.isEmpty())
                 if (isNiemType(typeName))
-                    SubsetModel.copyType(typeName); 
+                    SubsetModel.copyType(typeName);
                 else 
                     ExtensionModel.addType(NamespaceModel.getSchemaURI(typeName), typeName, description, notes);
         }
@@ -484,7 +518,7 @@ public class NiemUmlModel {
 
         // relate extension types to base types and attribute groups
         Log.debug("createSubsetAndExtension: copy subset base types and create extension base types");
-        it = UmlItem.all.iterator();
+        Iterator<UmlItem> it = UmlItem.all.iterator();
         while (it.hasNext()) {
             UmlItem item = it.next();
             if (!isNiemUml(item))
@@ -628,13 +662,11 @@ public class NiemUmlModel {
      * deletes NIEM mappings
      *
      */
-    //@SuppressWarnings("unchecked")
     public void deleteMapping() {
         Log.trace("Deleting NIEM Mapping");
-        Vector<UmlItem> all = UmlItem.all;
-        Iterator<UmlItem> it = all.iterator();
-        while (it.hasNext()) {
-            UmlItem item = it.next();
+        @SuppressWarnings("unchecked")
+        java.util.Vector<UmlItem> all = (java.util.Vector<UmlItem>) UmlItem.all;
+        for (UmlItem item : all) {
             if (isNiemUml(item) && item.kind() != anItemKind.aClassInstance)
                 for (int property = 4; property < NIEM_STEREOTYPE_MAP.length; property++)
                     item.set_PropertyValue(getNiemProperty(property), "");
@@ -813,7 +845,8 @@ public class NiemUmlModel {
         Map<String, UmlClassInstance> messages = new TreeMap<>();
         Set<String> messageNamespaces = new TreeSet<>();
         messageNamespaces.add(NiemModel.XSD_PREFIX);
-        Iterator<UmlItem> it = (UmlClass.classes.iterator());
+        @SuppressWarnings("unchecked")
+        Iterator<UmlItem> it = (Iterator<UmlItem>) UmlClass.classes.iterator();
         while (it.hasNext()) {
             UmlItem item = it.next();
             if (!item.stereotype().equals("interface") && !item.stereotype().equals(INTERFACE_STEREOTYPE))
@@ -947,14 +980,15 @@ public class NiemUmlModel {
     public void exportCmf() {
         String cmfDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
                         properties.getProperty(ProjectProperties.EXPORT_CMF_DIR);
+        String cmfFile = properties.getProperty(ProjectProperties.EXPORT_CMF_FILE);
         String cmfVersion = properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION);
         if (cmfDir != null && cmfVersion != null)
             try {
             CmfWriter cmfWriter = new CmfWriter(cmfDir, "1.0");
-            cmfWriter.exportCmf(cmfDir);
+            cmfWriter.exportCmf(cmfDir, cmfFile);
             if (!cmfVersion.equals("1.0")) {
                 cmfWriter = new CmfWriter(cmfDir, cmfVersion);
-                cmfWriter.exportCmf(cmfDir);
+                cmfWriter.exportCmf(cmfDir, cmfFile);
             }
         } catch (IOException e) {
             Log.trace("exportSpecification: error exporting common model format files " + e.toString());
@@ -969,7 +1003,6 @@ public class NiemUmlModel {
      * @param dir
      * @param filename
      */
-    // FIXME: empty wantlist
     public void exportWantlist() {
 
         String directory = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);

@@ -1,5 +1,3 @@
-package org.cabral.niemtools;
-
 /*
  *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
  *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
@@ -22,6 +20,39 @@ package org.cabral.niemtools;
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * The {@code NamespaceResolver} class implements the {@link NamespaceContext} interface
+ * to resolve XML namespaces within a DOM tree. It parses a given DOM {@link Node} (typically
+ * a Document or Element) and caches all namespace declarations found, allowing for efficient
+ * namespace URI and prefix lookups.
+ * <p>
+ * The resolver can be configured to examine only the top-level node or recursively traverse
+ * all descendant nodes to collect namespace information.
+ * </p>
+ * <p>
+ * This class is thread-safe due to its use of {@link ConcurrentHashMap} for internal caches.
+ * </p>
+ *
+ * <h2>Usage</h2>
+ * <pre>
+ *     NamespaceResolver resolver = new NamespaceResolver(documentNode, true);
+ *     String uri = resolver.getNamespaceURI("prefix");
+ * </pre>
+ *
+ * <h2>Features</h2>
+ * <ul>
+ *   <li>Parses and caches namespace declarations from a DOM node.</li>
+ *   <li>Supports both default and prefixed namespaces.</li>
+ *   <li>Implements {@link NamespaceContext} for use with XPath and other XML APIs.</li>
+ *   <li>Thread-safe cache for prefix-to-URI and URI-to-prefix mappings.</li>
+ * </ul>
+ *
+ * @author James Cabral
+ * @see NamespaceContext
+ * @see Node
+ */
+package org.cabral.niemtools;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

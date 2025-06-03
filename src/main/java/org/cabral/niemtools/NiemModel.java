@@ -1,5 +1,3 @@
-package org.cabral.niemtools;
-
 /*
  *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
  *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
@@ -22,10 +20,44 @@ package org.cabral.niemtools;
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ * The {@code NiemModel} class provides methods and constants for managing and manipulating
+ * NIEM (National Information Exchange Model) reference, subset, and extension models
+ * within a UML modeling environment. It supports importing NIEM schemas, caching model
+ * elements and types, exporting schemas to XML and JSON, and handling NIEM-specific
+ * naming, design rules, and conformance targets.
+ * <p>
+ * Key features include:
+ * <ul>
+ *   <li>Importing NIEM elements, types, and attribute groups from XML Schema documents.</li>
+ *   <li>Caching and managing UML representations of NIEM elements, types, and their relationships.</li>
+ *   <li>Exporting NIEM models to XML Schema (XSD) and JSON Schema formats.</li>
+ *   <li>Supporting NIEM naming conventions, namespace management, and code list handling.</li>
+ *   <li>Providing utility methods for filtering and validating NIEM model names and values.</li>
+ *   <li>Managing UML stereotypes, descriptions, and custom properties for NIEM artifacts.</li>
+ * </ul>
+ * <p>
+ * This class interacts with UML modeling classes (such as {@code UmlClass}, {@code UmlClassInstance},
+ * {@code UmlAttribute}, and {@code UmlRelation}) and relies on supporting classes for namespace
+ * resolution, logging, and schema writing.
+ * <p>
+ * <b>Note:</b> This class is intended for internal use within NIEM UML modeling tools and assumes
+ * the presence of supporting infrastructure for UML and XML processing.
+ *
+ * @author James Cabral
+ * @version 1.0
+ * @see NamespaceModel
+ * @see NiemUmlModel
+ * @see UmlClass
+ * @see UmlClassInstance
+ * @see UmlAttribute
+ * @see UmlRelation
+ */
+package org.cabral.niemtools;
+
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -182,6 +214,7 @@ class NiemModel {
      * @param item
      * @return base type related to a type or element as a UmlClass
      */
+    @SuppressWarnings("unused")
     static UmlClass getBaseType(UmlItem item) {
         UmlClass baseType = null;
         switch (item.kind().value()) {
@@ -337,7 +370,7 @@ class NiemModel {
         //elementInType.set_Type(element.type());
 
         // copy properties
-        Hashtable<String, String> properties = element.properties();
+        java.util.Hashtable<String, String> properties = element.properties();
         for (String key : properties.keySet())
             elementInType.set_PropertyValue(key, properties.get(key));
 
@@ -578,7 +611,7 @@ class NiemModel {
 
         // copy properties
         String uri = getURI(schemaURI, elementName);
-        Hashtable<String, String> properties = sourceElement.properties();
+        java.util.Hashtable<String, String> properties = sourceElement.properties();
         for (String key : properties.keySet())
             element.set_PropertyValue(key, key.equals(NiemUmlModel.URI_PROPERTY) ? uri : properties.get(key));
         //String uri = getURI(schemaURI, elementName);
@@ -623,7 +656,7 @@ class NiemModel {
             relateElementInType(attribute, element);
 
             // copy properties
-            Hashtable<String, String> properties = element.properties();
+            java.util.Hashtable<String, String> properties = element.properties();
             for (String key : properties.keySet())
                 attribute.set_PropertyValue(key, properties.get(key));
             //attribute.set_PropertyValue(URI_PROPERTY, getURI(element));
@@ -684,7 +717,7 @@ class NiemModel {
             type.set_BaseType(baseTypeSpec);
 
         // copy type properties
-        Hashtable<String, String> properties = sourceType.properties();
+        java.util.Hashtable<String, String> properties = sourceType.properties();
         for (String key : properties.keySet())
             type.set_PropertyValue(key, properties.get(key));
         //type.set_PropertyValue(URI_PROPERTY, getURI(sourceType));
@@ -1054,6 +1087,7 @@ class NiemModel {
      * @param item
      * @return a referenced element in model as a UmlClassInstance
      */
+    @SuppressWarnings("unused")
     UmlClassInstance getReferencedElement(UmlItem item) {
         anItemKind kind = item.kind();
         //if (item.kind() != anItemKind.anAttribute)
@@ -1972,13 +2006,12 @@ class NiemModel {
     private void setNotes(UmlItem item, String notes) {
         if ((item != null) && (notes != null) && (!notes.isEmpty())) {
             String currentNotes = item.propertyValue(NiemUmlModel.NOTES_PROPERTY);
-            if (currentNotes == null)
+            if (currentNotes == null) {
                 currentNotes = notes;
-            else if (!currentNotes.contains(notes)) {
+            } else if (!currentNotes.contains(notes))
                 currentNotes = currentNotes + "; " + notes;
             if (!currentNotes.isEmpty())
                 item.set_PropertyValue(NiemUmlModel.NOTES_PROPERTY, currentNotes);
             }
         }
-    }
 }

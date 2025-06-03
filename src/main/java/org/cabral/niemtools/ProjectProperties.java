@@ -1,3 +1,60 @@
+/*
+ *   NIEMtools - This is a plug_out that extends the BOUML UML tool with support for the National Information Exchange Model (NIEM) defined at http://niem.gov.
+ *   Specifically, it enables a UML Common Information Model (CIM), an abstract class mode, to be mapped into a
+ *   UML Platform Specific Model (PSM), the NIEM reference/subset/extension model, and a UML Platform Specific Model (NIEM), NIEM XML Schema.
+ *
+ *   NOTE: This plug_out requires that the BOUML project include a simple NIEM profile that provides the stereotypes required for mapping.
+ *   
+ *   Copyright (C) 2025 James E. Cabral Jr., jim@cabral.org, http://github.com/cabralje
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
+ * ProjectProperties is a specialized {@link Properties} class that manages configuration
+ * properties for a NIEM tools project. It provides a set of predefined property keys
+ * for import, export, and message specification settings, and synchronizes these properties
+ * with a BOUML UML project.
+ * <p>
+ * The class supports loading properties from the associated UML project, storing properties
+ * back to the project, and initializing with a set of default values.
+ * </p>
+ *
+ * <h2>Property Categories:</h2>
+ * <ul>
+ *   <li><b>Import Properties:</b> Control how code descriptions, facets, and domains are imported.</li>
+ *   <li><b>Export Properties:</b> Configure export options such as URIs, schema locations, and output formats (CMF, HTML, XSD, JSON, WSDL, OpenAPI).</li>
+ *   <li><b>Message Specification Properties:</b> Define metadata for the IEPD (Information Exchange Package Documentation), such as name, version, organization, and contact information.</li>
+ *   <li><b>Import/Export Paths:</b> Specify directories and filenames for importing reference models and exporting generated artifacts.</li>
+ * </ul>
+ *
+ * <h2>Usage:</h2>
+ * <ul>
+ *   <li>Use {@link #getDefaults()} to obtain a Properties object with default values.</li>
+ *   <li>Call {@link #load()} to populate properties from the UML project.</li>
+ *   <li>Use {@link #store()} to persist properties back to the UML project.</li>
+ *   <li>Setting a property via {@link #setProperty(String, String)} will also update the UML project.</li>
+ * </ul>
+ *
+ * <h2>Thread Safety:</h2>
+ * <p>
+ * The {@link #setProperty(String, String)} method is synchronized to ensure thread safety
+ * when updating properties.
+ * </p>
+ *
+ * @author James Cabral
+ * @version 1.0
+ */
 package org.cabral.niemtools;
 
 import java.util.Enumeration;
@@ -6,9 +63,7 @@ import java.util.Properties;
 
 import fr.bouml.UmlPackage;
 
-/**
- * Properties implementation that loads and stores properties from a BOUML UmlPackage project.
- */
+
 public class ProjectProperties extends Properties {
 
     // import properties
@@ -25,7 +80,11 @@ public class ProjectProperties extends Properties {
     static final String EXPORT_CMF = "ExportCMF";
     static final String EXPORT_HTML = "ExportHTML";
     static final String EXPORT_XSD = "ExportXSD";
+    static final String EXPORT_CMF_TO_XSD = "ExportCMFtoXSD";
+    static final String EXPORT_CMFTOOL_TO_XSD = "ExportCMFTooltoXSD";
     static final String EXPORT_JSON = "ExportJSON";
+    static final String EXPORT_CMF_TO_JSON = "ExportCMFtoJSON";
+    static final String EXPORT_CMFTOOL_TO_JSON = "ExportCMFTooltoJSON";
     static final String EXPORT_WSDL = "ExportWSDL";
     static final String EXPORT_OPENAPI = "ExportOpenAPI";     
 
@@ -50,9 +109,11 @@ public class ProjectProperties extends Properties {
     static final String EXPORT_PROJECT_DIR = "ExportProjectDir";
     static final String EXPORT_MODEL_DIR = "html dir";
     static final String EXPORT_CMF_DIR = "ExportCMFDir";
+    static final String EXPORT_CMF_FILE = "ExportCMFFile";
     static final String EXPORT_XSD_DIR = "ExportXSDDir";
     static final String EXPORT_XML_DIR = "ExportXMLDir";
     static final String EXPORT_JSON_SCHEMA_DIR = "ExportJSONSchemaDir";
+    static final String EXPORT_JSON_SCHEMA_FILE = "ExportJSONSchemaFile";
     static final String EXPORT_JSON_DIR = "ExportJSONDir"; 
     static final String EXPORT_WSDL_DIR = "ExportWSDLDir";
     static final String EXPORT_OPENAPI_DIR = "ExportOpenAPIDir";
@@ -98,7 +159,11 @@ public class ProjectProperties extends Properties {
         defaults.setProperty(EXPORT_CMF,"true");
         defaults.setProperty(EXPORT_HTML,"true");
         defaults.setProperty(EXPORT_XSD,"true");
+        defaults.setProperty(EXPORT_CMF_TO_XSD,"true");
+        defaults.setProperty(EXPORT_CMFTOOL_TO_XSD,"cmftool.bat m2xmsg -d -c -o");
         defaults.setProperty(EXPORT_JSON,"true");
+        defaults.setProperty(EXPORT_CMF_TO_JSON,"true");
+        defaults.setProperty(EXPORT_CMFTOOL_TO_JSON,"cmftool.bat m2jmsg -o");
         defaults.setProperty(EXPORT_WSDL,"true");
         defaults.setProperty(EXPORT_OPENAPI,"true");
 
@@ -123,9 +188,11 @@ public class ProjectProperties extends Properties {
         defaults.setProperty(EXPORT_PROJECT_DIR, System.getProperty("user.home"));
         defaults.setProperty(EXPORT_MODEL_DIR,"model");
         defaults.setProperty(EXPORT_CMF_DIR,"cmf");
+        defaults.setProperty(EXPORT_CMF_FILE,"model");
         defaults.setProperty(EXPORT_XSD_DIR,"schema");
         defaults.setProperty(EXPORT_XML_DIR,"examples");
         defaults.setProperty(EXPORT_JSON_SCHEMA_DIR,"json\\schema");
+        defaults.setProperty(EXPORT_JSON_SCHEMA_FILE,"model");
         defaults.setProperty(EXPORT_JSON_DIR,"json\\examples");
         defaults.setProperty(EXPORT_WSDL_DIR,"WS-SIP");
         defaults.setProperty(EXPORT_OPENAPI_DIR,"json");
