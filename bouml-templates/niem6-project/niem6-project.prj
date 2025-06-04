@@ -1,6 +1,6 @@
 format 224
 "niem6-project"
-  revision 7
+  revision 8
   modified_by 2 "JamesCabral"
 
 
@@ -44,7 +44,7 @@ format 224
 
   mark_for_import
   
-  ncouples 38
+  ncouples 44
   key "ImportReferenceModelDir" value "C:\\Users\\JamesCabral\\git\\niem-model\\xsd"
   key "ImportIncludeDomains" value ""
   key "ImportExcludeDomains" value "mo, mo-usmtf"
@@ -83,6 +83,12 @@ format 224
   key "IEPDChangeLogFile" value "changelog.txt"
   key "ExportWSDLDir" value "WS-SIP"
   key "IEPDConformanceFile" value "conformance-assertion.pdf"
+  key "ExportCMFTooltoJSON" value "cmftool.bat m2jmsg -o"
+  key "ExportJSONSchemaFile" value "model"
+  key "ExportCMFtoJSON" value "true"
+  key "ExportCMFTooltoXSD" value "cmftool.bat m2xmsg -d -c -o"
+  key "ExportCMFFile" value "model"
+  key "ExportCMFtoXSD" value "true"
   package_ref 134530 // niem-profile
 
   package_ref 141058 // UML

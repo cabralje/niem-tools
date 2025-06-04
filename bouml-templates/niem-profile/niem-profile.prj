@@ -1,6 +1,6 @@
 format 224
 "niem-profile"
-  revision 160
+  revision 161
   modified_by 2 "JamesCabral"
 
 
@@ -45,7 +45,7 @@ format 224
   mark_for_import
   
   stereotype "profile"
-  ncouples 27
+  ncouples 71
   key "" value ""
   key "" value ""
   key "" value ""
@@ -73,6 +73,50 @@ format 224
   key "gxmi gen eclipse" value "no"
   key "gxmi comment exporter" value "no"
   key "gxmi linefeed" value "no"
+  key "ExportExternalSchemas" value "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,cbc=urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonBasicComponents-2.1.xsd,ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd"
+  key "IEPDEmail" value "email@example.com"
+  key "ImportExcludeCodes" value ""
+  key "ExportCMFTooltoJSON" value "cmftool.bat m2jmsg -o"
+  key "IEPDLicense" value "https://opensource.org/licenses/BSD-3-Clause"
+  key "IEPDStatus" value "Draft"
+  key "ExportJSONSchemaDir" value "json\\schema"
+  key "ExportCMF" value "true"
+  key "ExportJSONSchemaFile" value "model"
+  key "html dir" value "model"
+  key "ExportCMFDir" value "cmf"
+  key "ExportCMFVersion" value "0.8"
+  key "ExportCMFtoJSON" value "true"
+  key "ExportCMFTooltoXSD" value "cmftool.bat m2xmsg -d -c -o"
+  key "ExportURI" value "http://local"
+  key "IEPDVersion" value "1.0"
+  key "IEPDTermsOfService" value "example.com/terms"
+  key "ImportReferenceModelDir" value ""
+  key "ImportMaxFacets" value "300"
+  key "ExportHTML" value "true"
+  key "ExportXMLDir" value "examples"
+  key "niem-mapping" value "niem-mapping.csv"
+  key "ExportXSDDir" value "schema"
+  key "ExportCMFFile" value "model"
+  key "IEPDReadMeFile" value "readme.txt"
+  key "ImportIncludeDomains" value "justice, hs"
+  key "ExportJSONDir" value "json\\examples"
+  key "IEPDName" value "NIEM Message Specification"
+  key "ExportWSDL" value "true"
+  key "ExportProjectDir" value "C:\\Users\\JamesCabral"
+  key "IEPDCatalogFile" value "mpd-catalog.xml"
+  key "ExportOpenAPI" value "true"
+  key "ExportCMFtoXSD" value "true"
+  key "ExportJSON" value "true"
+  key "ImportExcludeDomains" value ""
+  key "IEPDOrganization" value "Organization Name"
+  key "ExportXSD" value "true"
+  key "IEPDContact" value "Contact Name"
+  key "ExportOpenAPIDir" value "json"
+  key "ExportWantlistFile" value "schema\\wantlist"
+  key "ImportCodeDescriptions" value "true"
+  key "IEPDChangeLogFile" value "changelog.txt"
+  key "ExportWSDLDir" value "WS-SIP"
+  key "IEPDConformanceFile" value "conformance-assertion.pdf"
   classview 172802 "Stereotypes"
     
     classdiagramsettings member_max_width 0 end

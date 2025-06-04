@@ -17,19 +17,4 @@ tool "HTML documentation" "ghtml" Activity InterruptibleActivityRegion Expansion
 tool "HTML doc. (flat)" "ghtml -flat" Activity InterruptibleActivityRegion ExpansionRegion ActivityObject ActivityAction Parameter ParameterSet Pin ExpansionNode InitialActivityNode FinalActivityNode ExitPointActivityNode DecisionActivityNode MergeActivityNode ForkActivityNode JoinActivityNode Flow
 tool "HTML doc. (svg)" "ghtml -svg" Activity InterruptibleActivityRegion ExpansionRegion ActivityObject ActivityAction Parameter ParameterSet Pin ExpansionNode InitialActivityNode FinalActivityNode ExitPointActivityNode DecisionActivityNode MergeActivityNode ForkActivityNode JoinActivityNode Flow
 tool "HTML doc. (flat, svg)" "ghtml -flat -svg" Activity InterruptibleActivityRegion ExpansionRegion ActivityObject ActivityAction Parameter ParameterSet Pin ExpansionNode InitialActivityNode FinalActivityNode ExitPointActivityNode DecisionActivityNode MergeActivityNode ForkActivityNode JoinActivityNode Flow
-tool "Launch NIEMtools" "java org.cabral.niemtools.BoumlPlugout configure" Project Package UseCaseView ClassView ComponentView DeploymentView UseCaseDiagram SeqDiagram ColDiagram ClassDiagram ObjectDiagram StateDiagram ActivityDiagram ComponentDiagram DeploymentDiagram UseCase Component Node Artifact Inherit DependOn
-tool "HTML documentation" "ghtml" Project Package UseCaseView ClassView ComponentView DeploymentView UseCaseDiagram SeqDiagram ColDiagram ClassDiagram ObjectDiagram StateDiagram ActivityDiagram ComponentDiagram DeploymentDiagram UseCase Component Node Artifact Inherit DependOn
-tool "HTML doc. (flat)" "ghtml -flat" Project Package UseCaseView ClassView ComponentView DeploymentView UseCaseDiagram SeqDiagram ColDiagram ClassDiagram ObjectDiagram StateDiagram ActivityDiagram ComponentDiagram DeploymentDiagram UseCase Component Node Artifact Inherit DependOn
-tool "HTML doc. (svg)" "ghtml -svg" Project Package UseCaseView ClassView ComponentView DeploymentView UseCaseDiagram SeqDiagram ColDiagram ClassDiagram ObjectDiagram StateDiagram ActivityDiagram ComponentDiagram DeploymentDiagram UseCase Component Node Artifact Inherit DependOn
-tool "HTML doc. (flat, svg)" "ghtml -flat -svg" Project Package UseCaseView ClassView ComponentView DeploymentView UseCaseDiagram SeqDiagram ColDiagram ClassDiagram ObjectDiagram StateDiagram ActivityDiagram ComponentDiagram DeploymentDiagram UseCase Component Node Artifact Inherit DependOn
-tool "Generate .pro" "gpro" Artifact
-tool "Import Rose" "irose" Project Package
-tool "Generate XMI 1.2" "gxmi" Project
-tool "Generate XMI 2.x" "gxmi2" Project
-tool "Import XMI 2.x" "ixmi2" Project Package
-tool "Use case wizard" "usecasewizard" UseCase
-tool "Check-in" "file_control ci" Project Package
-tool "Check-out" "file_control co" Project Package
-tool "Deploy classes" "deplcl" ClassView
-tool "Global Change" "global_change" Project Package ClassView DeploymentView
-tool "Uml projection" "uml_proj" Project Package ClassView
+tool "Launch NIEMtools" "java org.cabral.niemtools.BoumlPlugout" Project Package UseCaseView ClassView ComponentView DeploymentView UseCaseDiagram SeqDiagram ColDiagram ClassDiagram ObjectDiagram StateDiagram ActivityDiagram ComponentDiagram DeploymentDiagram UseCase Component Node Artifact Inherit DependOn
