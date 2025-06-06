@@ -339,13 +339,13 @@ class ConfigurationDialog extends JDialog {
         JPanel uriPanel = labeledField("URI for extensions", ProjectProperties.EXPORT_URI, fieldColumns);
         exportPanel.add(uriPanel, BorderLayout.NORTH);
  
-        // publish UML
+        // publish CMF
         JPanel exportPanel1 = new JPanel(new BorderLayout());
         exportPanel1.add(label("Common Model Format (CMF)"), BorderLayout.NORTH);
         JPanel exportPanel1a = new JPanel(new BorderLayout());
         JPanel exportPanel1b = new JPanel(new BorderLayout());
         exportPanel1b.add(labeledField("Directory", ProjectProperties.EXPORT_CMF_DIR, fieldColumns), BorderLayout.NORTH);
-        exportPanel1b.add(labeledField("CMF File", ProjectProperties.EXPORT_CMF_FILE, fieldColumns), BorderLayout.NORTH);
+        exportPanel1b.add(labeledField("CMF File", ProjectProperties.EXPORT_CMF_FILE, fieldColumns), BorderLayout.CENTER);
         exportPanel1b.add(labeledField("Version", ProjectProperties.EXPORT_CMF_VERSION, fieldColumns), BorderLayout.SOUTH);
         JPanel exportPanel1c = new JPanel(new BorderLayout());
         exportPanel1c.add(checkedBox("Include CMF in Message Specification", ProjectProperties.EXPORT_CMF), BorderLayout.SOUTH);

@@ -62,11 +62,9 @@ import fr.bouml.anItemKind;
 
 public class CsvReader {
 
-    /**
+    /** Imports NIEM mappings from a CSV file and applies them to UML classes and instances.
      * @param filename
      */
-    // TODO importCsv: import non-nillable elements
-
     void importCsv(String filename) {
         // cache UML classes
         Map<String, UmlClass> UMLClasses = new ConcurrentHashMap<>();
