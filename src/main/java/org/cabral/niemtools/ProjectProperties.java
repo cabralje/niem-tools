@@ -189,15 +189,15 @@ public class ProjectProperties extends Properties {
         defaults.setProperty(EXPORT_MODEL_DIR,"model");
         defaults.setProperty(EXPORT_CMF_DIR,"cmf");
         defaults.setProperty(EXPORT_CMF_FILE,"model");
-        defaults.setProperty(EXPORT_XSD_DIR,"schema");
-        defaults.setProperty(EXPORT_XML_DIR,"examples");
+        defaults.setProperty(EXPORT_XSD_DIR,"xml\\schema");
+        defaults.setProperty(EXPORT_XML_DIR,"xml\\examples");
         defaults.setProperty(EXPORT_JSON_SCHEMA_DIR,"json\\schema");
         defaults.setProperty(EXPORT_JSON_SCHEMA_FILE,"model");
         defaults.setProperty(EXPORT_JSON_DIR,"json\\examples");
         defaults.setProperty(EXPORT_WSDL_DIR,"WS-SIP");
         defaults.setProperty(EXPORT_OPENAPI_DIR,"json");
         defaults.setProperty(EXPORT_MAPPING_FILE,"niem-mapping.csv");
-        defaults.setProperty(EXPORT_WANTLIST_FILE,"schema\\wantlist");
+        defaults.setProperty(EXPORT_WANTLIST_FILE,"xml\\schema\\wantlist");
 
         return defaults;
     }
