@@ -276,7 +276,7 @@ public class CmfWriter {
      * @param type
      * @return CMF class definition
      */
-    // TODO exportCmfClass: add augmentations to CMF < 1.0
+    // FIXME exportCmfClass: add augmentations to CMF < 1.0
     private String exportCmfClass(UmlClass type) {
 
         String id = NamespaceModel.getPrefixedName(type);
@@ -573,7 +573,12 @@ public class CmfWriter {
                             continue;
                         augmentationCmf += "<AugmentationRecord>"
                                 + tagRef("Class", typeName);
-                        if (isClass(type))
+                        UmlClass elementType = model.getBaseType(element);
+                        if (elementType == null) {
+                            Log.debug("exportCmfNamespace: unable to type for element" + element.name());
+                            continue;
+                        }
+                        if (isClass(elementType))
                             augmentationCmf += tagRef("ObjectProperty", NamespaceModel.filterAttributePrefix(NamespaceModel.getPrefixedName(element)));
                         else
                             augmentationCmf += tagRef("DataProperty", NamespaceModel.filterAttributePrefix(NamespaceModel.getPrefixedName(element)));
