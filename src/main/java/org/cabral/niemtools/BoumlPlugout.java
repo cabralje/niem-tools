@@ -464,6 +464,7 @@ public class BoumlPlugout {
     private static String selectFileProperty(NiemUmlModel model, String propertyName, String dialogTitle) throws HeadlessException {
         String file = model.properties.getProperty(propertyName);
         JFileChooser fc = new JFileChooser(file);
+        fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV Files", "csv"));
         if (fc.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
             if (fc.getSelectedFile() != null) {
                 file = fc.getSelectedFile().getAbsolutePath();
