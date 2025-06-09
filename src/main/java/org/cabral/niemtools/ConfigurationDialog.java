@@ -160,21 +160,16 @@ class ConfigurationDialog extends JDialog {
     private JPanel labeledField(String name, String property, int fieldColumns) {
         JPanel panel = new JPanel();
         panel.add(new JLabel(name, JLabel.RIGHT));
-        JTextField field = new JTextField(properties.getProperty(property), fieldColumns);
+        JTextField field = new JTextField(sanitize(properties.getProperty(property)), fieldColumns);
         field.getDocument().addDocumentListener((SimpleDocumentListener) (DocumentEvent e) -> {
-            properties.setProperty(property, field.getText());
+            properties.setProperty(property, sanitize(field.getText()));
         });
         panel.add(field);
         return panel;
     }
 
-     /* Creates a labeled field with the specified name, property, and number of
-     * columns.
-     * @param name
-     * @param boxProperty
-     */
     private JCheckBox checkedBox(String name, String boxProperty) {
-        JCheckBox box = new JCheckBox(name, properties.getProperty(boxProperty).equals("true"));
+        JCheckBox box = new JCheckBox(name, "true".equals(sanitize(properties.getProperty(boxProperty))));
         box.addItemListener((ItemEvent e) -> {
             properties.setProperty(boxProperty, String.valueOf(box.isSelected()));
         });
@@ -473,38 +468,59 @@ class ConfigurationDialog extends JDialog {
         // show frame
         setVisible(true);
 
+        // When reading from the table, sanitize user input before using/storing
         try {
             LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<>();
             for (int i = 0; i < model.getRowCount(); i++) {
                 String prefix = "", namespace = "", url = "";
                 Object prefixValue = model.getValueAt(i, 0);
                 if (prefixValue != null)
-                    prefix = prefixValue.toString();
+                    prefix = sanitize(prefixValue.toString());
                 Object namespaceValue = model.getValueAt(i, 1);
                 if (namespaceValue != null)
-                    namespace = namespaceValue.toString();
+                    namespace = sanitize(namespaceValue.toString());
                 Object urlValue = model.getValueAt(i, 2);
                 if (urlValue != null)
-                    url = urlValue.toString();
+                    url = sanitize(urlValue.toString());
                 if (url.startsWith("http"))
-					try {
+                    try {
                         URI uri = new URI(url);
                         uri.toURL();
                     } catch (MalformedURLException | URISyntaxException e1) {
                         Log.trace("URL " + url + " is malformed" + e1.getMessage());
                         throw new IllegalArgumentException("URL " + url + " is malformed", e1); 
-                }
+                    }
                 if (prefix != null && !prefix.isEmpty() && namespace != null && !namespace.isEmpty()
                         && !url.isEmpty())
                     externalSchemas2.add(prefix + "=" + namespace + "=" + url);
             }
             properties.setProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS, String.join(",", externalSchemas2));
-
         } catch (IllegalArgumentException | IllegalStateException e1) {
             Log.trace("ConfigurationDialog: exception " + e1.toString());
             throw e1; // Rethrow the exception after logging
         }
 
         return command;
+    }
+
+    /**
+     * Returns the sanitized command string.
+     * @return
+     */
+    // Add a sanitization helper method
+    private String sanitize(String input) {
+        if (input == null) return "";
+        // OWASP guidance: Remove control characters except for line breaks, tabs, and path separators, then trim whitespace.
+        // Allow both Unix (/) and Windows (\) path separators.
+        // Remove non-printable and dangerous characters, and normalize Unicode.
+        String sanitized = input
+            .replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "") // Remove control chars except \r, \n, \t
+            .replaceAll("[<>\"'`]", "")                // Remove HTML/script injection chars
+            .replaceAll("[\\p{C}]", "")                // Remove other non-printable chars
+            .replaceAll("(?<![\\\\/])[\\\\/](?![\\\\/])", "/") // Normalize single separators
+            .trim();
+        // Normalize Unicode to prevent homoglyph attacks
+        sanitized = java.text.Normalizer.normalize(sanitized, java.text.Normalizer.Form.NFKC);
+        return sanitized;
     }
 }
