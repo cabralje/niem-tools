@@ -372,7 +372,4 @@ public class HtmlWriter {
             Log.trace("writeLineHtml: error " + e.toString());
         }
     }
-
-
-
 }

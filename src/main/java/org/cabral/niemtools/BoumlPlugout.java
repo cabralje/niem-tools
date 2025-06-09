@@ -148,9 +148,18 @@ public class BoumlPlugout {
 
         // cache UML model
         UmlPackage project = UmlPackage.getProject();
-        UmlItem target = UmlCom.targetItem();
+        //UmlItem target = UmlCom.targetItem();
         ProjectProperties properties = new ProjectProperties(project, ProjectProperties.getDefaults());
         properties.load();
+
+        // Find UML package
+        UmlPackage umlPackage = null;
+        if (project != null)
+            for (UmlItem pkg : project.children())
+                if ((pkg.kind() == fr.bouml.anItemKind.aPackage) || pkg.name().equals("UML")) {   
+                    umlPackage = (UmlPackage)pkg;
+                    break;
+                }
 
         // handle configuration
         if (!args.isEmpty())
@@ -168,15 +177,13 @@ public class BoumlPlugout {
         String projectDirectory = model.properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
 
         // cache UML model
-        if (target != null) {
-            //Log.stop("memo_ref");
-            //Log.start("memo_ref");
-            UmlCom.message("Memorize references ...");
-            target.memo_ref();
-            //Log.stop("memo_ref");
-        } else {
-            Log.trace("Warning: target is null. Skipping memo_ref.");
-        }
+        UmlCom.message("Memorize references ...");
+        if (umlPackage != null)
+            umlPackage.memo_ref();
+        else if (project != null)
+            project.memo_ref();
+        else
+            Log.trace("Warning: project is null. Skipping memorization of references.");
 
         switch (command) {
             
@@ -185,7 +192,7 @@ public class BoumlPlugout {
                 //TODO automate download from GitHub and import of the reference model
                 // Automate download from GitHub and import of the reference model
                 // Implementation Plan:
-                // 1. Define the GitHub repository URL and the target directory for the download.
+                // 1. Define the GitHub repository URL and the project directory for the download.
                 // 2. Use a library like Apache HttpClient or Java's HttpURLConnection to fetch the files.
                 // 3. Save the downloaded files to the specified directory.
                 // 4. Validate the downloaded files (e.g., check file integrity or structure).
@@ -267,24 +274,19 @@ public class BoumlPlugout {
                 
             case "addStereotype":
                 
-                model.addStereotype(target);
+                model.addStereotype(project);
                 break;
                 
             case "removeStereotype":
                 
-                model.removeStereotype(target);
+                model.removeStereotype(project);
                 break;
                 
             case "publishUML":
                 try {
-                    // Create NIEM models
-                    //model.createNIEM();
-                    
-                    // Cache models
-                    //model.cacheModels(false);
-                    
+
                     // Generate HTML documentation
-                    model.exportHtml(target);
+                    model.exportHtml((umlPackage == null) ? project : umlPackage);
                     
                     // Generate NIEM Mapping HTML
                     model.exportMappingHtml();
@@ -302,12 +304,6 @@ public class BoumlPlugout {
                 
             case "importMapping":
                 try {
-                    // Create NIEM models
-                    //model.createNIEM();
-                    
-                    // Cache models
-                    //model.cacheModels(false);
-                    
                     // Delete previous mapping
                     model.deleteMapping();
                     
@@ -369,7 +365,7 @@ public class BoumlPlugout {
                 try {  
                     
                     // Generate HTML documentation
-                    model.exportHtml(target);
+                    model.exportHtml(project);
                     
                     // Generate NIEM Mapping HTML
                     model.exportMappingHtml();
