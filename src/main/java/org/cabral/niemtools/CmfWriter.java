@@ -276,7 +276,6 @@ public class CmfWriter {
      * @param type
      * @return CMF class definition
      */
-    // FIXME exportCmfClass: add augmentations to CMF < 1.0
     private String exportCmfClass(UmlClass type) {
 
         String id = NamespaceModel.getPrefixedName(type);
@@ -288,6 +287,8 @@ public class CmfWriter {
             tagIds.add(id);
 
             typeName = NamespaceModel.getName(type);
+            if (NiemModel.isAugmentation(typeName))
+                return "";
             Log.debug("exportCmfClass: exporting class " + typeName);
 
             String prefix = NamespaceModel.getPrefix(type);
@@ -552,39 +553,30 @@ public class CmfWriter {
         int augmentations = 0;
         for (UmlItem item : classview.children()) {
             if (item != null && item.kind() == anItemKind.aClassInstance) {
-                //UmlClassInstance instance = (UmlAttribute) item;
-                NiemModel model2 = NiemUmlModel.getModel(NiemModel.getURI(item));
-                UmlClassInstance element = model2.getReferencedElement(item);
-                if (element != null) {
-                    String typeName = element.propertyValue(NiemUmlModel.SUBSTITUTION_TYPE_PROPERTY);
-                    if (typeName != null) {
-                        Log.debug("exportCmfNamespace: augmenting " + typeName + " with " + NamespaceModel.getName(element));
-                        String multiplicity = element.propertyValue(NiemUmlModel.SUBSTITUTION_MULTIPLICITY_PROPERTY);
+                NiemModel substitutionElementModel = NiemUmlModel.getModel(NiemModel.getURI(item));
+                UmlClassInstance substitutionElement = substitutionElementModel.getReferencedElement(item);
+                if (substitutionElement != null) {
+                    String sustitutionInType = substitutionElement.propertyValue(NiemUmlModel.SUBSTITUTION_TYPE_PROPERTY);
+                    if (sustitutionInType != null) {
+                        String substitutionElementName = NamespaceModel.getPrefixedName(substitutionElement);
+                        if (substitutionElementName.endsWith(NiemModel.AUGMENTATION_NAME)) {
+                            Log.debug("exportCmfNamespace: skipping augmentation element " + substitutionElementName);
+                            continue;
+                        }
+                        String substitutionForElement = substitutionElement.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
+                        if (substitutionForElement.endsWith(NiemModel.ABSTRACT_NAME) || substitutionForElement.endsWith(NiemModel.REPRESENTATION_NAME)) {
+                            Log.debug("exportCmfNamespace: skipping abstract or representation head element " + substitutionForElement);
+                            continue;
+                        }
+                        UmlClass sustitutionElementType = NiemModel.getBaseType(substitutionElement);
+                        String multiplicity = substitutionElement.propertyValue(NiemUmlModel.SUBSTITUTION_MULTIPLICITY_PROPERTY);
                         if (multiplicity == null || multiplicity.isEmpty())
                             multiplicity = "0,unbounded";
-                        NiemModel model = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName)) ? NiemUmlModel.getSubsetModel() : NiemUmlModel.getExtensionModel();
-                        UmlClass type = model.getType(NamespaceModel.getSchemaURI(typeName), typeName);
-                        if (type == null) {
-                            Log.debug("exportCmfNamespace: unable to find type " + typeName);
-                            continue;
-                        }
-                        String typePrefix = NamespaceModel.getPrefix(type);
-                        if (prefix != null && typePrefix != null && prefix.equals(typePrefix))
-                            continue;
-                        augmentationCmf += "<AugmentationRecord>"
-                                + tagRef("Class", typeName);
-                        UmlClass elementType = model.getBaseType(element);
-                        if (elementType == null) {
-                            Log.debug("exportCmfNamespace: unable to type for element" + element.name());
-                            continue;
-                        }
-                        if (isClass(elementType))
-                            augmentationCmf += tagRef("ObjectProperty", NamespaceModel.filterAttributePrefix(NamespaceModel.getPrefixedName(element)));
-                        else
-                            augmentationCmf += tagRef("DataProperty", NamespaceModel.filterAttributePrefix(NamespaceModel.getPrefixedName(element)));
-                        augmentationCmf += exportCmfMultiplicity(multiplicity)
-                                + tag("AugmentationIndex", String.valueOf(augmentations++))
-                                + "</AugmentationRecord>";
+                        augmentationCmf += tag("AugmentationRecord",
+                            tagRef("Class", sustitutionInType)
+                            + tagRef(isClass(sustitutionElementType) ? "ObjectProperty" : "DataProperty", NamespaceModel.filterAttributePrefix(substitutionElementName))
+                            + exportCmfMultiplicity(multiplicity)
+                            + tag("AugmentationIndex", String.valueOf(augmentations++)));
                     }
                 }
             }
@@ -620,7 +612,6 @@ public class CmfWriter {
      * @param element
      * @return CMF property definition
      */
-    // FIXME cmftool generating duplicate augmentation points
     private String exportCmfProperty(UmlClassInstance element) {
         String id = NamespaceModel.filterAttributePrefix(NamespaceModel.getPrefixedName(element));
         if (id == null || id.isEmpty()) {
@@ -634,14 +625,14 @@ public class CmfWriter {
 
         tagIds.add(id);
         String elementName = NamespaceModel.getName(element);
-        if (elementName.endsWith(NiemModel.AUGMENTATION_POINT_NAME))
+        if (elementName.endsWith(NiemModel.AUGMENTATION_POINT_NAME) || elementName.endsWith(NiemModel.AUGMENTATION_NAME))
             return "";
         Log.debug("exportCmfProperty: exporting property " + elementName);
 
         UmlClass baseType = getCmfBaseType(element);
         if (baseType == null || NiemModel.isAbstract(NamespaceModel.getName(baseType)))
             // abstract
-            return tagId(dataPropertyName, id,
+            return tagId(objectPropertyName, id,
                     exportCmfComponent(element)
                     + tag("AbstractIndicator", "true"));
     
@@ -748,8 +739,8 @@ public class CmfWriter {
 
         // check if type is abstract
         if (NiemModel.isAbstract(NamespaceModel.getName(type))) {
-            dataTypeIds.add(id);
-            return false;
+            classIds.add(id);
+            return true;
         }
 
         Boolean properties = false;
@@ -800,7 +791,7 @@ public class CmfWriter {
         if (id != null && !id.isEmpty())
             tagString += " " + NiemModel.STRUCTURES_PREFIX + ":id=\"" + id.replace(":", ".") + "\"";
         if (ref != null && !ref.isEmpty())
-            tagString += " " + NiemModel.STRUCTURES_PREFIX + ":ref=\"" + ref.replace(":", ".") + "\" xsi:nill=\"true\"";
+            tagString += " " + NiemModel.STRUCTURES_PREFIX + ":ref=\"" + ref.replace(":", ".") + "\" xsi:nil=\"true\"";
         if (content != null && !content.isEmpty())
             tagString += ">" + content + "</" + tag + ">"; 
         else 

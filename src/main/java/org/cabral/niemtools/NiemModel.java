@@ -128,6 +128,9 @@ class NiemModel {
     //static final String ASSOCIATION_TYPE_NAME = "AssociationType";
     private static final String AUGMENTATION_TYPE_NAME = "AugmentationType";
     static final String AUGMENTATION_POINT_NAME = "AugmentationPoint";
+    static final String AUGMENTATION_NAME = "Augmentation";
+    static final String ABSTRACT_NAME = "Abstract";
+    static final String REPRESENTATION_NAME = "Representation"; 
     static final String SIMPLE_TYPE_NAME = "SimpleType";
     private static final String OBJECT_TYPE_NAME = "ObjectType";
     private static final String SIMPLE_OBJECT_ATTRIBUTE_GROUP = "@SimpleObjectAttributeGroup";
@@ -217,9 +220,18 @@ class NiemModel {
     @SuppressWarnings("unused")
     static UmlClass getBaseType(UmlItem item) {
         UmlClass baseType = null;
+        UmlClassInstance classInstance = null;
         switch (item.kind().value()) {
+            case anItemKind._anAttribute:
+                UmlAttribute attribute = (UmlAttribute) item;
+                if (attribute.stereotype().equals(NiemUmlModel.FACET_STEREOTYPE)) {
+                    Log.trace("getBaseType: facets do not have base types " + item.name());
+                    return null;
+                }
+                baseType = attribute.type().type;
+                break;
             case anItemKind._aClassInstance:
-                UmlClassInstance classInstance = (UmlClassInstance) item;
+                classInstance = (UmlClassInstance) item;
                 baseType = classInstance.type();
                 break;
             case anItemKind._aClass:
@@ -239,7 +251,7 @@ class NiemModel {
                     String prefix = NamespaceModel.getPrefix(item);
                     //if (prefix.equals(STRUCTURES_PREFIX) || prefix.equals(XSD_PREFIX))
                     //    return null;
-                    if (NamespaceModel.getName(item).endsWith(AUGMENTATION_TYPE_NAME))
+                    if (NiemModel.isAugmentation(NamespaceModel.getName(item)))
                         baseType = NiemUmlModel.getSubsetModel().getAugmentationType();
                 }
             default:
@@ -607,7 +619,7 @@ class NiemModel {
         // copy stereotype, description and type
         element.set_Stereotype(sourceElement.stereotype());
         element.set_Description(sourceElement.description());
-        element.set_Type(sourceElement.type());
+        element.set_Type(baseType);
 
         // copy properties
         String uri = getURI(schemaURI, elementName);
