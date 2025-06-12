@@ -317,7 +317,7 @@ class NiemModel {
             // create element
             UmlClassView nsClassView = NamespaceModel.getNamespaceClassView(this, NamespaceModel.getPrefix(elementName), elementSchemaURI);
             if (nsClassView == null) {
-                Log.trace("addElement: error - no prefix or schema for element " + elementName);
+                Log.debug("addElement: error - no prefix or schema for element " + elementName);
                 return null;
             }
             try {
@@ -325,12 +325,12 @@ class NiemModel {
                 Log.debug("addElement: adding element " + elementName2 + " to schema " + elementSchemaURI);
                 element = UmlClassInstance.create(nsClassView, elementName2, baseType);
             } catch (RuntimeException e) {
-                Log.trace("addElement: error adding element " + elementName + " of type " + baseType.name());
+                Log.debug("addElement: error adding element " + elementName + " of type " + baseType.name());
                 return null;
             }
             if (element == null) {
-                Log.trace("addElement: error adding element " + elementName + " of type " + baseType.name());
-                return element;
+                Log.debug("addElement: error adding element " + elementName + " of type " + baseType.name());
+                return null;
             }
             element.set_Description(description);
             String uri = getURI(elementSchemaURI, elementName);
@@ -371,14 +371,15 @@ class NiemModel {
             Log.debug("addElementInType: adding " + elementInTypeName + " to type " + typeName);
             elementInType = UmlAttribute.create(type, elementInTypeName);
         } catch (RuntimeException re) {
-            Log.trace("addElementInType: error - creating element " + elementInTypeName + " in type " + type.name());
+            Log.debug("addElementInType: error - creating element " + elementInTypeName + " in type " + type.name());
             return null;
         }
 
         // copy stereotype, description, multiplicity and type
         elementInType.set_Stereotype(element.stereotype());
         elementInType.set_Description(element.description());
-        elementInType.set_Multiplicity(multiplicity);
+        if (!multiplicity.isEmpty())
+            elementInType.set_Multiplicity(multiplicity);
         //elementInType.set_Type(element.type());
 
         // copy properties
@@ -398,7 +399,7 @@ class NiemModel {
         // insert element in type list
         NiemModel model = NiemUmlModel.getModel(type);
         if (model == null) {
-            Log.trace("addElementInTypes: error - no model for type " + typeName);
+            Log.debug("addElementInTypes: error - no model for type " + typeName);
             return null;
         }
         List<UmlClassInstance> elementInTypeList = model.getElementsInType(getURI(type));
@@ -424,7 +425,7 @@ class NiemModel {
             // create type
             UmlClassView nsClassView = NamespaceModel.getNamespaceClassView(this, NamespaceModel.getPrefix(typeName), typeSchemaURI);
             if (nsClassView == null) {
-                Log.trace("addType: error - no prefix or schema for type " + typeName);
+                Log.debug("addType: error - no prefix or schema for type " + typeName);
                 return null;
             }
             try {
@@ -432,11 +433,11 @@ class NiemModel {
                 Log.debug("addType: adding " + typeName2 + " to schema " + typeSchemaURI);
                 type = UmlClass.create(nsClassView, typeName2);
             } catch (RuntimeException re) {
-                Log.trace("addType: error adding type " + typeName);
+                Log.debug("addType: error adding type " + typeName);
                 return null;
             }
             if (type == null) {
-                Log.trace("addType: error adding type " + typeName);
+                Log.debug("addType: error adding type " + typeName);
                 return null;
             }
             String uri = getURI(typeSchemaURI, typeName);
@@ -590,7 +591,7 @@ class NiemModel {
         // if element doesn't exist in reference model, return error
         UmlClassInstance sourceElement = NiemUmlModel.getReferenceModel().getElement(schemaURI, elementName);
         if (sourceElement == null) {
-            Log.trace("copyElement: error - element " + elementName + " not in reference model");
+            Log.debug("copyElement: error - element " + elementName + " not in reference model");
             return null;
         }
 
@@ -604,7 +605,7 @@ class NiemModel {
         // if namespace doesn't exist, create it
         UmlClassView nsClassView = NamespaceModel.getNamespaceClassView(this, NamespaceModel.getPrefix(elementName), schemaURI);
         if (nsClassView == null) {
-            Log.trace("addElement: error - no prefix or schema for element " + elementName);
+            Log.debug("copyElement: error - no prefix or schema for element " + elementName);
             return null;
         }
 
@@ -612,7 +613,7 @@ class NiemModel {
         try {
             element = UmlClassInstance.create(nsClassView, filterUMLElement(NamespaceModel.getName(elementName)), baseType);
         } catch (RuntimeException e) {
-            Log.trace("copyElement: error copying element " + elementName + " to subset");
+            Log.debug("copyElement: error copying element " + elementName + " to subset");
             return null;
         }
 
@@ -664,7 +665,7 @@ class NiemModel {
                     }
                 }
                 if (!childFound) {
-                    Log.trace("copyElementInType: error - element " + elementInTypeName + " not in type " + typeName);
+                    Log.debug("copyElementInType: error - element " + elementInTypeName + " not in type " + typeName);
                     return null;
                 }
             }
@@ -674,7 +675,7 @@ class NiemModel {
                 Log.debug("copyElementInType: error - attribute already exists " + element + " " + re.toString());
             }
         if (attribute == null)
-            Log.trace("copyElementInType: error copying element " + elementInTypeName + " in " + typeName);
+            Log.debug("copyElementInType: error copying element " + elementInTypeName + " in " + typeName);
         else {
             // copy stereotype, type, description and multiplicity
             attribute.set_Stereotype(element.stereotype());
@@ -705,14 +706,14 @@ class NiemModel {
 
         // Check prefix
         if (!NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName))) {
-            Log.trace("copyType: error - type " + typeName + " doesn't have a NIEM prefix");
+            Log.debug("copyType: error - type " + typeName + " doesn't have a NIEM prefix");
             return null;
         }
 
         // Check namespace
         String schemaURI = NamespaceModel.getSchemaURI(typeName);
         if (schemaURI == null) {
-            Log.trace("copyType: error - namespace for type " + typeName + " not in reference model");
+            Log.debug("copyType: error - namespace for type " + typeName + " not in reference model");
             return null;
         }
 
@@ -724,14 +725,14 @@ class NiemModel {
         // find reference type
         UmlClass sourceType = NiemUmlModel.getReferenceModel().getType(schemaURI, typeName);
         if (sourceType == null) {
-            Log.trace("copyType: error - type " + typeName + " not in reference model");
+            Log.debug("copyType: error - type " + typeName + " not in reference model");
             return null;
         }
 
         // if subset namespace doesn't exist, create it
         UmlClassView nsClassView = NamespaceModel.getNamespaceClassView(this, NamespaceModel.getPrefix(typeName), schemaURI);
         if (nsClassView == null) {
-            Log.trace("copyType: error - no prefix or schema for type " + typeName);
+            Log.debug("copyType: error - no prefix or schema for type " + typeName);
             return null;
         }
 
@@ -1151,8 +1152,8 @@ class NiemModel {
         for (UmlItem item : type.children()) {
             if (item.kind() == anItemKind.anAttribute && item.name().equals(elementInTypeName)) {
                 String previousMultiplicity = ((UmlAttribute) item).multiplicity();
-                if (!previousMultiplicity.equals(multiplicity))
-                    Log.trace("getElementInType:  error - " + NamespaceModel.getPrefixedName(type) + "/" + elementInTypeName
+                if (!previousMultiplicity.isEmpty() && !multiplicity.isEmpty() && !previousMultiplicity.equals(multiplicity))
+                    Log.trace("getElementInType:  warning - " + NamespaceModel.getPrefixedName(type) + "/" + elementInTypeName
                             + " has conflicting multiplicities " + previousMultiplicity + " and " + multiplicity);
                 return (UmlAttribute) item;
             }

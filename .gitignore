@@ -60,3 +60,5 @@ buildNumber.properties
 # testing resources
 src/test/resources/**
 target/surefire-reports/**
+target/maven-status/**
+target/maven-archiver/**

@@ -550,7 +550,7 @@ public class NiemUmlModel {
                 if (!elementName.isEmpty())
                     continue;
                 if (baseTypeName.isEmpty()) {
-                    Log.trace("createSubsetAndExtension: base type not defined for type " + typeName
+                    Log.trace("createSubsetAndExtension: warning - base type not defined for type " + typeName
                             + "; using default base type.");
                     baseType = SubsetModel.getObjectType();
                 } else {
