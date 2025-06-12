@@ -652,6 +652,22 @@ class NiemModel {
         String typeName = NamespaceModel.getPrefixedName(type);
         UmlAttribute attribute = getElementInType(type, elementInTypeName, multiplicity);
         if (attribute == null)
+
+            // if reference model, ensure element exists in the type
+            if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName))) {
+                UmlClass referenceType = NiemUmlModel.getReferenceModel().getType(NamespaceModel.getSchemaURI(typeName), typeName);
+                boolean childFound = false;
+                for (UmlItem item : referenceType.children()) {
+                    if (item.name().equals(elementInTypeName)) {
+                        childFound = true;
+                        break;
+                    }
+                }
+                if (!childFound) {
+                    Log.trace("copyElementInType: error - element " + elementInTypeName + " not in type " + typeName);
+                    return null;
+                }
+            }
 			try {
                 attribute = UmlAttribute.create(type, elementInTypeName);
             } catch (RuntimeException re) {
@@ -686,9 +702,17 @@ class NiemModel {
 
         if ((typeName == null) || (typeName.isEmpty()))
             return null;
+
+        // Check prefix
+        if (!NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName))) {
+            Log.trace("copyType: error - type " + typeName + " doesn't have a NIEM prefix");
+            return null;
+        }
+
+        // Check namespace
         String schemaURI = NamespaceModel.getSchemaURI(typeName);
         if (schemaURI == null) {
-            Log.trace("copyType: error - schema for type " + typeName + " not in reference model");
+            Log.trace("copyType: error - namespace for type " + typeName + " not in reference model");
             return null;
         }
 
@@ -1344,7 +1368,7 @@ class NiemModel {
                 UmlClassInstance newElement = null;
                 try {
                     if (baseType == null && baseTypeName != null && !baseTypeName.isEmpty())
-                        Log.trace("importElements: error - base type " + baseTypeName + " not in model with URI " + baseTypeSchemaURI);
+                        Log.trace("importElements: error - base type " + baseTypeName + " not in model");
                     else if (nodeDocumentationXPath != null)
                         newElement = addElement(ns.getSchemaURI(), elementName, baseType, nodeDocumentationXPath.evaluate(elementElement), null);
                     else
@@ -1419,7 +1443,7 @@ class NiemModel {
                 try {
                     UmlClass baseType2 = getType(baseTypeSchemaURI, baseTypeName);
                     if (baseType2 == null && baseTypeName != null && !baseTypeName.isEmpty())
-                        Log.trace("importElements: error - base type " + baseTypeName + " not in model with URI " + baseTypeSchemaURI);
+                        Log.trace("importElements: error - base type " + baseTypeName + " not in model");
                     else if (nodeDocumentationXPath != null)
                         element = addElement(ns.getSchemaURI(), attributeName, baseType2, nodeDocumentationXPath.evaluate(attribute), null);
                     else

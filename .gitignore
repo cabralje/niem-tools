@@ -60,3 +60,4 @@ buildNumber.properties
 # testing resources
 src/test/resources/**
 target/surefire-reports/**
+target/site/**

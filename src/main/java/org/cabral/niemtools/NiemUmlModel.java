@@ -473,6 +473,7 @@ public class NiemUmlModel {
         Log.trace("Generating NIEM subset and extension models");
 
         Log.start("createSubsetAndExtension - add types");
+        
         // add types to subset and extension
         Log.debug("createSubsetAndExtension: copy subset types and create extension types");
         java.util.Vector<UmlItem> all = (java.util.Vector<UmlItem>) UmlItem.all;
@@ -484,7 +485,7 @@ public class NiemUmlModel {
             if (NiemModel.isAbstract(baseTypeName))
                 continue;
 
-            Log.debug("creatSubsetAndExtension: " + item.name());
+            Log.debug("createSubsetAndExtension: " + item.name());
             String typeName = item.propertyValue(NIEM_STEREOTYPE_TYPENAME).trim();
             String elementName = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
             String notes = item.propertyValue(NIEM_STEREOTYPE_NOTES).trim();
@@ -501,17 +502,23 @@ public class NiemUmlModel {
 
             // add base type
             if (!baseTypeName.isEmpty())
-                if (isNiemType(baseTypeName))
-                    SubsetModel.copyType(baseTypeName);
-                else 
-                    ExtensionModel.addType(NamespaceModel.getSchemaURI(baseTypeName), baseTypeName, null, null);
+                if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(baseTypeName))) {
+                    if (SubsetModel.copyType(baseTypeName) == null)
+                        Log.trace("createSubsetAndExtension: error - base type " + baseTypeName + " not found in reference model");
+                } else {
+                    if (ExtensionModel.addType(NamespaceModel.getSchemaURI(baseTypeName), baseTypeName, null, null) == null)
+                        Log.trace("createSubsetAndExtension: error - cannot add extension base type " + baseTypeName);
+                }
 
             // add type
             if (!typeName.isEmpty())
-                if (isNiemType(typeName))
-                    SubsetModel.copyType(typeName);
-                else 
-                    ExtensionModel.addType(NamespaceModel.getSchemaURI(typeName), typeName, description, notes);
+                if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName))) {
+                    if (SubsetModel.copyType(typeName) == null)
+                        Log.trace("createSubsetAndExtension: error - type " + typeName + " not found in reference model");
+                } else {
+                    if (ExtensionModel.addType(NamespaceModel.getSchemaURI(typeName), typeName, null, null) == null)
+                        Log.trace("createSubsetAndExtension: error - cannot add extension type " + typeName);
+                }
         }
         Log.stop("createSubsetAndExtension - add types");
         Log.start("createSubsetAndExtension - add base types");
@@ -565,8 +572,9 @@ public class NiemUmlModel {
                 ExtensionModel.relateAttributeGroup(type, SubsetModel.getSimpleObjectAttributeGroup());
         }
         Log.stop("createSubsetAndExtension - add base types");
-        Log.start("createSubsetAndExtension - add elements");
+        
         // Copy subset elements and create extension elements
+        Log.start("createSubsetAndExtension - add elements");
         Log.debug("createSubsetAndExtension: copy subset elements and create extension elements");
         it = UmlItem.all.iterator();
         while (it.hasNext()) {
@@ -614,21 +622,32 @@ public class NiemUmlModel {
                 NiemModel model = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(baseTypeName2)) ? SubsetModel : ExtensionModel;
                 UmlClass baseType = model.getType(NamespaceModel.getSchemaURI(baseTypeName2), baseTypeName2);
                 if (baseType == null && !baseTypeName.isEmpty())
-                    Log.trace("createSubsetAndExtension: error - base type " + baseTypeName2 + " not in model with URI " + NamespaceModel.getSchemaURI(baseTypeName2));
-                UmlClassInstance element = (isNiemElement(elementName)) ? SubsetModel.copyElement(elementName)
-                        : ExtensionModel.addElement(NamespaceModel.getSchemaURI(elementName), elementName, baseType, description, mappingNotes);
+                    Log.trace("createSubsetAndExtension: error - base type " + baseTypeName2 + " not in model");
+                
+                UmlClassInstance element = null;
+                if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(elementName))) {
+                    element = SubsetModel.copyElement(elementName);
+                    if (element == null)
+                        Log.trace("createSubsetAndExtension: error - element " + elementName + " not found in reference model");
+                } else {
+                    element = ExtensionModel.addElement(NamespaceModel.getSchemaURI(elementName), elementName, baseType, description, mappingNotes);
+                    if (element == null)
+                        Log.trace("createSubsetAndExtension: error - cannot add extension element " + elementName);
+                }
                 if (element == null)
                     continue;
 
                 // copy element in type
                 if ((!substitution || !representation) && !typeName.isEmpty()) {
-                    NiemModel model2 = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName)) ? SubsetModel : ExtensionModel;
-                    UmlClass type = model2.getType(NamespaceModel.getSchemaURI(typeName), typeName);
-                    if (type != null) {
-                        if (isNiemType(typeName))
-                            SubsetModel.copyElementInType(type, element, multiplicity); 
-                        else 
-                            ExtensionModel.addElementInType(type, element, multiplicity);
+                    UmlClass type = null;
+                    if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName))) {
+                        type = SubsetModel.getType(NamespaceModel.getSchemaURI(typeName), typeName);
+                        if (type == null || SubsetModel.copyElementInType(type, element, multiplicity) == null)
+                                Log.trace("createSubsetAndExtension: error - reference element " + elementName + " not in type " + typeName);
+                    } else {
+                        type = ExtensionModel.getType(NamespaceModel.getSchemaURI(typeName), typeName);
+                        if (type == null || ExtensionModel.addElementInType(type, element, multiplicity)== null)
+                            Log.trace("createSubsetAndExtension: error - extension element " + elementName + " not in type " + typeName);
                     }
                 }
 
