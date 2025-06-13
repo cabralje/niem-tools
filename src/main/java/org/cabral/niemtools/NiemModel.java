@@ -860,8 +860,10 @@ class NiemModel {
 
         String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
                         properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
-        String jsonDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                         properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_DIR);
+        String jsonFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                         properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE);
+        String jsonDir = Paths.get(jsonFile).getParent().toString();
+
         String exportXML = properties.getProperty(ProjectProperties.EXPORT_XSD);
         String exportJSON = properties.getProperty(ProjectProperties.EXPORT_JSON);
         String exportCmftoJSON = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);

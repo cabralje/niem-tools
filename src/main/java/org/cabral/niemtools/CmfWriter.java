@@ -228,11 +228,11 @@ public class CmfWriter {
      * @param cmfDir
      * @param messages
      */
-    public void exportCmf(String cmfDir, String cmfFile) throws IOException {
+    public void exportCmf(String cmfFile) throws IOException {
 
         Log.start("exportCmf");
         String path1 = getCmfFilename(cmfFile, cmfVersion);                
-        Log.trace("Generating CMF model version " + cmfVersion + " in " + cmfDir + "\\" + path1);
+        Log.trace("Generating CMF model version " + cmfVersion + " in " + path1);
 
         String cmfUri = CMF_URI + cmfVersion + "/";
         if (isOlderCmfVersion(cmfVersion, "1.0")) {
@@ -254,7 +254,7 @@ public class CmfWriter {
 
             // open file
 
-            Path p1 = Paths.get(cmfDir, path1);
+            Path p1 = Paths.get(path1);
             File file = p1.toFile();
             File parentFile = file.getParentFile();
             if (parentFile != null)

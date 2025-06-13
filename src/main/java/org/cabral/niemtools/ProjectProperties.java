@@ -79,6 +79,8 @@ public class ProjectProperties extends Properties {
     static final String EXPORT_EXTERNAL_SCHEMAS = "ExportExternalSchemas";
     static final String EXPORT_CMF_VERSION = "ExportCMFVersion";
     static final String EXPORT_CMF = "ExportCMF";
+    static final String EXPORT_CMF_TO_XSD_MODEL = "ExportCMFtoXSDModel";
+    static final String EXPORT_CMFTOOL_TO_XSD_MODEL = "ExportCMFTooltoXSDModel";
     static final String EXPORT_HTML = "ExportHTML";
     static final String EXPORT_XSD = "ExportXSD";
     static final String EXPORT_CMF_TO_XSD = "ExportCMFtoXSD";
@@ -108,12 +110,13 @@ public class ProjectProperties extends Properties {
 
     // export paths
     static final String EXPORT_PROJECT_DIR = "ExportProjectDir";
-    static final String EXPORT_MODEL_DIR = "html dir";
-    static final String EXPORT_CMF_DIR = "ExportCMFDir";
+    static final String EXPORT_HTML_DIR = "html dir";
+    //static final String EXPORT_CMF_DIR = "ExportCMFDir";
+    static final String EXPORT_XSD_MODEL_DIR = "ExportXSDModelDir";
     static final String EXPORT_CMF_FILE = "ExportCMFFile";
     static final String EXPORT_XSD_DIR = "ExportXSDDir";
     static final String EXPORT_XML_DIR = "ExportXMLDir";
-    static final String EXPORT_JSON_SCHEMA_DIR = "ExportJSONSchemaDir";
+    //static final String EXPORT_JSON_SCHEMA_DIR = "ExportJSONSchemaDir";
     static final String EXPORT_JSON_SCHEMA_FILE = "ExportJSONSchemaFile";
     static final String EXPORT_JSON_DIR = "ExportJSONDir"; 
     static final String EXPORT_WSDL_DIR = "ExportWSDLDir";
@@ -159,10 +162,12 @@ public class ProjectProperties extends Properties {
             + "ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd" );
         defaults.setProperty(EXPORT_CMF_VERSION, "0.8");
         defaults.setProperty(EXPORT_CMF,"true");
+        defaults.setProperty(EXPORT_CMF_TO_XSD_MODEL,"true");
+        defaults.setProperty(EXPORT_CMFTOOL_TO_XSD_MODEL,"cmftool.bat m2x -d -c -o");
         defaults.setProperty(EXPORT_HTML,"true");
         defaults.setProperty(EXPORT_XSD,"true");
         defaults.setProperty(EXPORT_CMF_TO_XSD,"true");
-        defaults.setProperty(EXPORT_CMFTOOL_TO_XSD,"cmftool.bat m2x -d -c -o");
+        defaults.setProperty(EXPORT_CMFTOOL_TO_XSD,"cmftool.bat m2xmsg -d -c -o");
         defaults.setProperty(EXPORT_JSON,"true");
         defaults.setProperty(EXPORT_CMF_TO_JSON,"true");
         defaults.setProperty(EXPORT_CMFTOOL_TO_JSON,"cmftool.bat m2jmsg -o");
@@ -188,18 +193,19 @@ public class ProjectProperties extends Properties {
 
         // export paths
         defaults.setProperty(EXPORT_PROJECT_DIR, System.getProperty("user.home"));
-        defaults.setProperty(EXPORT_MODEL_DIR,"model");
-        defaults.setProperty(EXPORT_CMF_DIR,"cmf");
-        defaults.setProperty(EXPORT_CMF_FILE,"model");
+        defaults.setProperty(EXPORT_HTML_DIR,"model\\html");
+        //defaults.setProperty(EXPORT_CMF_DIR,"model\\cmf");
+        defaults.setProperty(EXPORT_XSD_MODEL_DIR,"model\\xsd");
+        defaults.setProperty(EXPORT_CMF_FILE,"model\\cmf\\model");
         defaults.setProperty(EXPORT_XSD_DIR,"xml\\schema");
         defaults.setProperty(EXPORT_XML_DIR,"xml\\examples");
-        defaults.setProperty(EXPORT_JSON_SCHEMA_DIR,"json\\schema");
-        defaults.setProperty(EXPORT_JSON_SCHEMA_FILE,"model");
+        //defaults.setProperty(EXPORT_JSON_SCHEMA_DIR,"json\\schema");
+        defaults.setProperty(EXPORT_JSON_SCHEMA_FILE,"json\\schema\\model");
         defaults.setProperty(EXPORT_JSON_DIR,"json\\examples");
-        defaults.setProperty(EXPORT_WSDL_DIR,"WS-SIP");
+        defaults.setProperty(EXPORT_WSDL_DIR,"xml\\wsdl");
         defaults.setProperty(EXPORT_OPENAPI_DIR,"json");
-        defaults.setProperty(EXPORT_MAPPING_FILE,"niem-mapping.csv");
-        defaults.setProperty(EXPORT_WANTLIST_FILE,"xml\\schema\\wantlist");
+        defaults.setProperty(EXPORT_MAPPING_FILE,"model\\mapping\\niem-mapping.csv");
+        defaults.setProperty(EXPORT_WANTLIST_FILE,"model\\mapping\\wantlist");
 
         return defaults;
     }

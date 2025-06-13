@@ -736,7 +736,7 @@ public class NiemUmlModel {
      * @return generates HTML documentation for the target item
      */
     public void exportHtml(UmlItem target) {
-        String modelDir = properties.getProperty(ProjectProperties.EXPORT_MODEL_DIR);
+        String modelDir = properties.getProperty(ProjectProperties.EXPORT_HTML_DIR);
         String exportHtml = properties.getProperty(ProjectProperties.EXPORT_HTML);
         String startFile = "index";
 
@@ -998,13 +998,14 @@ public class NiemUmlModel {
 
         TreeSet<String> jsonDefinitions = new TreeSet<>();
         TreeSet<String> jsonDefinitions2 = new TreeSet<>();
-        String jsonDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                         properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_DIR);
+        String jsonFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                         properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE);
+        String jsonDir = Paths.get(jsonFile).getParent().toString();
 
         // Verify JSON directory exists
-        Path jsonPath = Paths.get(jsonDir);
+        Path jsonPath = Paths.get(jsonFile);
         if (!Files.exists(jsonPath)) {
-            Log.debug("exportSpecification: JSON directory does not exist, creating " + jsonDir);
+            Log.debug("exportSpecification: JSON directory does not exist, creating " + jsonFile);
             try {
                 Files.createDirectories(jsonPath);
             } catch (IOException e) {
@@ -1062,15 +1063,14 @@ public class NiemUmlModel {
     }
 
     public void exportCmf() {
-        String cmfDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                        properties.getProperty(ProjectProperties.EXPORT_CMF_DIR);
-        String cmfFile = properties.getProperty(ProjectProperties.EXPORT_CMF_FILE);
+
+        String cmfFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + properties.getProperty(ProjectProperties.EXPORT_CMF_FILE);
         String cmfVersion = properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION);
 
         // Verify directory exists
-        Path cmfPath = Paths.get(cmfDir);
+        Path cmfPath = Paths.get(cmfFile).getParent();
         if (!Files.exists(cmfPath)) {
-            Log.debug("exportSpecification: cmf directory does not exist, creating " + cmfDir);
+            Log.debug("exportSpecification: cmf directory does not exist, creating " + cmfFile);
             try {
                 Files.createDirectories(cmfPath);
             } catch (IOException e) {
@@ -1079,14 +1079,10 @@ public class NiemUmlModel {
             }
         }
 
-        if (cmfDir != null && cmfVersion != null)
+        if (cmfFile != null && cmfVersion != null)
             try {
-            CmfWriter cmfWriter = new CmfWriter(cmfDir, "1.0");
-            cmfWriter.exportCmf(cmfDir, cmfFile);
-            if (!cmfVersion.equals("1.0")) {
-                cmfWriter = new CmfWriter(cmfDir, cmfVersion);
-                cmfWriter.exportCmf(cmfDir, cmfFile);
-            }
+            CmfWriter cmfWriter = new CmfWriter(cmfPath.toString(), cmfVersion);
+            cmfWriter.exportCmf(cmfFile);
         } catch (IOException e) {
             Log.trace("exportSpecification: error exporting common model format files " + e.toString());
         }

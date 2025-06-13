@@ -311,18 +311,22 @@ class ConfigurationDialog extends JDialog {
         // mapping panel
         JPanel mappingPanel = new JPanel(new BorderLayout());
 
+
         // project directory
-        JPanel projectPanel = new JPanel();
-        projectPanel.add(label("Project Directory"));
+        JPanel projectPanel = new JPanel(new BorderLayout());
+        JPanel projectPanel1 = new JPanel();
+        projectPanel1.add(new JLabel("Project Directory", JLabel.CENTER));
         JTextField textField1 = new JTextField(properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR), 60);
         textField1.getDocument().addDocumentListener((SimpleDocumentListener) e -> {
-            properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, textField1.getText());
-            String modelDir = textField1.getText()+ File.separator + ProjectProperties.getDefaults().getProperty(ProjectProperties.EXPORT_MODEL_DIR);
-            properties.setProperty(ProjectProperties.EXPORT_MODEL_DIR, modelDir);
-            properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, modelDir + File.separator + ProjectProperties.getDefaults().getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
+            String projectDir = textField1.getText();
+            properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, projectDir);
+            String htmlDir = projectDir + File.separator + ProjectProperties.getDefaults().getProperty(ProjectProperties.EXPORT_HTML_DIR);
+            properties.setProperty(ProjectProperties.EXPORT_HTML_DIR, htmlDir);
+            String mappingFile = projectDir + File.separator + ProjectProperties.getDefaults().getProperty(ProjectProperties.EXPORT_MAPPING_FILE);
+            properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, mappingFile);
         });
             //properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, modelDir + File.separator + ProjectProperties.getDefaults().getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
-        projectPanel.add(textField1);
+        projectPanel1.add(textField1);
         JButton button1 = new JButton("Browse...");
         button1.addActionListener((ActionEvent e) -> {
             JFileChooser fc = new JFileChooser(properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR));
@@ -333,20 +337,20 @@ class ConfigurationDialog extends JDialog {
             textField1.setText(value);
             properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, textField1.getText());
         });
-        projectPanel.add(button1);
+        projectPanel1.add(button1);
+        projectPanel.add(projectPanel1, BorderLayout.NORTH);
+        projectPanel.add(labeledField("Documentation", ProjectProperties.EXPORT_HTML_DIR, 60), BorderLayout.CENTER);
+        projectPanel.add(labeledField("Mapping File", ProjectProperties.EXPORT_MAPPING_FILE, 60), BorderLayout.SOUTH);
         mappingPanel.add(projectPanel, BorderLayout.NORTH);
 
-        // publish UML button
-        JButton publishUMLButton = commandButton("Publish UML Model","publishUML");
-        mappingPanel.add(publishUMLButton, BorderLayout.WEST);
+        // publish UML panel
+        mappingPanel.add(commandButton("Publish UML Model","publishUML"), BorderLayout.WEST);
 
-        // import mapping button
-        JButton importMappingButton = commandButton("Import Mapping File","importMapping");
-        mappingPanel.add(importMappingButton, BorderLayout.CENTER);
+        // import mapping panel
+        mappingPanel.add(commandButton("Import Mapping File","importMapping"), BorderLayout.CENTER);
 
-        // validate NIEM button
-        JButton validateMappingButton = commandButton("Validate NIEM Mapping","validateMapping");
-        mappingPanel.add(validateMappingButton, BorderLayout.EAST);
+        // validate NIEM panel
+        mappingPanel.add(commandButton("Validate NIEM Mapping","validateMapping"), BorderLayout.EAST);
 
         // export panel
         JPanel exportPanel = new JPanel(new BorderLayout());
@@ -357,28 +361,30 @@ class ConfigurationDialog extends JDialog {
  
         // publish CMF
         JPanel exportPanel1 = new JPanel(new BorderLayout());
-        exportPanel1.add(label("Common Model Format (CMF)"), BorderLayout.NORTH);
+        exportPanel1.add(label("Models: Common Model Format (CMF) and XSD"), BorderLayout.NORTH);
         JPanel exportPanel1a = new JPanel(new BorderLayout());
         JPanel exportPanel1b = new JPanel(new BorderLayout());
-        exportPanel1b.add(labeledField("Directory", ProjectProperties.EXPORT_CMF_DIR, fieldColumns), BorderLayout.NORTH);
-        exportPanel1b.add(labeledField("CMF File", ProjectProperties.EXPORT_CMF_FILE, fieldColumns), BorderLayout.CENTER);
-        exportPanel1b.add(labeledField("Version", ProjectProperties.EXPORT_CMF_VERSION, fieldColumns), BorderLayout.SOUTH);
+        exportPanel1b.add(labeledField("CMF File", ProjectProperties.EXPORT_CMF_FILE, fieldColumns), BorderLayout.NORTH);
+        exportPanel1b.add(labeledField("XSD Directory", ProjectProperties.EXPORT_XSD_MODEL_DIR, fieldColumns), BorderLayout.CENTER);
+        //exportPanel1b.add(labeledField("Version", ProjectProperties.EXPORT_CMF_VERSION, fieldColumns), BorderLayout.SOUTH);
+        exportPanel1b.add(labeledField("cmftool", ProjectProperties.EXPORT_CMFTOOL_TO_XSD_MODEL, fieldColumns), BorderLayout.SOUTH);
         JPanel exportPanel1c = new JPanel(new BorderLayout());
-        exportPanel1c.add(checkedBox("Include CMF in Message Specification", ProjectProperties.EXPORT_CMF), BorderLayout.SOUTH);
+        exportPanel1c.add(checkedBox("Include CMF in Message Specification", ProjectProperties.EXPORT_CMF), BorderLayout.CENTER);
+        exportPanel1c.add(checkedBox("Use cmftool to generate XSD model from CMF", ProjectProperties.EXPORT_CMF_TO_XSD_MODEL), BorderLayout.SOUTH);
         exportPanel1a.add(exportPanel1b, BorderLayout.NORTH);
         exportPanel1a.add(exportPanel1c, BorderLayout.SOUTH);      
         exportPanel1.add(exportPanel1a, BorderLayout.CENTER);
-        exportPanel1.add(commandButton("Publish CMF","publishCMF"), BorderLayout.SOUTH);
+        exportPanel1.add(commandButton("Publish CMF/XSD Models","publishCMF"), BorderLayout.SOUTH);
         exportPanel.add(exportPanel1, BorderLayout.WEST);
 
         // publish XSD
         JPanel exportPanel2 = new JPanel(new BorderLayout());
-        exportPanel2.add(label("XML Schema (XSD)"), BorderLayout.NORTH);
+        exportPanel2.add(label("Messages: XML Schemas"), BorderLayout.NORTH);
         JPanel exportPanel2a = new JPanel(new BorderLayout());
         JPanel exportPanel2b = new JPanel(new BorderLayout());
         exportPanel2b.add(labeledField("Directory", ProjectProperties.EXPORT_XSD_DIR, fieldColumns), BorderLayout.NORTH);
         exportPanel2b.add(labeledField("Wantlist File", ProjectProperties.EXPORT_WANTLIST_FILE, fieldColumns), BorderLayout.CENTER);
-        exportPanel2b.add(labeledField("cmfTool", ProjectProperties.EXPORT_CMFTOOL_TO_XSD, fieldColumns), BorderLayout.SOUTH);
+        exportPanel2b.add(labeledField("cmffool", ProjectProperties.EXPORT_CMFTOOL_TO_XSD, fieldColumns), BorderLayout.SOUTH);
         JPanel exportPanel2c = new JPanel(new BorderLayout());
         exportPanel2c.add(checkedBox("Include XSD in Message Specification", ProjectProperties.EXPORT_XSD), BorderLayout.NORTH);
         exportPanel2c.add(checkedBox("Include WSDL in Message Specification", ProjectProperties.EXPORT_WSDL), BorderLayout.CENTER);
@@ -386,17 +392,17 @@ class ConfigurationDialog extends JDialog {
         exportPanel2a.add(exportPanel2b, BorderLayout.NORTH);
         exportPanel2a.add(exportPanel2c, BorderLayout.SOUTH);
         exportPanel2.add(exportPanel2a, BorderLayout.CENTER);
-        exportPanel2.add(commandButton("Publish XSD","publishXSD"), BorderLayout.SOUTH);
+        exportPanel2.add(commandButton("Publish XSD Message Schemas","publishXSD"), BorderLayout.SOUTH);
         exportPanel.add(exportPanel2, BorderLayout.CENTER);
 
         // publish JSON
         JPanel exportPanel3 = new JPanel(new BorderLayout());
-        exportPanel3.add(label("JSON Schema"), BorderLayout.NORTH);
+        exportPanel3.add(label("Messages: JSON Schema"), BorderLayout.NORTH);
         JPanel exportPanel3a = new JPanel(new BorderLayout());
         JPanel exportPanel3b = new JPanel(new BorderLayout());
-        exportPanel3b.add(labeledField("Directory", ProjectProperties.EXPORT_JSON_SCHEMA_DIR, fieldColumns), BorderLayout.NORTH);
-        exportPanel3b.add(labeledField("Schema File", ProjectProperties.EXPORT_JSON_SCHEMA_FILE, fieldColumns), BorderLayout.CENTER);
-        exportPanel3b.add(labeledField("cmfTool", ProjectProperties.EXPORT_CMFTOOL_TO_JSON, fieldColumns), BorderLayout.SOUTH);
+        //exportPanel3b.add(labeledField("Directory", ProjectProperties.EXPORT_JSON_SCHEMA_DIR, fieldColumns), BorderLayout.NORTH);
+        exportPanel3b.add(labeledField("Schema File", ProjectProperties.EXPORT_JSON_SCHEMA_FILE, fieldColumns), BorderLayout.NORTH);
+        exportPanel3b.add(labeledField("cmftool", ProjectProperties.EXPORT_CMFTOOL_TO_JSON, fieldColumns), BorderLayout.SOUTH);
         JPanel exportPanel3c = new JPanel(new BorderLayout());
         exportPanel3c.add(checkedBox("Include JSON in Message Specification", ProjectProperties.EXPORT_JSON), BorderLayout.NORTH);
         exportPanel3c.add(checkedBox("Include OpenAPI in Message Specification", ProjectProperties.EXPORT_OPENAPI), BorderLayout.CENTER);
@@ -404,7 +410,7 @@ class ConfigurationDialog extends JDialog {
         exportPanel3a.add(exportPanel3b, BorderLayout.NORTH);
         exportPanel3a.add(exportPanel3c, BorderLayout.SOUTH);
         exportPanel3.add(exportPanel3a, BorderLayout.CENTER);
-        exportPanel3.add(commandButton("Publish JSON","publishJSON"), BorderLayout.SOUTH);
+        exportPanel3.add(commandButton("Publish JSON Schema Models","publishJSON"), BorderLayout.SOUTH);
         exportPanel.add(exportPanel3, BorderLayout.EAST);
 
         // export button
