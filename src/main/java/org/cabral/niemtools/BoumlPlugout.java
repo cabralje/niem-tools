@@ -650,9 +650,6 @@ public class BoumlPlugout {
                 // Cache models
                 model.cacheModels(false);
                 
-                // Generate wantlist for the subset
-                model.exportWantlist();
-                
                 // export code lists
                 String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
                         properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
@@ -674,6 +671,8 @@ public class BoumlPlugout {
             }
         }   
 
+        // Generate wantlist for the subset
+        model.exportWantlist();
     }
 
     /**
