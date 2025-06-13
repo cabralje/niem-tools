@@ -200,7 +200,7 @@ public class BoumlPlugout {
                 // 4. Validate the downloaded files (e.g., check file integrity or structure).
                 // 5. Proceed with importing the reference model into the UML project.
 
-                String importDir = "/tmp";
+                String importDir = System.getProperty("java.io.tmpdir");
                 try {
                     String githubRepoUrl = "https://github.com/niemopen/niem-model/archive/refs/tags/";
                     String modelUrl = githubRepoUrl + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION) + ".zip";
