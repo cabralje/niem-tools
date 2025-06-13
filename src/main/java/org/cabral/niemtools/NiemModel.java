@@ -642,6 +642,32 @@ class NiemModel {
 
     /**
      * @param type
+     * @param elementInTypeName
+     * @param multiplicity
+     * @return an element in type as a UmlAttribute
+     */
+    boolean isElementInType(UmlClass type, String elementName) {
+
+        boolean childFound = false;
+        for (UmlItem item : type.children()) {
+            if (item.name().equals(elementName)) {
+                childFound = true;
+                break;
+            }
+        }
+
+        // if not found in type, check base type
+        //if (!childFound) {
+        //    UmlClass baseType = NiemModel.getBaseType(type);
+        //    if (baseType != null)
+        //        childFound = isElementInType(baseType, elementName);
+       // }
+
+        return childFound;
+    }
+
+    /**
+     * @param type
      * @param element
      * @param multiplicity
      * @return an element in type copied from reference model to subset as a
@@ -657,14 +683,8 @@ class NiemModel {
             // if reference model, ensure element exists in the type
             if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName))) {
                 UmlClass referenceType = NiemUmlModel.getReferenceModel().getType(NamespaceModel.getSchemaURI(typeName), typeName);
-                boolean childFound = false;
-                for (UmlItem item : referenceType.children()) {
-                    if (item.name().equals(elementInTypeName)) {
-                        childFound = true;
-                        break;
-                    }
-                }
-                if (!childFound) {
+
+                if (!isElementInType(referenceType, elementInTypeName)) {
                     Log.debug("copyElementInType: error - element " + elementInTypeName + " not in type " + typeName);
                     return null;
                 }
