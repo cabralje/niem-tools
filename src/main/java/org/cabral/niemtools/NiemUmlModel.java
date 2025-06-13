@@ -739,6 +739,18 @@ public class NiemUmlModel {
         String modelDir = properties.getProperty(ProjectProperties.EXPORT_MODEL_DIR);
         String exportHtml = properties.getProperty(ProjectProperties.EXPORT_HTML);
         String startFile = "index";
+
+        // Verify model directory exists
+        Path modelPath = Paths.get(modelDir);
+        if (!Files.exists(modelPath)) {
+            Log.debug("exportHtml: model directory does not exist, creating " + modelDir);
+            try {
+                Files.createDirectories(modelPath);
+            } catch (IOException e) {
+                Log.trace("exportHtml: error creating model directory " + e.toString());
+                return;
+            }
+        }
         // Generate UML Model HTML documentation
         if (exportHtml.equals("true")) {
             Log.trace("Generating HTML documentation at " + modelDir + "\\" + startFile + ".html");
@@ -779,6 +791,18 @@ public class NiemUmlModel {
         //String directory = properties.getProperty(ProjectProperties.EXPORT_MODEL_DIR);
         String filename = properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE);
 
+        //Verify directory exists
+        Path modelPath = Paths.get(filename).getParent();
+        if (!Files.exists(modelPath)) {
+            Log.debug("exportCsv: model directory does not exist, creating " + modelPath);
+            try {
+                Files.createDirectories(modelPath);
+            } catch (IOException e) {
+                Log.trace("exportCsv: error creating model directory " + e.toString());
+                return;
+            }
+        }
+
         UmlCom.message("Generating NIEM Mapping CSV ...");
         Log.trace("Generating NIEM Mapping CSV at " + filename);
         NamespaceModel.cacheExternalSchemas();
@@ -807,6 +831,17 @@ public class NiemUmlModel {
         String filename = properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE).replace(".csv",".html");
         HtmlWriter htmlWriter = new HtmlWriter();
 
+        // Verify directory exists
+        Path modelPath = Paths.get(filename).getParent();
+        if (!Files.exists(modelPath)) {
+            Log.debug("exportHtml: model directory does not exist, creating " + modelPath);
+            try {
+                Files.createDirectories(modelPath);
+            } catch (IOException e) {
+                Log.trace("exportHtml: error creating model directory " + e.toString());
+                return;
+            }
+        }
         UmlCom.message("Generating NIEM Mapping HTML ...");
         Log.trace("Generating NIEM Mapping HTMLat " + filename);
         NamespaceModel.cacheExternalSchemas();
@@ -844,6 +879,18 @@ public class NiemUmlModel {
 
         String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
                         properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
+
+        // Verify XML directory exists
+        Path xmlPath = Paths.get(xmlDir);
+        if (!Files.exists(xmlPath)) {
+            Log.debug("exportSpecification: XML directory does not exist, creating " + xmlDir);
+            try {
+                Files.createDirectories(xmlPath);
+            } catch (IOException e) {
+                Log.trace("exportSpecification: error creating XML directory " + e.toString());
+                return;
+            }
+        }
         XmlWriter xmlWriter = new XmlWriter(xmlDir);
 
         if (exportXsd.equals("true")){
@@ -953,6 +1000,18 @@ public class NiemUmlModel {
         TreeSet<String> jsonDefinitions2 = new TreeSet<>();
         String jsonDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
                          properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_DIR);
+
+        // Verify JSON directory exists
+        Path jsonPath = Paths.get(jsonDir);
+        if (!Files.exists(jsonPath)) {
+            Log.debug("exportSpecification: JSON directory does not exist, creating " + jsonDir);
+            try {
+                Files.createDirectories(jsonPath);
+            } catch (IOException e) {
+                Log.trace("exportSpecification: error creating JSON directory " + e.toString());
+                return;
+            }
+        }
         //if (jsonDir != null) {
         //    jsonDefinitions.addAll(SubsetModel.exportSchemas(null, jsonDir));
         //}
@@ -1007,6 +1066,19 @@ public class NiemUmlModel {
                         properties.getProperty(ProjectProperties.EXPORT_CMF_DIR);
         String cmfFile = properties.getProperty(ProjectProperties.EXPORT_CMF_FILE);
         String cmfVersion = properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION);
+
+        // Verify directory exists
+        Path cmfPath = Paths.get(cmfDir);
+        if (!Files.exists(cmfPath)) {
+            Log.debug("exportSpecification: cmf directory does not exist, creating " + cmfDir);
+            try {
+                Files.createDirectories(cmfPath);
+            } catch (IOException e) {
+                Log.trace("exportSpecification: error creating cmf directory " + e.toString());
+                return;
+            }
+        }
+
         if (cmfDir != null && cmfVersion != null)
             try {
             CmfWriter cmfWriter = new CmfWriter(cmfDir, "1.0");
@@ -1033,6 +1105,18 @@ public class NiemUmlModel {
         String directory = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
         String filename = properties.getProperty(ProjectProperties.EXPORT_WANTLIST_FILE)+".xml";
 
+        // Verify directory exists
+        Path modelPath = Paths.get(directory);
+        if (!Files.exists(modelPath)) {
+            Log.debug("exportWantlist: model directory does not exist, creating " + directory);
+            try {
+                Files.createDirectories(modelPath);
+            } catch (IOException e) {
+                Log.trace("exportWantlist: error creating model directory " + e.toString());
+                return;
+            }
+        }
+        
         Log.start("exportWantlist");
         UmlCom.message("Generating NIEM Wantlist ...");
         Log.trace("Generating NIEM Wantlist in " + directory + "\\" + filename);
@@ -1045,7 +1129,10 @@ public class NiemUmlModel {
         try {
             // Export schema
             Log.debug("exportWantlist: create header");
-            File file = Paths.get(directory, filename).toFile();
+            Path path = Paths.get(directory, filename);
+            if (!Files.exists(path.getParent()))
+                Files.createDirectories(path.getParent());
+            File file = path.toFile();
             File parentFile = file.getParentFile();
             if (parentFile != null)
                 parentFile.mkdirs();

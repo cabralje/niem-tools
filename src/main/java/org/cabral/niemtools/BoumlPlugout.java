@@ -76,6 +76,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -199,7 +201,7 @@ public class BoumlPlugout {
                 // 5. Proceed with importing the reference model into the UML project.
 
                 try {
-                    String githubRepoUrl = "https://github.com/niemopen/niem=model/archive/refs/heads/main.zip";
+                    String githubRepoUrl = "https://github.com/niemopen/niem=-model/archive/refs/heads/main.zip";
                     String importDir = "/tmp";
                     String importFile = importDir + File.separator + "reference_model.zip";
 //                   String targetDirectory = properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR);
@@ -529,14 +531,36 @@ public class BoumlPlugout {
             Log.trace("Exporting CMF to XSD using cmftool");
             // Export CMF to XSD
 
-            String execCommandXsd =
-                properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_XSD) + " " +
-                properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " " +
-                properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+            String xsdDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
+            String cmfFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
                 properties.getProperty(ProjectProperties.EXPORT_CMF_DIR) + File.separator +
                 CmfWriter.getCmfFilename(properties.getProperty(ProjectProperties.EXPORT_CMF_FILE), 
                     properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION)); 
+
+            //Verify xsdDir exists
+            Path xsdPath = Paths.get(xsdDir);
+            if (!Files.exists(xsdPath)) {
+                try {
+                    Files.createDirectories(xsdPath);
+                } catch (IOException e) {
+                    Log.trace("Exception: could not create directory " + xsdDir + ": " + e.getMessage());
+                    return;
+                }
+            }
+            // Verify cmfFile directory exists
+            Path cmfPath = Paths.get(cmfFile).getParent();
+            if (!Files.exists(cmfPath)) {
+                try {
+                    Files.createDirectories(cmfPath);
+                } catch (IOException e) {
+                    Log.trace("Exception: could not create directory " + cmfPath + ": " + e.getMessage());
+                    return;
+                }
+            }
+            
+            String execCommandXsd = properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_XSD) + " " 
+                + xsdDir + " " + cmfFile;
             try {     
                 exec(execCommandXsd);
             } catch (IOException | InterruptedException e) {
@@ -593,17 +617,41 @@ public class BoumlPlugout {
         // use cmftool to generate JSON schemas from CMF
         if (exportCmfToJson.equals("true")) {
             Log.trace("Exporting CMF to JSON schema using cmftool");
+
+            String jsonFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_DIR) + File.separator +
+                JsonWriter.getJsonFilename(properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE));
+            String cmfFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                properties.getProperty(ProjectProperties.EXPORT_CMF_DIR) + File.separator +
+                CmfWriter.getCmfFilename(properties.getProperty(ProjectProperties.EXPORT_CMF_FILE), 
+                    properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION));
+
+            // Verify jsonFile directory exists
+            Path jsonPath = Paths.get(jsonFile).getParent();
+            if (!Files.exists(jsonPath)) {
+                try {
+                    Files.createDirectories(jsonPath);
+                } catch (IOException e) {
+                    Log.trace("Exception: could not create directory " + jsonPath + ": " + e.getMessage());
+                    return;
+                }
+            }
+
+            // Verify cmfFile directory exists
+            Path cmfPath = Paths.get(cmfFile).getParent();
+            if (!Files.exists(cmfPath)) {
+                try {
+                    Files.createDirectories(cmfPath);
+                } catch (IOException e) {
+                    Log.trace("Exception: could not create directory " + cmfPath + ": " + e.getMessage());
+                    return;
+                }
+            }
+
             // Export CMF to XSD
             String execCommandXsd =
                 properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_JSON) + " " +
-                properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_DIR) + File.separator +
-                JsonWriter.getJsonFilename(properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE)) + " " +
-                properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                properties.getProperty(ProjectProperties.EXPORT_CMF_DIR) + File.separator +
-                CmfWriter.getCmfFilename(properties.getProperty(ProjectProperties.EXPORT_CMF_FILE), 
-                    properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION));          
-
+                jsonFile + " " + cmfFile + " ";
             try {     
                 exec(execCommandXsd);
             } catch (IOException | InterruptedException e) {
