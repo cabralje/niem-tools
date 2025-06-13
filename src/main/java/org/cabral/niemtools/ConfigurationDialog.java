@@ -53,14 +53,21 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -72,6 +79,7 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
@@ -268,22 +276,35 @@ class ConfigurationDialog extends JDialog {
         // import button
         importPanel.add(navigationButton("Configure External Schemas", EXTERNAL_TAB), BorderLayout.NORTH);
         importPanel.add(commandButton("Import NIEM Reference Model","importReferenceModel"), BorderLayout.SOUTH);
-
+        
         int fieldColumns = 20;
         // import options
         JPanel importPanel1 = new JPanel(new BorderLayout());
-        importPanel1.add(label("Include domains"), BorderLayout.NORTH);
-        importPanel1.add(labeledField("", ProjectProperties.IMPORT_INCLUDE_DOMAINS, fieldColumns), BorderLayout.CENTER);
+        importPanel1.add(label("Version"), BorderLayout.NORTH);
+        JComboBox<String> niemVersionDropdown = new JComboBox<>(new String[] {"Loading..."});
+
+        // Populate the dropdown asynchronously
+        populateNiemVersionDropdown(niemVersionDropdown);
+
+        // Store the selected version in properties when changed
+        niemVersionDropdown.addActionListener(e -> {
+            String selected = (String) niemVersionDropdown.getSelectedItem();
+            if (selected != null && !selected.equals("Loading...") && !selected.equals("Failed to load versions")) {
+                properties.setProperty(ProjectProperties.IMPORT_NIEM_VERSION, selected);
+            }
+        });
+        importPanel1.add(niemVersionDropdown, BorderLayout.CENTER);
         importPanel.add(importPanel1, BorderLayout.WEST);
 
         JPanel importPanel2 = new JPanel(new BorderLayout());
-        importPanel2.add(label("Exclude domains"), BorderLayout.NORTH);
-        importPanel2.add(labeledField("", ProjectProperties.IMPORT_EXCLUDE_DOMAINS, fieldColumns), BorderLayout.CENTER);
+        importPanel2.add(label("Domains"), BorderLayout.NORTH);
+        importPanel2.add(labeledField("Include", ProjectProperties.IMPORT_INCLUDE_DOMAINS, fieldColumns), BorderLayout.CENTER);
+        importPanel2.add(labeledField("Exclude", ProjectProperties.IMPORT_EXCLUDE_DOMAINS, fieldColumns), BorderLayout.SOUTH);
         importPanel.add(importPanel2, BorderLayout.CENTER);
 
         JPanel importPanel3 = new JPanel(new BorderLayout());
-        importPanel3.add(label("Exclude codes"), BorderLayout.NORTH);
-        importPanel3.add(labeledField("", ProjectProperties.IMPORT_EXCLUDE_CODES, fieldColumns), BorderLayout.CENTER);
+        importPanel3.add(label("Codes"), BorderLayout.NORTH);
+        importPanel3.add(labeledField("Exclude", ProjectProperties.IMPORT_EXCLUDE_CODES, fieldColumns), BorderLayout.CENTER);
         //importPanel2.add(labeledField("Maximum facets", ProjectProperties.IMPORT_MAX_FACETS, fieldColumns));
         importPanel.add(importPanel3, BorderLayout.EAST);
  
@@ -501,6 +522,105 @@ class ConfigurationDialog extends JDialog {
         }
 
         return command;
+    }
+
+    /**
+     * Fetches the list of NIEM versions from GitHub tags API.
+     * Uses built-in JSON parsing (no external dependencies).
+     */
+    private void populateNiemVersionDropdown(JComboBox<String> comboBox) {
+        System.out.println("Starting NIEM version fetch..."); // Debug
+        new SwingWorker<List<String>, Void>() {
+            @Override
+            protected List<String> doInBackground() throws Exception {
+                System.out.println("doInBackground() started"); // Debug
+                List<String> versions = new ArrayList<>();
+                
+                try {
+                    URL url = new URL("https://api.github.com/repos/niemopen/niem-model/tags");
+                    System.out.println("Connecting to: " + url); // Debug
+                    
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("GET");
+                    conn.setRequestProperty("Accept", "application/vnd.github.v3+json");
+                    conn.setRequestProperty("User-Agent", "NIEM-Tools/1.0");
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(10000);
+                    
+                    int responseCode = conn.getResponseCode();
+                    //System.out.println("HTTP Response Code: " + responseCode); // Debug
+                    
+                    if (responseCode == 200) {
+                        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+                            StringBuilder sb = new StringBuilder();
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                sb.append(line);
+                            }
+                            String json = sb.toString();
+                            //System.out.println("JSON Response length: " + json.length()); // Debug
+                            
+                            // Simple JSON parsing without external libraries
+                            versions = parseVersionsFromJson(json);
+                            //System.out.println("Found " + versions.size() + " versions"); // Debug
+                        }
+                    } else {
+                        //System.out.println("HTTP Error: " + responseCode);
+                    }
+                } catch (Exception e) {
+                    //System.out.println("Exception in doInBackground: " + e.getMessage());
+                    e.printStackTrace();
+                    throw e;
+                }
+                
+                return versions;
+            }
+            
+            @Override
+            protected void done() {
+                System.out.println("done() called"); // Debug
+                try {
+                    List<String> versions = get();
+                    //System.out.println("Retrieved " + versions.size() + " versions in done()"); // Debug
+                    
+                    comboBox.removeAllItems();
+                    if (versions.isEmpty()) {
+                        comboBox.addItem("No versions found");
+                    } else {
+                        for (String version : versions) {
+                            comboBox.addItem(version);
+                            //System.out.println("Added to combo: " + version); // Debug
+                        }
+                    }
+                    comboBox.repaint();
+                } catch (Exception e) {
+                    //System.out.println("Exception in done(): " + e.getMessage());
+                    e.printStackTrace();
+                    comboBox.removeAllItems();
+                    comboBox.addItem("Error: " + e.getMessage());
+                }
+            }
+        }.execute();
+    }
+
+    /**
+     * Simple JSON parsing to extract version names from GitHub tags API response.
+     * Looks for "name" fields in the JSON array.
+     */
+    private List<String> parseVersionsFromJson(String json) {
+        List<String> versions = new ArrayList<>();
+        
+        // Simple regex-based parsing for "name": "version_string"
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\"name\"\\s*:\\s*\"([^\"]+)\"");
+        java.util.regex.Matcher matcher = pattern.matcher(json);
+        
+        while (matcher.find()) {
+            String version = matcher.group(1);
+            versions.add(version);
+            //System.out.println("Parsed version: " + version); // Debug
+        }
+        
+        return versions;
     }
 
     /**

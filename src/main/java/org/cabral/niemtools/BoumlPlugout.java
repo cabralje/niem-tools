@@ -189,7 +189,7 @@ public class BoumlPlugout {
 
         switch (command) {
             
-            case "ImportReferenceModel":
+            case "importReferenceModel":
 
                 //TODO automate download from GitHub and import of the reference model
                 // Automate download from GitHub and import of the reference model
@@ -200,15 +200,16 @@ public class BoumlPlugout {
                 // 4. Validate the downloaded files (e.g., check file integrity or structure).
                 // 5. Proceed with importing the reference model into the UML project.
 
+                String importDir = "/tmp";
                 try {
-                    String githubRepoUrl = "https://github.com/niemopen/niem=-model/archive/refs/heads/main.zip";
-                    String importDir = "/tmp";
+                    String githubRepoUrl = "https://github.com/niemopen/niem-model/archive/refs/tags/";
+                    String modelUrl = githubRepoUrl + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION) + ".zip";
                     String importFile = importDir + File.separator + "reference_model.zip";
 //                   String targetDirectory = properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR);
                     //if (targetDirectory == null || targetDirectory.isEmpty()) {
                     // Download the reference model from GitHub
                     // Download the reference model from GitHub using HttpURLConnection with timeouts
-                    java.net.URL url = java.net.URI.create(githubRepoUrl).toURL();
+                    java.net.URL url = java.net.URI.create(modelUrl).toURL();
                     java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
                     connection.setConnectTimeout(10000); // 10 seconds timeout for connection
                     connection.setReadTimeout(10000);    // 10 seconds timeout for reading
@@ -218,15 +219,15 @@ public class BoumlPlugout {
                         connection.disconnect();
                     }
                     // Download the reference model from GitHub using Java's built-in URL/Streams
-                    try (java.io.InputStream in = java.net.URI.create(githubRepoUrl).toURL().openStream()) {
+                    try (java.io.InputStream in = java.net.URI.create(modelUrl).toURL().openStream()) {
                         java.nio.file.Files.copy(in, new File(importFile).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                     }
 
-                    // Unzip the downloaded file with apache commons compress
+                    // Unzip the downloaded file
                     try (java.io.InputStream fis = new java.io.FileInputStream(importFile);
-                         org.apache.commons.compress.archivers.zip.ZipArchiveInputStream zis =
-                             new org.apache.commons.compress.archivers.zip.ZipArchiveInputStream(fis)) {
-                        org.apache.commons.compress.archivers.zip.ZipArchiveEntry entry;
+                         java.util.zip.ZipInputStream zis =
+                             new java.util.zip.ZipInputStream(fis)) {
+                        java.util.zip.ZipEntry entry;
                         while ((entry = zis.getNextEntry()) != null) {
                             File outFile = new File(importDir, entry.getName());
                             if (entry.isDirectory()) {
@@ -245,13 +246,15 @@ public class BoumlPlugout {
                     }
 
                 } catch (IOException e) {
-                    Log.trace("Exception: " + e.getMessage());
+                    Log.trace("Exception 1 in importReferenceModel " + e.getMessage());
                     System.exit(1); 
                 }
 
                 try {
                     Log.start("importReferenceModel");
-                    String directory = properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR);
+                    String directory = importDir + File.separator + "niem-model-" + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION) + File.separator + "xsd";
+                    //String directory = properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR);
+                    properties.setProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR, directory);
                     if (directory == null || directory.isEmpty())
                         directory = selectDirectoryProperty(model, directory,
                                 "Directory of the reference schemas to be imported");
@@ -264,7 +267,7 @@ public class BoumlPlugout {
                     // Next step
                     UmlCom.trace("\nNEXT STEP: Model content in UML, add NIEM stereotypes, and then select 'Publish UML'");
                 } catch (IOException e) {
-                    Log.trace("Exception: " + e.getMessage());
+                    Log.trace("Exception 2 in importReferenceModel: " + e.getMessage());
                     System.exit(1);
                 }
                 
@@ -299,7 +302,7 @@ public class BoumlPlugout {
                     // Next steps
                     UmlCom.trace("\nNEXT STEP: map content to NIEM in " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " and then select 'Import Mapping File'");
                 } catch (Exception e) {
-                    Log.trace("Exception: " + e.getMessage());
+                    Log.trace("Exception in publishUML: " + e.getMessage());
                     System.exit(1);
                 }
                 break;
@@ -317,7 +320,7 @@ public class BoumlPlugout {
                     UmlCom.trace("\nNEXT: 'Validating NIEM mapping'");
                     
                 } catch (HeadlessException e) {
-                    Log.trace("Exception: " + e.getMessage());
+                    Log.trace("Exception in importMapping: " + e.getMessage());
                     System.exit(1);
                 }
 
@@ -408,7 +411,7 @@ public class BoumlPlugout {
                     // Generate message specification
                     model.exportSpecification();
                 } catch (Exception ex) {
-                    Log.trace("Exception: " + ex.getMessage());
+                    Log.trace("Exception in publishSpecification: " + ex.getMessage());
                     System.exit(1);
                 }
                 break;
@@ -544,7 +547,7 @@ public class BoumlPlugout {
                 try {
                     Files.createDirectories(xsdPath);
                 } catch (IOException e) {
-                    Log.trace("Exception: could not create directory " + xsdDir + ": " + e.getMessage());
+                    Log.trace("Exception 1 in publishXSD: could not create directory " + xsdDir + ": " + e.getMessage());
                     return;
                 }
             }
@@ -554,7 +557,7 @@ public class BoumlPlugout {
                 try {
                     Files.createDirectories(cmfPath);
                 } catch (IOException e) {
-                    Log.trace("Exception: could not create directory " + cmfPath + ": " + e.getMessage());
+                    Log.trace("Exception 2 in publishXSD: could not create directory " + cmfPath + ": " + e.getMessage());
                     return;
                 }
             }
@@ -564,7 +567,7 @@ public class BoumlPlugout {
             try {     
                 exec(execCommandXsd);
             } catch (IOException | InterruptedException e) {
-                Log.trace("Exception: " + e.getMessage());
+                Log.trace("Exception 3 in publishXSD: " + e.getMessage());
                 System.exit(1); 
             }
 
@@ -598,7 +601,7 @@ public class BoumlPlugout {
                 // Next steps
                 UmlCom.trace("\nNEXT STEP: Select 'Publish Message Specification'");
             } catch (IOException e) {
-                Log.trace("Exception: " + e.getMessage());
+                Log.trace("Exception 4 in publishXSD: " + e.getMessage());
                 System.exit(1);
             }
         }   
@@ -632,7 +635,7 @@ public class BoumlPlugout {
                 try {
                     Files.createDirectories(jsonPath);
                 } catch (IOException e) {
-                    Log.trace("Exception: could not create directory " + jsonPath + ": " + e.getMessage());
+                    Log.trace("Exception 1 in publish JSON: could not create directory " + jsonPath + ": " + e.getMessage());
                     return;
                 }
             }
@@ -643,7 +646,7 @@ public class BoumlPlugout {
                 try {
                     Files.createDirectories(cmfPath);
                 } catch (IOException e) {
-                    Log.trace("Exception: could not create directory " + cmfPath + ": " + e.getMessage());
+                    Log.trace("Exception 2 in publishJSON: could not create directory " + cmfPath + ": " + e.getMessage());
                     return;
                 }
             }
@@ -655,7 +658,7 @@ public class BoumlPlugout {
             try {     
                 exec(execCommandXsd);
             } catch (IOException | InterruptedException e) {
-                Log.trace("Exception: " + e.getMessage());
+                Log.trace("Exception 3 in publishJSON: " + e.getMessage());
                 System.exit(1);
             }
         } else {
@@ -674,7 +677,7 @@ public class BoumlPlugout {
                 // Next steps
                 UmlCom.trace("\nNEXT STEP: Select 'Publish Message Specification'");
             } catch (Exception e) {
-                Log.trace("Exception: " + e.getMessage());
+                Log.trace("Exception 4 in publishJSON: " + e.getMessage());
                 System.exit(1);
             }
         }

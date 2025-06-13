@@ -67,6 +67,7 @@ import fr.bouml.UmlPackage;
 public class ProjectProperties extends Properties {
 
     // import properties
+    static final String IMPORT_NIEM_VERSION = "ImportNIEMVersion";
     static final String IMPORT_CODE_DESCRIPTIONS = "ImportCodeDescriptions";
     static final String IMPORT_MAX_FACETS = "ImportMaxFacets";
     static final String IMPORT_INCLUDE_DOMAINS = "ImportIncludeDomains";
@@ -144,6 +145,7 @@ public class ProjectProperties extends Properties {
 
         // import defaults
         Properties defaults = new Properties();
+        defaults.setProperty(IMPORT_NIEM_VERSION, "6.0");
         defaults.setProperty(IMPORT_CODE_DESCRIPTIONS, "true");
         defaults.setProperty(IMPORT_MAX_FACETS, "300");
         defaults.setProperty(IMPORT_INCLUDE_DOMAINS, "justice, hs");
