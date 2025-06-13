@@ -252,7 +252,7 @@ public class BoumlPlugout {
 
                 try {
                     Log.start("importReferenceModel");
-                    String directory = importDir + File.separator + "niem-model-" + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION) + File.separator + "xsd";
+                    String directory = importDir + File.separator + "niem-model-" + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);
                     //String directory = properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR);
                     properties.setProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR, directory);
                     if (directory == null || directory.isEmpty())

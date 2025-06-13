@@ -22,12 +22,13 @@
  */
 package org.cabral.niemtools;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
 public class TestHarness {
 
-    public static String filename = "C:\\tmp\\boumlport.txt";
+    public static String filename = System.getProperty("java.io.tmpdir") + File.separator + "boumlport.txt";
 
     public static void main(String argv[]) {
 
