@@ -221,7 +221,7 @@ public class CmfWriter {
      * @return
      */
     static public String getCmfFilename(String filename, String version) {
-        return filename + "-" + version + CMF_FILE_TYPE;
+        return filename + CMF_FILE_TYPE;
     }
 
     /**
@@ -406,9 +406,10 @@ public class CmfWriter {
                 = tag("Name", name)
                 + tagRef("Namespace", NamespaceModel.getPrefix(item));
         String description = item.description();
-        if (description != null && !description.isEmpty())
+        if (description != null && !description.isEmpty()) {
+            description = description.replace("&", "&amp;");
             componentCmf += tag(documentationName, description);
-
+        }
         return componentCmf;
     }
 
@@ -482,8 +483,11 @@ public class CmfWriter {
                         else
                             enumeration = tag("FacetCategoryCode", name)
                                     + tag("FacetValue", codeValue);
-                        if (codeDescription != null && !codeDescription.isEmpty())
+                        if (codeDescription != null && !codeDescription.isEmpty()) {
+                            // Escape ampersands in codeDescription for XML
+                            codeDescription = codeDescription.replace("&", "&amp;");
                             enumeration += tag(documentationName, codeDescription);
+                        }
                         restrictionCmf += tag(facetName, enumeration);
                     }
                 }
@@ -582,6 +586,7 @@ public class CmfWriter {
             }
         }
         String schemaCmf = "";
+        description = description.replace("&", "&amp;");
         String namespaceCmf = tag("NamespaceURI", NamespaceModel.getSchemaURIForPrefix(prefix))
                 + tag("NamespacePrefixText", prefix)
                 + tag(documentationName, description);

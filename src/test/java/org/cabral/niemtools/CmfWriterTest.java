@@ -93,7 +93,7 @@ public class CmfWriterTest {
     public void testGetCmfFilename() {
         String filename = "TestFile";
         String version = "1.2";
-        String expected = "TestFile-1.2.cmf";
+        String expected = "TestFile.cmf";
         assertEquals(expected, CmfWriter.getCmfFilename(filename, version));
     }
 

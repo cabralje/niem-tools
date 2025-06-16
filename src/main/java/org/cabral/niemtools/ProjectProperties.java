@@ -160,7 +160,7 @@ public class ProjectProperties extends Properties {
         defaults.setProperty(EXPORT_EXTERNAL_SCHEMAS, "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,"
             + "cbc=urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonBasicComponents-2.1.xsd,"
             + "ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd" );
-        defaults.setProperty(EXPORT_CMF_VERSION, "0.8");
+        defaults.setProperty(EXPORT_CMF_VERSION, "1.0");
         defaults.setProperty(EXPORT_CMF,"true");
         defaults.setProperty(EXPORT_CMF_TO_XSD_MODEL,"true");
         defaults.setProperty(EXPORT_CMFTOOL_TO_XSD_MODEL,"cmftool.bat m2x -d -c -o");

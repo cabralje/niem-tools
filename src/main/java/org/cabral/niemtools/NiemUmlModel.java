@@ -843,7 +843,7 @@ public class NiemUmlModel {
             }
         }
         UmlCom.message("Generating NIEM Mapping HTML ...");
-        Log.trace("Generating NIEM Mapping HTMLat " + filename);
+        Log.trace("Generating NIEM Mapping HTML at " + filename);
         NamespaceModel.cacheExternalSchemas();
         // cache NIEM namespaces, elements and types
         // cacheModel(referencePackage);
