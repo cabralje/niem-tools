@@ -260,8 +260,7 @@ class ConfigurationDialog extends JDialog {
 
     }
 
-    String showDialog() {
-
+    String showDialog() {        
         // overview panel
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(navigationButton("Import Reference Model", IMPORT_TAB), BorderLayout.NORTH);
@@ -276,23 +275,28 @@ class ConfigurationDialog extends JDialog {
         // import button
         importPanel.add(navigationButton("Configure External Schemas", EXTERNAL_TAB), BorderLayout.NORTH);
         importPanel.add(commandButton("Import NIEM Reference Model","importReferenceModel"), BorderLayout.SOUTH);
-        
         int fieldColumns = 20;
+
         // import options
         JPanel importPanel1 = new JPanel(new BorderLayout());
         importPanel1.add(label("Version"), BorderLayout.NORTH);
-        JComboBox<String> niemVersionDropdown = new JComboBox<>(new String[] {"Loading..."});
+
+        // Default to previously selected version
+        String selectedVersion = properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);
+        if (selectedVersion == null || selectedVersion.isEmpty())
+            selectedVersion = "Loading...";
+        JComboBox<String> niemVersionDropdown = new JComboBox<>(new String[] {selectedVersion});
 
         // Populate the dropdown asynchronously
-        populateNiemVersionDropdown(niemVersionDropdown);
+        populateNiemVersionDropdown(niemVersionDropdown, selectedVersion);
 
         // Store the selected version in properties when changed
         niemVersionDropdown.addActionListener(e -> {
             String selected = (String) niemVersionDropdown.getSelectedItem();
-            if (selected != null && !selected.equals("Loading...") && !selected.equals("Failed to load versions")) {
+            if (selected != null && !selected.equals("Loading...") && !selected.equals("Failed to load versions"))
                 properties.setProperty(ProjectProperties.IMPORT_NIEM_VERSION, selected);
-            }
         });
+        
         importPanel1.add(niemVersionDropdown, BorderLayout.CENTER);
         importPanel.add(importPanel1, BorderLayout.WEST);
 
@@ -305,12 +309,11 @@ class ConfigurationDialog extends JDialog {
         JPanel importPanel3 = new JPanel(new BorderLayout());
         importPanel3.add(label("Codes"), BorderLayout.NORTH);
         importPanel3.add(labeledField("Exclude", ProjectProperties.IMPORT_EXCLUDE_CODES, fieldColumns), BorderLayout.CENTER);
-        //importPanel2.add(labeledField("Maximum facets", ProjectProperties.IMPORT_MAX_FACETS, fieldColumns));
+        importPanel3.add(labeledField("Maximum facets", ProjectProperties.IMPORT_MAX_FACETS, fieldColumns), BorderLayout.SOUTH);
         importPanel.add(importPanel3, BorderLayout.EAST);
  
         // mapping panel
         JPanel mappingPanel = new JPanel(new BorderLayout());
-
 
         // project directory
         JPanel projectPanel = new JPanel(new BorderLayout());
@@ -534,17 +537,17 @@ class ConfigurationDialog extends JDialog {
      * Fetches the list of NIEM versions from GitHub tags API.
      * Uses built-in JSON parsing (no external dependencies).
      */
-    private void populateNiemVersionDropdown(JComboBox<String> comboBox) {
-        System.out.println("Starting NIEM version fetch..."); // Debug
+    private void populateNiemVersionDropdown(JComboBox<String> comboBox, String selectedVersion) {
+        Log.debug("Starting NIEM version fetch..."); // Debug
         new SwingWorker<List<String>, Void>() {
             @Override
             protected List<String> doInBackground() throws Exception {
-                System.out.println("doInBackground() started"); // Debug
+                Log.debug("doInBackground() started"); // Debug
                 List<String> versions = new ArrayList<>();
                 
                 try {
                     URL url = new URL("https://api.github.com/repos/niemopen/niem-model/tags");
-                    System.out.println("Connecting to: " + url); // Debug
+                    Log.debug("Connecting to: " + url);
                     
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
@@ -554,7 +557,7 @@ class ConfigurationDialog extends JDialog {
                     conn.setReadTimeout(10000);
                     
                     int responseCode = conn.getResponseCode();
-                    //System.out.println("HTTP Response Code: " + responseCode); // Debug
+                    Log.debug("HTTP Response Code: " + responseCode);
                     
                     if (responseCode == 200) {
                         try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
@@ -564,17 +567,17 @@ class ConfigurationDialog extends JDialog {
                                 sb.append(line);
                             }
                             String json = sb.toString();
-                            //System.out.println("JSON Response length: " + json.length()); // Debug
+                            Log.debug("JSON Response length: " + json.length());
                             
                             // Simple JSON parsing without external libraries
                             versions = parseVersionsFromJson(json);
-                            //System.out.println("Found " + versions.size() + " versions"); // Debug
+                            Log.debug("Found " + versions.size() + " versions");
                         }
                     } else {
-                        //System.out.println("HTTP Error: " + responseCode);
+                        Log.debug("HTTP Error: " + responseCode);
                     }
                 } catch (Exception e) {
-                    //System.out.println("Exception in doInBackground: " + e.getMessage());
+                    Log.trace("Exception populating NIEM versions: " + e.getMessage());
                     e.printStackTrace();
                     throw e;
                 }
@@ -584,10 +587,10 @@ class ConfigurationDialog extends JDialog {
             
             @Override
             protected void done() {
-                System.out.println("done() called"); // Debug
+                Log.debug("done() called"); // Debug
                 try {
                     List<String> versions = get();
-                    //System.out.println("Retrieved " + versions.size() + " versions in done()"); // Debug
+                    Log.debug("Retrieved " + versions.size() + " versions in done()");
                     
                     comboBox.removeAllItems();
                     if (versions.isEmpty()) {
@@ -595,12 +598,21 @@ class ConfigurationDialog extends JDialog {
                     } else {
                         for (String version : versions) {
                             comboBox.addItem(version);
-                            //System.out.println("Added to combo: " + version); // Debug
+                            Log.debug("Added to combo: " + version);
+                        }
+                    }
+                    // Set the selected item to the item named selectedVersion, if present
+                    if (selectedVersion != null && !selectedVersion.isEmpty()) {
+                        for (int i = 0; i < comboBox.getItemCount(); i++) {
+                            if (selectedVersion.equals(comboBox.getItemAt(i))) {
+                                comboBox.setSelectedIndex(i);
+                                break;
+                            }
                         }
                     }
                     comboBox.repaint();
                 } catch (Exception e) {
-                    //System.out.println("Exception in done(): " + e.getMessage());
+                    Log.debug("Exception in done(): " + e.getMessage());
                     e.printStackTrace();
                     comboBox.removeAllItems();
                     comboBox.addItem("Error: " + e.getMessage());
@@ -623,7 +635,7 @@ class ConfigurationDialog extends JDialog {
         while (matcher.find()) {
             String version = matcher.group(1);
             versions.add(version);
-            //System.out.println("Parsed version: " + version); // Debug
+            Log.debug("Parsed version: " + version);
         }
         
         return versions;
