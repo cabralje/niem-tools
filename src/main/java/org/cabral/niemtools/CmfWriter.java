@@ -448,9 +448,10 @@ public class CmfWriter {
 
             restrictionCmf = exportCmfComponent(type);
             UmlClass baseType = getCmfBaseType(type);
-            if (baseType == null)
+            if (baseType == null) {
                 Log.trace("exportCmfClass: unable to find base type for " + typeName); 
-            else 
+                restrictionCmf += tagRef(restrictionBaseName, "xs:string");
+            } else 
                 restrictionCmf += tagRef(restrictionBaseName, NamespaceModel.getPrefixedName(baseType));
             if (NiemUmlModel.isEnumeration(type))
                 codeListType = type; 
