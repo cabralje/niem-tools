@@ -667,13 +667,16 @@ public class NiemUmlModel {
         Log.stop("createSubsetAndExtension - add elements");
 
         // Sorting
-        //Log.trace("createSubsetAndExtension: sorting namespaces");
-        //UmlPackage subset = SubsetModel.getModelPackage();
-        //if (subset != null)
-        //	subset.sort();
-        //UmlPackage extension = ExtensionModel.getModelPackage();
-        //if (extension != null)
-        //	extension.sort(extension.all);
+        UmlPackage subset = SubsetModel.getModelPackage();
+        if (subset != null) {
+            Log.trace("createSubsetAndExtension: sorting subset model");
+        	sort(subset);
+        }
+        UmlPackage extension = ExtensionModel.getModelPackage();
+        if (extension != null) {
+            Log.trace("createSubsetAndExtension: sorting extension model");
+            sort(extension);
+        }
         Log.stop("createSubsetAndExtension");
     }
 
@@ -1553,4 +1556,15 @@ public class NiemUmlModel {
     //static void setFacets(UmlItem item, String facets) {
     //    item.set_PropertyValue(FACETS_PROPERTY, facets);
     //}
+
+    /**
+     * sort item and all its children
+     *
+     * @param item
+     */
+    public void sort(UmlItem item) {
+        item.sortChildren();
+        for (UmlItem child : item.children())
+            sort(child);
+    }
 }
