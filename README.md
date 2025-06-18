@@ -1,5 +1,5 @@
 # niem-tools
-This is a [BOUML](http://bouml.fr "BOUML") "plugout" that supports mapping UML abstract class models to the [NIEM](http://niemopen.org "NIEM") 6 framework.
+This is a [BOUML](http://bouml.fr "BOUML") "plugout" that supports developing [NIEM](http://niemopen.org "NIEM") message specifications in UML.
 
 [Jim Cabral](mailto:jim@cabral.org) developed this UML-based tool for developing and managing NIEM architectures.  
 Portions of this work were supported by [MTG Management Consultants LLC](http://mtgmc.com "MTG") and [InfoTrack US](https://infotrack.com "InfoTrack").
@@ -8,7 +8,7 @@ The advantages relative to other tools include:
 
 <b>Standards-Based</b> – Conforms to UML 2.0 and NIEM Naming and Design Rules (NDR).
 
-<b>Inexpensive</b> – An open source “plugout” module for BOUML, a free UML modeling program
+<b>Free</b> – An open source “plugout” module for BOUML, a free UML modeling program
 
 <b>Simple to Use</b> – Supports round-trip NIEM mapping using a simple spreadsheet.
 
