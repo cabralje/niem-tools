@@ -74,7 +74,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-//import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -126,6 +125,7 @@ public class NiemUmlModel {
     static final String NOTES_PROPERTY = "Notes";
     static final String NILLABLE_PROPERTY = "isNillable";
     static final String PREFIX_PROPERTY = "prefix";
+    static final String SEQUENCE_ID_PROPERTY = "sequenceID";
     static final String SUBSTITUTION_PROPERTY = "substitutesFor";
     static final String SUBSTITUTION_TYPE_PROPERTY = "substitutesIn";
     static final String SUBSTITUTION_MULTIPLICITY_PROPERTY = "subMultiplicity";
@@ -1438,8 +1438,8 @@ public class NiemUmlModel {
         }
 
         // Sorting
-        //Log.trace("Sorting namespaces");
-        //ReferenceModel.getModelPackage().sort(); // Error: target not allowed, must be a package, any view or a use case?
+        Log.trace("Sorting namespaces");
+        ReferenceModel.getModelPackage().sortChildren();
         Log.trace("Namespaces: " + NamespaceModel.getSize());
         Log.trace("Elements: " + ReferenceModel.getSize());
     }
@@ -1567,7 +1567,48 @@ public class NiemUmlModel {
      * @param item
      */
     public void sort(UmlItem item) {
-        item.sortChildren();
+        if (item == null) {
+            Log.trace("sort: item is null");
+            return;
+        }   
+        if (item instanceof UmlClass) {
+            UmlItem[] v = item.children();
+            int sz = v.length;
+            if (sz != 0) {
+                // sort in memory by sequence ID property
+                java.util.Arrays.sort(v, (a, b) -> {
+                    String seqA = a.propertyValue(SEQUENCE_ID_PROPERTY);
+                    String seqB = b.propertyValue(SEQUENCE_ID_PROPERTY);
+                    // Handle nulls and empty strings as "infinite" (sort last)
+                    boolean emptyA = (seqA == null || seqA.isEmpty());
+                    boolean emptyB = (seqB == null || seqB.isEmpty());
+                    if (emptyA && emptyB) return a.name().compareToIgnoreCase(b.name());
+                    if (emptyA) return 1;
+                    if (emptyB) return -1;
+                    try {
+                        int intA = Integer.parseInt(seqA);
+                        int intB = Integer.parseInt(seqB);
+                        return Integer.compare(intA, intB);
+                    } catch (NumberFormatException e) {
+                        // Fallback to string comparison if not numeric
+                        if (seqA == null && seqB == null) return 0;
+                        if (seqA == null) return 1;
+                        if (seqB == null) return -1;
+                        return seqA.compareTo(seqB);
+                    }
+                });
+
+                // update browser
+                int u;
+                UmlItem previous = null;
+
+                for (u = 0; u != sz; u += 1) {
+                    v[u].moveAfter(previous);
+                    previous = v[u];
+                }
+            }
+        } else
+            item.sortChildren();
         for (UmlItem child : item.children())
             sort(child);
     }

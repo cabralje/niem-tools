@@ -646,13 +646,14 @@ class NiemModel {
      * @param multiplicity
      * @return an element in type as a UmlAttribute
      */
-    boolean isElementInType(UmlClass type, String elementName) {
+    UmlAttribute getElementInType(UmlClass type, String elementName) {
 
-        boolean childFound = false;
+        //boolean childFound = false;
         for (UmlItem item : type.children()) {
             if (item.name().equals(elementName)) {
-                childFound = true;
-                break;
+                return (UmlAttribute) item;
+                //childFound = true;
+                //break;
             }
         }
 
@@ -663,7 +664,7 @@ class NiemModel {
         //        childFound = isElementInType(baseType, elementName);
        // }
 
-        return childFound;
+        return null;
     }
 
     /**
@@ -678,13 +679,15 @@ class NiemModel {
         String elementInTypeName = NamespaceModel.getPrefixedName(element);
         String typeName = NamespaceModel.getPrefixedName(type);
         UmlAttribute attribute = getElementInType(type, elementInTypeName, multiplicity);
+        UmlAttribute referenceAttribute = null;
         if (attribute == null)
 
             // if reference model, ensure element exists in the type
             if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName))) {
                 UmlClass referenceType = NiemUmlModel.getReferenceModel().getType(NamespaceModel.getSchemaURI(typeName), typeName);
 
-                if (!isElementInType(referenceType, elementInTypeName)) {
+                referenceAttribute = getElementInType(referenceType, elementInTypeName);
+                if (referenceAttribute == null) {
                     Log.debug("copyElementInType: error - element " + elementInTypeName + " not in type " + typeName);
                     return null;
                 }
@@ -708,7 +711,8 @@ class NiemModel {
              ConcurrentHashMap<String, String> properties = new  ConcurrentHashMap<>(element.properties());
             for (String key : properties.keySet())
                 attribute.set_PropertyValue(key, properties.get(key));
-            //attribute.set_PropertyValue(URI_PROPERTY, getURI(element));
+            if (referenceAttribute != null)
+                attribute.set_PropertyValue(NiemUmlModel.SEQUENCE_ID_PROPERTY, referenceAttribute.propertyValue(NiemUmlModel.SEQUENCE_ID_PROPERTY));
         }
         Log.debug("addElementInTypes: inserted " + elementInTypeName + " to " + typeName);
         return attribute;
@@ -1571,7 +1575,13 @@ class NiemModel {
                             Log.trace("importElementsInType: error - attribute " + attributeName + " not in model");
                             continue;
                         }
-                        addElementInType(attributeGroup, element, multiplicity);
+                        UmlAttribute attribute = addElementInType(attributeGroup, element, multiplicity);
+                        if (attribute == null)
+                            Log.trace("importElementsInTypes: error adding attribute " + attributeName + " to group " + attributeGroupName);
+                        else {
+                            attribute.set_PropertyValue(NiemUmlModel.SEQUENCE_ID_PROPERTY, String.valueOf(attributeIndex));
+                            Log.debug("importElementsInTypes: imported attribute " + attributeName + " in group " + attributeGroupName);
+                        }
                     }
                 }
             }
@@ -1618,6 +1628,7 @@ class NiemModel {
         }
         if (complexTypeNodeList != null) {
             for (int elementIndex = 0; elementIndex < complexTypeNodeList.getLength(); elementIndex++) {
+                int sequenceID = 0;
                 Element typeElement = (Element) complexTypeNodeList.item(elementIndex).cloneNode(true);
                 if (typeElement == null)
                     continue;
@@ -1706,14 +1717,17 @@ class NiemModel {
                         UmlClassInstance element = getElement(attributeSchemaURI, attributeName);
                         //UmlClassInstance element = getElement(doc.lookupNamespaceURI(NamespaceModel.getPrefix(attributeName)),
                         //		NamespaceModel.getPrefixedAttributeName(NamespaceModel.getPrefix(attributeName), attributeName));
-                        if (element == null)
+                        if (element == null) {
                             Log.trace("importElementsInTypes: error - attribute " + attributeName + " not in model");
+                            continue;
+                        }
+                        
+                        UmlAttribute attributeInType = addElementInType(type, element, multiplicity);
+                        if (attributeInType == null)
+                            Log.trace("importElementsInTypes: error adding attribute " + attributeName + " to type" + typeName);
                         else {
-                            UmlAttribute attributeInType = addElementInType(type, element, multiplicity);
-                            if (attributeInType == null)
-                                Log.trace("importElementsInTypes: error adding attribute " + attributeName + " to type");
-                            else
-                                Log.debug("importElementsInTypes: imported attribute " + attributeName + " in type " + typeName);
+                            attributeInType.set_PropertyValue(NiemUmlModel.SEQUENCE_ID_PROPERTY, String.valueOf(sequenceID++));
+                            Log.debug("importElementsInTypes: imported attribute " + attributeName + " in type " + typeName);
                         }
                     }
                 }
@@ -1759,13 +1773,16 @@ class NiemModel {
                                         + " not in reference model");
                                 continue;
                             }
-                            addElementInType(type, element, multiplicity);
-                            // trace("importElementsInTypes: added element " + elementName + " in type " +
-                            // typeName);
-
+                            UmlAttribute attribute = addElementInType(type, element, multiplicity);
+                            if (attribute == null)
+                                Log.trace("importElementsInTypes: error adding element " + elementName + " to type" + typeName);
+                            else {
+                                attribute.set_PropertyValue(NiemUmlModel.SEQUENCE_ID_PROPERTY, String.valueOf(sequenceID++));
+                                Log.debug("importElementsInTypes: imported element " + elementName + " in type " + typeName);
+                            }
                         }
                     }
-                } catch (Exception re) {
+                } catch (RuntimeException re) {
                     Log.trace(filename + "\nimportElementsInTypes: error importing element " + elementName + " in type "
                             + typeName + " " + re.toString());
                 }
