@@ -251,7 +251,7 @@ class NiemModel {
                     String prefix = NamespaceModel.getPrefix(item);
                     //if (prefix.equals(STRUCTURES_PREFIX) || prefix.equals(XSD_PREFIX))
                     //    return null;
-                    if (NiemModel.isAugmentation(NamespaceModel.getName(item)))
+                    if (NiemModel.isAugmentationType(NamespaceModel.getName(item)))
                         baseType = NiemUmlModel.getSubsetModel().getAugmentationType();
                 }
             default:
@@ -1145,6 +1145,10 @@ class NiemModel {
      * @return an element in model with uri elementUri as a String
      */
     UmlClassInstance getElementByURI(String elementUri) {
+        if (elementUri == null || elementUri.isEmpty()) {
+            Log.trace("getElementByURI: error - no URI for element");
+            return null;
+        }
         return elements.get(elementUri);
     }
 
@@ -1244,6 +1248,10 @@ class NiemModel {
      * @return an element in model with uri elementUri as a UmlClass
      */
     UmlClass getTypeByURI(String uri) {
+        if (uri == null || uri.isEmpty()) {
+            Log.trace("getTypeByURI: error - no URI for type");
+            return null;
+        }
         return types.get(uri);
     }
 
@@ -1996,12 +2004,21 @@ class NiemModel {
     }
 
     /**
+     * identify if an element is an augmentation
+     *
+     * @param elementName
+     * @return true if element is an augmentation
+     */
+    static boolean isAugmentation(String elementName) {
+        return elementName.endsWith(NiemModel.AUGMENTATION_POINT_NAME) || elementName.endsWith(NiemModel.AUGMENTATION_NAME);
+    }
+    /**
      * identify if a type is an augmentation
      *
      * @param typeName
      * @return true if type is an augmentation
      */
-    static boolean isAugmentation(String typeName) {
+    static boolean isAugmentationType(String typeName) {
         return typeName.endsWith(NiemModel.AUGMENTATION_TYPE_NAME);
     }
 

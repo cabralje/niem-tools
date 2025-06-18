@@ -358,7 +358,7 @@ public class NiemUmlModel {
      * @return true if an element in type exists in reference model
      */
     static Boolean isNiemElementInType(String typeName, String elementName) {
-        if (!isNiem(typeName) || !isNiemElement(elementName))
+        if (!isNiemType(typeName) || !isNiemElement(elementName))
             return false;
         UmlClassInstance element = ReferenceModel.getElement(NamespaceModel.getSchemaURI(elementName), elementName);
         List<UmlClassInstance> elementList = ReferenceModel.getElementsInType(NiemModel.getURI(NamespaceModel.getSchemaURI(typeName), typeName));
@@ -373,7 +373,7 @@ public class NiemUmlModel {
      * @param name
      * @return true if name exists in reference model
      */
-    static Boolean isNiem(String name) {
+    static Boolean isNiemType(String name) {
         if ((name == null) || name.isEmpty() || name.equals("??") || NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(name)))
             return false;
         String schemaURI = NamespaceModel.getSchemaURIForPrefix(NamespaceModel.getPrefix(name));
@@ -389,7 +389,7 @@ public class NiemUmlModel {
     static Boolean isNiem(UmlItem item) {
         String prefixedName = NamespaceModel.getPrefixedName(item);
         if (item.kind() == anItemKind.aClass)
-            return isNiem(prefixedName); 
+            return isNiemType(prefixedName); 
         else if (item.kind() == anItemKind.aClassInstance)
             return isNiemElement(prefixedName); 
         else
@@ -493,7 +493,7 @@ public class NiemUmlModel {
 
             Log.debug("createSubsetAndExtension: adding type " + typeName + " and base type " + baseTypeName);
             
-            //String description = null;
+            String description = item.description().trim();
             // skip elements in types
             //if (elementName.isEmpty())
             //    if (NiemModel.isAugmentation(typeName))
@@ -507,7 +507,7 @@ public class NiemUmlModel {
                     if (SubsetModel.copyType(baseTypeName) == null)
                         Log.trace("createSubsetAndExtension: error - base type " + baseTypeName + " not found in reference model");
                 } else {
-                    if (ExtensionModel.addType(NamespaceModel.getSchemaURI(baseTypeName), baseTypeName, null, null) == null)
+                    if (ExtensionModel.addType(NamespaceModel.getSchemaURI(baseTypeName), baseTypeName, description, null) == null)
                         Log.trace("createSubsetAndExtension: error - cannot add extension base type " + baseTypeName);
                 }
 
@@ -517,7 +517,7 @@ public class NiemUmlModel {
                     if (SubsetModel.copyType(typeName) == null)
                         Log.trace("createSubsetAndExtension: error - type " + typeName + " not found in reference model");
                 } else {
-                    if (ExtensionModel.addType(NamespaceModel.getSchemaURI(typeName), typeName, null, null) == null)
+                    if (ExtensionModel.addType(NamespaceModel.getSchemaURI(typeName), typeName, description, null) == null)
                         Log.trace("createSubsetAndExtension: error - cannot add extension type " + typeName);
                 }
         }
@@ -533,7 +533,7 @@ public class NiemUmlModel {
                 continue;
 
             String typeName = item.propertyValue(NIEM_STEREOTYPE_TYPENAME).trim();
-            if (typeName.isEmpty() || isNiem(typeName))
+            if (typeName.isEmpty() || isNiemType(typeName))
                 continue;
 
             String elementName = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
@@ -545,7 +545,7 @@ public class NiemUmlModel {
                 continue;
 
             UmlClass baseType;
-            if (baseTypeName.isEmpty() && NiemModel.isAugmentation(typeName))
+            if (baseTypeName.isEmpty() && NiemModel.isAugmentationType(typeName))
                 baseType = SubsetModel.getAugmentationType(); 
             else {
                 if (!elementName.isEmpty())

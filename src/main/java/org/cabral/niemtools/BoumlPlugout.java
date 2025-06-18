@@ -190,16 +190,6 @@ public class BoumlPlugout {
         switch (command) {
             
             case "importReferenceModel":
-
-                //TODO automate download from GitHub and import of the reference model
-                // Automate download from GitHub and import of the reference model
-                // Implementation Plan:
-                // 1. Define the GitHub repository URL and the project directory for the download.
-                // 2. Use a library like Apache HttpClient or Java's HttpURLConnection to fetch the files.
-                // 3. Save the downloaded files to the specified directory.
-                // 4. Validate the downloaded files (e.g., check file integrity or structure).
-                // 5. Proceed with importing the reference model into the UML project.
-
                 String importDir = System.getProperty("java.io.tmpdir");
                 try {
                     String githubRepoUrl = "https://github.com/niemopen/niem-model/archive/refs/tags/";

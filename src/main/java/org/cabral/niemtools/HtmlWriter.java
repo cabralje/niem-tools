@@ -277,7 +277,7 @@ public class HtmlWriter {
                             Log.trace("writeLineHtml: type " + typeName + " has no prefix");
                             return;
                         }
-                        if (NamespaceModel.isNiemPrefix(typePrefix) && !NiemUmlModel.isNiem(typeName)) {
+                        if (NamespaceModel.isNiemPrefix(typePrefix) && !NiemUmlModel.isNiemType(typeName)) {
                             fgcolor = invalidFGColor;
                             Log.trace("writeLineHtml: type " + typeName + " is not in the NIEM reference model");
                         }
@@ -326,7 +326,7 @@ public class HtmlWriter {
                     if (!baseType.isEmpty() && !NiemModel.isAbstract(baseType)) {
                         if (!NamespaceModel.isNiemPrefix(basePrefix) && !NamespaceModel.isExternalPrefix(basePrefix))
                             bgcolor = extensionBGColor;
-                        if (NamespaceModel.isNiemPrefix(basePrefix) && !NiemUmlModel.isNiem(baseType))
+                        if (NamespaceModel.isNiemPrefix(basePrefix) && !NiemUmlModel.isNiemType(baseType))
                             fgcolor = invalidFGColor;
                     }
                     fw.write(getColumnHtml(baseType, bgcolor, fgcolor, true));
