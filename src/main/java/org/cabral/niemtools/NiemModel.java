@@ -108,7 +108,7 @@ class NiemModel {
 
     // NIEM Naming and Design Rules
     static final String NDR_URI = "https://docs.oasis-open.org/niemopen/ns/specification/NDR/6.0/";
-    static final String NILLABLE_DEFAULT = "true";
+    static final String NILLABLE_DEFAULT = "false";
 
     // NIEM conformance targets
     static final String CT_REFERENCE = "#SubsetSchemaDocument";
@@ -1276,12 +1276,16 @@ class NiemModel {
         String truncated = "false";
         //int me = maxEnums;
         String maxEnumsString = NiemUmlModel.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
-        Integer maxEnums = Integer.valueOf(maxEnumsString);
-        if (length > maxEnums) {
-            if (type != null)
-                Log.trace("importCodeList: truncated code list " + type.name() + " from " + length + " to " + maxEnums);
-            length = maxEnums;
-            truncated = "true";
+        try {
+            Integer maxEnums = Integer.valueOf(maxEnumsString);
+            if (length > maxEnums) {
+                if (type != null)
+                    Log.trace("importCodeList: truncated code list " + type.name() + " from " + length + " to " + maxEnums);
+                length = maxEnums;
+                truncated = "true";
+            }
+        } catch (NumberFormatException e) {
+            Log.debug("importCodeList: error - cannot parse maxEnums " + maxEnumsString + " " + e.toString());
         }
         if (type != null)
             type.set_PropertyValue(NiemUmlModel.TRUNCATED_PROPERTY, truncated);
@@ -1815,11 +1819,15 @@ class NiemModel {
 
         String truncated = "false";
         String maxEnumsString = NiemUmlModel.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
-        Integer maxEnums = Integer.valueOf(maxEnumsString);
-        if (length > maxEnums) {
-            Log.trace("importFacets: truncated facet restrictions on " + type.name() + " from " + length + " to " + maxEnums);
-            length = maxEnums;
-            truncated = "true";
+        try {
+            Integer maxEnums = Integer.valueOf(maxEnumsString);
+            if (length > maxEnums) {
+                Log.trace("importFacets: truncated facet restrictions on " + type.name() + " from " + length + " to " + maxEnums);
+                length = maxEnums;
+                truncated = "true";
+            }
+        } catch (NumberFormatException e) {
+            Log.trace("importFacets: error - cannot parse max facets value " + maxEnumsString  + " " + e.toString());
         }
         if (type != null)
             type.set_PropertyValue(NiemUmlModel.TRUNCATED_PROPERTY, truncated);

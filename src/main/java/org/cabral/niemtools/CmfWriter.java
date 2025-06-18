@@ -381,7 +381,11 @@ public class CmfWriter {
         try {
             Log.debug("exportCmfClass: exported complex class " + typeName);
             classCmf = exportCmfComponent(type);
-                    //+ tag("ReferenceCode", "NONE");
+            String isNillable = type.propertyValue(NiemUmlModel.NILLABLE_PROPERTY);
+            if (isNillable == null)
+                isNillable = NiemModel.NILLABLE_DEFAULT;
+            if (isNillable.equals("true"))
+                classCmf += tag("ReferenceCode", "ANY");
             if (isOlderCmfVersion(cmfVersion, "1.0")) {
                 classCmf += tag("AugmentableIndicator", "true");
             }
@@ -668,9 +672,14 @@ public class CmfWriter {
             return tagId(dataPropertyName, id, propertyCmf);
         } else {
             // object property
-            propertyCmf = exportCmfComponent(element) 
+            propertyCmf = exportCmfComponent(element);
+            String isNillable = element.propertyValue(NiemUmlModel.NILLABLE_PROPERTY);
+            if (isNillable == null)
+                isNillable = NiemModel.NILLABLE_DEFAULT;
+             if (isNillable.equals("true"))
+                propertyCmf += tag("ReferenceCode", "ANY"); 
                         //+ tag("ReferenceCode", "NONE")
-                        + tagRef("Class", NamespaceModel.getPrefixedName(baseType));
+            propertyCmf += tagRef("Class", NamespaceModel.getPrefixedName(baseType));
             // augmentation
             String head = element.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
             if (head != null) {

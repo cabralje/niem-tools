@@ -1344,7 +1344,8 @@ public class NiemUmlModel {
     public void importSchemaDir(String dir) throws IOException {
 
         UmlCom.message("Importing NIEM schema");
-
+        Log.trace("Importing NIEM reference model.");
+        Log.trace("Code lists/facets will be limited to " + properties.getProperty(ProjectProperties.IMPORT_MAX_FACETS) + " values.");
         // Configure DOM
         Path path = FileSystems.getDefault().getPath(dir);
         String importPath = path.toString();
@@ -1391,9 +1392,8 @@ public class NiemUmlModel {
                     String filepath = filepath1.replaceAll(java.util.regex.Matcher.quoteReplacement(File.separator), "/");
                     
                     // check for included or excluded domains
-
+                    String filepath2 = filepath.substring(filepath.lastIndexOf("/") + 1).replace(".xsd", "");
                     if (filepath.contains("/domains/")) {
-                        String filepath2 = filepath.replace("/domains/", "").replace(".xsd","");
                         String includes = properties.getProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS);
                         if (!includes.isEmpty() && (!includes.contains(filepath2))) {
                             Log.trace("importSchemaDir: skipping domain " + filepath + " - not on include list");
@@ -1408,7 +1408,6 @@ public class NiemUmlModel {
                     
                     // check for included or excluded codes
                     if (filepath.contains("/codes/")) {
-                        String filepath2 = filepath.replace("/codes/", "").replace(".xsd","");
                         String excludes = properties.getProperty(ProjectProperties.IMPORT_EXCLUDE_CODES);
                         if (!excludes.isEmpty() && (excludes.contains(filepath2))) {
                             Log.trace("importSchemaDir: skipping excluded codes " + filepath);

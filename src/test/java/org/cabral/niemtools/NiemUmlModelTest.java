@@ -52,7 +52,7 @@ public class NiemUmlModelTest {
     public void testIsNiemTypeAndIsNiemElement() {
         // These will return false for null, empty, or unknown types
         //assertFalse(NiemUmlModel.isNiem(null));
-        assertFalse(NiemUmlModel.isNiem(""));
+        assertFalse(NiemUmlModel.isNiemType(""));
         assertFalse(NiemUmlModel.isNiemElement(null));
         assertFalse(NiemUmlModel.isNiemElement(""));
     }

@@ -579,7 +579,7 @@ class ConfigurationDialog extends JDialog {
                         Log.debug("HTTP Error: " + responseCode);
                     }
                 } catch (IOException e) {
-                    Log.trace("Exception populating NIEM versions: " + e.getMessage());
+                    Log.trace("Timeout populating NIEM versions from niem-model GitHub repo: " + e.getMessage());
                     //e.printStackTrace();
                     throw e;
                 }

@@ -665,7 +665,6 @@ public class XmlWriter {
         String description = element.description();
         if (description != null && !description.isEmpty()) {
             elementSchema += """
-                                         
                                          <xs:annotation>
                                          <xs:documentation>""" + description + "</xs:documentation>\n";
             //String codeList = NiemUmlClass.getCodeList(element);
