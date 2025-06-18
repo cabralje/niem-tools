@@ -1,7 +1,6 @@
 package org.cabral.niemtools;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
@@ -64,29 +63,5 @@ public class BoumlPlugoutTest {
             fail("Unexpected InterruptedException");
         }
     }
-
     // Helper methods to invoke private static methods via reflection
-    private String invokeSelectDirectoryProperty(NiemUmlModel model, String propertyName, String dialogTitle) {
-        try {
-            java.lang.reflect.Method m = BoumlPlugout.class.getDeclaredMethod(
-                "selectDirectoryProperty", NiemUmlModel.class, String.class, String.class);
-            m.setAccessible(true);
-            return (String) m.invoke(null, model, propertyName, dialogTitle);
-        } catch (IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
-            // Acceptable in headless or test environments
-            return null;
-        }
-    }
-
-    private String invokeSelectFileProperty(NiemUmlModel model, String propertyName, String dialogTitle) {
-        try {
-            java.lang.reflect.Method m = BoumlPlugout.class.getDeclaredMethod(
-                "selectFileProperty", NiemUmlModel.class, String.class, String.class);
-            m.setAccessible(true);
-            return (String) m.invoke(null, model, propertyName, dialogTitle);
-        } catch (IllegalAccessException | NoSuchMethodException | SecurityException | InvocationTargetException e) {
-            // Acceptable in headless or test environments
-            return null;
-        }
-    }
 }

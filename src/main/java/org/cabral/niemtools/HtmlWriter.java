@@ -48,6 +48,7 @@ package org.cabral.niemtools;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,7 +89,7 @@ public class HtmlWriter {
 
                 // Show NIEM Mappings for Classes
                 @SuppressWarnings("unchecked")
-                java.util.Vector<UmlItem> classes = UmlClass.classes;
+                ArrayList<UmlItem> classes = new ArrayList<>(UmlClass.classes);
                 Iterator<UmlItem> it = (classes.iterator());
                 while (it.hasNext()) {
                     UmlItem thisClass = it.next();
@@ -272,11 +273,11 @@ public class HtmlWriter {
                     if (typeName != null && !typeName.isEmpty()) {
                         //@SuppressWarnings('unused');
                         if (typePrefix == null) {
-                            fgcolor = invalidFGColor;
+                            //fgcolor = invalidFGColor;
                             Log.trace("writeLineHtml: type " + typeName + " has no prefix");
                             return;
                         }
-                        if (NamespaceModel.isNiemPrefix(typePrefix) && !NiemUmlModel.isNiemType(typeName)) {
+                        if (NamespaceModel.isNiemPrefix(typePrefix) && !NiemUmlModel.isNiem(typeName)) {
                             fgcolor = invalidFGColor;
                             Log.trace("writeLineHtml: type " + typeName + " is not in the NIEM reference model");
                         }
@@ -325,7 +326,7 @@ public class HtmlWriter {
                     if (!baseType.isEmpty() && !NiemModel.isAbstract(baseType)) {
                         if (!NamespaceModel.isNiemPrefix(basePrefix) && !NamespaceModel.isExternalPrefix(basePrefix))
                             bgcolor = extensionBGColor;
-                        if (NamespaceModel.isNiemPrefix(basePrefix) && !NiemUmlModel.isNiemType(baseType))
+                        if (NamespaceModel.isNiemPrefix(basePrefix) && !NiemUmlModel.isNiem(baseType))
                             fgcolor = invalidFGColor;
                     }
                     fw.write(getColumnHtml(baseType, bgcolor, fgcolor, true));

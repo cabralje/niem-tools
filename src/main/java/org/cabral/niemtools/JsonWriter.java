@@ -154,11 +154,19 @@ public class JsonWriter {
             // OpenAPI 3.0 now supports "oneOf"
             if (minOccurs.equals("0") || minOccurs.equals("1")) {
                 elementSchema += "\"oneOf\": [";
-                elementSchema += "{\n" + "\"$ref\": \"" + elementRef + "\"\n" + "},\n";
+                elementSchema += """
+                        {
+                        "$ref": "%s"
+                        },
+                        """.formatted(elementRef);
                 elementSchema += "{\n";
-                //	elementSchema +="]\n";
             }
-            elementSchema += "\"items\": {\n" + "\"$ref\": \"" + elementRef + "\"\n" + "},\n" + "\n\"minItems\": " + minOccurs + ",\n";
+            elementSchema += """
+                    "items": {
+                    "$ref": "%s"
+                    },
+                    "minItems": %s,
+                    """.formatted(elementRef, minOccurs);
             if (!maxOccurs.equals("unbounded"))
                 elementSchema += "\n\"maxItems\": " + maxOccurs + ",\n";
             elementSchema += "\"type\": \"array\"\n";
@@ -756,14 +764,13 @@ public class JsonWriter {
                                 // String minOccurs = getMinOccurs(mult);
                                 String maxOccurs = NiemUmlModel.getMaxOccurs(mult);
                                 String required = (maxOccurs.equals("0")) ? "false" : "true";
-                                openapiPathParameters.add("           {\n"
-                                        + "            \"name\": \"" + paramName + "\",\n"
-                                        + "            \"in\": \"" + paramKind + "\",\n"
-                                        // + " \"description\": \"" + param.type.toString() + "\",\n"
-                                        + "            \"required\": " + required + ",\n"
-                                        + paramSchema + "\n"
-                                        + // " \"format\": \"int64\"\n" +
-                                        "          }");
+                                openapiPathParameters.add("""
+                                           {
+                                            "name": "%s",
+                                            "in": "%s",
+                                            "required": %s,
+                                        %s
+                                          }""".formatted(paramName, paramKind, required, paramSchema));
 
                                 continue;
                             }
@@ -784,13 +791,13 @@ public class JsonWriter {
                                 if (inputTypeSchema != null) {
                                     if (inputTypeSchema.isEmpty())
                                         Log.trace("exportOpenAPI - operation " + operationName + " parameter " + param.name + " has no base type ");
-                                    openapiBodyParameters.add("{\n"
-                                            + "            \"name\": \"" + elementName + "\",\n"
-                                            + "            \"in\": \"body\",\n"
-                                            //+ "            \"description\": \"" + operationName + " request\",\n" 
-                                            + "            \"required\": true,\n"
-                                            + inputTypeSchema + "\n"
-                                            + "          }");
+                                    openapiBodyParameters.add("""
+                                            {
+                                                        "name": "%s",
+                                                        "in": "body",
+                                                        "required": true,
+                                            %s
+                                                      }""".formatted(elementName, inputTypeSchema));
                                 }
                             } else {
                                 if (!NiemUmlModel.isNiemUml(inputType)) {
@@ -820,11 +827,16 @@ public class JsonWriter {
                                 if (Integer.parseInt(NiemUmlModel.getMinOccurs(mult)) > 0)
                                     jsonRequiredElementsInType.add("\"" + inputMessage + "\"");
                                 // for each input parameter
-                                openapiBodyParameters.add("{\n" + "            \"name\": \"" + elementName + "\",\n"
-                                        + "            \"in\": \"body\",\n" + "            \"description\": \""
-                                        + operationName + " request\",\n" + "            \"required\": true,\n"
-                                        + "            \"schema\": {\n" + "              \"$ref\": \"#/definitions/"
-                                        + elementName + "\"\n" + "            }\r\n" + "          }");
+                                openapiBodyParameters.add("""
+                                        {
+                                            "name": "%s",
+                                            "in": "body",
+                                            "description": "%s request",
+                                            "required": true,
+                                            "schema": {
+                                              "$ref": "#/definitions/%s"
+                                            }
+                                          }""".formatted(elementName, operationName, elementName));
                             }
                         }
                         // export type wrapper
@@ -867,18 +879,20 @@ public class JsonWriter {
                     if (outputType == null) {
                         String outputTypeSchema = exportJsonPrimitiveSchemafromUml(outputType2);
                         if (outputTypeSchema == null)
-                            openapiResponses.add("\n"
-                                    + "          \"200\": {\n"
-                                    + "            \"description\": \"" + operationName + " response\"\n"
-                                    + "            }"); 
+                            openapiResponses.add("""
+
+                                      "200": {
+                                        "description": "%s response"
+                                        }""".formatted(operationName)); 
                         else {
                             if (outputTypeSchema.isEmpty())
                                 Log.trace("exportOpenAPI - operation " + operationName + " response has no base type ");
-                            openapiResponses.add("\n"
-                                    + "          \"200\": {\n"
-                                    + "            \"description\": \"" + operationName + " response\",\n"
-                                    + "\"schema\": {" + outputTypeSchema + "}\n"
-                                    + "            }");
+                            openapiResponses.add("""
+
+                                      "200": {
+                                        "description": "%s response",
+                                    "schema": {%s}
+                                        }""".formatted(operationName, outputTypeSchema));
                         }
                     } else {
                         if (!NiemUmlModel.isNiemUml(outputType)) {
@@ -958,21 +972,25 @@ public class JsonWriter {
                         jsonDefinitions.add(typeSchema);
                         Log.debug("exportOpenAPI: exported element " + elementName + " and type " + outputTypeName);
                         // add successful response
-                        openapiResponses.add("\n"
-                                + "          \"200\": {\n"
-                                + "            \"description\": \"" + operationName + " response\",\n"
-                                + "            \"schema\": {\n"
-                                + "                \"$ref\": \"#/definitions/" + operationName + "Response" + "\"\n"
-                                + "            }\n" + "          }");
+                        openapiResponses.add("""
+
+                                  "200": {
+                                    "description": "%s response",
+                                    "schema": {
+                                        "$ref": "#/definitions/%sResponse"
+                                    }
+                                  }""".formatted(operationName, operationName));
                         // add error response
                         if (JsonWriter.ERROR_RESPONSE != null) {
-                            openapiResponses.add("\n"
-                                    + "          \"default\": {\n"
-                                    + "            \"description\": \"unexpected error\",\n"
-                                    + "            \"schema\": {\n"
-                                    + "              \"$ref\": \"#/definitions/" + JsonWriter.ERROR_RESPONSE + "\"\n"
-                                    + "            }\n"
-                                    + "          }\n");
+                            openapiResponses.add("""
+                                
+                                  "default": {
+                                    "description": "unexpected error",
+                                    "schema": {
+                                      "$ref": "#/definitions/%s"
+                                    }
+                                  }
+                                """.formatted(JsonWriter.ERROR_RESPONSE));
                         }
 
                         //}
@@ -985,18 +1003,31 @@ public class JsonWriter {
                                 case "post":
                                     openapiParameters.addAll(openapiBodyParameters);
                                 default:
-                                    openapiOperations.add("\n" + "      \"" + method + "\": {\n"
-                                            + "        \"description\": \"" + operation.description() + "\\n\",\n"
-                                            + "        \"operationId\": \"" + operationName + "\",\n"
-                                            + "        \"parameters\": [" + "        " + String.join(",", openapiParameters)
-                                            + "\n" + "        ],\n" + "        \"responses\": {" + "        "
-                                            + String.join(",", openapiResponses) + "\n" + "        }" + "\n      }");
+                                                                    openapiOperations.add("""
+                                      "%s": {
+                                        "description": "%s\\n",
+                                        "operationId": "%s",
+                                        "parameters": [
+                                        %s
+                                        ],
+                                        "responses": {
+                                        %s
+                                        }
+                                      }""".formatted(
+                                        method,
+                                        operation.description(),
+                                        operationName,
+                                        String.join(",", openapiParameters),
+                                        String.join(",", openapiResponses)
+                                      ));
                             }
                         }
                     }
 
-                    openapiPaths.add("\n" + "    \"" + operationPath + "\": {" + String.join(",", openapiOperations)
-                            + "\n      }");
+                    openapiPaths.add("""
+                        %n    "%s": {%s
+                              }
+                        """.formatted(operationPath, String.join(",", openapiOperations)));
                 }
             }
             // write OpenAPI file
@@ -1008,35 +1039,58 @@ public class JsonWriter {
                     parentFile.mkdirs();
                 try (FileWriter fw = new FileWriter(file)) {
                     Log.debug("OpenAPI: " + portName + OPENAPI_FILE_TYPE);
-                    fw.write("  ],\n" + "{\n"
-                            + // jsonContext + ",\n" +
-                            "  \"openapi\": \"" + OPENAPI_VERSION + "\",\n"
-                                    + "  \"info\": {\n"
-                                    + "    \"version\": \"" + properties.getProperty(ProjectProperties.IEPD_VERSION) + "\",\n"
-                                            + "    \"title\": \"" + portName + "\",\n"
-                                                    + "    \"description\": \"" + port.description() + "\",\n"
-                                                            + "    \"termsOfService\": \"" + properties.getProperty(ProjectProperties.IEPD_TERMS_URL) + "\",\n"
-                                                                    + "    \"contact\": {\n"
-                                                                    + "      \"name\": \"" + properties.getProperty(ProjectProperties.IEPD_ORGANIZATION) + "\",\n"
-                                                                            + "      \"email\": \"" + properties.getProperty(ProjectProperties.IEPD_EMAIL) + "\",\n"
-                                                                                    + "      \"url\": \"" + properties.getProperty(ProjectProperties.IEPD_CONTACT) + "\"\n"
-                                                                                            + "    },\n"
-                                                                                            + "    \"license\": {\n"
-                                                                                            + "      \"name\": \"" + properties.getProperty(ProjectProperties.IEPD_LICENSE_URL) + "\",\n"
-                                                                                                    + "      \"url\": \"" + properties.getProperty(ProjectProperties.IEPD_LICENSE_URL) + "\"\n"
-                                                                                                            + "    }\n"
-                                                                                                            + "  },\n"
-                                                                                                            + "  \"host\": \"host.example.com\",\n"
-                                                                                                            + "  \"basePath\": \"" + portPath + "\",\n"
-                                                                                                                    + "  \"schemes\": [\n" + "    \"http\"\n" + "  ],\n"
-                                                                                                                    + "  \"consumes\": [\n"
-                                                                                                                    + "    \"application/json\"\n"
-                            + "  \"produces\": [\n"
-                            + "    \"application/json\"\n" + "  ],"
-                            + "  \"paths\": {" + "  " + String.join(",", openapiPaths) + "\n"
-                            + "      },\n"
-                            + "  \"definitions\": {\n" + String.join(",\n", jsonDefinitions) + "\n}"
-                            + "}\n");
+                    fw.write("""
+                            ],
+                            {
+                              "openapi": "%s",
+                              "info": {
+                                "version": "%s",
+                                "title": "%s",
+                                "description": "%s",
+                                "termsOfService": "%s",
+                                "contact": {
+                                  "name": "%s",
+                                  "email": "%s",
+                                  "url": "%s"
+                                },
+                                "license": {
+                                  "name": "%s",
+                                  "url": "%s"
+                                }
+                              },
+                              "host": "host.example.com",
+                              "basePath": "%s",
+                              "schemes": [
+                                "http"
+                              ],
+                              "consumes": [
+                                "application/json"
+                              ],
+                              "produces": [
+                                "application/json"
+                              ],
+                              "paths": {
+                                %s
+                              },
+                              "definitions": {
+                                %s
+                              }
+                            }
+                            """.formatted(
+                                OPENAPI_VERSION,
+                                properties.getProperty(ProjectProperties.IEPD_VERSION),
+                                portName,
+                                port.description(),
+                                properties.getProperty(ProjectProperties.IEPD_TERMS_URL),
+                                properties.getProperty(ProjectProperties.IEPD_ORGANIZATION),
+                                properties.getProperty(ProjectProperties.IEPD_EMAIL),
+                                properties.getProperty(ProjectProperties.IEPD_CONTACT),
+                                properties.getProperty(ProjectProperties.IEPD_LICENSE_URL),
+                                properties.getProperty(ProjectProperties.IEPD_LICENSE_URL),
+                                portPath,
+                                String.join(",", openapiPaths),
+                                String.join(",\n", jsonDefinitions)
+                            ));
                 }
             } catch (IOException e1) {
                 Log.trace("exportOpenAPI: error exporting OpenAPI JSON " + e1.toString());
@@ -1079,7 +1133,12 @@ public class JsonWriter {
         if (maxOccurs.equals("1"))
             elementSchema += "\"$ref\": \"" + elementRef + "\"\n"; 
         else {
-            elementSchema += "\"items\": {\n" + "\"$ref\": \"" + elementRef + "\"\n" + "},\n" + "\n\"minItems\": " + minOccurs + ",\n";
+            elementSchema += """
+                    "items": {
+                    "$ref": "%s"
+                    },
+                    "minItems": %s,
+                    """.formatted(elementRef, minOccurs);
             if (!maxOccurs.equals("unbounded")) {
                 elementSchema += "\n\"maxItems\": " + maxOccurs + ",\n";
             }

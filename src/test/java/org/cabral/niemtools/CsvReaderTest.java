@@ -3,7 +3,6 @@ package org.cabral.niemtools;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import org.junit.After;
 import org.junit.Before;
@@ -144,35 +143,16 @@ public class CsvReaderTest {
         reader.importCsv(tempFile.getAbsolutePath());
         // Should not throw, should log error
     }
-
-    // --- Helper methods ---
-
-    private void writeCsv(File file, String[] header, String[] row) throws IOException {
-        try (PrintWriter pw = new PrintWriter(file)) {
-            pw.println(String.join(",", header));
-            pw.println(String.join(",", row));
-        }
-    }
-
-    // Reflection helpers for static fields
-    private void setStaticField(Class<?> clazz, String fieldName, Object value) throws Exception {
-        java.lang.reflect.Field field = clazz.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(null, value);
-    }
-
     // Mockito static mocking helpers (requires mockito-inline or mockito-core 3.4+)
-    private void mockStatic(Class<?> clazz) {
-        // This is a placeholder for static mocking, which may require PowerMockito or Mockito's inline mock maker.
-        // In real projects, use @PrepareForTest and PowerMockito.mockStatic, or Mockito.mockStatic if available.
-    }
+    // This is a placeholder for static mocking, which may require PowerMockito or Mockito's inline mock maker.
+    // In real projects, use @PrepareForTest and PowerMockito.mockStatic, or Mockito.mockStatic if available.
     /*
     private <T> T anyInt() {
-        return Mockito.anyInt();
+    return Mockito.anyInt();
     }
-
     private <T> T anyString() {
-        return Mockito.anyString();
+    return Mockito.anyString();
     }
-    */
+     */    // Reflection helpers for static fields
+    // --- Helper methods ---
 }

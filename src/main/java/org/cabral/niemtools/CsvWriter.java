@@ -53,6 +53,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.opencsv.CSVWriter;
@@ -170,7 +171,7 @@ public class CsvWriter {
 
                 // Export NIEM Mappings for Classes
                 @SuppressWarnings("unchecked")
-                java.util.Vector<UmlItem> classes = UmlClass.classes;
+                ArrayList<UmlItem> classes = new ArrayList<>(UmlClass.classes);
                 Iterator<UmlItem> it = (classes.iterator());
                 while (it.hasNext()) {
                     UmlItem thisClass = it.next();

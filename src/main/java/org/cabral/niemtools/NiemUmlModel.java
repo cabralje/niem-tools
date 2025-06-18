@@ -67,6 +67,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +100,7 @@ import fr.bouml.anItemKind;
 public class NiemUmlModel {
 
     // NIEM defaults
-    private static final String NIEM_VERSION_DEFAULT = "6.0";
+    //private static final String NIEM_VERSION_DEFAULT = "6.0";
     private static final String WANTLIST_URI = "http://niem.gov/niem/wantlist/2.2";
     static final String NIEM_DIR = "niem";
 
@@ -357,7 +358,7 @@ public class NiemUmlModel {
      * @return true if an element in type exists in reference model
      */
     static Boolean isNiemElementInType(String typeName, String elementName) {
-        if (!isNiemType(typeName) || !isNiemElement(elementName))
+        if (!isNiem(typeName) || !isNiemElement(elementName))
             return false;
         UmlClassInstance element = ReferenceModel.getElement(NamespaceModel.getSchemaURI(elementName), elementName);
         List<UmlClassInstance> elementList = ReferenceModel.getElementsInType(NiemModel.getURI(NamespaceModel.getSchemaURI(typeName), typeName));
@@ -369,16 +370,16 @@ public class NiemUmlModel {
     }
 
     /**
-     * @param typeName
-     * @return true if type exists in reference model
+     * @param name
+     * @return true if name exists in reference model
      */
-    static Boolean isNiemType(String typeName) {
-        if ((typeName == null) || typeName.isEmpty() || typeName.equals("??") || NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(typeName)))
+    static Boolean isNiem(String name) {
+        if ((name == null) || name.isEmpty() || name.equals("??") || NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(name)))
             return false;
-        String schemaURI = NamespaceModel.getSchemaURIForPrefix(NamespaceModel.getPrefix(typeName));
+        String schemaURI = NamespaceModel.getSchemaURIForPrefix(NamespaceModel.getPrefix(name));
         if (schemaURI == null)
             return false;
-        return ReferenceModel.getTypeByURI(NiemModel.getURI(schemaURI, typeName)) != null;
+        return ReferenceModel.getTypeByURI(NiemModel.getURI(schemaURI, name)) != null;
     }
 
     /**
@@ -388,7 +389,7 @@ public class NiemUmlModel {
     static Boolean isNiem(UmlItem item) {
         String prefixedName = NamespaceModel.getPrefixedName(item);
         if (item.kind() == anItemKind.aClass)
-            return isNiemType(prefixedName); 
+            return isNiem(prefixedName); 
         else if (item.kind() == anItemKind.aClassInstance)
             return isNiemElement(prefixedName); 
         else
@@ -476,7 +477,7 @@ public class NiemUmlModel {
         
         // add types to subset and extension
         Log.debug("createSubsetAndExtension: copy subset types and create extension types");
-        java.util.Vector<UmlItem> all = (java.util.Vector<UmlItem>) UmlItem.all;
+        ArrayList<UmlItem> all = new ArrayList<>(UmlItem.all);
         for (UmlItem item : all) {
             if (!isNiemUml(item))
                 continue;
@@ -487,18 +488,18 @@ public class NiemUmlModel {
 
             Log.debug("createSubsetAndExtension: " + item.name());
             String typeName = item.propertyValue(NIEM_STEREOTYPE_TYPENAME).trim();
-            String elementName = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
-            String notes = item.propertyValue(NIEM_STEREOTYPE_NOTES).trim();
+            //String elementName = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
+            //String notes = item.propertyValue(NIEM_STEREOTYPE_NOTES).trim();
 
             Log.debug("createSubsetAndExtension: adding type " + typeName + " and base type " + baseTypeName);
-            String description = null;
-
+            
+            //String description = null;
             // skip elements in types
-            if (elementName.isEmpty())
-                if (NiemModel.isAugmentation(typeName))
-                    description = "An augmentation type";
-                else 
-                    description = item.description().trim();
+            //if (elementName.isEmpty())
+            //    if (NiemModel.isAugmentation(typeName))
+            //        description = "An augmentation type";
+            //    else 
+            //        description = item.description().trim();
 
             // add base type
             if (!baseTypeName.isEmpty())
@@ -532,7 +533,7 @@ public class NiemUmlModel {
                 continue;
 
             String typeName = item.propertyValue(NIEM_STEREOTYPE_TYPENAME).trim();
-            if (typeName.isEmpty() || isNiemType(typeName))
+            if (typeName.isEmpty() || isNiem(typeName))
                 continue;
 
             String elementName = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
@@ -624,7 +625,7 @@ public class NiemUmlModel {
                 if (baseType == null && !baseTypeName.isEmpty())
                     Log.trace("createSubsetAndExtension: error - base type " + baseTypeName2 + " not in model");
                 
-                UmlClassInstance element = null;
+                UmlClassInstance element;
                 if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(elementName))) {
                     element = SubsetModel.copyElement(elementName);
                     if (element == null)
@@ -639,7 +640,7 @@ public class NiemUmlModel {
 
                 // copy element in type
                 if ((!substitution || !representation) && !typeName.isEmpty()) {
-                    UmlClass type = null;
+                    UmlClass type;
                     if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(typeName))) {
                         type = SubsetModel.getType(NamespaceModel.getSchemaURI(typeName), typeName);
                         if (type == null || SubsetModel.copyElementInType(type, element, multiplicity) == null)
@@ -687,7 +688,7 @@ public class NiemUmlModel {
     public void deleteMapping() {
         Log.trace("Deleting NIEM Mapping");
         @SuppressWarnings("unchecked")
-        java.util.Vector<UmlItem> all = (java.util.Vector<UmlItem>) UmlItem.all;
+        ArrayList<UmlItem> all = new ArrayList<>(UmlItem.all);
         for (UmlItem item : all) {
             if (isNiemUml(item) && item.kind() != anItemKind.aClassInstance)
                 for (int property = 4; property < NIEM_STEREOTYPE_MAP.length; property++)
@@ -872,11 +873,11 @@ public class NiemUmlModel {
 		 * cacheModel(subsetPackage); cacheModel(extensionPackage);
          */
         // export code lists for extension elements
-        String exportCmf = properties.getProperty(ProjectProperties.EXPORT_CMF);
+        //String exportCmf = properties.getProperty(ProjectProperties.EXPORT_CMF);
         String exportXsd = properties.getProperty(ProjectProperties.EXPORT_XSD);
         String exportJson = properties.getProperty(ProjectProperties.EXPORT_JSON);
         String exportCmfToXsd = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
-        String exportCmfToJson = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
+        //String exportCmfToJson = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
         String exportWsdl = properties.getProperty(ProjectProperties.EXPORT_WSDL);
         String exportOpenApi = properties.getProperty(ProjectProperties.EXPORT_OPENAPI);
 
@@ -1283,7 +1284,10 @@ public class NiemUmlModel {
      * @return NIEM version as a String
      */
     static public String getNiemVersion() {
-        String niemVersion = NIEM_VERSION_DEFAULT;
+        //String niemVersion = NIEM_VERSION_DEFAULT;
+        String niemVersion = UmlPackage.getProject().propertyValue(ProjectProperties.IMPORT_NIEM_VERSION);
+        if (niemVersion != null && niemVersion.contains("-"))
+            niemVersion = niemVersion.substring(0, niemVersion.indexOf('-'));
 
         /*		String schemaURI = NamespaceModel.getSchemaURIForPrefix("nc");
 		// UmlCom.trace("NIEM URI: " + schemaURI);

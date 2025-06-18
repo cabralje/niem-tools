@@ -55,6 +55,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -64,6 +65,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -546,7 +548,7 @@ class ConfigurationDialog extends JDialog {
                 List<String> versions = new ArrayList<>();
                 
                 try {
-                    URL url = new URL("https://api.github.com/repos/niemopen/niem-model/tags");
+                    URL url = URI.create("https://api.github.com/repos/niemopen/niem-model/tags").toURL();
                     Log.debug("Connecting to: " + url);
                     
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -576,9 +578,9 @@ class ConfigurationDialog extends JDialog {
                     } else {
                         Log.debug("HTTP Error: " + responseCode);
                     }
-                } catch (Exception e) {
+                } catch (IOException e) {
                     Log.trace("Exception populating NIEM versions: " + e.getMessage());
-                    e.printStackTrace();
+                    //e.printStackTrace();
                     throw e;
                 }
                 
@@ -611,9 +613,9 @@ class ConfigurationDialog extends JDialog {
                         }
                     }
                     comboBox.repaint();
-                } catch (Exception e) {
+                } catch (InterruptedException | ExecutionException e) {
                     Log.debug("Exception in done(): " + e.getMessage());
-                    e.printStackTrace();
+                    //e.printStackTrace();
                     comboBox.removeAllItems();
                     comboBox.addItem("Error: " + e.getMessage());
                 }

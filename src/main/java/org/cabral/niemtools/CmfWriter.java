@@ -377,8 +377,8 @@ public class CmfWriter {
 
         try {
             Log.debug("exportCmfClass: exported complex class " + typeName);
-            classCmf = exportCmfComponent(type)
-                    + tag("ReferenceCode", "NONE");
+            classCmf = exportCmfComponent(type);
+                    //+ tag("ReferenceCode", "NONE");
             if (isOlderCmfVersion(cmfVersion, "1.0")) {
                 classCmf += tag("AugmentableIndicator", "true");
             }
@@ -564,7 +564,7 @@ public class CmfWriter {
                     String sustitutionInType = substitutionElement.propertyValue(NiemUmlModel.SUBSTITUTION_TYPE_PROPERTY);
                     if (sustitutionInType != null) {
                         String substitutionElementName = NamespaceModel.getPrefixedName(substitutionElement);
-                        if (substitutionElementName.endsWith(NiemModel.AUGMENTATION_NAME)) {
+                        if (substitutionElementName.endsWith(NiemModel.AUGMENTATION_NAME)  && !NiemUmlModel.isNiem(substitutionElementName)) {
                             Log.debug("exportCmfNamespace: skipping augmentation element " + substitutionElementName);
                             continue;
                         }
@@ -631,7 +631,8 @@ public class CmfWriter {
 
         tagIds.add(id);
         String elementName = NamespaceModel.getName(element);
-        if (elementName.endsWith(NiemModel.AUGMENTATION_POINT_NAME) || elementName.endsWith(NiemModel.AUGMENTATION_NAME))
+        if ((elementName.endsWith(NiemModel.AUGMENTATION_POINT_NAME) || elementName.endsWith(NiemModel.AUGMENTATION_NAME)) && !NiemUmlModel.isNiem(elementName))
+            // augmentation point or augmentation
             return "";
         Log.debug("exportCmfProperty: exporting property " + elementName);
 
@@ -663,7 +664,7 @@ public class CmfWriter {
         } else {
             // object property
             propertyCmf = exportCmfComponent(element) 
-                        + tag("ReferenceCode", "NONE")
+                        //+ tag("ReferenceCode", "NONE")
                         + tagRef("Class", NamespaceModel.getPrefixedName(baseType));
             // augmentation
             String head = element.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);

@@ -1,14 +1,22 @@
 package fr.bouml;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.Label;
+import java.awt.Panel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 /**
  * Java doesn't define a simple Dialog just to ask to a question :-((
  * this one is defined here
  */
-@SuppressWarnings("serial")
+@SuppressWarnings("ThisEscapedInObjectConstruction")
 class ConfirmBox extends Dialog implements ActionListener{
   @SuppressWarnings("deprecation")
 public ConfirmBox(String msg) {
@@ -37,6 +45,7 @@ public ConfirmBox(String msg) {
     return choice;
   }
 
+  @Override
   public void actionPerformed(ActionEvent ae) {
     if(ae.getSource() == yes) {
       choice = true;

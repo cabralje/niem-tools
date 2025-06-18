@@ -220,7 +220,7 @@ class NiemModel {
     @SuppressWarnings("unused")
     static UmlClass getBaseType(UmlItem item) {
         UmlClass baseType = null;
-        UmlClassInstance classInstance = null;
+        UmlClassInstance classInstance;
         switch (item.kind().value()) {
             case anItemKind._anAttribute:
                 UmlAttribute attribute = (UmlAttribute) item;
@@ -383,7 +383,7 @@ class NiemModel {
         //elementInType.set_Type(element.type());
 
         // copy properties
-        java.util.Hashtable<String, String> properties = element.properties();
+        ConcurrentHashMap<String, String> properties = new ConcurrentHashMap<>(element.properties());
         for (String key : properties.keySet())
             elementInType.set_PropertyValue(key, properties.get(key));
 
@@ -624,7 +624,7 @@ class NiemModel {
 
         // copy properties
         String uri = getURI(schemaURI, elementName);
-        java.util.Hashtable<String, String> properties = sourceElement.properties();
+        ConcurrentHashMap<String, String> properties = new ConcurrentHashMap<>(sourceElement.properties());
         for (String key : properties.keySet())
             element.set_PropertyValue(key, key.equals(NiemUmlModel.URI_PROPERTY) ? uri : properties.get(key));
         //String uri = getURI(schemaURI, elementName);
@@ -705,7 +705,7 @@ class NiemModel {
             relateElementInType(attribute, element);
 
             // copy properties
-            java.util.Hashtable<String, String> properties = element.properties();
+             ConcurrentHashMap<String, String> properties = new  ConcurrentHashMap<>(element.properties());
             for (String key : properties.keySet())
                 attribute.set_PropertyValue(key, properties.get(key));
             //attribute.set_PropertyValue(URI_PROPERTY, getURI(element));
@@ -774,7 +774,7 @@ class NiemModel {
             type.set_BaseType(baseTypeSpec);
 
         // copy type properties
-        java.util.Hashtable<String, String> properties = sourceType.properties();
+         ConcurrentHashMap<String, String> properties = new  ConcurrentHashMap<>(sourceType.properties());
         for (String key : properties.keySet())
             type.set_PropertyValue(key, properties.get(key));
         //type.set_PropertyValue(URI_PROPERTY, getURI(sourceType));
@@ -933,11 +933,11 @@ class NiemModel {
                         xmlType = xmlWriter.exportXmlTypeSchema(type);
                         if (xmlType != null)
                             xmlTypes.add(xmlType);
-                            if (exportJSON.equals("true") && exportCmftoJSON.equals("false")) {
-                                jsonType = (prefix.equals(NiemModel.XSD_PREFIX)) ? jsonWriter.exportJsonPrimitiveSchemafromXML(type)
-                                    : jsonWriter.exportJsonTypeSchema(this, type, prefix);
-                            if (jsonType != null)
-                                jsonDefinitions.add(jsonType);
+                        if (exportJSON.equals("true") && exportCmftoJSON.equals("false")) {
+                            jsonType = (prefix.equals(NiemModel.XSD_PREFIX)) ? jsonWriter.exportJsonPrimitiveSchemafromXML(type) : 
+                            jsonWriter.exportJsonTypeSchema(this, type, prefix);
+                        if (jsonType != null)
+                            jsonDefinitions.add(jsonType);
                         }
                     } catch (RuntimeException re) {
                         Log.trace("exportSchemas: error exporting type " + type.name() + " " + re.toString());
@@ -1175,7 +1175,7 @@ class NiemModel {
             if (item.kind() == anItemKind.anAttribute && item.name().equals(elementInTypeName)) {
                 String previousMultiplicity = ((UmlAttribute) item).multiplicity();
                 if (!previousMultiplicity.isEmpty() && !multiplicity.isEmpty() && !previousMultiplicity.equals(multiplicity))
-                    Log.trace("getElementInType:  warning - " + NamespaceModel.getPrefixedName(type) + "/" + elementInTypeName
+                    Log.debug("getElementInType:  warning - " + NamespaceModel.getPrefixedName(type) + "/" + elementInTypeName
                             + " has conflicting multiplicities " + previousMultiplicity + " and " + multiplicity);
                 return (UmlAttribute) item;
             }

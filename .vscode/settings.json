@@ -10,5 +10,11 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "files.exclude": {
+        "**/src/main/java/fr/bouml/**": true
+    },
+    //"java.compile.nullAnalysis.mode": "disabled",
+    "java.configuration.checkProjectSettingsExcludes": false,
+    //"problems.decorations.enabled": false
 }
