@@ -413,6 +413,9 @@ public class BoumlPlugout {
                         }
                     }
                     
+                    // Generate wantlist for the subset
+                    model.exportWantlist();
+
                     // Generate message specification
                     model.exportSpecification();
                 } catch (Exception ex) {
@@ -662,8 +665,6 @@ public class BoumlPlugout {
             }
         }   
 
-        // Generate wantlist for the subset
-        model.exportWantlist();
     }
 
     /**

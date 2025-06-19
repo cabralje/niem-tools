@@ -1103,7 +1103,7 @@ public class NiemUmlModel {
     public void exportWantlist() {
 
         String directory = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
-        String filename = properties.getProperty(ProjectProperties.EXPORT_WANTLIST_FILE)+".xml";
+        String filename = properties.getProperty(ProjectProperties.EXPORT_WANTLIST_FILE);
 
         // Verify directory exists
         Path modelPath = Paths.get(directory);
@@ -1178,7 +1178,8 @@ public class NiemUmlModel {
                                 }
                                 Log.debug("exportWantlist: export element " + elementName);
                                 String isNillable = element.propertyValue(NILLABLE_PROPERTY);
-                                if (isNillable == null)
+                                //if (isNillable == null || (!isNillable.equals("true") && !isNillable.equals("false")))
+                                if (isNillable == null || isNillable.isEmpty())
                                     isNillable = NiemModel.NILLABLE_DEFAULT;
                                 fw.write("<w:Element w:name=\"" + elementName + "\" w:isReference=\"false\" w:nillable=\""
                                         + isNillable + "\"/>\n");
