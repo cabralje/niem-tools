@@ -870,6 +870,7 @@ class NiemModel {
 
         String exportXML = properties.getProperty(ProjectProperties.EXPORT_XSD);
         String exportJSON = properties.getProperty(ProjectProperties.EXPORT_JSON);
+        String exportCmftoXSD = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
         String exportCmftoJSON = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
 
         XmlWriter xmlWriter = new XmlWriter(xmlDir);
@@ -998,7 +999,7 @@ class NiemModel {
             }
 
             // export XSDs
-            if (exportXML.equals("true")) {
+            if (exportXML.equals("true") && exportCmftoXSD.equals("false")) {
                 // Open XSD file for each extension schema and write header
                 Log.debug("exportSchemas: schema " + xmlDir + "/" + prefix + XmlWriter.XSD_FILE_TYPE);
                 Namespace ns = NamespaceModel.getNamespace(nsSchemaURI);
