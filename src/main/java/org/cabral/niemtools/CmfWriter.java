@@ -294,6 +294,11 @@ public class CmfWriter {
             }
             Log.debug("exportCmfClass: exporting class " + typeName);
 
+            if (NamespaceModel.isAttribute(typeName)) {
+                Log.debug("exportCmfClass: skipping attribute class " + typeName);
+                return "";
+            }
+
             String prefix = NamespaceModel.getPrefix(type);
 
             // datatype
@@ -699,14 +704,6 @@ public class CmfWriter {
         } else {
             // object property
             propertyCmf = exportCmfComponent(element);
-            String isNillable = element.propertyValue(NiemUmlModel.NILLABLE_PROPERTY);
-            if (isNillable == null)
-                isNillable = NiemModel.NILLABLE_DEFAULT;
-             if (isNillable.equals("true"))
-                propertyCmf += tag("ReferenceCode", "ANY"); 
-                        //+ tag("ReferenceCode", "NONE")
-            propertyCmf += tagRef("Class", NamespaceModel.getPrefixedName(baseType));
-            // augmentation
             String head = element.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
             if (head != null) {
                 String uri = NiemModel.getURI(NamespaceModel.getSchemaURI(head), head);
@@ -715,6 +712,15 @@ public class CmfWriter {
                 if (headElement != null && !headElementName.endsWith(NiemModel.AUGMENTATION_POINT_NAME))
                     propertyCmf += tagRef("SubPropertyOf", NamespaceModel.getPrefixedName(headElement));
             }
+            String isNillable = element.propertyValue(NiemUmlModel.NILLABLE_PROPERTY);
+            if (isNillable == null)
+                isNillable = NiemModel.NILLABLE_DEFAULT;
+             if (isNillable.equals("true"))
+                propertyCmf += tag("ReferenceCode", "ANY"); 
+                        //+ tag("ReferenceCode", "NONE")
+            propertyCmf += tagRef("Class", NamespaceModel.getPrefixedName(baseType));
+            // augmentation
+
         }
         Log.debug("exportCmfProperty: exported object property " + elementName);
         return tagId(objectPropertyName, id, propertyCmf);
