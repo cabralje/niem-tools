@@ -72,6 +72,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -161,6 +162,7 @@ class NiemModel {
     static final XPath xPath = XPathFactory.newInstance().newXPath();
     static XPathExpression namespaceXPath = null;
     static XPathExpression schemaDocumentationXPath = null;
+    static XPathExpression localTermsXPath = null;
     private static XPathExpression nodeDocumentationXPath = null;
     private static XPathExpression enumerationXPath = null;
     private static XPathExpression facetXPath = null;
@@ -192,6 +194,7 @@ class NiemModel {
                 xPath.setNamespaceContext(new NamespaceResolver(doc, true));
                 namespaceXPath = xPath.compile("xs:schema/@targetNamespace");
                 schemaDocumentationXPath = xPath.compile("xs:schema/xs:annotation[1]/xs:documentation[1]");
+                localTermsXPath = xPath.compile("xs:schema/xs:annotation[1]/xs:appinfo[1]/*[local-name()='LocalTerm']");
                 nodeDocumentationXPath = xPath.compile("xs:annotation[1]/xs:documentation[1]");
                 enumerationXPath = xPath.compile("xs:restriction[1]/xs:enumeration");
                 facetXPath = xPath.compile("xs:restriction[1]/*[not(self::xs:enumeration)]");
@@ -1344,7 +1347,7 @@ class NiemModel {
         Node root = null;
         if (doc != null) {
             root = doc.getDocumentElement();
-            ns = NamespaceModel.importNamespaces(doc);
+            ns = importNamespaces(doc);
         } else
             filename2 = "";
         //recompileXPaths();
@@ -1516,7 +1519,7 @@ class NiemModel {
         Node root = null;
         if (doc != null) {
             root = doc.getDocumentElement();
-            ns = NamespaceModel.importNamespaces(doc);
+            ns = importNamespaces(doc);
         }
         //recompileXPaths();
 
@@ -1881,6 +1884,109 @@ class NiemModel {
         return facets;
     }
 
+        /**
+     * @param elist
+     * @return local terms and literals code values in a schema as a String
+     */
+    protected String importLocalTerms(NodeList elist, String namespaceURI) {
+        if (namespaceURI != null) {
+            Log.debug("importLocalTerms: adding local terms to namespace " + namespaceURI);
+        }
+        String termList = "";
+        int length = elist.getLength();
+        if (length == 0)
+            return termList;
+        // String truncated = "false";
+        String maxEnumsString = NiemUmlModel.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
+        try {
+            Integer maxEnums = Integer.valueOf(maxEnumsString);
+            if (length > maxEnums) {
+                if (namespaceURI != null)
+                    Log.trace("importLocalTerms: truncated local terms in namespace " + namespaceURI + " from " + length + " to " + maxEnums);
+                length = maxEnums;
+                // truncated = "true";
+            }
+        } catch (NumberFormatException e) {
+            Log.debug("importCodeList: error - cannot parse maxEnums " + maxEnumsString + " " + e.toString());
+        }
+        for (int j = 0; j < length; j++) {
+            Element enumElement = (Element) elist.item(j);
+            String term = filterASCII(enumElement.getAttribute("term"));
+            String literal = filterASCII(enumElement.getAttribute("literal"));
+            if (literal != null && !literal.isEmpty())
+                termList += filterEnum(term) + CODELIST_DEFINITION_DELIMITER + filterEnumDefinition(literal) + CODELIST_DELIMITER + " ";
+            else
+                termList += filterEnum(term) + CODELIST_DELIMITER + " ";
+        }
+
+        return termList;
+    }
+
+        /**
+     * import namespaces and return target namespace
+     *
+     * @param doc
+     * @return target namespace
+     */
+    Namespace importNamespaces(Document doc) {
+
+        // get target namespace
+        Namespace ns = null;
+        String targetSchemaURI = null;
+        //Node doc2 = doc.cloneNode(true);
+        try {
+            //NiemModel.xPath.setNamespaceContext(new NamespaceResolver(doc, true));
+            targetSchemaURI = NiemModel.namespaceXPath.evaluate(doc);
+            if (targetSchemaURI == null)
+                targetSchemaURI = NiemModel.LOCAL_URI;
+            Log.debug("importNamespaces: target schema URI " + targetSchemaURI);
+
+            // create namespaces and classviews
+            NamedNodeMap nslist = doc.getDocumentElement().getAttributes();
+            for (int nsIndex = 0; nsIndex < nslist.getLength(); nsIndex++) {
+                Node attributeNode = nslist.item(nsIndex);
+                String attributeNodeName = attributeNode.getNodeName();
+                String schemaURI = attributeNode.getNodeValue();
+                // parser filters "xml" namespace definition so it is hardcoded
+                if (schemaURI.equals(XMLConstants.XML_NS_URI))
+                    attributeNodeName = NamespaceModel.getPrefixedName(XMLConstants.XMLNS_ATTRIBUTE, XMLConstants.XML_NS_PREFIX);
+                Log.debug("importNamespaces: processing attribute " + attributeNodeName);
+                if (attributeNodeName.startsWith(XMLConstants.XMLNS_ATTRIBUTE) && !attributeNodeName.equals(XMLConstants.XMLNS_ATTRIBUTE)) {
+
+                    String prefix = attributeNodeName.substring(6);
+                    UmlClassView classView = NamespaceModel.getNamespaceClassView(NiemUmlModel.getReferenceModel(), prefix, schemaURI);
+
+                    // get target namespace description
+                    if (schemaURI.equals(targetSchemaURI) && classView != null) {
+                        classView.set_Description(NiemModel.schemaDocumentationXPath.evaluate(doc));
+
+                        // get local terms
+                        NodeList elist = (NodeList) localTermsXPath.evaluate(doc, XPathConstants.NODESET);
+                        String localTerms = importLocalTerms(elist, targetSchemaURI);
+                        if (!localTerms.isEmpty())
+                            classView.set_PropertyValue(NiemUmlModel.LOCALTERM_PROPERTY, localTerms);
+                    }
+                }
+            }
+            ns = NamespaceModel.getNamespace(targetSchemaURI);
+            if (ns == null) {
+                UmlClassView classView = NamespaceModel.getNamespaceClassView(NiemUmlModel.getReferenceModel(), targetSchemaURI, targetSchemaURI);
+                ns = NamespaceModel.getNamespace(targetSchemaURI);
+                if (classView != null) {
+                    classView.set_Description(NiemModel.schemaDocumentationXPath.evaluate(doc));
+                    NodeList elist = (NodeList) localTermsXPath.evaluate(doc, XPathConstants.NODESET);
+                    String localTerms = importLocalTerms(elist, targetSchemaURI);
+                    if (!localTerms.isEmpty())
+                        classView.set_PropertyValue(NiemUmlModel.LOCALTERM_PROPERTY, localTerms);
+                }
+            }
+        } catch (RuntimeException | XPathExpressionException e) {
+            Log.trace("importNamespaces: error - could not create namespace for schema " + targetSchemaURI);
+        }
+
+        return ns;
+    }
+
     /**
      * import NIEM reference model types
      *
@@ -1896,7 +2002,7 @@ class NiemModel {
 
         if (doc != null) {
             root = doc.getDocumentElement();
-            ns = NamespaceModel.importNamespaces(doc);
+            ns = importNamespaces(doc);
         } else
             filename2 = "";
         //recompileXPaths();

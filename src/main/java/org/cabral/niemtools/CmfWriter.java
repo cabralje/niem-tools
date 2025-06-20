@@ -525,7 +525,6 @@ public class CmfWriter {
      * @param prefix
      * @return CMF namespace definition
      */
-    // TODO exportCmfNamespace: local terms
     private String exportCmfNamespace(UmlClassView classview) {
         if (classview == null)
             return null;
@@ -593,6 +592,11 @@ public class CmfWriter {
                 }
             }
         }
+
+        // add local terms
+        String localTermsCmf = exportCmfLocalTerms(classview);
+
+        // build namespace CMF
         String schemaCmf = "";
         description = description.replace("&", "&amp;");
         String namespaceCmf = tag("NamespaceURI", NamespaceModel.getSchemaURIForPrefix(prefix))
@@ -608,7 +612,8 @@ public class CmfWriter {
                     //			+ tag("NamespaceKindCode", namespaceCategoryCode)
                     + tag("NIEMVersionText", NiemUmlModel.getNiemVersion())
                     //			+ tag("SchemaVersionText", "ps02")
-                    + tag("SchemaLanguageName", XmlWriter.XML_LANG));
+                    + tag("SchemaLanguageName", XmlWriter.XML_LANG)
+                    + localTermsCmf);
         } else
             namespaceCmf += tag("ConformanceTargetURI", NiemModel.NDR_URI + conformanceTargetURI)
                     + tag("DocumentFilePathText", path)
@@ -616,9 +621,30 @@ public class CmfWriter {
                     //		+ tag("NamespaceVersionText", "ps02")
                     + tag("NIEMVersionName", "NIEM" + NiemUmlModel.getNiemVersion())
                     + tag("NamespaceLanguageName", XmlWriter.XML_LANG)
+                    + localTermsCmf
                     + augmentationCmf;
 
         return tagId("Namespace", prefix, namespaceCmf) + schemaCmf;
+    }
+
+    /**
+     * @param classview
+     * @return CMF local terms definition
+     */
+    private String exportCmfLocalTerms(UmlClassView classview) {
+        String localTermsCmf = "";
+        String localTerms = classview.propertyValue(NiemUmlModel.LOCALTERM_PROPERTY);
+        if (localTerms != null && localTerms.contains(NiemModel.CODELIST_DELIMITER)) {
+            String[] terms = localTerms.split(NiemModel.CODELIST_DELIMITER);
+            for (String term : terms) {
+                String[] pairs = term.split(NiemModel.CODELIST_DEFINITION_DELIMITER);
+                String termCmf = tag("TermName", pairs[0].trim());
+                if (pairs.length > 1)
+                    termCmf += tag("TermLiteralText", pairs[1].trim().replace("&", "&amp;"));
+                localTermsCmf += tag("LocalTerm", termCmf);
+            }
+        }
+        return localTermsCmf;
     }
 
     /**

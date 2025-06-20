@@ -125,6 +125,7 @@ public class NiemUmlModel {
     static final String NOTES_PROPERTY = "Notes";
     static final String NILLABLE_PROPERTY = "isNillable";
     static final String PREFIX_PROPERTY = "prefix";
+    static final String LOCALTERM_PROPERTY = "localTerm";
     static final String SEQUENCE_ID_PROPERTY = "sequenceID";
     static final String SUBSTITUTION_PROPERTY = "substitutesFor";
     static final String SUBSTITUTION_TYPE_PROPERTY = "substitutesIn";

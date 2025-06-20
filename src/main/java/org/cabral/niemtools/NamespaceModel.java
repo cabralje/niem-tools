@@ -59,13 +59,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.xml.XMLConstants;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
 import fr.bouml.UmlClassView;
 import fr.bouml.UmlItem;
 import fr.bouml.anItemKind;
@@ -261,6 +254,9 @@ public class NamespaceModel {
                         namespaceClassView.set_PropertyValue(NiemUmlModel.FILE_PATH_PROPERTY, filepath);
                     else
                         Log.debug("getNamespaceClassView: error - no filepath for " + referenceClassView.name());
+                    String localTerms = referenceClassView.propertyValue(NiemUmlModel.LOCALTERM_PROPERTY);
+                    if (localTerms != null && !localTerms.isEmpty())
+                        namespaceClassView.set_PropertyValue(NiemUmlModel.LOCALTERM_PROPERTY, localTerms);
                 }
             }
         }
@@ -370,60 +366,6 @@ public class NamespaceModel {
      */
     static int getSize() {
         return Namespaces.size();
-    }
-
-    /**
-     * import namespaces and return target namespace
-     *
-     * @param doc
-     * @return target namespace
-     */
-    static Namespace importNamespaces(Document doc) {
-
-        // get target namespace
-        Namespace ns = null;
-        String targetSchemaURI = null;
-        //Node doc2 = doc.cloneNode(true);
-        try {
-            //NiemModel.xPath.setNamespaceContext(new NamespaceResolver(doc, true));
-            targetSchemaURI = NiemModel.namespaceXPath.evaluate(doc);
-            if (targetSchemaURI == null)
-                targetSchemaURI = NiemModel.LOCAL_URI;
-            Log.debug("importNamespaces: target schema URI " + targetSchemaURI);
-
-            // create namespaces and classviews
-            NamedNodeMap nslist = doc.getDocumentElement().getAttributes();
-            for (int nsIndex = 0; nsIndex < nslist.getLength(); nsIndex++) {
-                Node attributeNode = nslist.item(nsIndex);
-                String attributeNodeName = attributeNode.getNodeName();
-                String schemaURI = attributeNode.getNodeValue();
-                // parser filters "xml" namespace definition so it is hardcoded
-                if (schemaURI.equals(XMLConstants.XML_NS_URI))
-                    attributeNodeName = XMLConstants.XMLNS_ATTRIBUTE + NAMESPACE_DELIMITER + XMLConstants.XML_NS_PREFIX;
-                Log.debug("importNamespaces: processing attribute " + attributeNodeName);
-                if (attributeNodeName.startsWith(XMLConstants.XMLNS_ATTRIBUTE) && !attributeNodeName.equals(XMLConstants.XMLNS_ATTRIBUTE)) {
-
-                    String prefix = attributeNodeName.substring(6);
-                    UmlClassView classView = getNamespaceClassView(NiemUmlModel.getReferenceModel(), prefix, schemaURI);
-
-                    // get target namespace description
-                    if (schemaURI.equals(targetSchemaURI) && classView != null)
-                        classView.set_Description(NiemModel.schemaDocumentationXPath.evaluate(doc));
-                }
-            }
-            ns = getNamespace(targetSchemaURI);
-            if (ns == null) {
-                UmlClassView classView = getNamespaceClassView(NiemUmlModel.getReferenceModel(), targetSchemaURI, targetSchemaURI);
-                ns = getNamespace(targetSchemaURI);
-                if (classView != null)
-                    classView.set_Description(NiemModel.schemaDocumentationXPath.evaluate(doc));
-            }
-        } catch (RuntimeException e) {
-            Log.trace("importNamespaces: error - could not create namespace for schema " + targetSchemaURI);
-        } catch (XPathExpressionException ex) {
-        }
-
-        return ns;
     }
 
     /**
