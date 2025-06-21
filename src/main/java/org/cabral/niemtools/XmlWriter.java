@@ -810,7 +810,6 @@ public class XmlWriter {
      * @param type
      * @return XML schema type definition as a String
      */
-    // TODO exportXmlTypeSchema: add facets properties
     String exportXmlTypeSchema(UmlClass type) {
         String typeName = NamespaceModel.getName(type);
         String typeSchema;
@@ -881,7 +880,7 @@ public class XmlWriter {
                     String elementName = NamespaceModel.getPrefixedName(element);
                     Log.debug("exportXmlTypeSchema: exporting element in type " + elementName);
                     String elementMappingNotes = null;
-                    if (elementName.endsWith(NiemModel.AUGMENTATION_POINT_NAME))
+                    if (NiemModel.isAugmentation(elementName))
                         augmentationPoint = attribute;
                     if (isComplexContent)
                         elementMappingNotes = attribute.propertyValue(NiemUmlModel.NOTES_PROPERTY);

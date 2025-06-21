@@ -1280,16 +1280,18 @@ class NiemModel {
         String truncated = "false";
         //int me = maxEnums;
         String maxEnumsString = NiemUmlModel.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
-        try {
-            Integer maxEnums = Integer.valueOf(maxEnumsString);
-            if (length > maxEnums) {
-                if (type != null)
-                    Log.trace("importCodeList: truncated code list " + type.name() + " from " + length + " to " + maxEnums);
-                length = maxEnums;
-                truncated = "true";
+        if (maxEnumsString != null && !maxEnumsString.isEmpty()) {
+            try {
+                Integer maxEnums = Integer.valueOf(maxEnumsString);
+                if (length > maxEnums) {
+                    if (type != null)
+                        Log.trace("importCodeList: truncated code list " + type.name() + " from " + length + " to " + maxEnums);
+                    length = maxEnums;
+                    truncated = "true";
+                }
+            } catch (NumberFormatException e) {
+                Log.debug("importCodeList: error - cannot parse maxEnums " + maxEnumsString + " " + e.toString());
             }
-        } catch (NumberFormatException e) {
-            Log.debug("importCodeList: error - cannot parse maxEnums " + maxEnumsString + " " + e.toString());
         }
         if (type != null)
             type.set_PropertyValue(NiemUmlModel.TRUNCATED_PROPERTY, truncated);
@@ -1823,15 +1825,17 @@ class NiemModel {
 
         String truncated = "false";
         String maxEnumsString = NiemUmlModel.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
-        try {
-            Integer maxEnums = Integer.valueOf(maxEnumsString);
-            if (length > maxEnums) {
-                Log.trace("importFacets: truncated facet restrictions on " + type.name() + " from " + length + " to " + maxEnums);
-                length = maxEnums;
-                truncated = "true";
+        if (maxEnumsString != null && !maxEnumsString.isEmpty()) {
+            try {
+                Integer maxEnums = Integer.valueOf(maxEnumsString);
+                if (length > maxEnums) {
+                    Log.trace("importFacets: truncated facet restrictions on " + type.name() + " from " + length + " to " + maxEnums);
+                    length = maxEnums;
+                    truncated = "true";
+                }
+            } catch (NumberFormatException e) {
+                Log.trace("importFacets: error - cannot parse max facets value " + maxEnumsString  + " " + e.toString());
             }
-        } catch (NumberFormatException e) {
-            Log.trace("importFacets: error - cannot parse max facets value " + maxEnumsString  + " " + e.toString());
         }
         if (type != null)
             type.set_PropertyValue(NiemUmlModel.TRUNCATED_PROPERTY, truncated);
@@ -1898,16 +1902,18 @@ class NiemModel {
             return termList;
         // String truncated = "false";
         String maxEnumsString = NiemUmlModel.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
-        try {
-            Integer maxEnums = Integer.valueOf(maxEnumsString);
-            if (length > maxEnums) {
-                if (namespaceURI != null)
-                    Log.trace("importLocalTerms: truncated local terms in namespace " + namespaceURI + " from " + length + " to " + maxEnums);
-                length = maxEnums;
-                // truncated = "true";
+        if (maxEnumsString != null && !maxEnumsString.isEmpty()) {
+            try {
+                Integer maxEnums = Integer.valueOf(maxEnumsString);
+                if (length > maxEnums) {
+                    if (namespaceURI != null)
+                        Log.trace("importLocalTerms: truncated local terms in namespace " + namespaceURI + " from " + length + " to " + maxEnums);
+                    length = maxEnums;
+                    // truncated = "true";
+                }
+            } catch (NumberFormatException e) {
+                Log.debug("importCodeList: error - cannot parse maxEnums " + maxEnumsString + " " + e.toString());
             }
-        } catch (NumberFormatException e) {
-            Log.debug("importCodeList: error - cannot parse maxEnums " + maxEnumsString + " " + e.toString());
         }
         for (int j = 0; j < length; j++) {
             Element enumElement = (Element) elist.item(j);

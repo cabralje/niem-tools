@@ -464,8 +464,6 @@ public class NiemUmlModel {
      * creates NIEM subset and extension models
      *
      */
-    // TODO createSubsetAndExtension: ensure all NIEM types and elements are in the reference model
-    // TODO allow namespaces with a "-" in the prefix (not supported by UmlAttribute)
     //@SuppressWarnings("unchecked")
     @SuppressWarnings("unchecked")
     public void createSubsetAndExtension() {
@@ -1342,12 +1340,14 @@ public class NiemUmlModel {
      * @param includeEnums
      * @throws IOException
      */
-    // TODO importSchemaDir: import multiple pattern facets (e.g. fema:BuildingFloodZoneSimpleType)
     public void importSchemaDir(String dir) throws IOException {
 
         UmlCom.message("Importing NIEM schema");
         Log.trace("Importing NIEM reference model.");
-        Log.trace("Code lists/facets will be limited to " + properties.getProperty(ProjectProperties.IMPORT_MAX_FACETS) + " values.");
+        String maxEnumsString = properties.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
+        if (maxEnumsString != null && !maxEnumsString.isEmpty())
+            Log.trace("Code lists/facets will be limited to " + maxEnumsString + " values.");
+            
         // Configure DOM
         Path path = FileSystems.getDefault().getPath(dir);
         String importPath = path.toString();

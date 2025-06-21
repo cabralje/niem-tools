@@ -286,6 +286,8 @@ public class NamespaceModel {
      */
     static String getPrefix(UmlItem item) {
         switch (item.kind().value()) {
+            //case anItemKind._anAttribute:
+            //    return "";
             case anItemKind._aClass:
             case anItemKind._aClassInstance:
                 return getPrefix(item.parent());
