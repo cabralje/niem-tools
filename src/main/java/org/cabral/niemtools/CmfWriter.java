@@ -387,17 +387,16 @@ public class CmfWriter {
             Log.debug("exportCmfClass: exported complex class " + typeName);
             classCmf = exportCmfComponent(type);
             String isNillable = type.propertyValue(NiemUmlModel.NILLABLE_PROPERTY);
+  
+            String baseTypePrefix = NamespaceModel.getPrefix(baseType);
+            if (!baseTypePrefix.equals(NiemModel.STRUCTURES_PREFIX))
+                classCmf += tagRef(subclassName, NamespaceModel.getPrefixedName(baseType));
             if (isNillable == null)
                 isNillable = NiemModel.NILLABLE_DEFAULT;
-            if (isNillable.equals("true"))
+            //if (isNillable.equals("true"))
                 classCmf += tag("ReferenceCode", "ANY");
-            if (isOlderCmfVersion(cmfVersion, "1.0")) {
+            if (isOlderCmfVersion(cmfVersion, "1.0"))
                 classCmf += tag("AugmentableIndicator", "true");
-            }
-            String baseTypePrefix = NamespaceModel.getPrefix(baseType);
-            if (!baseTypePrefix.equals(NiemModel.STRUCTURES_PREFIX)) {
-                classCmf += tagRef(subclassName, NamespaceModel.getPrefixedName(baseType));
-            }
             classCmf += childrenCmf;
             return tagId("Class", id, classCmf);
         } catch (Exception e) {
@@ -745,7 +744,9 @@ public class CmfWriter {
             String isNillable = element.propertyValue(NiemUmlModel.NILLABLE_PROPERTY);
             if (isNillable == null)
                 isNillable = NiemModel.NILLABLE_DEFAULT;
-             if (isNillable.equals("true"))
+            
+            // FYI cmftool doesn't support ReferenceCode yet
+            if (isNillable.equals("true"))
                 propertyCmf += tag("ReferenceCode", "ANY"); 
                         //+ tag("ReferenceCode", "NONE")
             propertyCmf += tagRef("Class", NamespaceModel.getPrefixedName(baseType));
