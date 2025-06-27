@@ -150,7 +150,7 @@ public class BoumlPlugout {
 
         // cache UML model
         UmlPackage project = UmlPackage.getProject();
-        //UmlItem target = UmlCom.targetItem();
+        UmlItem target = UmlCom.targetItem();
         ProjectProperties properties = new ProjectProperties(project, ProjectProperties.getDefaults());
         properties.load();
 
@@ -269,12 +269,12 @@ public class BoumlPlugout {
                 
             case "addStereotype":
                 
-                model.addStereotype(project);
+                model.addStereotype(target);
                 break;
                 
             case "removeStereotype":
                 
-                model.removeStereotype(project);
+                model.removeStereotype(target);
                 break;
                 
             case "publishUML":
@@ -332,7 +332,19 @@ public class BoumlPlugout {
                 UmlCom.trace("\nNEXT STEP: If any there are any mapping issues above, update " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " and import mappings and validate again as needed.");
                 UmlCom.trace("Otherwise, select 'Publish NIEM schemas` and publish CMF, XSD and/or JSON schemas.");
                 break;
-                
+            
+            case "testCMF":
+
+                //  Validate cmftool is available
+                String execCommandXsd = "cmftool.bat help";
+                try {     
+                    exec(execCommandXsd);
+                } catch (IOException | InterruptedException e) {
+                    Log.trace("Exception in testCMF: " + e.getMessage());
+                    System.exit(1); 
+                }
+                break;
+
             case "publishCMF":
                 
                 // Create NIEM models
