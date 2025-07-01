@@ -222,6 +222,8 @@ class NiemModel {
      */
     @SuppressWarnings("unused")
     static UmlClass getBaseType(UmlItem item) {
+        if (item == null)
+            return null;
         UmlClass baseType = null;
         UmlClassInstance classInstance;
         switch (item.kind().value()) {
@@ -242,14 +244,15 @@ class NiemModel {
                     return null;
                 }
                 UmlClass type = (UmlClass) item;
-                for (UmlItem item2 : type.children())
-                    if (item2.kind() == anItemKind.aRelation) {
-                        UmlRelation r = (UmlRelation) item2;
-                        if (r.relationKind() == aRelationKind.aGeneralisation) {
-                            baseType = r.roleType();
-                            break;
+                if (type.children() != null)
+                    for (UmlItem item2 : type.children())
+                        if (item2.kind() == anItemKind.aRelation) {
+                            UmlRelation r = (UmlRelation) item2;
+                            if (r.relationKind() == aRelationKind.aGeneralisation) {
+                                baseType = r.roleType();
+                                break;
+                            }
                         }
-                    }
                 if (baseType == null) {
                     String prefix = NamespaceModel.getPrefix(item);
                     //if (prefix.equals(STRUCTURES_PREFIX) || prefix.equals(XSD_PREFIX))
@@ -387,8 +390,9 @@ class NiemModel {
 
         // copy properties
         ConcurrentHashMap<String, String> properties = new ConcurrentHashMap<>(element.properties());
-        for (String key : properties.keySet())
-            elementInType.set_PropertyValue(key, properties.get(key));
+        if (properties.keySet() != null)
+            for (String key : properties.keySet())
+                elementInType.set_PropertyValue(key, properties.get(key));
 
         // copy element properties
         //elementInType.set_PropertyValue(URI_PROPERTY, getURI(element));
@@ -468,86 +472,90 @@ class NiemModel {
         String schemaURI;
 
         Log.debug("cacheModel: caching namespaces, types and elements");
-        for (UmlItem classView : modelPackage.children()) {
-            if ((classView == null) || (classView.kind() != anItemKind.aClassView)) {
-                continue;
-            }
-            schemaURI = getURI(classView);
-            String prefix = classView.propertyValue(NiemUmlModel.PREFIX_PROPERTY);
-            NamespaceModel.addPrefix(schemaURI, prefix);
-            Namespace ns = NamespaceModel.getNamespace(schemaURI);
-            if ((ns == null) && (schemaURI != null)) {
-                // create namespace
-                ns = NamespaceModel.addNamespace(schemaURI);
-            }
-            if (ns != null) {
-                if (this == NiemUmlModel.getReferenceModel())
-                    ns.setReferenceClassView((UmlClassView) classView);
-                else
-                    ns.setNsClassView((UmlClassView) classView);
+        if (modelPackage.children() != null)
+            for (UmlItem classView : modelPackage.children()) {
+                if ((classView == null) || (classView.kind() != anItemKind.aClassView)) {
+                    continue;
+                }
+                schemaURI = getURI(classView);
+                String prefix = classView.propertyValue(NiemUmlModel.PREFIX_PROPERTY);
+                NamespaceModel.addPrefix(schemaURI, prefix);
+                Namespace ns = NamespaceModel.getNamespace(schemaURI);
+                if ((ns == null) && (schemaURI != null)) {
+                    // create namespace
+                    ns = NamespaceModel.addNamespace(schemaURI);
+                }
+                if (ns != null) {
+                    if (this == NiemUmlModel.getReferenceModel())
+                        ns.setReferenceClassView((UmlClassView) classView);
+                    else
+                        ns.setNsClassView((UmlClassView) classView);
 
-                if (this == NiemUmlModel.getReferenceModel() || this == NiemUmlModel.getExtensionModel())
-                    ns.setFilepath(classView.propertyValue(NiemUmlModel.FILE_PATH_PROPERTY));
-            }
+                    if (this == NiemUmlModel.getReferenceModel() || this == NiemUmlModel.getExtensionModel())
+                        ns.setFilepath(classView.propertyValue(NiemUmlModel.FILE_PATH_PROPERTY));
+                }
 
-            // cache types and elements
-            for (UmlItem item : classView.children()) {
-                String uri = getURI(item);
-                if (uri != null) {
-                    switch (item.kind().value()) {
-                        case anItemKind._aClass -> {
-                            if (!types.containsKey(uri))
-                                types.put(uri, (UmlClass) item);
-                        }
-                        case anItemKind._aClassInstance -> {
-                            UmlClassInstance element = (UmlClassInstance) item;
-                            if (!elements.containsKey(uri))
-                                elements.put(uri, element);
-                            String headElement = element.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
-                            try {
-                                if (headElement != null) {
-                                    List<UmlClassInstance> enlist = (Substitutions.get(headElement));
-                                    if (enlist == null)
-                                        enlist = new ArrayList<>();
-                                    if (!enlist.contains(element))
-                                        enlist.add(element);
-                                    Substitutions.put(headElement, enlist);
+                // cache types and elements
+                if (classView.children() != null)
+                    for (UmlItem item : classView.children()) {
+                        String uri = getURI(item);
+                        if (uri != null) {
+                            switch (item.kind().value()) {
+                                case anItemKind._aClass -> {
+                                    if (!types.containsKey(uri))
+                                        types.put(uri, (UmlClass) item);
                                 }
-                            } catch (Exception e) {
-                                Log.trace("cacheModel: error caching sustitutions " + e.toString());
+                                case anItemKind._aClassInstance -> {
+                                    UmlClassInstance element = (UmlClassInstance) item;
+                                    if (!elements.containsKey(uri))
+                                        elements.put(uri, element);
+                                    String headElement = element.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
+                                    try {
+                                        if (headElement != null) {
+                                            List<UmlClassInstance> enlist = (Substitutions.get(headElement));
+                                            if (enlist == null)
+                                                enlist = new ArrayList<>();
+                                            if (!enlist.contains(element))
+                                                enlist.add(element);
+                                            Substitutions.put(headElement, enlist);
+                                        }
+                                    } catch (Exception e) {
+                                        Log.trace("cacheModel: error caching sustitutions " + e.toString());
+                                    }
+                                }
+                                default -> {
+                                }
                             }
                         }
-                        default -> {
-                        }
                     }
-                }
             }
-        }
 
         // Cache elements in types
         Log.debug("cacheModel: caching elements in types");
-        for (UmlClass type : types.values()) {
-            String typeURI = getURI(type);
-            List<UmlClassInstance> list = (elementsInType.get(typeURI));
-            if (list == null) {
-                list = new ArrayList<>();
-                elementsInType.put(typeURI, list);
-            }
-            if (!NiemUmlModel.isEnumeration(type))
-                for (UmlItem attribute : type.children()) {
-                    if (attribute.kind() == anItemKind.anAttribute && !NiemUmlModel.isFacet(attribute)) {
-                        // trace("cacheModel: caching " + getURI(attribute));
-                        String attributeURI = getURI(attribute);
-                        if (attributeURI == null) {
-                            Log.trace("cacheModel: error - no URI for " + attribute.name());
-                            continue;
-                        }
-                        UmlClassInstance element = elements.get(attributeURI);
-                        if (!list.contains(element))
-                            list.add(element);
-                    }
+        if (types != null && types.values() != null)
+            for (UmlClass type : types.values()) {
+                String typeURI = getURI(type);
+                List<UmlClassInstance> list = (elementsInType.get(typeURI));
+                if (list == null) {
+                    list = new ArrayList<>();
+                    elementsInType.put(typeURI, list);
                 }
-        }
+                if (!NiemUmlModel.isEnumeration(type))
+                    if (type != null && type.children() != null)
+                        for (UmlItem attribute : type.children()) {
+                            if (attribute.kind() == anItemKind.anAttribute && !NiemUmlModel.isFacet(attribute)) {
+                                // trace("cacheModel: caching " + getURI(attribute));
+                                String attributeURI = getURI(attribute);
+                                if (attributeURI == null) {
+                                    Log.trace("cacheModel: error - no URI for " + attribute.name());
+                                    continue;
+                                }
+                                UmlClassInstance element = elements.get(attributeURI);
+                                if (!list.contains(element))
+                                    list.add(element);
+                            }
+                        }
+            }
 
         Log.debug("cacheModel: store caches and add simple and abstract types");
         if (this == NiemUmlModel.getReferenceModel()) {
@@ -628,8 +636,9 @@ class NiemModel {
         // copy properties
         String uri = getURI(schemaURI, elementName);
         ConcurrentHashMap<String, String> properties = new ConcurrentHashMap<>(sourceElement.properties());
-        for (String key : properties.keySet())
-            element.set_PropertyValue(key, key.equals(NiemUmlModel.URI_PROPERTY) ? uri : properties.get(key));
+        if (properties.keySet() != null)
+            for (String key : properties.keySet())
+                element.set_PropertyValue(key, key.equals(NiemUmlModel.URI_PROPERTY) ? uri : properties.get(key));
         //String uri = getURI(schemaURI, elementName);
         //element.set_PropertyValue(URI_PROPERTY, uri);
         elements.put(uri, element);
@@ -652,13 +661,14 @@ class NiemModel {
     UmlAttribute getElementInType(UmlClass type, String elementName) {
 
         //boolean childFound = false;
-        for (UmlItem item : type.children()) {
-            if (item.name().equals(elementName)) {
-                return (UmlAttribute) item;
-                //childFound = true;
-                //break;
+        if (type != null && type.children() != null)
+            for (UmlItem item : type.children()) {
+                if (item.name().equals(elementName)) {
+                    return (UmlAttribute) item;
+                    //childFound = true;
+                    //break;
+                }
             }
-        }
 
         // if not found in type, check base type
         //if (!childFound) {
@@ -712,8 +722,9 @@ class NiemModel {
 
             // copy properties
              ConcurrentHashMap<String, String> properties = new  ConcurrentHashMap<>(element.properties());
-            for (String key : properties.keySet())
-                attribute.set_PropertyValue(key, properties.get(key));
+             if (properties.keySet() != null)
+                for (String key : properties.keySet())
+                    attribute.set_PropertyValue(key, properties.get(key));
             if (referenceAttribute != null)
                 attribute.set_PropertyValue(NiemUmlModel.SEQUENCE_ID_PROPERTY, referenceAttribute.propertyValue(NiemUmlModel.SEQUENCE_ID_PROPERTY));
         }
@@ -781,9 +792,10 @@ class NiemModel {
             type.set_BaseType(baseTypeSpec);
 
         // copy type properties
-         ConcurrentHashMap<String, String> properties = new  ConcurrentHashMap<>(sourceType.properties());
-        for (String key : properties.keySet())
-            type.set_PropertyValue(key, properties.get(key));
+        ConcurrentHashMap<String, String> properties = new  ConcurrentHashMap<>(sourceType.properties());
+        if (properties.keySet() != null)
+            for (String key : properties.keySet())
+                type.set_PropertyValue(key, properties.get(key));
         //type.set_PropertyValue(URI_PROPERTY, getURI(sourceType));
 
         //String codeList = NiemUmlClass.getCodeList(sourceType);
@@ -801,45 +813,48 @@ class NiemModel {
         }
 
         // copy elements and attributes in type
-        for (UmlItem item : sourceType.children()) {
-            if (NamespaceModel.isAttribute(item)) {
-                UmlClassInstance sourceElement = NiemUmlModel.getReferenceModel().getReferencedElement(item);
-                if (sourceElement == null) {
-                    Log.trace("copyType: error - no element for uri " + getURI(item) + " in reference model");
-                    continue;
+        if (sourceType.children() != null)
+            for (UmlItem item : sourceType.children()) {
+                if (NamespaceModel.isAttribute(item)) {
+                    UmlClassInstance sourceElement = NiemUmlModel.getReferenceModel().getReferencedElement(item);
+                    if (sourceElement == null) {
+                        Log.trace("copyType: error - no element for uri " + getURI(item) + " in reference model");
+                        continue;
+                    }
+                    String attributeName = NamespaceModel.getPrefixedName(sourceElement);
+                    UmlClassInstance element = copyElement(attributeName);
+                    if (element == null)
+                        Log.trace("copyType: error - no attribute " + attributeName);
+                    else
+                        copyElementInType(type, element, ((UmlAttribute) item).multiplicity());
                 }
-                String attributeName = NamespaceModel.getPrefixedName(sourceElement);
-                UmlClassInstance element = copyElement(attributeName);
-                if (element == null)
-                    Log.trace("copyType: error - no attribute " + attributeName);
-                else
-                    copyElementInType(type, element, ((UmlAttribute) item).multiplicity());
             }
-        }
 
         // copy enumerations in type
         if (NiemUmlModel.isEnumeration(sourceType)) {
             type.set_Stereotype(NiemUmlModel.ENUM_STEREOTYPE);
-            for (UmlItem sourceItem : sourceType.children()) {
-                if (sourceItem.kind() != anItemKind.anAttribute)
-                    continue;
-                UmlAttribute sourceAttribute = (UmlAttribute) sourceItem;
-                UmlAttribute attribute = UmlAttribute.create(type, sourceAttribute.name());
-                if (attribute == null) {
-                    Log.trace("copyType: error - attribute " + sourceAttribute.name() + " already exists in type " + typeName);
-                    continue;
-                }
-                // copy stereotype, description, value and type
-                attribute.set_Stereotype(sourceAttribute.stereotype());
-                attribute.set_DefaultValue(sourceAttribute.defaultValue());
-                attribute.set_Description(sourceAttribute.description());
-                attribute.set_Type(sourceAttribute.type());
+            if (sourceType.children() != null)
+                for (UmlItem sourceItem : sourceType.children()) {
+                    if (sourceItem.kind() != anItemKind.anAttribute)
+                        continue;
+                    UmlAttribute sourceAttribute = (UmlAttribute) sourceItem;
+                    UmlAttribute attribute = UmlAttribute.create(type, sourceAttribute.name());
+                    if (attribute == null) {
+                        Log.trace("copyType: error - attribute " + sourceAttribute.name() + " already exists in type " + typeName);
+                        continue;
+                    }
+                    // copy stereotype, description, value and type
+                    attribute.set_Stereotype(sourceAttribute.stereotype());
+                    attribute.set_DefaultValue(sourceAttribute.defaultValue());
+                    attribute.set_Description(sourceAttribute.description());
+                    attribute.set_Type(sourceAttribute.type());
 
-                // copy properties
-                Map<String, String> attributeProperties = sourceAttribute.properties();
-                for (String key : attributeProperties.keySet())
-                    attribute.set_PropertyValue(key, attributeProperties.get(key));
-            }
+                    // copy properties
+                    Map<String, String> attributeProperties = sourceAttribute.properties();
+                    if (attributeProperties != null)
+                        for (String key : attributeProperties.keySet())
+                            attribute.set_PropertyValue(key, attributeProperties.get(key));
+                }
         }
 
         // copy and relate to attribute groups
@@ -881,7 +896,8 @@ class NiemModel {
         TreeSet<String> openapiDefinitions = new TreeSet<>();
 
         // export each schema
-        for (UmlItem thisPackage : modelPackage.children()) {
+        if (modelPackage != null && modelPackage.children() != null)
+          for (UmlItem thisPackage : modelPackage.children()) {
             if (thisPackage.kind() != anItemKind.aClassView)
                 continue;
             UmlClassView classView = (UmlClassView) thisPackage;
@@ -912,94 +928,96 @@ class NiemModel {
             Log.debug("exportSchemas: exporting types and elements");
             String xmlType;
             String jsonType;
-            for (UmlItem item : classView.children()) {
-                // add types and attribute groups
-                if (item.kind() == anItemKind.aClass) {
-                    UmlClass type = (UmlClass) item;
+            if (classView.children() != null)
+                for (UmlItem item : classView.children()) {
+                    // add types and attribute groups
+                    if (item.kind() == anItemKind.aClass) {
+                        UmlClass type = (UmlClass) item;
 
-                    // add referenced namespaces
-                    try {
-                        schemaNamespaces.add(NamespaceModel.getPrefix(type));
-                        UmlClass baseType = getBaseType(type);
-                        if (baseType != null)
-                            schemaNamespaces.add(NamespaceModel.getPrefix(baseType));
-                        for (UmlItem item2 : type.children()) {
-                            if (item2.kind() == anItemKind.anAttribute) {
-                                NiemModel model2 = NiemUmlModel.getModel(getURI(item2));
-                                UmlClassInstance element = model2.getReferencedElement(item2);
-                                if (element != null)
-                                    schemaNamespaces.add(NamespaceModel.getPrefix(element));
-                            }
+                        // add referenced namespaces
+                        try {
+                            schemaNamespaces.add(NamespaceModel.getPrefix(type));
+                            UmlClass baseType = getBaseType(type);
+                            if (baseType != null)
+                                schemaNamespaces.add(NamespaceModel.getPrefix(baseType));
+                            if (type.children() != null)
+                                for (UmlItem item2 : type.children()) {
+                                    if (item2.kind() == anItemKind.anAttribute) {
+                                        NiemModel model2 = NiemUmlModel.getModel(getURI(item2));
+                                        UmlClassInstance element = model2.getReferencedElement(item2);
+                                        if (element != null)
+                                            schemaNamespaces.add(NamespaceModel.getPrefix(element));
+                                    }
+                                }
+                        } catch (RuntimeException re) {
+                            Log.trace("exportSchemas: error adding namespace " + type.name() + " " + re.toString());
+                            continue;
                         }
-                    } catch (RuntimeException re) {
-                        Log.trace("exportSchemas: error adding namespace " + type.name() + " " + re.toString());
-                        continue;
-                    }
 
-                    // get type schema
-                    try {
-                        xmlType = xmlWriter.exportXmlTypeSchema(type);
-                        if (xmlType != null)
-                            xmlTypes.add(xmlType);
-                        if (exportJSON.equals("true") && exportCmftoJSON.equals("false")) {
-                            jsonType = (prefix.equals(NiemModel.XSD_PREFIX)) ? jsonWriter.exportJsonPrimitiveSchemafromXML(type) : 
-                            jsonWriter.exportJsonTypeSchema(this, type, prefix);
-                        if (jsonType != null)
-                            jsonDefinitions.add(jsonType);
-                        }
-                    } catch (RuntimeException re) {
-                        Log.trace("exportSchemas: error exporting type " + type.name() + " " + re.toString());
-                        continue;
-                    }
-                }
-                // add elements and attributes
-                String xmlElement;
-                String jsonElement = null;
-                if (item.kind() == anItemKind.aClassInstance) {
-                    UmlClassInstance element = (UmlClassInstance) item;
-                    UmlClass baseType = getBaseType(element);
-
-                    // add referenced namespaces
-                    try {
-                        schemaNamespaces.add(NamespaceModel.getPrefix(element));
-                        if (baseType != null)
-                            schemaNamespaces.add(NamespaceModel.getPrefix(baseType));
-                        String headElement = element.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
-                        if (headElement != null)
-                            schemaNamespaces.add(NamespaceModel.getPrefix(headElement));
-                    } catch (RuntimeException re) {
-                        Log.trace("exportSchemas: error adding namespace " + element.name() + " " + re.toString());
-                        continue;
-                    }
-
-                    // get element schema
-                    try {
-                        Log.debug("exportSchemas: exporting element " + element.name());
-                        if (NamespaceModel.isAttribute(element.name()))
-                            xmlElement = xmlWriter.exportXmlAttributeSchema(element);
-                        else
-                            xmlElement = xmlWriter.exportXmlElementSchema(element);
-                        if (xmlElement != null)
-                            xmlElements.add(xmlElement);
-                        if (baseType != null && !NiemModel.isAbstract(NamespaceModel.getName(baseType))) {
-                            schemaNamespaces.add(NamespaceModel.getPrefix(element));
+                        // get type schema
+                        try {
+                            xmlType = xmlWriter.exportXmlTypeSchema(type);
+                            if (xmlType != null)
+                                xmlTypes.add(xmlType);
                             if (exportJSON.equals("true") && exportCmftoJSON.equals("false")) {
-                                jsonElement = jsonWriter.exportJsonElementSchema(element, prefix);
-                                if (jsonElement != null)
-                                    jsonDefinitions.add(jsonElement);
+                                jsonType = (prefix.equals(NiemModel.XSD_PREFIX)) ? jsonWriter.exportJsonPrimitiveSchemafromXML(type) : 
+                                jsonWriter.exportJsonTypeSchema(this, type, prefix);
+                            if (jsonType != null)
+                                jsonDefinitions.add(jsonType);
                             }
-                            String messageElement = element.propertyValue(NiemUmlModel.MESSAGE_ELEMENT_PROPERTY);
-                            if (messageElement != null)
-                                Log.debug("exportSchemas: messageElement " + messageElement);
-                            if (exportJSON.equals("true") && exportCmftoJSON.equals("false")
-                                && messageElement != null && !messageElement.isEmpty())
-                                    jsonProperties.add(jsonElement);
+                        } catch (RuntimeException re) {
+                            Log.trace("exportSchemas: error exporting type " + type.name() + " " + re.toString());
+                            continue;
                         }
-                    } catch (RuntimeException re) {
-                        Log.trace("exportSchemas: error exporting element " + element.name() + " " + re.toString());
+                    }
+                    // add elements and attributes
+                    String xmlElement;
+                    String jsonElement = null;
+                    if (item.kind() == anItemKind.aClassInstance) {
+                        UmlClassInstance element = (UmlClassInstance) item;
+                        UmlClass baseType = getBaseType(element);
+
+                        // add referenced namespaces
+                        try {
+                            schemaNamespaces.add(NamespaceModel.getPrefix(element));
+                            if (baseType != null)
+                                schemaNamespaces.add(NamespaceModel.getPrefix(baseType));
+                            String headElement = element.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
+                            if (headElement != null)
+                                schemaNamespaces.add(NamespaceModel.getPrefix(headElement));
+                        } catch (RuntimeException re) {
+                            Log.trace("exportSchemas: error adding namespace " + element.name() + " " + re.toString());
+                            continue;
+                        }
+
+                        // get element schema
+                        try {
+                            Log.debug("exportSchemas: exporting element " + element.name());
+                            if (NamespaceModel.isAttribute(element.name()))
+                                xmlElement = xmlWriter.exportXmlAttributeSchema(element);
+                            else
+                                xmlElement = xmlWriter.exportXmlElementSchema(element);
+                            if (xmlElement != null)
+                                xmlElements.add(xmlElement);
+                            if (baseType != null && !NiemModel.isAbstract(NamespaceModel.getName(baseType))) {
+                                schemaNamespaces.add(NamespaceModel.getPrefix(element));
+                                if (exportJSON.equals("true") && exportCmftoJSON.equals("false")) {
+                                    jsonElement = jsonWriter.exportJsonElementSchema(element, prefix);
+                                    if (jsonElement != null)
+                                        jsonDefinitions.add(jsonElement);
+                                }
+                                String messageElement = element.propertyValue(NiemUmlModel.MESSAGE_ELEMENT_PROPERTY);
+                                if (messageElement != null)
+                                    Log.debug("exportSchemas: messageElement " + messageElement);
+                                if (exportJSON.equals("true") && exportCmftoJSON.equals("false")
+                                    && messageElement != null && !messageElement.isEmpty())
+                                        jsonProperties.add(jsonElement);
+                            }
+                        } catch (RuntimeException re) {
+                            Log.trace("exportSchemas: error exporting element " + element.name() + " " + re.toString());
+                        }
                     }
                 }
-            }
 
             // export XSDs
             if (exportXML.equals("true") && exportCmftoXSD.equals("false")) {
@@ -1100,14 +1118,15 @@ class NiemModel {
      * @return attribute group related to a type as a UmlClass
      */
     private UmlClass getAttributeGroup(UmlClass type) {
-        for (UmlItem item : type.children()) {
-            if (item.kind() == anItemKind.aRelation) {
-                UmlRelation r = (UmlRelation) item;
-                if (r.relationKind() == aRelationKind.aDirectionalAggregation) {
-                    return r.roleType();
+        if (type != null && type.children() != null)
+            for (UmlItem item : type.children()) {
+                if (item.kind() == anItemKind.aRelation) {
+                    UmlRelation r = (UmlRelation) item;
+                    if (r.relationKind() == aRelationKind.aDirectionalAggregation) {
+                        return r.roleType();
+                    }
                 }
             }
-        }
         // trace("getAttributeGroup: error - attribute group not found for " +
         // type.name());
         return null;
@@ -1183,15 +1202,16 @@ class NiemModel {
      * @return an element in type as a UmlAttribute
      */
     private UmlAttribute getElementInType(UmlClass type, String elementInTypeName, String multiplicity) {
-        for (UmlItem item : type.children()) {
-            if (item.kind() == anItemKind.anAttribute && item.name().equals(elementInTypeName)) {
-                String previousMultiplicity = ((UmlAttribute) item).multiplicity();
-                if (!previousMultiplicity.isEmpty() && !multiplicity.isEmpty() && !previousMultiplicity.equals(multiplicity))
-                    Log.debug("getElementInType:  warning - " + NamespaceModel.getPrefixedName(type) + "/" + elementInTypeName
-                            + " has conflicting multiplicities " + previousMultiplicity + " and " + multiplicity);
-                return (UmlAttribute) item;
+        if (type != null && type.children() != null)
+            for (UmlItem item : type.children()) {
+                if (item.kind() == anItemKind.anAttribute && item.name().equals(elementInTypeName)) {
+                    String previousMultiplicity = ((UmlAttribute) item).multiplicity();
+                    if (!previousMultiplicity.isEmpty() && !multiplicity.isEmpty() && !previousMultiplicity.equals(multiplicity))
+                        Log.debug("getElementInType:  warning - " + NamespaceModel.getPrefixedName(type) + "/" + elementInTypeName
+                                + " has conflicting multiplicities " + previousMultiplicity + " and " + multiplicity);
+                    return (UmlAttribute) item;
+                }
             }
-        }
         return null;
     }
 
@@ -1300,7 +1320,8 @@ class NiemModel {
             //String value = filterEnum(filterASCII(enumElement.getAttribute("value")));
             String value = filterASCII(enumElement.getAttribute("value"));
             String codeDescription = null;
-            if (!NiemUmlModel.getProperty(ProjectProperties.IMPORT_CODE_DESCRIPTIONS).equals("false"))
+            String importCodeDescriptions = NiemUmlModel.getProperty(ProjectProperties.IMPORT_CODE_DESCRIPTIONS);
+            if (importCodeDescriptions != null && !importCodeDescriptions.equals("false"))
 				try {
                 if (nodeDocumentationXPath != null) {
 //						codeDescription = filterEnumDefinition(filterASCII(xe.evaluate(enumElement)));
@@ -1850,7 +1871,8 @@ class NiemModel {
             String facet = filterASCII(facetElement.getLocalName());
             String value = filterASCII(facetElement.getAttribute("value"));
             String facetDescription = null;
-            if (!NiemUmlModel.getProperty(ProjectProperties.IMPORT_CODE_DESCRIPTIONS).equals("false"))
+            String importCodeDescriptions = NiemUmlModel.getProperty(ProjectProperties.IMPORT_CODE_DESCRIPTIONS);
+            if (importCodeDescriptions != null && !importCodeDescriptions.equals("false"))
 				try {
                 if (nodeDocumentationXPath != null) {
 //						facetDescription = filterEnumDefinition(filterASCII(xe.evaluate(enumElement)));

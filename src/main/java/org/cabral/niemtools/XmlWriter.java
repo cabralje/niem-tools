@@ -157,90 +157,95 @@ public class XmlWriter {
     void exportCodeLists(NiemModel model) {
 
         String version = NiemUmlModel.getProperty(ProjectProperties.IEPD_VERSION);
+        if (version == null)
+            version = "";
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         String today = dateFormat.format(date);
 
         // export code lists for extension elements
-        for (UmlItem item : model.getModelPackage().children()) {
-            if (item.kind() != anItemKind.aClassView)
-                continue;
-            UmlClassView classView = (UmlClassView) item;
-            // classView.sort();
-            for (UmlItem item2 : classView.children()) {
-                if (item2.kind() != anItemKind.aClassInstance)
+        if (model != null && model.getModelPackage() != null && model.getModelPackage().children() != null)
+            for (UmlItem item : model.getModelPackage().children()) {
+                if (item != null && item.kind() != anItemKind.aClassView)
                     continue;
-                UmlClassInstance element = (UmlClassInstance) item2;
-                String elementName = NamespaceModel.getName(element);
-                String codeList = NiemUmlModel.getCodeList(element);
-                if (codeList == null || codeList.trim().isEmpty())
-                    continue;
-                if (!NiemUmlModel.isEnumeration(element))
-                    continue;
-                String codeListURI = NamespaceModel.getExtensionSchema(elementName);
-                CodeListNamespaces.add(elementName);
+                UmlClassView classView = (UmlClassView) item;
+                // classView.sort();
+                if (classView.children() != null)
+                    for (UmlItem item2 : classView.children()) {
+                        if (item2.kind() != anItemKind.aClassInstance)
+                            continue;
+                        UmlClassInstance element = (UmlClassInstance) item2;
+                        String elementName = NamespaceModel.getName(element);
+                        String codeList = NiemUmlModel.getCodeList(element);
+                        if (codeList == null || codeList.trim().isEmpty())
+                            continue;
+                        if (!NiemUmlModel.isEnumeration(element))
+                            continue;
+                        String codeListURI = NamespaceModel.getExtensionSchema(elementName);
+                        CodeListNamespaces.add(elementName);
 
-                // export code list
-                Log.debug("exportCodeList: exporting code list " + elementName + GC_FILE_TYPE);
-                try {
-                    File file = Paths.get(directory, elementName + GC_FILE_TYPE).toFile();
-                    File parentFile = file.getParentFile();
-                    if (parentFile != null)
-                        parentFile.mkdirs();
-                    try (FileWriter fw = new FileWriter(file)) {
-                        fw.write(XmlWriter.XML_HEADER + XmlWriter.XML_ATTRIBUTION + "<gc:CodeList ");
-                        writeXmlNs(fw, NiemModel.CT_PREFIX, NiemModel.CT_URI);
-                        writeXmlNs(fw, GC_PREFIX, GC_URI);
-                        writeXmlNs(fw, GC_APPINFO_PREFIX, GC_APPINFO_URI);
-                        writeXmlNs(fw, XmlWriter.XSI_PREFIX, XmlWriter.XSI_URI);
-                        writeXmlAttribute(fw, XmlWriter.XSI_PREFIX + ":schemaLocation", GC_URI + " " + GC_LOCATION);
-                        fw.write(">" + "<Annotation>" + "<AppInfo>" + "<gca:ConformanceTargets ct:conformanceTargets=\""
-                                + GC_CODELIST_URI + "#GenericodeCodeListDocument\"/>" + "</AppInfo>" + "</Annotation>"
-                                + "<Identification>" + "<ShortName>" + elementName + "</ShortName>" + "<Version>" + version
-                                + "</Version>" + "<CanonicalUri>" + codeListURI + "</CanonicalUri>"
-                                + "<CanonicalVersionUri>" + codeListURI + "/" + today + "</CanonicalVersionUri>"
-                                + "</Identification>" + "<ColumnSet>" + "<Column Id=\"" + GC_CODELIST_CODE
-                                + "\" Use=\"required\">" + "<ShortName>" + GC_CODELIST_CODE + "</ShortName>" + "<CanonicalUri>"
-                                + GC_CODELIST_URI + "column/" + GC_CODELIST_CODE + "</CanonicalUri>"
-                                + "<Data Type=\"normalizedString\" Lang=\"en\"/>" + "</Column>" + "<Column Id=\""
-                                + GC_CODELIST_DEFINITION + "\" Use=\"optional\">" + "<ShortName>" + GC_CODELIST_DEFINITION
-                                + "</ShortName>" + "<CanonicalUri>" + GC_CODELIST_URI + "column/" + GC_CODELIST_DEFINITION
-                                + "</CanonicalUri>" + "<Data Type=\"normalizedString\" Lang=\"en\"/>" + "</Column>"
-                                + "<Key Id=\"codeKey\">" + "<ShortName>CodeKey</ShortName>" + "<ColumnRef Ref=\""
-                                + GC_CODELIST_CODE + "\"/>" + "</Key>" + "</ColumnSet>" + "<SimpleCodeList>");
-                        if (codeList.contains(NiemModel.CODELIST_DELIMITER)) {
-                            String[] codes = codeList.split(NiemModel.CODELIST_DELIMITER);
-                            //if (NiemUmlClass.isEnumeration(element))
-                            //	for (UmlItem item1 : element.children()) {
-                            //		if (item1.kind() != anItemKind.anAttribute)
-                            //			continue;
-                            //		UmlAttribute attribute = (UmlAttribute) item1;
-                            //		String code = attribute.defaultValue();
-                            //		String codeDescription = attribute.description();
-                            for (String code : codes) {
-                                String[] pairs = code.split(NiemModel.CODELIST_DEFINITION_DELIMITER);
-                                fw.write("<Row><Value ColumnRef=\"" + GC_CODELIST_CODE + "\"><SimpleValue>"
-                                        + pairs[0].trim()
-                                        //	+ code
-                                        + "</SimpleValue></Value>");
-                                if (pairs.length > 1) //if (codeDescription != null && !codeDescription.isEmpty())
-                                    fw.write("<Value ColumnRef=\"" + GC_CODELIST_DEFINITION + "\"><SimpleValue>"
-                                            + pairs[1].trim()
-                                            //	+ codeDescription
-                                            + "</SimpleValue></Value>");
-                                fw.write("</Row>");
+                        // export code list
+                        Log.debug("exportCodeList: exporting code list " + elementName + GC_FILE_TYPE);
+                        try {
+                            File file = Paths.get(directory, elementName + GC_FILE_TYPE).toFile();
+                            File parentFile = file.getParentFile();
+                            if (parentFile != null)
+                                parentFile.mkdirs();
+                            try (FileWriter fw = new FileWriter(file)) {
+                                fw.write(XmlWriter.XML_HEADER + XmlWriter.XML_ATTRIBUTION + "<gc:CodeList ");
+                                writeXmlNs(fw, NiemModel.CT_PREFIX, NiemModel.CT_URI);
+                                writeXmlNs(fw, GC_PREFIX, GC_URI);
+                                writeXmlNs(fw, GC_APPINFO_PREFIX, GC_APPINFO_URI);
+                                writeXmlNs(fw, XmlWriter.XSI_PREFIX, XmlWriter.XSI_URI);
+                                writeXmlAttribute(fw, XmlWriter.XSI_PREFIX + ":schemaLocation", GC_URI + " " + GC_LOCATION);
+                                fw.write(">" + "<Annotation>" + "<AppInfo>" + "<gca:ConformanceTargets ct:conformanceTargets=\""
+                                        + GC_CODELIST_URI + "#GenericodeCodeListDocument\"/>" + "</AppInfo>" + "</Annotation>"
+                                        + "<Identification>" + "<ShortName>" + elementName + "</ShortName>" + "<Version>" + version
+                                        + "</Version>" + "<CanonicalUri>" + codeListURI + "</CanonicalUri>"
+                                        + "<CanonicalVersionUri>" + codeListURI + "/" + today + "</CanonicalVersionUri>"
+                                        + "</Identification>" + "<ColumnSet>" + "<Column Id=\"" + GC_CODELIST_CODE
+                                        + "\" Use=\"required\">" + "<ShortName>" + GC_CODELIST_CODE + "</ShortName>" + "<CanonicalUri>"
+                                        + GC_CODELIST_URI + "column/" + GC_CODELIST_CODE + "</CanonicalUri>"
+                                        + "<Data Type=\"normalizedString\" Lang=\"en\"/>" + "</Column>" + "<Column Id=\""
+                                        + GC_CODELIST_DEFINITION + "\" Use=\"optional\">" + "<ShortName>" + GC_CODELIST_DEFINITION
+                                        + "</ShortName>" + "<CanonicalUri>" + GC_CODELIST_URI + "column/" + GC_CODELIST_DEFINITION
+                                        + "</CanonicalUri>" + "<Data Type=\"normalizedString\" Lang=\"en\"/>" + "</Column>"
+                                        + "<Key Id=\"codeKey\">" + "<ShortName>CodeKey</ShortName>" + "<ColumnRef Ref=\""
+                                        + GC_CODELIST_CODE + "\"/>" + "</Key>" + "</ColumnSet>" + "<SimpleCodeList>");
+                                if (codeList.contains(NiemModel.CODELIST_DELIMITER)) {
+                                    String[] codes = codeList.split(NiemModel.CODELIST_DELIMITER);
+                                    //if (NiemUmlClass.isEnumeration(element))
+                                    //	for (UmlItem item1 : element.children()) {
+                                    //		if (item1.kind() != anItemKind.anAttribute)
+                                    //			continue;
+                                    //		UmlAttribute attribute = (UmlAttribute) item1;
+                                    //		String code = attribute.defaultValue();
+                                    //		String codeDescription = attribute.description();
+                                    if (codes != null)
+                                        for (String code : codes) {
+                                            String[] pairs = code.split(NiemModel.CODELIST_DEFINITION_DELIMITER);
+                                            fw.write("<Row><Value ColumnRef=\"" + GC_CODELIST_CODE + "\"><SimpleValue>"
+                                                    + pairs[0].trim()
+                                                    //	+ code
+                                                    + "</SimpleValue></Value>");
+                                            if (pairs.length > 1) //if (codeDescription != null && !codeDescription.isEmpty())
+                                                fw.write("<Value ColumnRef=\"" + GC_CODELIST_DEFINITION + "\"><SimpleValue>"
+                                                        + pairs[1].trim()
+                                                        //	+ codeDescription
+                                                        + "</SimpleValue></Value>");
+                                            fw.write("</Row>");
+                                        }
+                                }
+                                fw.write("</SimpleCodeList></gc:CodeList>");
                             }
-                        }
-                        fw.write("</SimpleCodeList></gc:CodeList>");
-                    }
 
-                } catch (IOException e) {
-                    Log.trace("exportCodeList: IO exception: " + e.toString());
-                } catch (RuntimeException e) {
-                    Log.trace("exportCodeList: Runtime Exception: " + e.toString());
-                }
+                        } catch (IOException e) {
+                            Log.trace("exportCodeList: IO exception: " + e.toString());
+                        } catch (RuntimeException e) {
+                            Log.trace("exportCodeList: Runtime Exception: " + e.toString());
+                        }
+                    }
             }
-        }
     }
 
     /**
@@ -262,17 +267,18 @@ public class XmlWriter {
         try (FileWriter xml = new FileWriter(file)) {
             xml.write(XmlWriter.XML_HEADER);
             xml.write("<c:Catalog");
-            for (Entry<String, String> entry : NamespaceModel.getPrefixes().entrySet()) {
-                String prefix = entry.getKey();
-                switch (prefix) {
-                    case NiemModel.NC_PREFIX ->
-                        writeXmlNs(xml, prefix, NiemModel.MPD_NC_URI);
-                    case NiemModel.STRUCTURES_PREFIX ->
-                        writeXmlNs(xml, prefix, NiemModel.MPD_STRUCTURES_URI);
-                    default ->
-                        writeXmlNs(xml, prefix, NamespaceModel.getSchemaURIForPrefix(prefix));
+            if (NamespaceModel.getPrefixes() != null && NamespaceModel.getPrefixes().entrySet() != null)
+                for (Entry<String, String> entry : NamespaceModel.getPrefixes().entrySet()) {
+                    String prefix = entry.getKey();
+                    switch (prefix) {
+                        case NiemModel.NC_PREFIX ->
+                            writeXmlNs(xml, prefix, NiemModel.MPD_NC_URI);
+                        case NiemModel.STRUCTURES_PREFIX ->
+                            writeXmlNs(xml, prefix, NiemModel.MPD_STRUCTURES_URI);
+                        default ->
+                            writeXmlNs(xml, prefix, NamespaceModel.getSchemaURIForPrefix(prefix));
+                    }
                 }
-            }
             writeXmlNs(xml, "c", NiemModel.MPD_CATALOG_URI);
             writeXmlAttribute(xml, XmlWriter.XSI_PREFIX + ":schemaLocation", NiemModel.MPD_CATALOG_URI + " " + NiemModel.MPD_CATALOG_LOCATION);
             xml.write(">");
@@ -289,33 +295,34 @@ public class XmlWriter {
                     + "</c:AuthoritativeSource>" + "<c:CreationDate>" + today + "</c:CreationDate>" + "<c:StatusText>"
                     + properties.getProperty(ProjectProperties.IEPD_STATUS) + "</c:StatusText>" + "</c:MPDInformation>");
             Path p2 = Paths.get(directory, properties.getProperty(ProjectProperties.IEPD_CATALOG_FILE)).getParent();
-            for (String message : messages) {
-                UmlClassInstance element;
-                if (NiemUmlModel.isNiemElement(message))
-                    element = NiemUmlModel.getSubsetModel().getElement(NamespaceModel.getSchemaURI(message), message); 
-                else 
-                    element = NiemUmlModel.getExtensionModel().getElement(NamespaceModel.getSchemaURI(message), message);
-                xml.write("<c:IEPConformanceTarget structures:id=\"" + NamespaceModel.getName(message) + "\">");
-                if (element == null)
-                    Log.trace("exportMpdCatalog: error - no root element " + message); 
-                else
-                    xml.write("<nc:DescriptionText>" + element.description() + "</nc:DescriptionText>");
-                xml.write("<c:HasDocumentElement c:qualifiedNameList=\"" + message + "\"/>" + "<c:XMLSchemaValid>"
-                        + "<c:XMLCatalog c:pathURI=\"" + XML_CATALOG_FILE + "\"/>" + "</c:XMLSchemaValid>");
-                String xmlExampleDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + properties.getProperty(ProjectProperties.EXPORT_XML_DIR);
-                if (xmlExampleDir != null) {
-                    Path p3;
-                    String path3 = xmlExampleDir + File.separator + NamespaceModel.getName(message) + XmlWriter.XML_FILE_TYPE;
-                    try {
-                        p3 = p2.relativize(Paths.get(path3));
-                        path3 = p3.toString();
-                    } catch (Exception e1) {
-                        Log.trace("exportMpdCatalog: No relative path 1 from " + p2.toString() + " to " + path3 + " " + e1.toString());
+            if (messages != null)
+                for (String message : messages) {
+                    UmlClassInstance element;
+                    if (NiemUmlModel.isNiemElement(message))
+                        element = NiemUmlModel.getSubsetModel().getElement(NamespaceModel.getSchemaURI(message), message); 
+                    else 
+                        element = NiemUmlModel.getExtensionModel().getElement(NamespaceModel.getSchemaURI(message), message);
+                    xml.write("<c:IEPConformanceTarget structures:id=\"" + NamespaceModel.getName(message) + "\">");
+                    if (element == null)
+                        Log.trace("exportMpdCatalog: error - no root element " + message); 
+                    else
+                        xml.write("<nc:DescriptionText>" + element.description() + "</nc:DescriptionText>");
+                    xml.write("<c:HasDocumentElement c:qualifiedNameList=\"" + message + "\"/>" + "<c:XMLSchemaValid>"
+                            + "<c:XMLCatalog c:pathURI=\"" + XML_CATALOG_FILE + "\"/>" + "</c:XMLSchemaValid>");
+                    String xmlExampleDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + properties.getProperty(ProjectProperties.EXPORT_XML_DIR);
+                    if (xmlExampleDir != null) {
+                        Path p3;
+                        String path3 = xmlExampleDir + File.separator + NamespaceModel.getName(message) + XmlWriter.XML_FILE_TYPE;
+                        try {
+                            p3 = p2.relativize(Paths.get(path3));
+                            path3 = p3.toString();
+                        } catch (Exception e1) {
+                            Log.trace("exportMpdCatalog: No relative path 1 from " + p2.toString() + " to " + path3 + " " + e1.toString());
+                        }
+                        xml.write("<c:IEPSampleXMLDocument c:pathURI=\"" + path3 + "\"/>");
                     }
-                    xml.write("<c:IEPSampleXMLDocument c:pathURI=\"" + path3 + "\"/>");
+                    xml.write("</c:IEPConformanceTarget>");
                 }
-                xml.write("</c:IEPConformanceTarget>");
-            }
             Path p4;
             String path4 = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + properties.getProperty(ProjectProperties.IEPD_READ_ME_FILE);
             try {
@@ -345,19 +352,20 @@ public class XmlWriter {
                     + "<c:MPDChangeLog c:pathURI=\"" + path5 + "\"/>"
                     + "<c:Wantlist c:pathURI=\"" + path6 + "\"/>"
                     + "<c:ConformanceAssertion c:pathURI=\"" + properties.getProperty(ProjectProperties.IEPD_CONFORMANCE_ASSERTION_FILE) + " \"/>");
-            for (Entry<String, String> entry : NamespaceModel.getPrefixes().entrySet()) {
-                String prefix = entry.getKey();
-                String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
-                if (schemaURI != null) {
-                    Namespace ns = NamespaceModel.getNamespace(schemaURI);
-                    if (ns != null)
-                        if ((ns.getReferenceClassView() == null) && (ns.getFilepath() != null))
-                            xml.write("<c:ExtensionSchemaDocument c:pathURI=\"" + ns.getFilepath() + "\"/>");
+            if (NamespaceModel.getPrefixes() != null && NamespaceModel.getPrefixes().entrySet() != null)
+                for (Entry<String, String> entry : NamespaceModel.getPrefixes().entrySet()) {
+                    String prefix = entry.getKey();
+                    String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
+                    if (schemaURI != null) {
+                        Namespace ns = NamespaceModel.getNamespace(schemaURI);
+                        if (ns != null)
+                            if ((ns.getReferenceClassView() == null) && (ns.getFilepath() != null))
+                                xml.write("<c:ExtensionSchemaDocument c:pathURI=\"" + ns.getFilepath() + "\"/>");
+                    }
                 }
-            }
-            for (String codeList : CodeListNamespaces) {
-                xml.write("<c:BusinessRulesArtifact c:pathURI=\"" + codeList + GC_FILE_TYPE + "\"/>\n");
-            }
+            if (CodeListNamespaces != null)
+                for (String codeList : CodeListNamespaces)
+                    xml.write("<c:BusinessRulesArtifact c:pathURI=\"" + codeList + GC_FILE_TYPE + "\"/>\n");
             xml.write("<c:ReadMe c:pathURI=\"" + properties.getProperty(ProjectProperties.IEPD_READ_ME_FILE) + "\"/>");
             xml.write("<c:MPDChangeLog c:pathURI=\"" + properties.getProperty(ProjectProperties.IEPD_CHANGE_LOG_FILE) + "\"/>");
             xml.write("</c:MPD></c:Catalog>");
@@ -381,117 +389,118 @@ public class XmlWriter {
         Log.trace("Generating document/literal wrapper schema");
         TreeSet<String> xmlTypes = new TreeSet<>();
         TreeSet<String> xmlElements = new TreeSet<>();
-        for (UmlClass port : ports.values()) {
-            for (UmlItem item2 : port.children()) {
-                if (item2.kind() != anItemKind.anOperation) {
-                    continue;
-                }
-                UmlOperation operation = (UmlOperation) item2;
-                String operationName = operation.name();
-                Log.debug("exportWSDL: generating document/literal wrapper for " + operationName);
-                UmlClass outputType = null, inputType = null;
-                UmlParameter[] params = operation.params();
-                if (params != null) {
-                    String elementName = operationName + "Request";
-                    String inputTypeName = elementName + "Type";
-                    String inputTypeSchema = "<xs:complexType name=\"" + inputTypeName + "\">" + "<xs:sequence>";
-                    for (UmlParameter param : params) {
-                        // ignore RESTful parameters
-                        if (!param.name.isEmpty() && !param.name.equals("body"))
+        if (ports != null && ports.values() != null)
+            for (UmlClass port : ports.values()) {
+                if (port != null && port.children() != null)
+                    for (UmlItem item2 : port.children()) {
+                        if (item2.kind() != anItemKind.anOperation)
                             continue;
-                        try {
-                            inputType = param.type.type;
-                        } catch (Exception e) {
-                            Log.trace("exportWSDL: error - no input message for " + operationName);
+                        UmlOperation operation = (UmlOperation) item2;
+                        String operationName = operation.name();
+                        Log.debug("exportWSDL: generating document/literal wrapper for " + operationName);
+                        UmlClass outputType = null, inputType = null;
+                        UmlParameter[] params = operation.params();
+                        if (params != null) {
+                            String elementName = operationName + "Request";
+                            String inputTypeName = elementName + "Type";
+                            String inputTypeSchema = "<xs:complexType name=\"" + inputTypeName + "\">" + "<xs:sequence>";
+                            for (UmlParameter param : params) {
+                                // ignore RESTful parameters
+                                if (!param.name.isEmpty() && !param.name.equals("body"))
+                                    continue;
+                                try {
+                                    inputType = param.type.type;
+                                } catch (Exception e) {
+                                    Log.trace("exportWSDL: error - no input message for " + operationName);
+                                }
+                                if (NiemUmlModel.isNiemUml(inputType)) {
+                                    Log.trace("exportWSDL: error - no type for input message for " + operationName);
+                                    continue;
+                                }
+                                String inputMessage = null;
+                                if (inputType != null)
+                                    inputMessage = inputType.propertyValue(NiemUmlModel.NIEM_STEREOTYPE_XPATH);
+                                if (inputMessage == null || inputMessage.isEmpty()) {
+                                    Log.trace("exportWSDL: error - non-NIEM type for input message for " + operationName);
+                                    continue;
+                                }
+                                Log.debug("exportWSDL: input Message: " + inputMessage + " from operation " + operationName);
+                                messageNamespaces.add(NamespaceModel.getPrefix(inputMessage));
+                                String mult = param.multiplicity;
+                                String minOccurs = "1";
+                                String maxOccurs = "1";
+                                if (!(mult.isEmpty())) {
+                                    if (mult.contains("..")) {
+                                        String[] occurs = mult.split("\\.\\.");
+                                        minOccurs = occurs[0];
+                                        maxOccurs = occurs[1];
+                                    } else
+                                        minOccurs = maxOccurs = mult;
+                                }
+                                if (maxOccurs.equals("*"))
+                                    maxOccurs = "unbounded";
+                                if (NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(inputMessage)))
+                                    inputTypeSchema += "<!--xs:element ref=\"" + inputMessage + "\" minOccurs=\"" + minOccurs
+                                            + "\" maxOccurs=\"" + maxOccurs + "\"/-->\n"; 
+                                else
+                                    inputTypeSchema += "<xs:element ref=\"" + inputMessage + "\" minOccurs=\"" + minOccurs
+                                            + "\" maxOccurs=\"" + maxOccurs + "\"/>\n";
+                            }
+                            inputTypeSchema += "</xs:sequence>" + "</xs:complexType>";
+                            xmlTypes.add(inputTypeSchema);
+                            xmlElements.add("<xs:element name=\"" + elementName + "\" type=\""
+                                    + NamespaceModel.getPrefixedName(WRAPPER_PREFIX, inputTypeName) + "\"/>");
                         }
-                        if (NiemUmlModel.isNiemUml(inputType)) {
-                            Log.trace("exportWSDL: error - no type for input message for " + operationName);
-                            continue;
-                        }
-                        String inputMessage = null;
-                        if (inputType != null)
-                            inputMessage = inputType.propertyValue(NiemUmlModel.NIEM_STEREOTYPE_XPATH);
-                        if (inputMessage == null || inputMessage.isEmpty()) {
-                            Log.trace("exportWSDL: error - non-NIEM type for input message for " + operationName);
-                            continue;
-                        }
-                        Log.debug("exportWSDL: input Message: " + inputMessage + " from operation " + operationName);
-                        messageNamespaces.add(NamespaceModel.getPrefix(inputMessage));
-                        String mult = param.multiplicity;
-                        String minOccurs = "1";
-                        String maxOccurs = "1";
-                        if (!(mult.isEmpty())) {
-                            if (mult.contains("..")) {
-                                String[] occurs = mult.split("\\.\\.");
-                                minOccurs = occurs[0];
-                                maxOccurs = occurs[1];
-                            } else
-                                minOccurs = maxOccurs = mult;
-                        }
-                        if (maxOccurs.equals("*"))
-                            maxOccurs = "unbounded";
-                        if (NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(inputMessage)))
-                            inputTypeSchema += "<!--xs:element ref=\"" + inputMessage + "\" minOccurs=\"" + minOccurs
-                                    + "\" maxOccurs=\"" + maxOccurs + "\"/-->\n"; 
-                        else
-                            inputTypeSchema += "<xs:element ref=\"" + inputMessage + "\" minOccurs=\"" + minOccurs
-                                    + "\" maxOccurs=\"" + maxOccurs + "\"/>\n";
-                    }
-                    inputTypeSchema += "</xs:sequence>" + "</xs:complexType>";
-                    xmlTypes.add(inputTypeSchema);
-                    xmlElements.add("<xs:element name=\"" + elementName + "\" type=\""
-                            + NamespaceModel.getPrefixedName(WRAPPER_PREFIX, inputTypeName) + "\"/>");
-                }
 
-                try {
-                    outputType = operation.returnType().type;
-                } catch (Exception e) {
-                    Log.trace("exportWSDL: error - no output message for " + operationName + " " + e.toString());
-                }
-                if (outputType == null || !NiemUmlModel.isNiemUml(outputType)) {
-                    String returnType = operation.returnType().toString();
-                    Log.debug("exportWSDL: unusual return type " + returnType);
-                    String outputTypeName;
-                    switch (returnType) {
-                        case "bool":
-                            outputTypeName = "xs:boolean";
-                            break;
-                        case "int":
-                            outputTypeName = "xs:integer";
-                            break;
-                        case "string":
-                        default:
-                            outputTypeName = "xs:string";
+                        try {
+                            outputType = operation.returnType().type;
+                        } catch (Exception e) {
+                            Log.trace("exportWSDL: error - no output message for " + operationName + " " + e.toString());
+                        }
+                        if (outputType == null || !NiemUmlModel.isNiemUml(outputType)) {
+                            String returnType = operation.returnType().toString();
+                            Log.debug("exportWSDL: unusual return type " + returnType);
+                            String outputTypeName;
+                            switch (returnType) {
+                                case "bool":
+                                    outputTypeName = "xs:boolean";
+                                    break;
+                                case "int":
+                                    outputTypeName = "xs:integer";
+                                    break;
+                                case "string":
+                                default:
+                                    outputTypeName = "xs:string";
+                            }
+        //					if (outputTypeName != null)
+                            xmlElements.add("<xs:element name=\"" + operationName + "Response" + "\" type=\"" + outputTypeName + "\"/>");
+                            continue;
+                        }
+                        String outputMessage = outputType.propertyValue(NiemUmlModel.NIEM_STEREOTYPE_XPATH);
+                        if (outputMessage == null || outputMessage.isEmpty()) {
+                            Log.trace("exportWSDL: error - no type for output message for " + operationName);
+                            continue;
+                        }
+                        Log.debug("exportWSDL: output Message: " + outputMessage + " from operation " + operationName);
+                        String ns = NamespaceModel.getPrefix(outputMessage);
+                        if (ns == null) {
+                            Log.trace("exportWSDL: error - no namespace for " + outputMessage);
+                            continue;
+                        }
+                        messageNamespaces.add(ns);
+                        String elementName = operationName + "Response";
+                        String outputTypeName = elementName + "Type";
+                        String outputTypeSchema = "<xs:complexType name=\"" + outputTypeName + "\">" + "<xs:sequence>";
+                        if (NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(outputMessage)))
+                            outputTypeSchema += "<!--xs:element ref=\"" + outputMessage + "\"/-->"; 
+                        else
+                            outputTypeSchema += "<xs:element ref=\"" + outputMessage + "\"/>";
+                        outputTypeSchema += "</xs:sequence>" + "</xs:complexType>";
+                        xmlTypes.add(outputTypeSchema);
+                        xmlElements.add("<xs:element name=\"" + elementName + "\" type=\""
+                                + NamespaceModel.getPrefixedName(WRAPPER_PREFIX, outputTypeName) + "\"/>");
                     }
-//					if (outputTypeName != null)
-                    xmlElements.add("<xs:element name=\"" + operationName + "Response" + "\" type=\"" + outputTypeName + "\"/>");
-                    continue;
-                }
-                String outputMessage = outputType.propertyValue(NiemUmlModel.NIEM_STEREOTYPE_XPATH);
-                if (outputMessage == null || outputMessage.isEmpty()) {
-                    Log.trace("exportWSDL: error - no type for output message for " + operationName);
-                    continue;
-                }
-                Log.debug("exportWSDL: output Message: " + outputMessage + " from operation " + operationName);
-                String ns = NamespaceModel.getPrefix(outputMessage);
-                if (ns == null) {
-                    Log.trace("exportWSDL: error - no namespace for " + outputMessage);
-                    continue;
-                }
-                messageNamespaces.add(ns);
-                String elementName = operationName + "Response";
-                String outputTypeName = elementName + "Type";
-                String outputTypeSchema = "<xs:complexType name=\"" + outputTypeName + "\">" + "<xs:sequence>";
-                if (NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(outputMessage)))
-                    outputTypeSchema += "<!--xs:element ref=\"" + outputMessage + "\"/-->"; 
-                else
-                    outputTypeSchema += "<xs:element ref=\"" + outputMessage + "\"/>";
-                outputTypeSchema += "</xs:sequence>" + "</xs:complexType>";
-                xmlTypes.add(outputTypeSchema);
-                xmlElements.add("<xs:element name=\"" + elementName + "\" type=\""
-                        + NamespaceModel.getPrefixedName(WRAPPER_PREFIX, outputTypeName) + "\"/>");
             }
-        }
 
         // export message wrapper
         Namespace ns = NamespaceModel.addNamespace(WRAPPERURI);
@@ -502,90 +511,96 @@ public class XmlWriter {
         exportXmlSchema(filename, WRAPPERURI, xmlTypes, xmlElements, messageNamespaces, properties);
 
         Log.trace("Generating WSDLs");
-        for (UmlClass port : ports.values()) {
-            String portName = port.name();
-            String path1 = portName + WSDL_FILE_TYPE;
-            Path p1 = Paths.get(wsdlDir, path1);
-            File file = p1.toFile();
-            File parentFile = file.getParentFile();
-            if (parentFile != null)
-                parentFile.mkdirs();
-            try (FileWriter wsdl = new FileWriter(file)) {
-                Log.debug("WSDL: " + portName + WSDL_FILE_TYPE);
-                wsdl.write("<definitions targetNamespace=\"" + WSDLURI + "/" + portName + "\"");
-                writeXmlNs(wsdl, WSDL_PREFIX, WSDLURI + "/" + portName);
-                writeXmlNs(wsdl, WRAPPER_PREFIX, WRAPPERURI);
-                writeXmlNs(wsdl, "xsd", XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                writeXmlNs(wsdl, SOAP_PREFIX, SOAP_URI);
-                writeXmlNs(wsdl, WSDL_SCHEMA_PREFIX, WSDL_SCHEMA_URI);
-                writeXmlNs(wsdl, "", WSDL_SCHEMA_URI);
-                writeXmlNs(wsdl, WSP_PREFIX, WSP_URI);
-                writeXmlNs(wsdl, WSRMP_PREFIX, WSRMP_URI);
-                writeXmlNs(wsdl, WSU_PREFIX, WSU_URI);
-                wsdl.write("><!-- " + port.description() + " -->");
-                Path p2;
-                String path2 = MESSAGE_WRAPPERS_FILE_NAME + XmlWriter.XSD_FILE_TYPE;
-                Path p3;
-                String s3 = "";
-                try {
-                    p2 = Paths.get(directory, path2);
-                    p3 = p1.getParent().relativize(p2);
-                    s3 = p3.toString().replace('\\', '/');
-                } catch (Exception e1) {
-                    Log.trace("exportWSDL: No relative path from " + path1 + " to " + path2 + " " + e1.toString());
-                }
-                wsdl.write("<wsp:UsingPolicy wsdl:required=\"true\"/>" + "<wsp:Policy wsu:Id=\"" + WSP_POLICY + "\">"
-                        + "<wsrmp:RMAssertion/>" + "</wsp:Policy>" + "<wsdl:types>" + "<xsd:schema>"
-                        //					+ "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + p3.toString() + "\"/>"
-                        + "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + s3 + "\"/>"
-                        + "</xsd:schema>" + "</wsdl:types>");
-                wsdl.write("<!-- messages -->");
-                for (UmlItem item : port.children()) {
-                    if (item.kind() == anItemKind.anOperation) {
-                        UmlOperation operation = (UmlOperation) item;
-                        String operationName = operation.name();
-                        wsdl.write("<message name=\"" + operationName + REQUEST_MESSAGE_SUFFIX + "\">"
-                                + "<part name=\"body\" element=\"" + NamespaceModel.getPrefixedName(WRAPPER_PREFIX, operationName)
-                                + REQUEST_MESSAGE_SUFFIX + "\"/>" + "</message>" + "<message name=\"" + operationName
-                                + RESPONSE_MESSAGE_SUFFIX + "\">" + "<part name=\"body\" element=\""
-                                + NamespaceModel.getPrefixedName(WRAPPER_PREFIX, operationName) + RESPONSE_MESSAGE_SUFFIX + "\"/>"
-                                + "</message>");
+        if (ports != null && ports.values() != null)
+            for (UmlClass port : ports.values()) {
+                if (port == null)
+                    continue;
+                String portName = port.name();
+                String path1 = portName + WSDL_FILE_TYPE;
+                Path p1 = Paths.get(wsdlDir, path1);
+                File file = p1.toFile();
+                File parentFile = file.getParentFile();
+                if (parentFile != null)
+                    parentFile.mkdirs();
+                try (FileWriter wsdl = new FileWriter(file)) {
+                    Log.debug("WSDL: " + portName + WSDL_FILE_TYPE);
+                    wsdl.write("<definitions targetNamespace=\"" + WSDLURI + "/" + portName + "\"");
+                    writeXmlNs(wsdl, WSDL_PREFIX, WSDLURI + "/" + portName);
+                    writeXmlNs(wsdl, WRAPPER_PREFIX, WRAPPERURI);
+                    writeXmlNs(wsdl, "xsd", XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                    writeXmlNs(wsdl, SOAP_PREFIX, SOAP_URI);
+                    writeXmlNs(wsdl, WSDL_SCHEMA_PREFIX, WSDL_SCHEMA_URI);
+                    writeXmlNs(wsdl, "", WSDL_SCHEMA_URI);
+                    writeXmlNs(wsdl, WSP_PREFIX, WSP_URI);
+                    writeXmlNs(wsdl, WSRMP_PREFIX, WSRMP_URI);
+                    writeXmlNs(wsdl, WSU_PREFIX, WSU_URI);
+                    wsdl.write("><!-- " + port.description() + " -->");
+                    Path p2;
+                    String path2 = MESSAGE_WRAPPERS_FILE_NAME + XmlWriter.XSD_FILE_TYPE;
+                    Path p3;
+                    String s3 = "";
+                    try {
+                        p2 = Paths.get(directory, path2);
+                        p3 = p1.getParent().relativize(p2);
+                        s3 = p3.toString().replace('\\', '/');
+                    } catch (Exception e1) {
+                        Log.trace("exportWSDL: No relative path from " + path1 + " to " + path2 + " " + e1.toString());
                     }
+                    wsdl.write("<wsp:UsingPolicy wsdl:required=\"true\"/>" + "<wsp:Policy wsu:Id=\"" + WSP_POLICY + "\">"
+                            + "<wsrmp:RMAssertion/>" + "</wsp:Policy>" + "<wsdl:types>" + "<xsd:schema>"
+                            //					+ "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + p3.toString() + "\"/>"
+                            + "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + s3 + "\"/>"
+                            + "</xsd:schema>" + "</wsdl:types>");
+                    wsdl.write("<!-- messages -->");
+                    if (port.children() != null)
+                        for (UmlItem item : port.children()) {
+                            if (item.kind() == anItemKind.anOperation) {
+                                UmlOperation operation = (UmlOperation) item;
+                                String operationName = operation.name();
+                                wsdl.write("<message name=\"" + operationName + REQUEST_MESSAGE_SUFFIX + "\">"
+                                        + "<part name=\"body\" element=\"" + NamespaceModel.getPrefixedName(WRAPPER_PREFIX, operationName)
+                                        + REQUEST_MESSAGE_SUFFIX + "\"/>" + "</message>" + "<message name=\"" + operationName
+                                        + RESPONSE_MESSAGE_SUFFIX + "\">" + "<part name=\"body\" element=\""
+                                        + NamespaceModel.getPrefixedName(WRAPPER_PREFIX, operationName) + RESPONSE_MESSAGE_SUFFIX + "\"/>"
+                                        + "</message>");
+                            }
+                        }
+                    wsdl.write("<!-- ports -->");
+                    wsdl.write("<portType name=\"" + portName + "\">");
+                    if (port.children() != null)
+                        for (UmlItem item : port.children()) {
+                            if (item.kind() == anItemKind.anOperation) {
+                                UmlOperation operation = (UmlOperation) item;
+                                String operationName = operation.name();
+                                wsdl.write("<operation name=\"" + operationName + "\">" + "<input message=\""
+                                        + NamespaceModel.getPrefixedName(WSDL_PREFIX, operationName) + REQUEST_MESSAGE_SUFFIX + "\"/>"
+                                        + "<output message=\"" + NamespaceModel.getPrefixedName(WSDL_PREFIX, operationName)
+                                        + RESPONSE_MESSAGE_SUFFIX + "\"/>" + "</operation>");
+                            }
+                        }
+                    wsdl.write("</portType>");
+                    wsdl.write("<!-- bindings -->");
+                    wsdl.write("<binding name=\"" + portName + "Soap\" type=\"" + NamespaceModel.getPrefixedName(WSDL_PREFIX, portName) + "\">"
+                            + "<wsp:PolicyReference URI=\"#" + WSP_POLICY + "\"/>"
+                            + "<soap:binding style=\"document\" transport=\"" + SOAP_HTTP_BINDING_URI + "\"/>");
+                    if (port.children() != null)
+                        for (UmlItem item : port.children())
+                            if (item.kind() == anItemKind.anOperation) {
+                                UmlOperation oper = (UmlOperation) item;
+                                String operationName = oper.name();
+                                wsdl.write("<operation name=\"" + operationName + "\">");
+                                wsdl.write("<!-- " + item.description() + " -->");
+                                wsdl.write("<soap:operation soapAction=\"" + WSDLURI + "/" + portName + "/" + operationName + "\"/>"
+                                        + "<input>" + "	<soap:body use=\"literal\"/>" + "</input>" + "<output>"
+                                        + "	<soap:body use=\"literal\"/>" + "</output>" + "</operation>");
+                            }
+                    wsdl.write("</binding>");
+                    wsdl.write(
+                            "<!-- services not defined here...defined in an implementation-specific WSDL that imports this one -->"
+                            + "</definitions>");
                 }
-                wsdl.write("<!-- ports -->");
-                wsdl.write("<portType name=\"" + portName + "\">");
-                for (UmlItem item : port.children()) {
-                    if (item.kind() == anItemKind.anOperation) {
-                        UmlOperation operation = (UmlOperation) item;
-                        String operationName = operation.name();
-                        wsdl.write("<operation name=\"" + operationName + "\">" + "<input message=\""
-                                + NamespaceModel.getPrefixedName(WSDL_PREFIX, operationName) + REQUEST_MESSAGE_SUFFIX + "\"/>"
-                                + "<output message=\"" + NamespaceModel.getPrefixedName(WSDL_PREFIX, operationName)
-                                + RESPONSE_MESSAGE_SUFFIX + "\"/>" + "</operation>");
-                    }
-                }
-                wsdl.write("</portType>");
-                wsdl.write("<!-- bindings -->");
-                wsdl.write("<binding name=\"" + portName + "Soap\" type=\"" + NamespaceModel.getPrefixedName(WSDL_PREFIX, portName) + "\">"
-                        + "<wsp:PolicyReference URI=\"#" + WSP_POLICY + "\"/>"
-                        + "<soap:binding style=\"document\" transport=\"" + SOAP_HTTP_BINDING_URI + "\"/>");
-                for (UmlItem item : port.children())
-                    if (item.kind() == anItemKind.anOperation) {
-                        UmlOperation oper = (UmlOperation) item;
-                        String operationName = oper.name();
-                        wsdl.write("<operation name=\"" + operationName + "\">");
-                        wsdl.write("<!-- " + item.description() + " -->");
-                        wsdl.write("<soap:operation soapAction=\"" + WSDLURI + "/" + portName + "/" + operationName + "\"/>"
-                                + "<input>" + "	<soap:body use=\"literal\"/>" + "</input>" + "<output>"
-                                + "	<soap:body use=\"literal\"/>" + "</output>" + "</operation>");
-                    }
-                wsdl.write("</binding>");
-                wsdl.write(
-                        "<!-- services not defined here...defined in an implementation-specific WSDL that imports this one -->"
-                        + "</definitions>");
             }
         }
-    }
 
     /**
      * exports XML catalog file
@@ -603,17 +618,19 @@ public class XmlWriter {
         xml = new FileWriter(file);
         xml.write(XmlWriter.XML_HEADER + XmlWriter.XML_ATTRIBUTION + XML_CATALOG_HEADER + "<catalog prefer=\"public\" "
                 + XMLConstants.XMLNS_ATTRIBUTE + "=\"" + XML_CATALOG_URI + "\">\n");
-        for (Entry<String, String> entry : NamespaceModel.getPrefixes().entrySet()) {
-            String prefix = entry.getKey();
-            String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
-            Namespace ns = NamespaceModel.getNamespace(schemaURI);
-            if (NamespaceModel.isExternalPrefix(prefix))
-                xml.write("<uri name=\"" + schemaURI + "\" uri=\"" + NamespaceModel.getExternalSchemaURL(schemaURI) + "\"/>\n"); 
-            else if (ns.getReferenceClassView() == null)
-                xml.write("<uri name=\"" + schemaURI + "\" uri=\"" + ns.getFilepath() + "\"/>\n");
-        }
-        for (String codeList : CodeListNamespaces)
-            xml.write("<uri name=\"" + NamespaceModel.getExtensionSchema(codeList) + "\" uri=\"" + codeList + GC_FILE_TYPE + "\"/>\n");
+        if (NamespaceModel.getPrefixes() != null && NamespaceModel.getPrefixes().entrySet() != null)
+            for (Entry<String, String> entry : NamespaceModel.getPrefixes().entrySet()) {
+                String prefix = entry.getKey();
+                String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
+                Namespace ns = NamespaceModel.getNamespace(schemaURI);
+                if (NamespaceModel.isExternalPrefix(prefix))
+                    xml.write("<uri name=\"" + schemaURI + "\" uri=\"" + NamespaceModel.getExternalSchemaURL(schemaURI) + "\"/>\n"); 
+                else if (ns.getReferenceClassView() == null)
+                    xml.write("<uri name=\"" + schemaURI + "\" uri=\"" + ns.getFilepath() + "\"/>\n");
+            }
+        if (CodeListNamespaces != null)
+            for (String codeList : CodeListNamespaces)
+                xml.write("<uri name=\"" + NamespaceModel.getExtensionSchema(codeList) + "\" uri=\"" + codeList + GC_FILE_TYPE + "\"/>\n");
         xml.write(
                 "<nextCatalog  catalog=\"" + Paths.get(NiemUmlModel.NIEM_DIR, XML_CATALOG_FILE).toString() + "\" />\n</catalog>\n");
         xml.close();
@@ -735,11 +752,12 @@ public class XmlWriter {
                 // export XML namespace definitions
                 writeXmlNs(xml, "", nsSchemaURI);
                 writeXmlNs(xml, XmlWriter.XSI_PREFIX, XmlWriter.XSI_URI);
-                if (schemaNamespaces.isEmpty())
+                if (schemaNamespaces == null || schemaNamespaces.isEmpty())
                     Log.trace("exportXMLSchema: error - no imported namespaces in " + filename);
-                for (String nsPrefix : schemaNamespaces)
-                    if (!nsPrefix.equals(NiemModel.LOCAL_PREFIX))
-                        writeXmlNs(xml, nsPrefix, NamespaceModel.getSchemaURIForPrefix(nsPrefix));
+                else
+                    for (String nsPrefix : schemaNamespaces)
+                        if (!nsPrefix.equals(NiemModel.LOCAL_PREFIX))
+                            writeXmlNs(xml, nsPrefix, NamespaceModel.getSchemaURIForPrefix(nsPrefix));
                 writeXmlNs(xml, NiemModel.APPINFO_PREFIX, NiemModel.APPINFO_URI);
                 writeXmlNs(xml, NiemModel.CT_PREFIX, NiemModel.CT_URI);
                 //writeXmlNs(xml, XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI);
@@ -757,7 +775,8 @@ public class XmlWriter {
                 // add import namespaces
                 Log.debug("exportXMLSchema: exporting namespaces");
                 Path path1 = Paths.get(file.getParent());
-                for (String nsPrefix : schemaNamespaces) {
+                if (schemaNamespaces != null)
+                  for (String nsPrefix : schemaNamespaces) {
                     if (NamespaceModel.isInfrastructurePrefix(nsPrefix))
                         continue;
                     // trace("exportSchema: exporting prefix " + nsPrefix);
@@ -837,7 +856,7 @@ public class XmlWriter {
         TreeSet<String> xmlEnumerations = new TreeSet<>();
         if (isComplexContent == false)
         {
-            if (NiemUmlModel.isEnumeration(type)) {
+            if (type != null && NiemUmlModel.isEnumeration(type) && type.children() != null) {
                 for (UmlItem item : type.children()) {
                     if (item.kind() != anItemKind.anAttribute)
                         continue;
@@ -867,7 +886,7 @@ public class XmlWriter {
         String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
         UmlAttribute augmentationPoint = null;
         String xmlElementInType;
-        if (!NiemUmlModel.isEnumeration(type))
+        if (type != null && !NiemUmlModel.isEnumeration(type) && type.children() != null)
             for (UmlItem item : type.children()) {
                 if (item.kind() == anItemKind.anAttribute) {
                     UmlAttribute attribute = (UmlAttribute) item;
@@ -918,10 +937,14 @@ public class XmlWriter {
         // write XML schema definition
         typeSchema = (isComplexType) ? "<xs:complexType" : "<xs:simpleType";
         typeSchema += " name=\"" + typeName + "\">\n";
-        String mappingNotes = type.propertyValue(NiemUmlModel.NOTES_PROPERTY);
+        String mappingNotes = "";
+        if (type != null)
+            mappingNotes = type.propertyValue(NiemUmlModel.NOTES_PROPERTY);
         if (mappingNotes != null && !mappingNotes.isEmpty())
             typeSchema += "<!--" + mappingNotes + "-->";
-        String description = type.description();
+        String description = "";
+        if (type != null)
+            description = type.description();
         if (description != null && !description.isEmpty())
             typeSchema += """
                                       <xs:annotation>

@@ -165,21 +165,22 @@ public class CmfWriter {
                         continue;
                     }
                     cmfNamespaces.add(cmfNamespace);
-                    for (UmlItem item2 : item.children()) // export subset and extension classes
-                        if (item2 != null && item2.kind() == anItemKind.aClass) {
-                            Log.debug("exportCmfModel: exporting class " + NamespaceModel.getName(item2));
-                            String cmfClass = null;
-                            try {
-                                cmfClass = exportCmfClass((UmlClass) item2);
-                            } catch (Exception e) {
-                                Log.trace("exportCmfModel: unable to export class " + NamespaceModel.getName(item2) + " " + e.toString());
+                    if (item.children() != null)
+                        for (UmlItem item2 : item.children()) // export subset and extension classes
+                            if (item2 != null && item2.kind() == anItemKind.aClass) {
+                                Log.debug("exportCmfModel: exporting class " + NamespaceModel.getName(item2));
+                                String cmfClass = null;
+                                try {
+                                    cmfClass = exportCmfClass((UmlClass) item2);
+                                } catch (Exception e) {
+                                    Log.trace("exportCmfModel: unable to export class " + NamespaceModel.getName(item2) + " " + e.toString());
+                                }
+                                if (cmfClass == null) {
+                                    Log.trace("exportCmfModel: unable to export class " + NamespaceModel.getName(item2));
+                                    continue;
+                                }
+                                cmfClasses.add(cmfClass);
                             }
-                            if (cmfClass == null) {
-                                Log.trace("exportCmfModel: unable to export class " + NamespaceModel.getName(item2));
-                                continue;
-                            }
-                            cmfClasses.add(cmfClass);
-                        }
                 }
             }
         } catch (Exception e) {
@@ -190,7 +191,7 @@ public class CmfWriter {
             // export subset and extension properties
             for (UmlItem item : items) {
                 if (item != null && item.kind() == anItemKind.aClassView) {
-                    String prefix = NamespaceModel.getPrefix(item);
+                    //String prefix = NamespaceModel.getPrefix(item);
                     //if (NamespaceModel.isInfrastructurePrefix(prefix))
                     //    continue;
                     for (UmlItem item2 : item.children()) // export subset and extension properties
@@ -354,47 +355,47 @@ public class CmfWriter {
 
         // complex class
         String childrenCmf = "";
-        for (UmlItem item : type.children()) {
-            try {
-                if (item != null && item.kind() == anItemKind.anAttribute) {
-                    UmlAttribute attribute = (UmlAttribute) item;
-                    NiemModel model2 = NiemUmlModel.getModel(NiemModel.getURI(item));
-                    UmlClassInstance element = model2.getReferencedElement(item);
-                    if (element != null) {
-                        String elementName = NamespaceModel.getPrefixedName(element);
-                        if (NiemModel.isAugmentation(elementName))
-                            continue;
-                        if (NamespaceModel.isAttribute(elementName))
-                            continue;
-                        String multiplicity = attribute.multiplicity();
-                        UmlClass elementBaseType = null;
-                        try {
-                            elementBaseType = getCmfBaseType(element);
-                        } catch (Exception e) {
-                            Log.trace("exportCmfClass: error getting base type for element " + elementName + ": " + e.toString());
+        if (type != null && type.children() != null)
+            for (UmlItem item : type.children()) {
+                try {
+                    if (item != null && item.kind() == anItemKind.anAttribute) {
+                        UmlAttribute attribute = (UmlAttribute) item;
+                        NiemModel model2 = NiemUmlModel.getModel(NiemModel.getURI(item));
+                        UmlClassInstance element = model2.getReferencedElement(item);
+                        if (element != null) {
+                            String elementName = NamespaceModel.getPrefixedName(element);
+                            if (NiemModel.isAugmentation(elementName))
+                                continue;
+                            if (NamespaceModel.isAttribute(elementName))
+                                continue;
+                            String multiplicity = attribute.multiplicity();
+                            UmlClass elementBaseType = null;
+                            try {
+                                elementBaseType = getCmfBaseType(element);
+                            } catch (Exception e) {
+                                Log.trace("exportCmfClass: error getting base type for element " + elementName + ": " + e.toString());
+                            }
+                            String propertyCmf = tagRef(isClass(elementBaseType) ? objectPropertyName : dataPropertyName, elementName);
+                            propertyCmf += exportCmfMultiplicity(multiplicity);
+                            childrenCmf += tag(childPropertyName, propertyCmf);
                         }
-                        String propertyCmf = tagRef(isClass(elementBaseType) ? objectPropertyName : dataPropertyName, elementName);
-                        propertyCmf += exportCmfMultiplicity(multiplicity);
-                        childrenCmf += tag(childPropertyName, propertyCmf);
                     }
+                } catch (Exception e) {
+                    Log.trace("exportCmfClass: error processing child attribute: " + e.toString());
                 }
-            } catch (Exception e) {
-                Log.trace("exportCmfClass: error processing child attribute: " + e.toString());
             }
-        }
 
         try {
             Log.debug("exportCmfClass: exported complex class " + typeName);
             classCmf = exportCmfComponent(type);
-            String isNillable = type.propertyValue(NiemUmlModel.NILLABLE_PROPERTY);
-  
+            //String isNillable = NiemModel.NILLABLE_DEFAULT;
+            //if (type != null)
+            //    isNillable = type.propertyValue(NiemUmlModel.NILLABLE_PROPERTY);
             String baseTypePrefix = NamespaceModel.getPrefix(baseType);
             if (!baseTypePrefix.equals(NiemModel.STRUCTURES_PREFIX))
                 classCmf += tagRef(subclassName, NamespaceModel.getPrefixedName(baseType));
-            if (isNillable == null)
-                isNillable = NiemModel.NILLABLE_DEFAULT;
             //if (isNillable.equals("true"))
-                classCmf += tag("ReferenceCode", "ANY");
+            classCmf += tag("ReferenceCode", "ANY");
             if (isOlderCmfVersion(cmfVersion, "1.0"))
                 classCmf += tag("AugmentableIndicator", "true");
             classCmf += childrenCmf;
@@ -479,7 +480,7 @@ public class CmfWriter {
 
         try {
             // add codeList
-            if (codeListType != null) {
+            if (codeListType != null && codeListType.children() != null) {
                 Log.debug("exportCmfClass: exporting code list " + typeName);
                 for (UmlItem item : codeListType.children()) {
                     if (item != null && item.kind() == anItemKind.anAttribute) {
@@ -603,17 +604,18 @@ public class CmfWriter {
                         if (NiemModel.isAugmentationType(NamespaceModel.getName(substitutionElementType))) {
                             //Log.debug("exportCmfNamespace: skipping augmentation element " + substitutionElementName);
                             // TODO: Expand augmentation elements
-                            for (UmlItem item2 : substitutionElementType.children()) {
-                                if (item2 != null && item2.kind() == anItemKind.anAttribute) {
-                                    UmlAttribute attribute = (UmlAttribute) item2;
-                                    augmentationCmf += exportCmfAugmentation(
-                                        sustitutionInType, 
-                                        attribute.name(),
-                                        NiemModel.getBaseType(attribute), 
-                                        attribute.multiplicity(),
-                                        augmentations++);
+                            if (substitutionElementType != null && substitutionElementType.children() != null)
+                                for (UmlItem item2 : substitutionElementType.children()) {
+                                    if (item2 != null && item2.kind() == anItemKind.anAttribute) {
+                                        UmlAttribute attribute = (UmlAttribute) item2;
+                                        augmentationCmf += exportCmfAugmentation(
+                                            sustitutionInType, 
+                                            attribute.name(),
+                                            NiemModel.getBaseType(attribute), 
+                                            attribute.multiplicity(),
+                                            augmentations++);
+                                    }
                                 }
-                            }
                             continue;
                         }
                         augmentationCmf += exportCmfAugmentation(
@@ -670,13 +672,14 @@ public class CmfWriter {
         String localTerms = classview.propertyValue(NiemUmlModel.LOCALTERM_PROPERTY);
         if (localTerms != null && localTerms.contains(NiemModel.CODELIST_DELIMITER)) {
             String[] terms = localTerms.split(NiemModel.CODELIST_DELIMITER);
-            for (String term : terms) {
-                String[] pairs = term.split(NiemModel.CODELIST_DEFINITION_DELIMITER);
-                String termCmf = tag("TermName", pairs[0].trim());
-                if (pairs.length > 1)
-                    termCmf += tag("TermLiteralText", pairs[1].trim().replace("&", "&amp;"));
-                localTermsCmf += tag("LocalTerm", termCmf);
-            }
+            if (terms != null)
+                for (String term : terms) {
+                    String[] pairs = term.split(NiemModel.CODELIST_DEFINITION_DELIMITER);
+                    String termCmf = tag("TermName", pairs[0].trim());
+                    if (pairs.length > 1)
+                        termCmf += tag("TermLiteralText", pairs[1].trim().replace("&", "&amp;"));
+                    localTermsCmf += tag("LocalTerm", termCmf);
+                }
         }
         return localTermsCmf;
     }

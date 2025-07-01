@@ -500,11 +500,12 @@ public class JsonWriter {
     void exportJsonSchema(String prefix, String nsSchemaURI, TreeSet<String> schemaNamespaces, TreeSet<String> jsonDefinitions, TreeSet<String> jsonProperties, TreeSet<String> jsonRequired) {
         // export JSON-LD namespace definitions
         TreeSet<String> jsonNamespaces = new TreeSet<>();
-        for (String nsPrefix : schemaNamespaces) {
-            if (!nsPrefix.equals(NiemModel.LOCAL_PREFIX)) {
-                jsonNamespaces.add("\n" + getJsonPair(nsPrefix, NamespaceModel.getSchemaURIForPrefix(nsPrefix) + "#"));
+        if (schemaNamespaces != null)
+            for (String nsPrefix : schemaNamespaces) {
+                if (!nsPrefix.equals(NiemModel.LOCAL_PREFIX)) {
+                    jsonNamespaces.add("\n" + getJsonPair(nsPrefix, NamespaceModel.getSchemaURIForPrefix(nsPrefix) + "#"));
+                }
             }
-        }
         jsonNamespaces.add("\n" + getJsonPair(NiemModel.APPINFO_PREFIX, NiemModel.APPINFO_URI + "#"));
         jsonNamespaces.add("\n" + getJsonPair(NiemModel.CT_PREFIX, NiemModel.CT_URI + "#"));
         //jsonNamespaces.add("\n" + getJsonPair(XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI + "#"));
@@ -544,7 +545,7 @@ public class JsonWriter {
         String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
         Boolean anyJSON = false;
         UmlClass type2 = type, baseType2 = null;
-        while (type2 != null) {
+        while (type2 != null && type2.children() != null) {
             for (UmlItem item4 : type2.children()) {
                 if (item4.kind() == anItemKind.anAttribute) {
                     UmlAttribute attribute = (UmlAttribute) item4;
@@ -601,27 +602,28 @@ public class JsonWriter {
                         baseType2 = relation.roleType();
                     if (relation.relationKind() == aRelationKind.aDirectionalAggregation) { // attributeGroup
                         UmlClass sourceBaseType = relation.roleType();
-                        for (UmlItem item5 : sourceBaseType.children()) {
-                            if (item5.kind() != anItemKind.anAttribute) // if (getName(item5).equals("@id") || getName(item5).equals("@ref"))
-                                continue;
-                            UmlAttribute attribute = (UmlAttribute) item5;
-                            NiemModel model2 = NiemUmlModel.getModel(NiemModel.getURI(attribute));
-                            UmlClassInstance element = model2.getReferencedElement(attribute);
-                            if (element == null || !NamespaceModel.isAttribute(element))
-                                continue;
-                            String elementName = NamespaceModel.getPrefixedName(element);
-                            UmlClass elementBaseType = NiemModel.getBaseType(element);
-                            String multiplicity = attribute.multiplicity();
-                            String minOccurs = NiemUmlModel.getMinOccurs(multiplicity);
-                            if (elementBaseType != null && !NiemModel.isAbstract(NamespaceModel.getName(elementBaseType))) {
-                                String jsonElementInType = exportJsonElementInTypeSchema(type, element,
-                                        multiplicity, NamespaceModel.isAttribute(element));
-                                if (jsonElementInType != null)
-                                    jsonElementsInType.add(jsonElementInType);
-                                if (Integer.parseInt(minOccurs) > 0)
-                                    jsonRequiredElementsInType.add("\"" + elementName + "\"");
+                        if (sourceBaseType != null && sourceBaseType.children() != null)
+                            for (UmlItem item5 : sourceBaseType.children()) {
+                                if (item5.kind() != anItemKind.anAttribute) // if (getName(item5).equals("@id") || getName(item5).equals("@ref"))
+                                    continue;
+                                UmlAttribute attribute = (UmlAttribute) item5;
+                                NiemModel model2 = NiemUmlModel.getModel(NiemModel.getURI(attribute));
+                                UmlClassInstance element = model2.getReferencedElement(attribute);
+                                if (element == null || !NamespaceModel.isAttribute(element))
+                                    continue;
+                                String elementName = NamespaceModel.getPrefixedName(element);
+                                UmlClass elementBaseType = NiemModel.getBaseType(element);
+                                String multiplicity = attribute.multiplicity();
+                                String minOccurs = NiemUmlModel.getMinOccurs(multiplicity);
+                                if (elementBaseType != null && !NiemModel.isAbstract(NamespaceModel.getName(elementBaseType))) {
+                                    String jsonElementInType = exportJsonElementInTypeSchema(type, element,
+                                            multiplicity, NamespaceModel.isAttribute(element));
+                                    if (jsonElementInType != null)
+                                        jsonElementsInType.add(jsonElementInType);
+                                    if (Integer.parseInt(minOccurs) > 0)
+                                        jsonRequiredElementsInType.add("\"" + elementName + "\"");
+                                }
                             }
-                        }
                     }
                 }
             }
@@ -688,7 +690,10 @@ public class JsonWriter {
         String openapiDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + 
                             properties.getProperty(ProjectProperties.EXPORT_OPENAPI_DIR);
         Log.trace("Generating OpenAPIs");
-        for (UmlClass port : ports.values()) {
+        if (ports != null && ports.values() != null)
+          for (UmlClass port : ports.values()) {
+            if (port == null)
+                continue;
             String portName = port.name();
             String portPath = port.propertyValue(NiemUmlModel.INTERFACE_PATH_PROPERTY);
             // write OpenAPI paths
@@ -702,7 +707,8 @@ public class JsonWriter {
             Path openapiPath = Paths.get(openapiDir, portName + OPENAPI_FILE_TYPE);
             Log.debug("exoirtOpenAPI: path " + openapiPath.toString());
 
-            for (UmlItem item : port.children()) {
+            if (port.children() != null)
+              for (UmlItem item : port.children()) {
                 if (item.kind() == anItemKind.anOperation) {
                     TreeSet<String> openapiOperations = new TreeSet<>();
                     LinkedHashSet<String> openapiPathParameters = new LinkedHashSet<>();

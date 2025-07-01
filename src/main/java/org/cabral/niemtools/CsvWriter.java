@@ -130,8 +130,9 @@ public class CsvWriter {
 
         // Export NIEM Mapping
         if (NiemUmlModel.isNiemUml(item))
-            for (int column = 5; column < NiemUmlModel.getNiemMap().length; column++)
-                nextLine[column] = item.propertyValue(NiemUmlModel.getNiemProperty(column));
+            if (NiemUmlModel.getNiemMap() != null)
+                for (int column = 5; column < NiemUmlModel.getNiemMap().length; column++)
+                    nextLine[column] = item.propertyValue(NiemUmlModel.getNiemProperty(column));
 
         return nextLine;
     }
@@ -175,6 +176,8 @@ public class CsvWriter {
                 Iterator<UmlItem> it = (classes.iterator());
                 while (it.hasNext()) {
                     UmlItem thisClass = it.next();
+                    if (thisClass == null)
+                        continue;
                     Log.debug("exportCsv: " + thisClass.name());
                     if (!NiemUmlModel.isNiemUml(thisClass))
                         continue;
@@ -184,14 +187,15 @@ public class CsvWriter {
                         writer.writeNext(nextLine);
 
                     // Export NIEM Mapping for Attributes and Relations
-                    for (UmlItem item : thisClass.children()) {
-                        if (!NiemUmlModel.isNiemUml(item))
-                            continue;
-                        nextLine = getItemCsv(item);
-                        Log.debug("exportCsv: write line");
-                        if (writer != null && nextLine != null)
-                            writer.writeNext(nextLine);
-                    }
+                    if (thisClass.children() != null)
+                        for (UmlItem item : thisClass.children()) {
+                            if (!NiemUmlModel.isNiemUml(item))
+                                continue;
+                            nextLine = getItemCsv(item);
+                            Log.debug("exportCsv: write line");
+                            if (writer != null && nextLine != null)
+                                writer.writeNext(nextLine);
+                        }
                 }
                 if (writer != null)
                     writer.close();

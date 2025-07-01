@@ -50,6 +50,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -71,7 +72,9 @@ public class CsvReader {
         Map<String, UmlClass> UMLClasses = new ConcurrentHashMap<>();
         Map<String, UmlClassInstance> UMLInstances = new ConcurrentHashMap<>();
         @SuppressWarnings("unchecked")
-        ArrayList<UmlItem> all = new ArrayList<>(UmlItem.all);
+        ArrayList<UmlItem> all = new ArrayList<>(
+            UmlItem.all != null ? UmlItem.all : Collections.emptyList()
+        );
         for (UmlItem item : all) {
             if (NiemUmlModel.isNiemUml(item)) {
                 if (item.kind() == anItemKind.aClass) {

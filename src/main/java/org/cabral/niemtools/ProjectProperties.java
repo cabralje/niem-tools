@@ -214,7 +214,10 @@ public class ProjectProperties extends Properties {
      */
     public void load() {
         @SuppressWarnings("unchecked")
-        Hashtable<String,String> projectProperties = project.properties();
+        Hashtable<String, String> projectProperties = 
+             (project != null && project.properties() != null)
+            ? project.properties()
+            : new Hashtable<>();
         for (String propertyName : projectProperties.keySet()) {
             String value = projectProperties.get(propertyName);
             if (value != null)

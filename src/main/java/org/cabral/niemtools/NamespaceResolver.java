@@ -97,20 +97,22 @@ public class NamespaceResolver implements NamespaceContext {
 
         if (node.hasAttributes()) {
             NamedNodeMap attributes = node.getAttributes();
-            for (int i = 0; i < attributes.getLength(); i++) {
-                Node attribute = attributes.item(i);
-                storeAttribute((Attr) attribute);
+            if (attributes != null)
+                for (int i = 0; i < attributes.getLength(); i++) {
+                    Node attribute = attributes.item(i);
+                    storeAttribute((Attr) attribute);
+                }
             }
-        }
 
         if (!attributesOnly && node.hasChildNodes()) {
             NodeList children = node.getChildNodes();
-            for (int i = 0; i < children.getLength(); i++) {
-                Node child = children.item(i);
-                if (child.getNodeType() == Node.ELEMENT_NODE) {
-                    examineNode(child, false);
+            if (children != null)
+                for (int i = 0; i < children.getLength(); i++) {
+                    Node child = children.item(i);
+                    if (child.getNodeType() == Node.ELEMENT_NODE) {
+                        examineNode(child, false);
+                    }
                 }
-            }
         }
 
     }

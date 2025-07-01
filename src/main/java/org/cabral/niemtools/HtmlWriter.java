@@ -83,8 +83,9 @@ public class HtmlWriter {
                         + "</title><link rel=\"stylesheet\" href=\"style.css\" type=\"text/css\" /></head>"
                         + "<body><div class = \"title\">" + NiemUmlModel.MAPPING_SPREADSHEET_TITLE + "</div>"
                         + "<table style=\"table-layout: fixed; width: 100%\"><tr bgcolor=\"#f0f0f0\">");
-                for (String[] column : NiemUmlModel.getNiemMap())
-                    fw.write("<td style=\"word-wrap: break-word\">" + column[0] + "</td>");
+                if (NiemUmlModel.getNiemMap() != null)
+                    for (String[] column : NiemUmlModel.getNiemMap())
+                        fw.write("<td style=\"word-wrap: break-word\">" + column[0] + "</td>");
                 fw.write("</tr>\n");
 
                 // Show NIEM Mappings for Classes
@@ -102,6 +103,7 @@ public class HtmlWriter {
 
                         // Show NIEM Mapping for Attributes and Relations
                        // if (!NiemUmlModel.isEnumeration(thisClass))
+                        if (thisClass.children() != null)
                             for (UmlItem item : thisClass.children())
                             //    if (NiemUmlModel.isNiemUml(item) && !NiemUmlModel.isFacet(item))
                                 if (NiemUmlModel.isNiemUml(item))
@@ -296,20 +298,21 @@ public class HtmlWriter {
                     bgcolor = defaultBGColor;
                     if (!elementLine.isEmpty()) {
                         String[] elementNames = elementLine.split(",");
-                        for (String elementName : elementNames) {
-                            elementName = elementName.trim();
-                            Matcher mat = Pattern.compile("\\((.*?)\\)").matcher(elementName);
-                            if (!mat.find()) {
-                                String prefix = NamespaceModel.getPrefix(elementName);
-                                if (NamespaceModel.isNiemPrefix(typePrefix) && NamespaceModel.isNiemPrefix(prefix)
-                                        && !NamespaceModel.isAttribute(elementName) && !NiemUmlModel.isNiemElementInType(typeName, elementName)) {
-                                    fgcolor = invalidFGColor;
-                                    Log.trace("writeLineHtml: element " + elementName + " is not in type " + typeName + " in the NIEM reference model");
+                        if (elementNames != null)
+                            for (String elementName : elementNames) {
+                                elementName = elementName.trim();
+                                Matcher mat = Pattern.compile("\\((.*?)\\)").matcher(elementName);
+                                if (!mat.find()) {
+                                    String prefix = NamespaceModel.getPrefix(elementName);
+                                    if (NamespaceModel.isNiemPrefix(typePrefix) && NamespaceModel.isNiemPrefix(prefix)
+                                            && !NamespaceModel.isAttribute(elementName) && !NiemUmlModel.isNiemElementInType(typeName, elementName)) {
+                                        fgcolor = invalidFGColor;
+                                        Log.trace("writeLineHtml: element " + elementName + " is not in type " + typeName + " in the NIEM reference model");
+                                    }
+                                    prefix = NamespaceModel.getPrefix(elementLine);
+                                    if (!NamespaceModel.isNiemPrefix(prefix) && !NamespaceModel.isExternalPrefix(prefix))
+                                        bgcolor = extensionBGColor;
                                 }
-                                prefix = NamespaceModel.getPrefix(elementLine);
-                                if (!NamespaceModel.isNiemPrefix(prefix) && !NamespaceModel.isExternalPrefix(prefix))
-                                    bgcolor = extensionBGColor;
-                            }
                         }
                     }
                     fw.write(getColumnHtml(elementLine, bgcolor, fgcolor, true));

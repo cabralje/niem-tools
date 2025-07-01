@@ -68,6 +68,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -300,7 +301,12 @@ public class NiemUmlModel {
      * @return return project property with name propertyName as a String
      */
     static String getProperty(String propertyName) {
-        return UmlPackage.getProject().propertyValue(propertyName);
+        String p = UmlPackage.getProject().propertyValue(propertyName);
+        if (p == null) {
+            Log.trace("getProperty: error - property " + propertyName + " not found");
+            return "";
+        }
+        return p;
     }
 
     /**
@@ -324,8 +330,10 @@ public class NiemUmlModel {
      */
     private static void hideItem(UmlItem item) {
         item.known = false;
-        for (UmlItem child : item.children())
-            hideItem(child);
+        UmlItem[] children = item.children();
+        if (children != null)
+            for (UmlItem child : children)
+                hideItem(child);
     }
 
     /**
@@ -402,12 +410,10 @@ public class NiemUmlModel {
      * @return true if item has the NIEM stereotype
      */
     static Boolean isNiemUml(UmlItem item) {
-        if (item == null)
-            return false;
+        if (item == null) return false;
         String stereotype = item.stereotype();
-        if (stereotype == null)
-            return false;
-        return (stereotype.equals(NIEM_STEREOTYPE));
+        if (stereotype == null) return false;
+        return stereotype.equals(NIEM_STEREOTYPE);
     }
 
     /**
@@ -476,7 +482,9 @@ public class NiemUmlModel {
         
         // add types to subset and extension
         Log.debug("createSubsetAndExtension: copy subset types and create extension types");
-        ArrayList<UmlItem> all = new ArrayList<>(UmlItem.all);
+        ArrayList<UmlItem> all = new ArrayList<>(
+            UmlItem.all != null ? UmlItem.all : Collections.emptyList()
+        );
         for (UmlItem item : all) {
             if (!isNiemUml(item))
                 continue;
@@ -525,7 +533,7 @@ public class NiemUmlModel {
 
         // relate extension types to base types and attribute groups
         Log.debug("createSubsetAndExtension: copy subset base types and create extension base types");
-        Iterator<UmlItem> it = UmlItem.all.iterator();
+        Iterator<UmlItem> it = all.iterator();
         while (it.hasNext()) {
             UmlItem item = it.next();
             if (!isNiemUml(item))
@@ -576,7 +584,7 @@ public class NiemUmlModel {
         // Copy subset elements and create extension elements
         Log.start("createSubsetAndExtension - add elements");
         Log.debug("createSubsetAndExtension: copy subset elements and create extension elements");
-        it = UmlItem.all.iterator();
+        it = all.iterator();
         while (it.hasNext()) {
             UmlItem item = it.next();
             if (!isNiemUml(item))
@@ -593,7 +601,8 @@ public class NiemUmlModel {
             boolean substitution = elementList.contains("(");
             String headElement = null;
             String[] elementNames = elementList.split(",");
-            for (String elementName : elementNames) {
+            if (elementNames != null)
+              for (String elementName : elementNames) {
                 boolean representation = false;
                 if (elementName.contains("(")) {
                     elementName = elementName.replaceAll("\\(|\\)", "");
@@ -687,7 +696,9 @@ public class NiemUmlModel {
     public void deleteMapping() {
         Log.trace("Deleting NIEM Mapping");
         @SuppressWarnings("unchecked")
-        ArrayList<UmlItem> all = new ArrayList<>(UmlItem.all);
+        ArrayList<UmlItem> all = new ArrayList<>(
+            UmlItem.all != null ? UmlItem.all : Collections.emptyList()
+        );
         for (UmlItem item : all) {
             if (isNiemUml(item) && item.kind() != anItemKind.aClassInstance)
                 for (int property = 4; property < NIEM_STEREOTYPE_MAP.length; property++)
@@ -920,13 +931,14 @@ public class NiemUmlModel {
         Iterator<UmlItem> it = (Iterator<UmlItem>) UmlClass.classes.iterator();
         while (it.hasNext()) {
             UmlItem item = it.next();
-            if (!item.stereotype().equals("interface") && !item.stereotype().equals(INTERFACE_STEREOTYPE))
+            if (item == null || (!item.stereotype().equals("interface") && !item.stereotype().equals(INTERFACE_STEREOTYPE)))
                 continue;
             UmlClass port = (UmlClass) item;
             String portName = port.name();
             ports.put(portName, port);
             Log.debug("exportSpecification: port: " + port.name());
-            for (UmlItem item2 : port.children()) {
+            if (port.children() != null)
+              for (UmlItem item2 : port.children()) {
                 if (item2.kind() != anItemKind.anOperation)
                     continue;
                 UmlOperation operation = (UmlOperation) item2;
@@ -1143,27 +1155,30 @@ public class NiemUmlModel {
                 UmlPackage modelPackage = SubsetModel.getModelPackage();
                 if (modelPackage == null)
                     return;
-                for (UmlItem item : modelPackage.children()) {
-                    if (item.kind() == anItemKind.aClassView) {
-                        String prefix = item.propertyValue(PREFIX_PROPERTY);
-                        String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
-                        if (!NamespaceModel.isInfrastructurePrefix(prefix)) {
-                            XmlWriter.writeXmlNs(fw, prefix, schemaURI);
+                if (modelPackage.children() != null)
+                    for (UmlItem item : modelPackage.children()) {
+                        if (item.kind() == anItemKind.aClassView) {
+                            String prefix = item.propertyValue(PREFIX_PROPERTY);
+                            String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
+                            if (!NamespaceModel.isInfrastructurePrefix(prefix)) {
+                                XmlWriter.writeXmlNs(fw, prefix, schemaURI);
+                            }
                         }
                     }
-                }
                 XmlWriter.writeXmlNs(fw, "w", WANTLIST_URI);
                 fw.write(">");
 
                 // export elements
-                for (UmlItem item : SubsetModel.getModelPackage().children()) {
-                    if (item.kind() == anItemKind.aClassView) {
+                if (SubsetModel != null && SubsetModel.getModelPackage() != null && SubsetModel.getModelPackage().children() != null)
+                  for (UmlItem item : SubsetModel.getModelPackage().children()) {
+                    if (item != null && item.kind() == anItemKind.aClassView) {
                         UmlClassView classView = (UmlClassView) item;
                         String prefix = classView.propertyValue(PREFIX_PROPERTY);
                         String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
                         if (NamespaceModel.isInfrastructurePrefix(prefix))
                             continue;
-                        for (UmlItem item2 : classView.children()) {
+                        if (classView.children() != null)
+                          for (UmlItem item2 : classView.children()) {
                             if (item2.kind() == anItemKind.aClassInstance) {
                                 UmlClassInstance element = (UmlClassInstance) item2;
                                 String elementName = NamespaceModel.getPrefixedName(element);
@@ -1188,14 +1203,16 @@ public class NiemUmlModel {
                 }
 
                 // export types
-                for (UmlItem item : SubsetModel.getModelPackage().children()) {
-                    if (item.kind() == anItemKind.aClassView) {
+                if (SubsetModel != null && SubsetModel.getModelPackage() != null && SubsetModel.getModelPackage().children() != null)
+                  for (UmlItem item : SubsetModel.getModelPackage().children()) {
+                    if (item != null && item.kind() == anItemKind.aClassView) {
                         UmlClassView classView = (UmlClassView) item;
                         String prefix = classView.propertyValue(PREFIX_PROPERTY);
                         if (NamespaceModel.isInfrastructurePrefix(prefix))
                             continue;
-                        for (UmlItem item2 : classView.children()) {
-                            if (item2.kind() == anItemKind.aClass) {
+                        if (classView.children() != null)
+                          for (UmlItem item2 : classView.children()) {
+                            if (item2 != null && item2.kind() == anItemKind.aClass) {
                                 UmlClass type = (UmlClass) item2;
                                 String typeName = NamespaceModel.getPrefixedName(type);
                                 Log.debug("exportWantlist: export type " + typeName);
@@ -1209,7 +1226,7 @@ public class NiemUmlModel {
 
                                 fw.write("<w:Type w:name=\"" + typeName + "\" w:isRequested=\"true\">\n");
 
-                                if (!isEnumeration(type)) {
+                                if (!isEnumeration(type) && type.children() != null) {
                                     for (UmlItem item3 : type.children()) {
                                         if (item3.kind() == anItemKind.anAttribute) {
                                             UmlAttribute attribute = (UmlAttribute) item3;
@@ -1248,22 +1265,23 @@ public class NiemUmlModel {
                                 } else // export enumerations
                                 // if (isEnumeration(type))
                                 {
-                                    for (UmlItem item3 : type.children()) {
-                                        if (item3.kind() != anItemKind.anAttribute)
-                                            continue;
-                                        UmlAttribute attribute = (UmlAttribute) item3;
-                                        String value = attribute.defaultValue();
-                                        //String codeList = type.propertyValue(CODELIST_PROPERTY);
-                                        //if (codeList != null && codeList.contains(NiemModel.CODELIST_DELIMITER)) {
-                                        // trace("exportWantlist: exporting enumerations for " + getPrefixedName(type));
-                                        //if (codeList.trim().contains(NiemModel.CODELIST_DELIMITER)) {
-                                        //    String[] codes = codeList.split(NiemModel.CODELIST_DELIMITER);
-                                        //    for (String code : codes) {
-                                        //        String[] pairs = code.split(NiemModel.CODELIST_DEFINITION_DELIMITER); String
-                                        //                value = pairs[0].trim();
-                                        if (!value.isEmpty()) //fw.write("<w:Facet w:facet=\"enumeration\" w:value=\"" + ReferenceModel.filterEnum(value) + "\"/>");
-                                            fw.write("<w:Facet w:facet=\"enumeration\" w:value=\"" + value + "\"/>");
-                                    }
+                                    if (type.children() != null)
+                                        for (UmlItem item3 : type.children()) {
+                                            if (item3.kind() != anItemKind.anAttribute)
+                                                continue;
+                                            UmlAttribute attribute = (UmlAttribute) item3;
+                                            String value = attribute.defaultValue();
+                                            //String codeList = type.propertyValue(CODELIST_PROPERTY);
+                                            //if (codeList != null && codeList.contains(NiemModel.CODELIST_DELIMITER)) {
+                                            // trace("exportWantlist: exporting enumerations for " + getPrefixedName(type));
+                                            //if (codeList.trim().contains(NiemModel.CODELIST_DELIMITER)) {
+                                            //    String[] codes = codeList.split(NiemModel.CODELIST_DELIMITER);
+                                            //    for (String code : codes) {
+                                            //        String[] pairs = code.split(NiemModel.CODELIST_DEFINITION_DELIMITER); String
+                                            //                value = pairs[0].trim();
+                                            if (!value.isEmpty()) //fw.write("<w:Facet w:facet=\"enumeration\" w:value=\"" + ReferenceModel.filterEnum(value) + "\"/>");
+                                                fw.write("<w:Facet w:facet=\"enumeration\" w:value=\"" + value + "\"/>");
+                                        }
                                 }
                                 fw.write("</w:Type>");
                             }
@@ -1308,13 +1326,16 @@ public class NiemUmlModel {
      * @return return child package as a UmlPackage
      */
     private UmlPackage getPackage(UmlPackage parentPackage, String packageName, boolean create) {
-        for (UmlItem item : parentPackage.children())
-            if (item.name().equals(packageName))
-                if ((item.kind() == anItemKind.aPackage))
-                    return (UmlPackage) item;
-        if (create) {
-            Log.debug("getPackage: Creating " + packageName);
-            return UmlPackage.create(parentPackage, packageName);
+        if (parentPackage != null) {
+            if (parentPackage.children() != null)
+                for (UmlItem item : parentPackage.children())
+                    if (item.name().equals(packageName))
+                        if ((item.kind() == anItemKind.aPackage))
+                            return (UmlPackage) item;
+            if (create) {
+                Log.debug("getPackage: Creating " + packageName);
+                return UmlPackage.create(parentPackage, packageName);
+            }
         }
         return null;
     }
@@ -1486,9 +1507,10 @@ public class NiemUmlModel {
         } catch (RuntimeException e) {
             Log.trace("addStereotype: error applying stereotype" + e.toString());
         }
-        UmlItem[] ch = item.children();
-        for (UmlItem c : ch)
-            addStereotype(c);
+        UmlItem[] children = item.children();
+        if (children != null)
+            for (UmlItem c : children)
+                addStereotype(c);
     }
 
     /**
@@ -1514,9 +1536,10 @@ public class NiemUmlModel {
         } catch (RuntimeException e) {
             Log.trace("removeStereotype: error removing stereotype from relation" + e.toString());
         }
-        UmlItem[] ch = item.children();
-        for (UmlItem c : ch)
-            removeStereotype(c);
+        UmlItem[] children = item.children();
+        if (children != null)
+            for (UmlItem c : children)
+                removeStereotype(c);
     }
 
     /**
@@ -1610,7 +1633,8 @@ public class NiemUmlModel {
             }
         } else
             item.sortChildren();
-        for (UmlItem child : item.children())
-            sort(child);
+        if (item.children() != null)
+            for (UmlItem child : item.children())
+                sort(child);
     }
 }

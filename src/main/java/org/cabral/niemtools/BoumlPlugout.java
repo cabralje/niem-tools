@@ -156,7 +156,7 @@ public class BoumlPlugout {
 
         // Find UML package
         UmlPackage umlPackage = null;
-        if (project != null)
+        if (project != null && project.children() != null)
             for (UmlItem pkg : project.children())
                 if ((pkg.kind() == fr.bouml.anItemKind.aPackage) || pkg.name().equals("UML")) {   
                     umlPackage = (UmlPackage)pkg;
@@ -513,9 +513,10 @@ public class BoumlPlugout {
         // parse the command into a list of arguments
         List<String> commandList = new ArrayList<>();
         String[] parts = execCommand.split(" (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-        for (String part : parts) {
-            commandList.add(part.replace("\"", ""));
-        }
+        if (parts != null)
+            for (String part : parts) {
+                commandList.add(part.replace("\"", ""));
+            }
         ProcessBuilder pb = new ProcessBuilder(commandList);
         Process process = pb.start();
 

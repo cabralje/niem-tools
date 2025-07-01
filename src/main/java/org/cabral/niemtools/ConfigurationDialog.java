@@ -450,15 +450,18 @@ class ConfigurationDialog extends JDialog {
         JPanel externalPanel = new JPanel(new BorderLayout());
         //String[] externalNamespaces = properties.getProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS).split(",");
         int row = 0;
-        String[][] data = new String[externalNamespaces.length][3];
-        for (String namespace : externalNamespaces) {
-            String[] parts = namespace.split("=");
-            if (parts.length == 3)
-                data[row++] = parts;
-        }
+        String[][] data = null;
         String[] columnNames = {"Prefix", "Namespace", "URL"};
-        if (data.length > 0 && data[0].length != columnNames.length) {
-            throw new IllegalArgumentException("Data column count does not match the expected column structure.");
+        if (externalNamespaces != null) {
+            data = new String[externalNamespaces.length][3];
+            for (String namespace : externalNamespaces) {
+                String[] parts = namespace.split("=");
+                if (parts.length == 3)
+                    data[row++] = parts;
+            }
+
+            if (data.length > 0 && data[0].length != columnNames.length)
+                throw new IllegalArgumentException("Data column count does not match the expected column structure.");
         }
         DefaultTableModel model = new DefaultTableModel(data, columnNames);
         JTable table = new JTable(model);
@@ -592,12 +595,11 @@ class ConfigurationDialog extends JDialog {
                 Log.debug("done() called"); // Debug
                 try {
                     List<String> versions = get();
-                    Log.debug("Retrieved " + versions.size() + " versions in done()");
-                    
                     comboBox.removeAllItems();
-                    if (versions.isEmpty()) {
+                    if (versions == null || versions.isEmpty()) {
                         comboBox.addItem("No versions found");
                     } else {
+                            Log.debug("Retrieved " + versions.size() + " versions in done()");
                         for (String version : versions) {
                             comboBox.addItem(version);
                             Log.debug("Added to combo: " + version);
