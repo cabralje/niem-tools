@@ -1082,7 +1082,7 @@ class NiemModel {
      * @param string
      * @return filtered String
      */
-    private String filterUMLAttribute(String string) {
+    static protected String filterUMLAttribute(String string) {
         return string.replaceAll("[^A-Za-z0-9_@#$`~,.<?;:'\"\\\\]", "");
     }
 

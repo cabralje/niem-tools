@@ -668,10 +668,34 @@ public class NiemUmlModel {
                     element.set_PropertyValue(SUBSTITUTION_TYPE_PROPERTY, typeName);
                     element.set_PropertyValue(SUBSTITUTION_MULTIPLICITY_PROPERTY, multiplicity);
                 }
-                if (codeList != null && !codeList.isEmpty() && (!substitution || representation)) 
+                if (codeList != null && !codeList.isEmpty() && (!substitution || representation)) {
                     setCodeList(element, codeList);
-
-            }
+                    if (baseType != null && !isNiem(baseType) && mappingNotes != null && !mappingNotes.contains("Genericode") && codeList.trim().contains(NiemModel.CODELIST_DELIMITER)) {
+                        Log.trace("exportWantlist: exporting enumerations for " + baseType.name());
+                        baseType.set_Stereotype(NiemUmlModel.ENUM_STEREOTYPE);
+                        String[] codes = codeList.split(NiemModel.CODELIST_DELIMITER);
+                        int anonymousEnums = 0;
+                        for (String code : codes) {
+                            String[] pairs = code.split(NiemModel.CODELIST_DEFINITION_DELIMITER);
+                            String value = pairs[0].trim();
+                            String definition = pairs.length > 1 ? pairs[1].trim() : "";
+                            Log.debug("importCodeList: adding " + value + " to type " + baseType.name());
+                            UmlAttribute attribute;
+                            try {
+                                attribute = UmlAttribute.create(baseType, NiemModel.filterUMLAttribute(value));
+                            } catch (RuntimeException re) {
+                                attribute = UmlAttribute.create(baseType, NiemModel.filterUMLAttribute("Enum" + anonymousEnums++));
+                                //Log.trace("importCodeList: error - cannot add attribute " + value + " in type " + type.name());
+                                //continue;
+                            }
+                            if (attribute != null) {
+                                attribute.set_DefaultValue(value);
+                                attribute.set_Description(definition);
+                            }
+                        }
+                    }
+                }
+              }
         }
         Log.stop("createSubsetAndExtension - add elements");
 

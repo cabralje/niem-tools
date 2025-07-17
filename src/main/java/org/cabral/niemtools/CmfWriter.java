@@ -461,8 +461,8 @@ public class CmfWriter {
             restrictionCmf = exportCmfComponent(type);
             UmlClass baseType = getCmfBaseType(type);
             if (baseType == null) {
-                Log.trace("exportCmfClass: unable to find base type for " + typeName); 
-                restrictionCmf += tagRef(restrictionBaseName, "xs:string");
+                Log.trace("exportCmfClass: unable to find base type for " + typeName + "- defaulting to xs:token");
+                restrictionCmf += tagRef(restrictionBaseName, "xs:token");
             } else 
                 restrictionCmf += tagRef(restrictionBaseName, NamespaceModel.getPrefixedName(baseType));
             if (NiemUmlModel.isEnumeration(type))
@@ -479,29 +479,32 @@ public class CmfWriter {
         }
 
         try {
-            // add codeList
+            // add codeList if not Genericode
+            String notes = type.propertyValue(NiemUmlModel.NOTES_PROPERTY);
             if (codeListType != null && codeListType.children() != null) {
-                Log.debug("exportCmfClass: exporting code list " + typeName);
-                for (UmlItem item : codeListType.children()) {
-                    if (item != null && item.kind() == anItemKind.anAttribute) {
-                        UmlAttribute attribute = (UmlAttribute) item;
-                        String codeValue = attribute.defaultValue();
-                        String codeDescription = attribute.description();
-                        String name = attribute.name();
-                        if (!NiemUmlModel.isFacet(attribute))
-                            name = "enumeration";
-                        String enumeration;
-                        if (isOlderCmfVersion(cmfVersion, "1.0"))
-                            enumeration = tag("StringValue", codeValue); 
-                        else
-                            enumeration = tag("FacetCategoryCode", name)
-                                    + tag("FacetValue", codeValue);
-                        if (codeDescription != null && !codeDescription.isEmpty()) {
-                            // Escape ampersands in codeDescription for XML
-                            codeDescription = codeDescription.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-                            enumeration += tag(documentationName, codeDescription);
+                if (notes == null || !notes.contains("Genericode")) {
+                    Log.debug("exportCmfClass: exporting code list " + typeName);
+                    for (UmlItem item : codeListType.children()) {
+                        if (item != null && item.kind() == anItemKind.anAttribute) {
+                            UmlAttribute attribute = (UmlAttribute) item;
+                            String codeValue = attribute.defaultValue();
+                            String codeDescription = attribute.description();
+                            String name = attribute.name();
+                            if (!NiemUmlModel.isFacet(attribute))
+                                name = "enumeration";
+                            String enumeration;
+                            if (isOlderCmfVersion(cmfVersion, "1.0"))
+                                enumeration = tag("StringValue", codeValue); 
+                            else
+                                enumeration = tag("FacetCategoryCode", name)
+                                        + tag("FacetValue", codeValue);
+                            if (codeDescription != null && !codeDescription.isEmpty()) {
+                                // Escape ampersands in codeDescription for XML
+                                codeDescription = codeDescription.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+                                enumeration += tag(documentationName, codeDescription);
+                            }
+                            restrictionCmf += tag(facetName, enumeration);
                         }
-                        restrictionCmf += tag(facetName, enumeration);
                     }
                 }
             }
