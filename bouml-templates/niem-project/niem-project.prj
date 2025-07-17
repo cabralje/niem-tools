@@ -1,6 +1,6 @@
 format 224
 "niem-project"
-  revision 10
+  revision 11
   modified_by 2 "JamesCabral"
 
 
@@ -56,7 +56,7 @@ format 224
   key "ExportJSONSchemaFile" value "model"
   key "html dir" value "model"
   key "ExportCMFDir" value "cmf"
-  key "ExportCMFVersion" value "0.8"
+  key "ExportCMFVersion" value "1.0"
   key "ExportCMFtoJSON" value "true"
   key "ExportCMFTooltoXSD" value "cmftool.bat m2xmsg -d -c -o"
   key "ExportURI" value "http://local"

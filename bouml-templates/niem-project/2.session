@@ -5,11 +5,11 @@ diagrams
     1615 1048 100 A4 0 0
 end
 show_stereotypes
-selected classview_ref 179586 // Message1
+selected class_ref 212610 // Message1
 open
   usecaseview_ref 134658 // Use Cases
   classview_ref 179330 // Interfaces and Operations
-  class_ref 212610 // Message1
+  classview_ref 179586 // Message1
   
   package_ref 147714 // Base Classes
 end
