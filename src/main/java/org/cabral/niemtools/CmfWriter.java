@@ -419,7 +419,7 @@ public class CmfWriter {
                 + tagRef("Namespace", NamespaceModel.getPrefix(item));
         String description = item.description();
         if (description != null && !description.isEmpty()) {
-            description = description.replace("&", "&amp;");
+            description = description.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
             componentCmf += tag(documentationName, description);
         }
         return componentCmf;
@@ -498,7 +498,7 @@ public class CmfWriter {
                                     + tag("FacetValue", codeValue);
                         if (codeDescription != null && !codeDescription.isEmpty()) {
                             // Escape ampersands in codeDescription for XML
-                            codeDescription = codeDescription.replace("&", "&amp;");
+                            codeDescription = codeDescription.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
                             enumeration += tag(documentationName, codeDescription);
                         }
                         restrictionCmf += tag(facetName, enumeration);
@@ -634,7 +634,7 @@ public class CmfWriter {
 
         // build namespace CMF
         String schemaCmf = "";
-        description = description.replace("&", "&amp;");
+        description = description.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
         String namespaceCmf = tag("NamespaceURI", NamespaceModel.getSchemaURIForPrefix(prefix))
                 + tag("NamespacePrefixText", prefix)
                 + tag(documentationName, description);
