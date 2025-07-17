@@ -1307,6 +1307,14 @@ public class NiemUmlModel {
         if (niemVersion != null && niemVersion.contains("-"))
             niemVersion = niemVersion.substring(0, niemVersion.indexOf('-'));
 
+        // Only use NIEM major versions
+        if (niemVersion != null && !niemVersion.isEmpty()) {
+            String[] parts = niemVersion.split("\\.");
+            if (parts.length > 0) {
+                niemVersion = parts[0] + ".0";
+            }
+        }
+
         /*		String schemaURI = NamespaceModel.getSchemaURIForPrefix("nc");
 		// UmlCom.trace("NIEM URI: " + schemaURI);
 		Matcher mat = Pattern.compile(".*niem-core/(.*)/").matcher(schemaURI);

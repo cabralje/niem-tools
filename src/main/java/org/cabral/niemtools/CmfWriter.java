@@ -655,7 +655,7 @@ public class CmfWriter {
                     + tag("DocumentFilePathText", path)
                     + tag("NamespaceCategoryCode", namespaceCategoryCode)
                     //		+ tag("NamespaceVersionText", "ps02")
-                    + tag("NIEMVersionName", "NIEM" + NiemUmlModel.getNiemVersion())
+                    + tag("ArchitectureVersionName", "NIEM" + NiemUmlModel.getNiemVersion())
                     + tag("NamespaceLanguageName", XmlWriter.XML_LANG)
                     + augmentationCmf
                     + localTermsCmf;
