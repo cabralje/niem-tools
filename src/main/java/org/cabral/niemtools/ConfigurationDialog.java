@@ -584,7 +584,8 @@ class ConfigurationDialog extends JDialog {
                 } catch (IOException e) {
                     Log.trace("Timeout populating NIEM versions from niem-model GitHub repo: " + e.getMessage());
                     //e.printStackTrace();
-                    throw e;
+                    //throw e;
+                    versions.add("6.0");
                 }
                 
                 return versions;
