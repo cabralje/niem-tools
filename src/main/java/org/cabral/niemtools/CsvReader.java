@@ -50,9 +50,11 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
 
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
@@ -75,75 +77,63 @@ public class CsvReader {
         ArrayList<UmlItem> all = new ArrayList<>(
             UmlItem.all != null ? UmlItem.all : Collections.emptyList()
         );
-        for (UmlItem item : all) {
-            if (NiemUmlModel.isNiemUml(item)) {
-                if (item.kind() == anItemKind.aClass) {
-                    UmlClass c = (UmlClass) item;
-                    if (!UMLClasses.containsKey(c.name()))
-                        UMLClasses.put(c.name(), c);
-                } else if (item.kind() == anItemKind.aClassInstance) {
-                    UmlClassInstance ci = (UmlClassInstance) item;
-                    if (!UMLInstances.containsKey(ci.name()))
-                        UMLInstances.put(ci.name(), ci);
-                }
+        // Use streams to populate UMLClasses and UMLInstances
+        all.stream()
+            .filter(NiemUmlModel::isNiemUml)
+            .forEach(item -> {
+            if (item.kind() == anItemKind.aClass) {
+                UmlClass c = (UmlClass) item;
+                UMLClasses.putIfAbsent(c.name(), c);
+            } else if (item.kind() == anItemKind.aClassInstance) {
+                UmlClassInstance ci = (UmlClassInstance) item;
+                UMLInstances.putIfAbsent(ci.name(), ci);
             }
-        }
-        try {
-            FileReader fr = new FileReader(filename);
-            Log.debug("importCsv: file read");
-            CSVReader reader = null;
-            try {
-                reader = new CSVReader(fr);
-            } catch (NoClassDefFoundError e) {
-                Log.trace("importCsv: error - Exception" + e.toString());
-                if (reader != null) {
-                    reader.close();
-                }
-                return;
-            }
-            Log.debug("importCsv: file parsed");
-            String[] nextLine;
+            });
 
-            // read header
-            reader.readNext();
+        try (FileReader fr = new FileReader(filename);
+            CSVReader reader = new CSVReader(fr)) {
+                Log.debug("importCsv: file read");
+                Log.debug("importCsv: file parsed");
 
-            Log.debug("importCsv: header read");
+                // read header
+                reader.readNext();
+                Log.debug("importCsv: header read");
 
-            // read mappings
-            int mapLength = NiemUmlModel.getNiemMap().length;
-            while ((nextLine = reader.readNext()) != null) {
-                String className = nextLine[0].trim();
-                String attributeName = nextLine[1].trim();
+                int mapLength = NiemUmlModel.getNiemMap().length;
+                while (true) {
+                    String[] nextLine = reader.readNext();
+                    if (nextLine == null) break;
+                    String className = nextLine[0].trim();
+                    String attributeName = nextLine[1].trim();
 
-                if (!className.isEmpty()) {
-                    UmlClass type = UMLClasses.get(className);
-                    if (type != null) {
-                        if (attributeName.isEmpty()) {
-                            // import NIEM mapping to class
-                            Log.debug("importCsv: importing NIEM mapping for " + className);
-                            for (int column = 5; column < mapLength
-                                    && column < nextLine.length; column++)
-                                type.set_PropertyValue(NiemUmlModel.getNiemProperty(column), nextLine[column]);
-                        } else {
-                            // import NIEM Mapping to attribute
-                            for (UmlItem item : type.children())
-                                if (NiemUmlModel.isNiemUml(item)&& (item.name().equals(attributeName)))
-                                    for (int column = 5; column < mapLength
-                                            && column < nextLine.length; column++)
-                                        item.set_PropertyValue(NiemUmlModel.getNiemProperty(column), nextLine[column]);
+                    if (!className.isEmpty()) {
+                        UmlClass type = UMLClasses.get(className);
+                        if (type != null) {
+                            if (attributeName.isEmpty()) {
+                                // import NIEM mapping to class
+                                Log.debug("importCsv: importing NIEM mapping for " + className);
+                                IntStream.range(5, Math.min(mapLength, nextLine.length))
+                                .forEach(column -> type.set_PropertyValue(NiemUmlModel.getNiemProperty(column), nextLine[column]));
+                            } else {
+                                // import NIEM Mapping to attribute
+                                Arrays.stream(type.children())
+                                .filter(item -> NiemUmlModel.isNiemUml(item) && item.name().equals(attributeName))
+                                .forEach(item -> IntStream.range(5, Math.min(mapLength, nextLine.length))
+                                    .forEach(column -> item.set_PropertyValue(NiemUmlModel.getNiemProperty(column), nextLine[column])));
+                            }
+                        }
+                    } else if (!attributeName.isEmpty()) {
+                        UmlClassInstance element = UMLInstances.get(attributeName);
+                        if (element != null) {
+                            // import NIEM mapping to class instance
+                            Log.debug("importCsv: importing NIEM mapping for " + attributeName);
+                            IntStream.range(5, Math.min(mapLength, nextLine.length))
+                                .forEach(column -> element.set_PropertyValue(NiemUmlModel.getNiemProperty(column), nextLine[column]));
                         }
                     }
-                } else if (!attributeName.isEmpty()) {
-                    UmlClassInstance element = UMLInstances.get(attributeName);
-                    if (element != null) {
-                        // import NIEM mapping to class
-                        Log.debug("importCsv: importing NIEM mapping for " + attributeName);
-                        for (int column = 5; column < mapLength && column < nextLine.length; column++)
-                            element.set_PropertyValue(NiemUmlModel.getNiemProperty(column), nextLine[column]);
-                    }
                 }
-            }
-            reader.close();
+    } catch (NoClassDefFoundError e) {
+            Log.trace("importCsv: error - Exception" + e.toString());
         } catch (CsvValidationException e) {
             Log.trace("importCsv: error reading CSV " + e.toString());
         } catch (FileNotFoundException e) {
