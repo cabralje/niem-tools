@@ -1628,39 +1628,42 @@ public class NiemUmlModel {
             return;
         }   
         if (item instanceof UmlClass) {
-            UmlItem[] v = item.children();
-            int sz = v.length;
-            if (sz != 0) {
-                // sort in memory by sequence ID property
-                java.util.Arrays.sort(v, (a, b) -> {
-                    String seqA = a.propertyValue(SEQUENCE_ID_PROPERTY);
-                    String seqB = b.propertyValue(SEQUENCE_ID_PROPERTY);
-                    // Handle nulls and empty strings as "infinite" (sort last)
-                    boolean emptyA = (seqA == null || seqA.isEmpty());
-                    boolean emptyB = (seqB == null || seqB.isEmpty());
-                    if (emptyA && emptyB) return a.name().compareToIgnoreCase(b.name());
-                    if (emptyA) return 1;
-                    if (emptyB) return -1;
-                    try {
-                        int intA = Integer.parseInt(seqA);
-                        int intB = Integer.parseInt(seqB);
-                        return Integer.compare(intA, intB);
-                    } catch (NumberFormatException e) {
-                        // Fallback to string comparison if not numeric
-                        if (seqA == null && seqB == null) return 0;
-                        if (seqA == null) return 1;
-                        if (seqB == null) return -1;
-                        return seqA.compareTo(seqB);
+            String stereotype = item.stereotype();
+            if (stereotype == null || stereotype.equals(ENUM_STEREOTYPE)) {
+                UmlItem[] v = item.children();
+                int sz = v.length;
+                if (sz != 0) {
+                    // sort in memory by sequence ID property
+                    java.util.Arrays.sort(v, (a, b) -> {
+                        String seqA = a.propertyValue(SEQUENCE_ID_PROPERTY);
+                        String seqB = b.propertyValue(SEQUENCE_ID_PROPERTY);
+                        // Handle nulls and empty strings as "infinite" (sort last)
+                        boolean emptyA = (seqA == null || seqA.isEmpty());
+                        boolean emptyB = (seqB == null || seqB.isEmpty());
+                        if (emptyA && emptyB) return a.name().compareToIgnoreCase(b.name());
+                        if (emptyA) return 1;
+                        if (emptyB) return -1;
+                        try {
+                            int intA = Integer.parseInt(seqA);
+                            int intB = Integer.parseInt(seqB);
+                            return Integer.compare(intA, intB);
+                        } catch (NumberFormatException e) {
+                            // Fallback to string comparison if not numeric
+                            if (seqA == null && seqB == null) return 0;
+                            if (seqA == null) return 1;
+                            if (seqB == null) return -1;
+                            return seqA.compareTo(seqB);
+                        }
+                    });
+
+                    // update browser
+                    int u;
+                    UmlItem previous = null;
+
+                    for (u = 0; u != sz; u += 1) {
+                        v[u].moveAfter(previous);
+                        previous = v[u];
                     }
-                });
-
-                // update browser
-                int u;
-                UmlItem previous = null;
-
-                for (u = 0; u != sz; u += 1) {
-                    v[u].moveAfter(previous);
-                    previous = v[u];
                 }
             }
         } else
