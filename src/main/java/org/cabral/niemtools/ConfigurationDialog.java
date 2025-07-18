@@ -228,7 +228,6 @@ class ConfigurationDialog extends JDialog {
     private JButton commandButton(String name, String command) {
         JButton button = new JButton(name);
         button.addActionListener((ActionEvent e) -> {
-            // Find the parent JTabbedPane and set the selected tab to "Import Reference Model"
             Component c = button;
             while (c != null && !(c instanceof ConfigurationDialog)) {
                 c = c.getParent();
@@ -273,11 +272,7 @@ class ConfigurationDialog extends JDialog {
 
         // import panel
         JPanel importPanel = new JPanel(new BorderLayout());
-
-        // import button
         importPanel.add(navigationButton("Configure External Schemas", EXTERNAL_TAB), BorderLayout.NORTH);
-        importPanel.add(commandButton("Import NIEM Reference Model","importReferenceModel"), BorderLayout.SOUTH);
-        int fieldColumns = 20;
 
         // import options
         JPanel importPanel1 = new JPanel(new BorderLayout());
@@ -293,15 +288,25 @@ class ConfigurationDialog extends JDialog {
         populateNiemVersionDropdown(niemVersionDropdown, selectedVersion);
 
         // Store the selected version in properties when changed
-        niemVersionDropdown.addActionListener(e -> {
+        //niemVersionDropdown.addActionListener(e -> {
+        //    String selected = (String) niemVersionDropdown.getSelectedItem();
+        //    if (selected != null && !selected.equals("Loading...") && !selected.equals("Failed to load versions"))
+        //        properties.setProperty(ProjectProperties.IMPORT_NIEM_VERSION, selected);
+        //});
+        
+        importPanel1.add(niemVersionDropdown, BorderLayout.CENTER);
+
+        // import button
+        JButton importButton = commandButton("Import NIEM Reference Model","importReferenceModel");
+        importButton.addActionListener((ActionEvent e) -> {
             String selected = (String) niemVersionDropdown.getSelectedItem();
             if (selected != null && !selected.equals("Loading...") && !selected.equals("Failed to load versions"))
                 properties.setProperty(ProjectProperties.IMPORT_NIEM_VERSION, selected);
         });
-        
-        importPanel1.add(niemVersionDropdown, BorderLayout.CENTER);
+        importPanel.add(importButton, BorderLayout.SOUTH);
         importPanel.add(importPanel1, BorderLayout.WEST);
 
+        int fieldColumns = 20;
         JPanel importPanel2 = new JPanel(new BorderLayout());
         importPanel2.add(label("Domains"), BorderLayout.NORTH);
         importPanel2.add(labeledField("Include", ProjectProperties.IMPORT_INCLUDE_DOMAINS, fieldColumns), BorderLayout.CENTER);
