@@ -538,7 +538,7 @@ public class CmfWriter {
      * @return CMF augmentation record definition
      */
     private String exportCmfAugmentation (String substitutionInType, String substitutionElement, 
-                UmlClass substitutionElementType, String multiplicity, int augmentationIndex) {
+                UmlClass substitutionElementType, String multiplicity, Integer augmentationIndex) {
         String multiplicity2 = multiplicity;
         if (multiplicity2 == null || multiplicity2.isEmpty())
             multiplicity2 = "0,unbounded";
@@ -546,7 +546,7 @@ public class CmfWriter {
             tagRef("Class", substitutionInType)
             + tagRef(isClass(substitutionElementType) ? "ObjectProperty" : "DataProperty", NamespaceModel.filterAttributePrefix(substitutionElement))
             + exportCmfMultiplicity(multiplicity2)
-            + tag("AugmentationIndex", String.valueOf(augmentationIndex)));
+            + ((augmentationIndex != null) ? tag("AugmentationIndex", String.valueOf(augmentationIndex)) : ""));
     }
 
     /**
@@ -606,7 +606,6 @@ public class CmfWriter {
                         UmlClass substitutionElementType = NiemModel.getBaseType(substitutionElement);
                         if (NiemModel.isAugmentationType(NamespaceModel.getName(substitutionElementType))) {
                             //Log.debug("exportCmfNamespace: skipping augmentation element " + substitutionElementName);
-                            // TODO: Expand augmentation elements
                             if (substitutionElementType != null && substitutionElementType.children() != null)
                                 for (UmlItem item2 : substitutionElementType.children()) {
                                     if (item2 != null && item2.kind() == anItemKind.anAttribute) {
@@ -626,7 +625,7 @@ public class CmfWriter {
                             substitutionElementName,
                             substitutionElementType, 
                             substitutionElement.propertyValue(NiemUmlModel.SUBSTITUTION_MULTIPLICITY_PROPERTY), 
-                            augmentations++);
+                            null);
                     }
                 }
             }

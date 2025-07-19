@@ -671,7 +671,7 @@ public class NiemUmlModel {
                 if (codeList != null && !codeList.isEmpty() && (!substitution || representation)) {
                     setCodeList(element, codeList);
                     if (baseType != null && !isNiem(baseType) && mappingNotes != null && !mappingNotes.contains("Genericode") && codeList.trim().contains(NiemModel.CODELIST_DELIMITER)) {
-                        Log.trace("exportWantlist: exporting enumerations for " + baseType.name());
+                        Log.debug("createSubsetAndExtension: exporting enumerations for " + baseType.name());
                         baseType.set_Stereotype(NiemUmlModel.ENUM_STEREOTYPE);
                         String[] codes = codeList.split(NiemModel.CODELIST_DELIMITER);
                         int anonymousEnums = 0;
@@ -679,7 +679,7 @@ public class NiemUmlModel {
                             String[] pairs = code.split(NiemModel.CODELIST_DEFINITION_DELIMITER);
                             String value = pairs[0].trim();
                             String definition = pairs.length > 1 ? pairs[1].trim() : "";
-                            Log.debug("importCodeList: adding " + value + " to type " + baseType.name());
+                            Log.debug("createSubsetAndExtension: adding " + value + " to type " + baseType.name());
                             UmlAttribute attribute;
                             try {
                                 attribute = UmlAttribute.create(baseType, NiemModel.filterUMLAttribute(value));
