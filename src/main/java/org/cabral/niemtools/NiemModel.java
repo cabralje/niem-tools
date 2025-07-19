@@ -940,7 +940,7 @@ class NiemModel {
                             UmlClass baseType = getBaseType(type);
                             if (baseType != null)
                                 schemaNamespaces.add(NamespaceModel.getPrefix(baseType));
-                            if (type.children() != null)
+                            if (type.children() != null && !NiemUmlModel.isEnumeration(type))
                                 for (UmlItem item2 : type.children()) {
                                     if (item2.kind() == anItemKind.anAttribute) {
                                         NiemModel model2 = NiemUmlModel.getModel(getURI(item2));

@@ -1629,7 +1629,7 @@ public class NiemUmlModel {
         }   
         if (item instanceof UmlClass) {
             String stereotype = item.stereotype();
-            if (stereotype == null || stereotype.equals(ENUM_STEREOTYPE)) {
+            if (stereotype == null || !stereotype.equals(ENUM_STEREOTYPE)) {
                 UmlItem[] v = item.children();
                 int sz = v.length;
                 if (sz != 0) {
