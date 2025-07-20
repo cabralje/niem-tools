@@ -703,12 +703,12 @@ public class NiemUmlModel {
         UmlPackage subset = SubsetModel.getModelPackage();
         if (subset != null) {
             Log.trace("createSubsetAndExtension: sorting subset model");
-        	sort(subset);
+        	sort(subset, true);
         }
         UmlPackage extension = ExtensionModel.getModelPackage();
         if (extension != null) {
             Log.trace("createSubsetAndExtension: sorting extension model");
-            sort(extension);
+            sort(extension, false);
         }
         Log.stop("createSubsetAndExtension");
     }
@@ -1622,14 +1622,14 @@ public class NiemUmlModel {
      *
      * @param item
      */
-    public void sort(UmlItem item) {
+    public void sort(UmlItem item, Boolean sortClassMembers) {
         if (item == null) {
             Log.trace("sort: item is null");
             return;
         }   
         if (item instanceof UmlClass) {
             String stereotype = item.stereotype();
-            if (stereotype == null || !stereotype.equals(ENUM_STEREOTYPE)) {
+            if (sortClassMembers && (stereotype == null || !stereotype.equals(ENUM_STEREOTYPE))) {
                 UmlItem[] v = item.children();
                 int sz = v.length;
                 if (sz != 0) {
@@ -1670,6 +1670,6 @@ public class NiemUmlModel {
             item.sortChildren();
         if (item.children() != null)
             for (UmlItem child : item.children())
-                sort(child);
+                sort(child, sortClassMembers);
     }
 }
