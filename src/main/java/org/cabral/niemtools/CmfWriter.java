@@ -620,12 +620,12 @@ public class CmfWriter {
                                 }
                             continue;
                         }
-                        augmentationCmf += exportCmfAugmentation(
+/*                        augmentationCmf += exportCmfAugmentation(
                             sustitutionInType, 
                             substitutionElementName,
                             substitutionElementType, 
                             substitutionElement.propertyValue(NiemUmlModel.SUBSTITUTION_MULTIPLICITY_PROPERTY), 
-                            null);
+                            null);*/
                     }
                 }
             }
