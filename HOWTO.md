@@ -100,22 +100,24 @@ This is a quick HOWTO for getting started with using `BoUML` and `niemtools` to 
 # Appendix: NIEM Mapping File Format
 | Column | Description | Example 1 | Example 2 |
 |--------|-------------|-----------|-----------|
+| **Model Class** | Class in the UML model(read-only) | `Case` |
+| **Model Attribute** | Class attribute in the UML model (read-only) | `CaseNumber` |
+| **Model Type** | Class/attribute type in the UML model (read-only) | `string` |
+| **Model Multiplicity** | Cardinality/multiplicity of the attribute in the UML model (read-only) | `0..1` |
+| **Model Definition** | Description of the class/attribute in the UML model (read-only) | `A court case` |
 | **NIEM XPath** | Full path from root to the specific element | `nc:Case/j:CaseAugmentation/j:CaseDefendantParty/nc:EntityPerson/nc:PersonOtherIdentification/ecf:PersonIdentificationCategoryType` | `ecf:CourtEventAugmentation/ecf:ConnectedDocument` |
 | **NIEM Type** | NIEM or extension type that contains the element | `nc:IdentificationType` | `ecf:CourtEventAugmentationType` |
-| **NIEM Property** | Element(s), comma-separated; use `@` for references, parentheses for representations | `nc:IdentificationCategory`, `@ecf:ConnectedDocument`, `(ecf:PersonIdentificationCategoryCode)` |
+| **NIEM Property** | Element(s), comma-separated; use `^` for references, parentheses for representations | `nc:IdentificationCategory`, `^ecf:ConnectedDocument`, `(ecf:PersonIdentificationCategoryCode)` |
 | **NIEM Base Type** | Base type of the NIEM Property | `xs:normalizedString` |
 | **NIEM Multiplicity** | Min and max occurrences | `0,1` |
-| **NIEM Mapping Notes** | Optional mapping notes, including code list info | Genericode code list |
-**Note:** Elements are included in the NIEM extension schemas as comments.
-**Code List Example:**
-* A code list such as `PersonIdentificationCategoryCode.gc` will be created.
-* Sample values:  
-  `DefendantNumber=Defendant Identifier`,  
-  `LocalAgencyID=Prosecutor Identifier`,  
-  `PersonID=Generic Person Identifier`,  
-  `PrisonerID=Jail Identifier`
+| **Old XPath** | Full path from a mapping to a previous reference model (e.g. GJXDM) | `ecf:CourtEventAugmentation/ecf:ConnectedDocument` |
+| **Olf Multiplicity** | Min and max occurrences from a mapping to a previous reference model | `0,1` |
+| **NIEM Mapping Notes** | Optional mapping notes; maybe the name of a Genericode code list | Genericode code list CourtLocationCode.gc|
+| **Code List** | Extension code list values and definitions in the format "code1=definition1; code2=definition2" | `civil=Civil Case Type; criminal=Criminal Case Type; domestic=Domestic Case Type` |
+
 **Mapping Tips:**
-* Optionally compare mappings to previous specifications using "Old XPath" and "Old Multiplicity" columns.
-* **Do not modify** UML model columns.
+
+* DO NOT MODIFY the **Model Class/Attribute/Type/Multiplicity/Defintion** columns in the mapping file - these are generated automatically from the UML.
 * NIEM namespace mappings (e.g., `nc:`) are reflected in the wantlist and subset.
 * Other prefixes will generate a schema extension file named `<prefix>.xsd`.
+* Optionally compare mappings to previous specifications using the **Old XPath** and **Old Multiplicity** columns.
