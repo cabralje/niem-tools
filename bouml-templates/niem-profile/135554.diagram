@@ -1,0 +1,41 @@
+format 209
+
+classcanvas 128002 class_ref 132226 // BaseMessage
+  classdiagramsettings hide_attributes yes member_max_width 0 end
+  xyz 483 82 2000
+end
+classcanvas 128130 class_ref 145154 // CaseQueryMessage
+  classdiagramsettings member_max_width 0 end
+  xyz 459 172 2006
+end
+classcanvas 128386 class_ref 170114 // CaseQueryCriteria
+  classdiagramsettings member_max_width 0 end
+  xyz 409 285 2000
+end
+classcanvas 128642 class_ref 133378 // TimeRange
+  classdiagramsettings member_max_width 0 end
+  xyzwh 326 497 2000 409 81
+end
+relationcanvas 128258 relation_ref 130562 // <generalisation>
+  from ref 128130 z 2007 to ref 128002
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 128514 relation_ref 151426 // <directional aggregation>
+  from ref 128130 z 2007 to ref 128386
+  role_a_pos 553 260 3000 no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 128770 relation_ref 151554 // <directional aggregation>
+  decenter_end 976
+  from ref 128386 z 2001 to ref 128642
+  role_a_pos 533 475 3000 no_role_b
+  multiplicity_a_pos 689 508 3000 no_multiplicity_b
+end
+relationcanvas 128898 relation_ref 151682 // <directional aggregation>
+  decenter_end 41
+  from ref 128386 z 2001 to ref 128642
+  role_a_pos 352 469 3000 no_role_b
+  multiplicity_a_pos 352 502 3000 no_multiplicity_b
+end
+end

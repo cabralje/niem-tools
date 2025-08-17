@@ -4,5 +4,23 @@
             "command": "package",
             "debug": false
         }
-    ]
+    ],
+    "python.testing.pytestArgs": [
+        "niemtools"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "files.exclude": {
+        "**/src/main/java/fr/bouml/**": true
+    },
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.compile.nullAnalysis.nonnull": [
+        "org.jetbrains.annotations.NotNull"
+    ],
+    "java.compile.nullAnalysis.nullable": [
+        "org.jetbrains.annotations.Nullable"
+    ],
+    "java.configuration.checkProjectSettingsExcludes": false,
+    //"problems.decorations.enabled": false
 }
