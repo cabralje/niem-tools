@@ -326,6 +326,8 @@ class ConfigurationDialog extends JDialog {
         JPanel projectPanel = new JPanel(new BorderLayout());
         JPanel projectPanel1 = new JPanel();
         projectPanel1.add(new JLabel("Project Directory", JLabel.CENTER));
+        projectPanel.add(labeledField("Documentation", ProjectProperties.EXPORT_HTML_DIR, 60), BorderLayout.CENTER);
+        projectPanel.add(labeledField("Mapping File", ProjectProperties.EXPORT_MAPPING_FILE, 60), BorderLayout.SOUTH);
         JTextField textField1 = new JTextField(properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR), 60);
         textField1.getDocument().addDocumentListener((SimpleDocumentListener) e -> {
             String projectDir = textField1.getText();
@@ -334,6 +336,14 @@ class ConfigurationDialog extends JDialog {
             properties.setProperty(ProjectProperties.EXPORT_HTML_DIR, htmlDir);
             String mappingFile = projectDir + File.separator + ProjectProperties.getDefaults().getProperty(ProjectProperties.EXPORT_MAPPING_FILE);
             properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, mappingFile);
+            // update fields
+            // Remove the components currently at CENTER and SOUTH, if any
+            Component centerComp = ((BorderLayout) projectPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+            if (centerComp != null) projectPanel.remove(centerComp);
+            Component southComp = ((BorderLayout) projectPanel.getLayout()).getLayoutComponent(BorderLayout.SOUTH);
+            if (southComp != null) projectPanel.remove(southComp);
+            projectPanel.add(labeledField("Documentation", ProjectProperties.EXPORT_HTML_DIR, 60), BorderLayout.CENTER);
+            projectPanel.add(labeledField("Mapping File", ProjectProperties.EXPORT_MAPPING_FILE, 60), BorderLayout.SOUTH);
         });
             //properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, modelDir + File.separator + ProjectProperties.getDefaults().getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
         projectPanel1.add(textField1);
@@ -349,8 +359,7 @@ class ConfigurationDialog extends JDialog {
         });
         projectPanel1.add(button1);
         projectPanel.add(projectPanel1, BorderLayout.NORTH);
-        projectPanel.add(labeledField("Documentation", ProjectProperties.EXPORT_HTML_DIR, 60), BorderLayout.CENTER);
-        projectPanel.add(labeledField("Mapping File", ProjectProperties.EXPORT_MAPPING_FILE, 60), BorderLayout.SOUTH);
+
         mappingPanel.add(projectPanel, BorderLayout.NORTH);
 
         // publish UML panel
