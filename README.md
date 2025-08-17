@@ -15,3 +15,5 @@ The advantages relative to other tools include:
 <b>Complete</b> – Captures UML process and object models and automatically generates HTML documentation, NIEM XML mappings, “want lists”, Common Model Format (CMF) models, XSD and JSON schemas, code lists, and Web Service Definition Language (WSDL) and OpenAPI service definitions.
 
 <b>Future-Proof</b> – Can import and migrate models to future versions of NIEM when released
+
+To get started, see the [HOWTO](HOWTO.md).
