@@ -123,6 +123,7 @@ public class ProjectProperties extends Properties {
     static final String EXPORT_OPENAPI_DIR = "ExportOpenAPIDir";
     static final String EXPORT_MAPPING_FILE = "niem-mapping";
     static final String EXPORT_WANTLIST_FILE = "ExportWantlistFile";
+    static final String EXPORT_CODELISTS_DIR = "ExportCodeListsDir";
 
     //private static final long serialVersionUID = 1L;
     private final UmlPackage project;
@@ -206,6 +207,7 @@ public class ProjectProperties extends Properties {
         defaults.setProperty(EXPORT_OPENAPI_DIR,"json");
         defaults.setProperty(EXPORT_MAPPING_FILE,"model\\mapping\\niem-mapping.csv");
         defaults.setProperty(EXPORT_WANTLIST_FILE,"model\\mapping\\wantlist");
+        defaults.setProperty(EXPORT_CODELISTS_DIR,"codelists");
 
         return defaults;
     }

@@ -179,13 +179,13 @@ public class XmlWriter {
                         String codeList = NiemUmlModel.getCodeList(element);
                         if (codeList == null || codeList.trim().isEmpty())
                             continue;
-                        if (!NiemUmlModel.isEnumeration(element))
-                            continue;
+//                        if (!NiemUmlModel.isEnumeration(element))
+//                            continue;
                         String codeListURI = NamespaceModel.getExtensionSchema(elementName);
                         CodeListNamespaces.add(elementName);
 
                         // export code list
-                        Log.debug("exportCodeList: exporting code list " + elementName + GC_FILE_TYPE);
+                        Log.trace("exportCodeList: exporting code list " + elementName + GC_FILE_TYPE);
                         try {
                             File file = Paths.get(directory, elementName + GC_FILE_TYPE).toFile();
                             File parentFile = file.getParentFile();

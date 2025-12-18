@@ -636,7 +636,7 @@ public class BoumlPlugout {
                     return;
                 }
             }
-            
+
             String execCommandXsd = properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_XSD) + " " 
                 + xsdDir + " " + cmfFile;
             try {     
@@ -659,7 +659,7 @@ public class BoumlPlugout {
                 
                 // export code lists
                 String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                        properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
+                        properties.getProperty(ProjectProperties.EXPORT_CODELISTS_DIR);
                 XmlWriter xmlWriter = new XmlWriter(xmlDir);
                 xmlWriter.exportCodeLists(NiemUmlModel.getExtensionModel());
                 xmlWriter.exportCodeLists(NiemUmlModel.getSubsetModel());

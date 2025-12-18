@@ -931,11 +931,6 @@ public class NiemUmlModel {
         }
         XmlWriter xmlWriter = new XmlWriter(xmlDir);
 
-        if (exportXsd.equals("true")){
-            xmlWriter.exportCodeLists(ExtensionModel);
-            xmlWriter.exportCodeLists(SubsetModel);
-        }
-
         try {
             if (exportXsd.equals("true") && exportCmfToXsd.equals("false")) {
                 // export catalog file
@@ -943,6 +938,14 @@ public class NiemUmlModel {
             }
         } catch (IOException e) {
             Log.trace("exportSpecification: error creating XML catalog file " + e.toString());
+        }
+
+        // export code lists
+        if (exportXsd.equals("true")){
+            String gcDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + "codelists";
+            XmlWriter gcWriter = new XmlWriter(gcDir);
+            gcWriter.exportCodeLists(ExtensionModel);
+            gcWriter.exportCodeLists(SubsetModel);
         }
 
         // cache list of ports and message elements
