@@ -597,7 +597,7 @@ public class CmfWriter {
                 if (substitutionElement != null) {
                     String sustitutionInType = substitutionElement.propertyValue(NiemUmlModel.SUBSTITUTION_TYPE_PROPERTY);
                     if (sustitutionInType != null) {
-                        String substitutionElementName = NamespaceModel.getPrefixedName(substitutionElement);
+                        //String substitutionElementName = NamespaceModel.getPrefixedName(substitutionElement);
                         String substitutionForElement = substitutionElement.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
                         if (substitutionForElement.endsWith(NiemModel.ABSTRACT_NAME) || substitutionForElement.endsWith(NiemModel.REPRESENTATION_NAME)) {
                             Log.debug("exportCmfNamespace: skipping abstract or representation head element " + substitutionForElement);
@@ -618,7 +618,7 @@ public class CmfWriter {
                                             augmentations++);
                                     }
                                 }
-                            continue;
+                            //continue;
                         }
 /*                        augmentationCmf += exportCmfAugmentation(
                             sustitutionInType, 

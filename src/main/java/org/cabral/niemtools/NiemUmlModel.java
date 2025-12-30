@@ -533,9 +533,7 @@ public class NiemUmlModel {
 
         // relate extension types to base types and attribute groups
         Log.debug("createSubsetAndExtension: copy subset base types and create extension base types");
-        Iterator<UmlItem> it = all.iterator();
-        while (it.hasNext()) {
-            UmlItem item = it.next();
+        for (UmlItem item : all) {
             if (!isNiemUml(item))
                 continue;
 
@@ -584,9 +582,7 @@ public class NiemUmlModel {
         // Copy subset elements and create extension elements
         Log.start("createSubsetAndExtension - add elements");
         Log.debug("createSubsetAndExtension: copy subset elements and create extension elements");
-        it = all.iterator();
-        while (it.hasNext()) {
-            UmlItem item = it.next();
+        for (UmlItem item : all) {
             if (!isNiemUml(item))
                 continue;
 
@@ -1176,7 +1172,8 @@ public class NiemUmlModel {
                 parentFile.mkdirs();
             try (FileWriter fw = new FileWriter(file)) {
                 fw.write(XmlWriter.XML_HEADER);
-                fw.write(XmlWriter.XML_ATTRIBUTION);
+                //fw.write(XmlWriter.XML_ATTRIBUTION);
+                fw.write(properties.getProperty(ProjectProperties.EXPORT_ATTRIBUTION));
                 fw.write("<w:WantList w:release=\"" + getNiemVersion()
                         + "\" w:product=\"NIEM\" w:nillableDefault=\"true\" ");
                 UmlPackage modelPackage = SubsetModel.getModelPackage();

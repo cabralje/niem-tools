@@ -1031,7 +1031,7 @@ class NiemModel {
                 Log.trace("Generating XSD for extension schema " + prefix);
                 String filename = Paths.get(xmlDir, ns.getFilepath()).toString();
                 Log.debug("exportSchemas: referenced namespaces in " + filename + ": " + schemaNamespaces.toString());
-                xmlWriter.exportXmlSchema(filename, nsSchemaURI, xmlTypes, xmlElements, schemaNamespaces, properties);
+                xmlWriter.exportXmlSchema(filename, nsSchemaURI, xmlTypes, xmlElements, schemaNamespaces);
             }
 
             // export JSON file
