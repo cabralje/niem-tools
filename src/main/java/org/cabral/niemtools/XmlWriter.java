@@ -159,9 +159,9 @@ public class XmlWriter {
         String version = NiemUmlModel.getProperty(ProjectProperties.IEPD_VERSION);
         if (version == null)
             version = "";
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date();
-        String today = dateFormat.format(date);
+        //DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        //Date date = new Date();
+        //String today = dateFormat.format(date);
 
         // export code lists for extension elements
         if (model != null && model.getModelPackage() != null && model.getModelPackage().children() != null)
@@ -202,7 +202,7 @@ public class XmlWriter {
                                         + GC_CODELIST_URI + "#GenericodeCodeListDocument\"/>" + "</AppInfo>" + "</Annotation>"
                                         + "<Identification>" + "<ShortName>" + elementName + "</ShortName>" + "<Version>" + version
                                         + "</Version>" + "<CanonicalUri>" + codeListURI + "</CanonicalUri>"
-                                        + "<CanonicalVersionUri>" + codeListURI + "/" + today + "</CanonicalVersionUri>"
+                                        + "<CanonicalVersionUri>" + codeListURI + "/" + NiemUmlModel.getProperty(ProjectProperties.EXPORT_DATE) + "</CanonicalVersionUri>"
                                         + "</Identification>" + "<ColumnSet>" + "<Column Id=\"" + GC_CODELIST_CODE
                                         + "\" Use=\"required\">" + "<ShortName>" + GC_CODELIST_CODE + "</ShortName>" + "<CanonicalUri>"
                                         + GC_CODELIST_URI + "column/" + GC_CODELIST_CODE + "</CanonicalUri>"
