@@ -507,7 +507,7 @@ public class JsonWriter {
                 }
             }
         jsonNamespaces.add("\n" + getJsonPair(NiemModel.APPINFO_PREFIX, NiemModel.APPINFO_URI + "#"));
-        jsonNamespaces.add("\n" + getJsonPair(NiemModel.CT_PREFIX, NiemModel.CT_URI + "#"));
+        jsonNamespaces.add("\n" + getJsonPair(NiemModel.CT_PREFIX, NiemUmlModel.getProperty(ProjectProperties.EXPORT_CT_URI) + "#"));
         //jsonNamespaces.add("\n" + getJsonPair(XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI + "#"));
 
         try {

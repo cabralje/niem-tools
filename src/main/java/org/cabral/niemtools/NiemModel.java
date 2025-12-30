@@ -103,7 +103,7 @@ class NiemModel {
     static final String APPINFO_PREFIX = "appinfo";
     static final String APPINFO_URI = "https://docs.oasis-open.org/niemopen/ns/model/appinfo/6.0/";
     static final String CT_PREFIX = "ct";
-    static final String CT_URI = "https://docs.oasis-open.org/niemopen/ns/specification/conformanceTargets/6.0/";
+    //static final String CT_URI = "https://docs.oasis-open.org/niemopen/ns/specification/conformanceTargets/6.0/";
     //static final String TERM_PREFIX = "term";
     //static final String TERM_URI = "http://release.niem.gov/niem/localTerminology/3.0/";
 

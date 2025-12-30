@@ -193,7 +193,7 @@ public class XmlWriter {
                                 parentFile.mkdirs();
                             try (FileWriter fw = new FileWriter(file)) {
                                 fw.write(XmlWriter.XML_HEADER + NiemUmlModel.getProperty(ProjectProperties.EXPORT_ATTRIBUTION) + "<gc:CodeList ");
-                                writeXmlNs(fw, NiemModel.CT_PREFIX, NiemModel.CT_URI);
+                                writeXmlNs(fw, NiemModel.CT_PREFIX, NiemUmlModel.getProperty(ProjectProperties.EXPORT_CT_URI));
                                 writeXmlNs(fw, GC_PREFIX, GC_URI);
                                 writeXmlNs(fw, GC_APPINFO_PREFIX, GC_APPINFO_URI);
                                 writeXmlNs(fw, XmlWriter.XSI_PREFIX, XmlWriter.XSI_URI);
@@ -760,7 +760,7 @@ public class XmlWriter {
                         if (!nsPrefix.equals(NiemModel.LOCAL_PREFIX))
                             writeXmlNs(xml, nsPrefix, NamespaceModel.getSchemaURIForPrefix(nsPrefix));
                 writeXmlNs(xml, NiemModel.APPINFO_PREFIX, NiemModel.APPINFO_URI);
-                writeXmlNs(xml, NiemModel.CT_PREFIX, NiemModel.CT_URI);
+                writeXmlNs(xml, NiemModel.CT_PREFIX, NiemUmlModel.getProperty(ProjectProperties.EXPORT_CT_URI));
                 //writeXmlNs(xml, XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI);
                 writeXmlAttribute(xml, "ct:conformanceTargets",
                         NiemModel.NDR_URI + NiemModel.CT_EXTENSION);
