@@ -95,7 +95,8 @@ public class ProjectProperties extends Properties {
     static final String EXPORT_OPENAPI = "ExportOpenAPI";
     static final String EXPORT_ATTRIBUTION = "ExportAttribution";
     static final String EXPORT_CT_URI = "ExportConformanceTargetURI";
-    static final String EXPORT_DATE = "ExportDate";     
+    static final String EXPORT_DATE = "ExportDate";
+    static final String EXPORT_SORT_EXTENSION = "ExportSortExtension";     
 
     // message specification properties
     static final String IEPD_NAME = "IEPDName";
@@ -184,6 +185,7 @@ public class ProjectProperties extends Properties {
         defaults.setProperty(EXPORT_CT_URI, "https://docs.oasis-open.org/niemopen/ns/specification/conformanceTargets/6.0/");
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         defaults.setProperty(EXPORT_DATE, dateFormat.format(new Date())); // default to today
+        defaults.setProperty(EXPORT_SORT_EXTENSION, "true");
 
         // message specification defaults
         defaults.setProperty(IEPD_NAME, "NIEM Message Specification");

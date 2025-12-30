@@ -702,7 +702,7 @@ public class NiemUmlModel {
         	sort(subset, true);
         }
         UmlPackage extension = ExtensionModel.getModelPackage();
-        if (extension != null) {
+        if (extension != null && properties.getProperty(ProjectProperties.EXPORT_SORT_EXTENSION).equals("true")) {
             Log.trace("createSubsetAndExtension: sorting extension model");
             sort(extension, false);
         }
