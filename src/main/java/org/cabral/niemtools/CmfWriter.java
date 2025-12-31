@@ -560,7 +560,10 @@ public class CmfWriter {
         String conformanceTargetURI;
         String prefix = NamespaceModel.getPrefix(classview);
 
-        if (!NamespaceModel.isNiemPrefix(prefix)) {
+        if (NamespaceModel.isExternalPrefix(prefix)) {
+            namespaceCategoryCode = "EXTERNAL";
+            conformanceTargetURI = "";
+        } else if (!NamespaceModel.isNiemPrefix(prefix)) {
             namespaceCategoryCode = "EXTENSION";
             conformanceTargetURI = NiemModel.CT_EXTENSION;
         } else if (NamespaceModel.isInfrastructurePrefix(prefix)) {
@@ -636,32 +639,44 @@ public class CmfWriter {
 
         // build namespace CMF
         String schemaCmf = "";
+        String namespaceCmf;
         description = description.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-        String namespaceCmf = tag("NamespaceURI", NamespaceModel.getSchemaURIForPrefix(prefix))
+        
+        // handle external namespaces
+        if (namespaceCategoryCode.equals("EXTERNAL")) {
+            String externalUri = NamespaceModel.getSchemaURIForPrefix(prefix);
+            String externalPath = NamespaceModel.getExternalSchemaURL(externalUri);
+            namespaceCmf = tag("SchemaDocument",
+                tag("NamespaceURI", externalUri)
                 + tag("NamespacePrefixText", prefix)
-                + tag(documentationName, description);
-        if (isOlderCmfVersion(cmfVersion, "1.0")) {
-            namespaceCmf += tag("NamespaceKindCode", namespaceCategoryCode);
-            schemaCmf = tag("SchemaDocument",
-                    tag("NamespaceURI", NamespaceModel.getSchemaURIForPrefix(prefix))
+            //    + tag("ConformanceTargetURI", NiemModel.NDR_URI + conformanceTargetURI)
+                + tag("DocumentFilePathText", externalPath)
+                + tag("NamespaceCategoryCode", namespaceCategoryCode)
+                + tag("NamespaceVersionText", NiemUmlModel.getNiemVersion()));
+        } else {
+        // handle other namespaces
+            namespaceCmf = tag("NamespaceURI", NamespaceModel.getSchemaURIForPrefix(prefix))
                     + tag("NamespacePrefixText", prefix)
-                    + tag("ConformanceTargetURIList", NiemModel.NDR_URI + conformanceTargetURI)
-                    + tag("DocumentFilePathText", path)
-                    //			+ tag("NamespaceKindCode", namespaceCategoryCode)
-                    + tag("NIEMVersionText", NiemUmlModel.getNiemVersion())
-                    //			+ tag("SchemaVersionText", "ps02")
-                    + tag("SchemaLanguageName", XmlWriter.XML_LANG)
-                    + localTermsCmf);
-        } else
-            namespaceCmf += tag("ConformanceTargetURI", NiemModel.NDR_URI + conformanceTargetURI)
-                    + tag("DocumentFilePathText", path)
-                    + tag("NamespaceCategoryCode", namespaceCategoryCode)
-                    //		+ tag("NamespaceVersionText", "ps02")
-                    + tag("ArchitectureVersionName", "NIEM" + NiemUmlModel.getNiemVersion())
-                    + tag("NamespaceLanguageName", XmlWriter.XML_LANG)
-                    + augmentationCmf
-                    + localTermsCmf;
-
+                    + tag(documentationName, description);
+            if (isOlderCmfVersion(cmfVersion, "1.0")) {
+                namespaceCmf += tag("NamespaceKindCode", namespaceCategoryCode);
+                schemaCmf = tag("SchemaDocument",
+                        tag("NamespaceURI", NamespaceModel.getSchemaURIForPrefix(prefix))
+                        + tag("NamespacePrefixText", prefix)
+                        + tag("ConformanceTargetURIList", NiemModel.NDR_URI + conformanceTargetURI)
+                        + tag("DocumentFilePathText", path)
+                        + tag("NIEMVersionText", NiemUmlModel.getNiemVersion())
+                        + tag("SchemaLanguageName", XmlWriter.XML_LANG)
+                        + localTermsCmf);
+            } else
+                namespaceCmf += tag("ConformanceTargetURI", NiemModel.NDR_URI + conformanceTargetURI)
+                        + tag("DocumentFilePathText", path)
+                        + tag("NamespaceCategoryCode", namespaceCategoryCode)
+                        + tag("ArchitectureVersionName", "NIEM" + NiemUmlModel.getNiemVersion())
+                        + tag("NamespaceLanguageName", XmlWriter.XML_LANG)
+                        + augmentationCmf
+                        + localTermsCmf;
+        }
         return tagId("Namespace", prefix, namespaceCmf) + schemaCmf;
     }
 
