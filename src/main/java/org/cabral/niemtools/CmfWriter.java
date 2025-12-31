@@ -645,14 +645,14 @@ public class CmfWriter {
         // handle external namespaces
         if (namespaceCategoryCode.equals("EXTERNAL")) {
             String externalUri = NamespaceModel.getSchemaURIForPrefix(prefix);
-            String externalPath = NamespaceModel.getExternalSchemaURL(externalUri);
-            namespaceCmf = tag("SchemaDocument",
-                tag("NamespaceURI", externalUri)
+            String externalPath = NamespaceModel.getExternalSchemaLocalPath(externalUri);
+            namespaceCmf = tag("NamespaceURI", externalUri)
                 + tag("NamespacePrefixText", prefix)
-            //    + tag("ConformanceTargetURI", NiemModel.NDR_URI + conformanceTargetURI)
+                + tag(documentationName, description)
                 + tag("DocumentFilePathText", externalPath)
+                //+ tag("DocumentFilePathText", prefix)
                 + tag("NamespaceCategoryCode", namespaceCategoryCode)
-                + tag("NamespaceVersionText", NiemUmlModel.getNiemVersion()));
+                + tag("NamespaceVersionText", NiemUmlModel.getNiemVersion());
         } else {
         // handle other namespaces
             namespaceCmf = tag("NamespaceURI", NamespaceModel.getSchemaURIForPrefix(prefix))

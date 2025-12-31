@@ -465,12 +465,12 @@ class ConfigurationDialog extends JDialog {
         //String[] externalNamespaces = properties.getProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS).split(",");
         int row = 0;
         String[][] data = null;
-        String[] columnNames = {"Prefix", "Namespace", "URL"};
+        String[] columnNames = {"Prefix", "Namespace", "URL", "LocalPath"};
         if (externalNamespaces != null) {
-            data = new String[externalNamespaces.length][3];
+            data = new String[externalNamespaces.length][4];
             for (String namespace : externalNamespaces) {
                 String[] parts = namespace.split("=");
-                if (parts.length == 3)
+                if (parts.length == 4)
                     data[row++] = parts;
             }
 
@@ -491,7 +491,7 @@ class ConfigurationDialog extends JDialog {
         JButton namespaceButton = new JButton("Add namespace");
         namespaceButton.addActionListener((ActionEvent e) -> {
             DefaultTableModel model1 = (DefaultTableModel) table.getModel();
-            model1.addRow(new String[]{"", "", ""});
+            model1.addRow(new String[]{"", "", "", ""});
         });
         externalPanel.add(namespaceButton, BorderLayout.SOUTH);
         externalPanel.add(scrollPanel, BorderLayout.CENTER);
@@ -521,7 +521,7 @@ class ConfigurationDialog extends JDialog {
         try {
             LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<>();
             for (int i = 0; i < model.getRowCount(); i++) {
-                String prefix = "", namespace = "", url = "";
+                String prefix = "", namespace = "", url = "", localPath="";
                 Object prefixValue = model.getValueAt(i, 0);
                 if (prefixValue != null)
                     prefix = sanitize(prefixValue.toString());
@@ -539,9 +539,12 @@ class ConfigurationDialog extends JDialog {
                         Log.trace("URL " + url + " is malformed" + e1.getMessage());
                         throw new IllegalArgumentException("URL " + url + " is malformed", e1); 
                     }
+                Object localPathValue = model.getValueAt(i, 3);
+                if (localPathValue != null)
+                    localPath = sanitize(localPathValue.toString());
                 if (prefix != null && !prefix.isEmpty() && namespace != null && !namespace.isEmpty()
-                        && !url.isEmpty())
-                    externalSchemas2.add(prefix + "=" + namespace + "=" + url);
+                        && !url.isEmpty() && !localPath.isEmpty())
+                    externalSchemas2.add(prefix + "=" + namespace + "=" + url + "=" + localPath);
             }
             properties.setProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS, String.join(",", externalSchemas2));
         } catch (IllegalArgumentException | IllegalStateException e1) {
