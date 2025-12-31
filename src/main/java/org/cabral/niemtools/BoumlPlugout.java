@@ -187,6 +187,12 @@ public class BoumlPlugout {
         else
             Log.trace("Warning: project is null. Skipping memorization of references.");
 
+        // warn if enumerations are truncated
+        String maxEnumsString = properties.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
+        if (maxEnumsString != null && !maxEnumsString.isEmpty()) {
+            Log.trace("WARNING: NIEM codelists are currently truncated to " + maxEnumsString + " values. To use the complete code lists, import the reference model again.");
+        }
+
         switch (command) {
             
             case "importReferenceModel":
