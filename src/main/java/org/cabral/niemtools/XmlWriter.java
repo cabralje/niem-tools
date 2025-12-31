@@ -884,7 +884,7 @@ public class XmlWriter {
         // add elements, attributes and attribute groups in types
         TreeSet<String> xmlElementsInType = new TreeSet<>();
         TreeSet<String> xmlAttributesInType = new TreeSet<>();
-        String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
+        //String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
         UmlAttribute augmentationPoint = null;
         String xmlElementInType;
         if (type != null && !NiemUmlModel.isEnumeration(type) && type.children() != null)
@@ -904,10 +904,10 @@ public class XmlWriter {
                         augmentationPoint = attribute;
                     if (isComplexContent)
                         elementMappingNotes = attribute.propertyValue(NiemUmlModel.NOTES_PROPERTY);
-                    if (elementName.equals(anyElement)) {
-                        xmlElementsInType.add("<xs:any/>");
-                        continue;
-                    }
+                    //if (elementName.equals(anyElement)) {
+                    //    xmlElementsInType.add("<xs:any/>");
+                    //    continue;
+                    //}
                     // if (complexContent)
                     String multiplicity = attribute.multiplicity();
                     if (NamespaceModel.isAttribute(element)) {

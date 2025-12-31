@@ -1198,7 +1198,7 @@ public class NiemUmlModel {
                     if (item != null && item.kind() == anItemKind.aClassView) {
                         UmlClassView classView = (UmlClassView) item;
                         String prefix = classView.propertyValue(PREFIX_PROPERTY);
-                        String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
+                        //String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
                         if (NamespaceModel.isInfrastructurePrefix(prefix))
                             continue;
                         if (classView.children() != null)
@@ -1206,8 +1206,8 @@ public class NiemUmlModel {
                             if (item2.kind() == anItemKind.aClassInstance) {
                                 UmlClassInstance element = (UmlClassInstance) item2;
                                 String elementName = NamespaceModel.getPrefixedName(element);
-                                if (elementName.equals(anyElement))
-                                    continue;
+                                //if (elementName.equals(anyElement))
+                                //    continue;
                                 if (NamespaceModel.isAttribute(element)) {
                                     elementName = NamespaceModel.getPrefixedAttributeName(NamespaceModel.getPrefix(elementName), elementName);
                                     Log.debug("exportWantlist: export attribute " + elementName);
