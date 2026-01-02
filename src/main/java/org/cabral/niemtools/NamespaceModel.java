@@ -68,6 +68,7 @@ public class NamespaceModel {
     private static final String ATTRIBUTE_PREFIX = "@";
     private static final Set<String> externalPrefixes = new HashSet<>();
     private static final Map<String, String> externalSchemaURL = new ConcurrentHashMap<>();
+    private static final Map<String, String> externalSchemaLocalPath = new ConcurrentHashMap<>();
     private static final String NAMESPACE_DELIMITER = ":";
     private static final Map<String, Namespace> Namespaces = new ConcurrentHashMap<>();
     private static final Map<String, String> Prefixes = new ConcurrentHashMap<>();
@@ -115,9 +116,11 @@ public class NamespaceModel {
                     String prefix = part[0].trim();
                     String schemaURI = part[1].trim();
                     String schemaLocation = part[2].trim();
+                    String localPath = part[3].trim();
                     externalPrefixes.add(prefix);
                     Prefixes.put(prefix, schemaURI);
                     externalSchemaURL.put(schemaURI, schemaLocation);
+                    externalSchemaLocalPath.put(schemaURI, localPath);
                 }
             }
         Log.debug("cacheExternalSchemas: external schemas cached");
@@ -147,6 +150,14 @@ public class NamespaceModel {
      */
     static String getExtensionSchema(String prefix) {
         return NiemUmlModel.getProperty(ProjectProperties.EXPORT_URI) + "/" + prefix;
+    }
+
+    /**
+     * @param schemaURI
+     * @return local path for schemaURI as a String
+     */
+    static String getExternalSchemaLocalPath(String schemaURI) {
+        return externalSchemaLocalPath.get(schemaURI);
     }
 
     /**

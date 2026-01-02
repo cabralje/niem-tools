@@ -103,7 +103,7 @@ class NiemModel {
     static final String APPINFO_PREFIX = "appinfo";
     static final String APPINFO_URI = "https://docs.oasis-open.org/niemopen/ns/model/appinfo/6.0/";
     static final String CT_PREFIX = "ct";
-    static final String CT_URI = "https://docs.oasis-open.org/niemopen/ns/specification/conformanceTargets/6.0/";
+    //static final String CT_URI = "https://docs.oasis-open.org/niemopen/ns/specification/conformanceTargets/6.0/";
     //static final String TERM_PREFIX = "term";
     //static final String TERM_URI = "http://release.niem.gov/niem/localTerminology/3.0/";
 
@@ -125,7 +125,7 @@ class NiemModel {
 
     // NIEM infrastructure type and element names
     static final String ABSTRACT_TYPE_NAME = "abstract";
-    static final String ANY_ELEMENT_NAME = "any";
+    //static final String ANY_ELEMENT_NAME = "any";
     //static final String ASSOCIATION_TYPE_NAME = "AssociationType";
     private static final String AUGMENTATION_TYPE_NAME = "AugmentationType";
     static final String AUGMENTATION_POINT_NAME = "AugmentationPoint";
@@ -135,7 +135,7 @@ class NiemModel {
     static final String SIMPLE_TYPE_NAME = "SimpleType";
     private static final String OBJECT_TYPE_NAME = "ObjectType";
     private static final String SIMPLE_OBJECT_ATTRIBUTE_GROUP = "@SimpleObjectAttributeGroup";
-    private static final String[] XML_TYPE_NAMES = {"anyURI", "base64Binary", "boolean", "byte", "date", "dateTime",
+    private static final String[] XML_TYPE_NAMES = {"anyType", "anyURI", "base64Binary", "boolean", "byte", "date", "dateTime",
         "decimal", "double", "duration", "ENTITIES", "ENTITY", "float", "gDay", "gMonth", "gMonthDay", "gYear",
         "gYearMonth", "hexBinary", "ID", "IDREF", "IDREFS", "int", "integer", "language", "long", "Name", "NCName",
         "negativeInteger", "NMTOKEN", "NMTOKENS", "nonNegativeInteger", "nonPositiveInteger", "normalizedString",
@@ -567,7 +567,7 @@ class NiemModel {
             //NamespaceModel.getNamespaceClassView(this, XMLConstants.XML_NS_PREFIX, XMLConstants.XML_NS_URI);
             for (String typeName : XML_TYPE_NAMES)
                 addType(XSD_URI, NamespaceModel.getPrefixedName(XSD_PREFIX, typeName), null, null);
-            addElement(XSD_URI, NamespaceModel.getPrefixedName(XSD_PREFIX, ANY_ELEMENT_NAME), null, null, null);
+            //addElement(XSD_URI, NamespaceModel.getPrefixedName(XSD_PREFIX, ANY_ELEMENT_NAME), null, null, null);
         } else if (this == NiemUmlModel.getSubsetModel()) {
             abstractType = copyType(NamespaceModel.getPrefixedName(LOCAL_PREFIX, ABSTRACT_TYPE_NAME));
             augmentationType = copyType(NamespaceModel.getPrefixedName(STRUCTURES_PREFIX, AUGMENTATION_TYPE_NAME));
@@ -575,7 +575,7 @@ class NiemModel {
             simpleObjectAttributeGroup = copyType(
                     NamespaceModel.getPrefixedName(STRUCTURES_PREFIX, SIMPLE_OBJECT_ATTRIBUTE_GROUP));
             //NamespaceModel.getNamespaceClassView(null, XSD_PREFIX, XSD_URI);
-            copyElement(NamespaceModel.getPrefixedName(XSD_PREFIX, ANY_ELEMENT_NAME));
+            //copyElement(NamespaceModel.getPrefixedName(XSD_PREFIX, ANY_ELEMENT_NAME));
             copyType("xs:NCName"); // JSON-LD @id is type xs:NCName
         } else if (this == NiemUmlModel.getExtensionModel()) {
             abstractType = NiemUmlModel.getSubsetModel().getAbstractType();
@@ -1031,7 +1031,7 @@ class NiemModel {
                 Log.trace("Generating XSD for extension schema " + prefix);
                 String filename = Paths.get(xmlDir, ns.getFilepath()).toString();
                 Log.debug("exportSchemas: referenced namespaces in " + filename + ": " + schemaNamespaces.toString());
-                xmlWriter.exportXmlSchema(filename, nsSchemaURI, xmlTypes, xmlElements, schemaNamespaces, properties);
+                xmlWriter.exportXmlSchema(filename, nsSchemaURI, xmlTypes, xmlElements, schemaNamespaces);
             }
 
             // export JSON file

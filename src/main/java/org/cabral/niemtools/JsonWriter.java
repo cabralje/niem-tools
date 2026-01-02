@@ -507,7 +507,7 @@ public class JsonWriter {
                 }
             }
         jsonNamespaces.add("\n" + getJsonPair(NiemModel.APPINFO_PREFIX, NiemModel.APPINFO_URI + "#"));
-        jsonNamespaces.add("\n" + getJsonPair(NiemModel.CT_PREFIX, NiemModel.CT_URI + "#"));
+        jsonNamespaces.add("\n" + getJsonPair(NiemModel.CT_PREFIX, NiemUmlModel.getProperty(ProjectProperties.EXPORT_CT_URI) + "#"));
         //jsonNamespaces.add("\n" + getJsonPair(XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI + "#"));
 
         try {
@@ -542,7 +542,7 @@ public class JsonWriter {
         // type.sortChildren();
         TreeSet<String> jsonRequiredElementsInType = new TreeSet<>();
         TreeSet<String> jsonElementsInType = new TreeSet<>();
-        String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
+        //String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
         Boolean anyJSON = false;
         UmlClass type2 = type, baseType2 = null;
         while (type2 != null && type2.children() != null) {
@@ -557,10 +557,10 @@ public class JsonWriter {
                     String elementName = NamespaceModel.getPrefixedName(element);
                     boolean elementIsAttribute = NamespaceModel.isAttribute(element);
                     Log.debug("exportJsonTypeSchema: exporting element in type " + elementName);
-                    if (elementName.equals(anyElement)) {
-                        anyJSON = true;
-                        continue;
-                    }
+                    //if (elementName.equals(anyElement)) {
+                    //    anyJSON = true;
+                    //    continue;
+                    //}
                     // if (complexContent)
                     String multiplicity = attribute.multiplicity();
                     UmlClass elementBaseType = NiemModel.getBaseType(element);

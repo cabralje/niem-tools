@@ -533,9 +533,7 @@ public class NiemUmlModel {
 
         // relate extension types to base types and attribute groups
         Log.debug("createSubsetAndExtension: copy subset base types and create extension base types");
-        Iterator<UmlItem> it = all.iterator();
-        while (it.hasNext()) {
-            UmlItem item = it.next();
+        for (UmlItem item : all) {
             if (!isNiemUml(item))
                 continue;
 
@@ -584,9 +582,7 @@ public class NiemUmlModel {
         // Copy subset elements and create extension elements
         Log.start("createSubsetAndExtension - add elements");
         Log.debug("createSubsetAndExtension: copy subset elements and create extension elements");
-        it = all.iterator();
-        while (it.hasNext()) {
-            UmlItem item = it.next();
+        for (UmlItem item : all) {
             if (!isNiemUml(item))
                 continue;
 
@@ -708,7 +704,7 @@ public class NiemUmlModel {
         UmlPackage extension = ExtensionModel.getModelPackage();
         if (extension != null) {
             Log.trace("createSubsetAndExtension: sorting extension model");
-            sort(extension, false);
+            sort(extension, properties.getProperty(ProjectProperties.EXPORT_SORT_EXTENSION).equals("true"));
         }
         Log.stop("createSubsetAndExtension");
     }
@@ -931,11 +927,6 @@ public class NiemUmlModel {
         }
         XmlWriter xmlWriter = new XmlWriter(xmlDir);
 
-        if (exportXsd.equals("true")){
-            xmlWriter.exportCodeLists(ExtensionModel);
-            xmlWriter.exportCodeLists(SubsetModel);
-        }
-
         try {
             if (exportXsd.equals("true") && exportCmfToXsd.equals("false")) {
                 // export catalog file
@@ -943,6 +934,14 @@ public class NiemUmlModel {
             }
         } catch (IOException e) {
             Log.trace("exportSpecification: error creating XML catalog file " + e.toString());
+        }
+
+        // export code lists
+        if (exportXsd.equals("true")){
+            String gcDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + "codelists";
+            XmlWriter gcWriter = new XmlWriter(gcDir);
+            gcWriter.exportCodeLists(ExtensionModel);
+            gcWriter.exportCodeLists(SubsetModel);
         }
 
         // cache list of ports and message elements
@@ -1173,7 +1172,8 @@ public class NiemUmlModel {
                 parentFile.mkdirs();
             try (FileWriter fw = new FileWriter(file)) {
                 fw.write(XmlWriter.XML_HEADER);
-                fw.write(XmlWriter.XML_ATTRIBUTION);
+                //fw.write(XmlWriter.XML_ATTRIBUTION);
+                fw.write(properties.getProperty(ProjectProperties.EXPORT_ATTRIBUTION));
                 fw.write("<w:WantList w:release=\"" + getNiemVersion()
                         + "\" w:product=\"NIEM\" w:nillableDefault=\"true\" ");
                 UmlPackage modelPackage = SubsetModel.getModelPackage();
@@ -1198,7 +1198,7 @@ public class NiemUmlModel {
                     if (item != null && item.kind() == anItemKind.aClassView) {
                         UmlClassView classView = (UmlClassView) item;
                         String prefix = classView.propertyValue(PREFIX_PROPERTY);
-                        String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
+                        //String anyElement = NamespaceModel.getPrefixedName(NiemModel.XSD_PREFIX, NiemModel.ANY_ELEMENT_NAME);
                         if (NamespaceModel.isInfrastructurePrefix(prefix))
                             continue;
                         if (classView.children() != null)
@@ -1206,8 +1206,8 @@ public class NiemUmlModel {
                             if (item2.kind() == anItemKind.aClassInstance) {
                                 UmlClassInstance element = (UmlClassInstance) item2;
                                 String elementName = NamespaceModel.getPrefixedName(element);
-                                if (elementName.equals(anyElement))
-                                    continue;
+                                //if (elementName.equals(anyElement))
+                                //    continue;
                                 if (NamespaceModel.isAttribute(element)) {
                                     elementName = NamespaceModel.getPrefixedAttributeName(NamespaceModel.getPrefix(elementName), elementName);
                                     Log.debug("exportWantlist: export attribute " + elementName);
