@@ -284,6 +284,9 @@ public class NamespaceModel {
             // trace("getPrefix: error - tagName is null");
             return null;
         }
+        if (isAttribute(tagName)) {
+            tagName = filterAttributePrefix(tagName);
+        }
         int i = tagName.indexOf(NAMESPACE_DELIMITER);
         if (i >= 0) {
             String prefix = tagName.substring(0, i).trim();
@@ -358,6 +361,13 @@ public class NamespaceModel {
      * @return schemaURI for type or element with name tagname as a String
      */
     static String getSchemaURI(String tagName) {
+        if (tagName == null) {
+            Log.trace("getSchemaURI: error - tagName is null");
+            return null;
+        }
+        if (isAttribute(tagName)) {
+            tagName = filterAttributePrefix(tagName);
+        }
         String prefix = getPrefix(tagName);
         if (prefix == null) // prefix = LOCAL_PREFIX;
             return null;

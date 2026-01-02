@@ -296,7 +296,7 @@ public class CmfWriter {
             Log.debug("exportCmfClass: exporting class " + typeName);
 
             if (NamespaceModel.isAttribute(typeName)) {
-                Log.debug("exportCmfClass: skipping attribute class " + typeName);
+                Log.trace("exportCmfClass: skipping attribute class " + typeName);
                 return "";
             }
 
@@ -364,10 +364,15 @@ public class CmfWriter {
                         UmlClassInstance element = model2.getReferencedElement(item);
                         if (element != null) {
                             String elementName = NamespaceModel.getPrefixedName(element);
-                            if (NiemModel.isAugmentation(elementName))
+                            if (NiemModel.isAugmentation(elementName)) {
+                                Log.debug("exportCmfClass: skipping augmentation property " + elementName);
                                 continue;
-                            if (NamespaceModel.isAttribute(elementName))
-                                continue;
+                            }
+                            if (NamespaceModel.isAttribute(elementName)) {
+                            //    Log.trace("exportCmfClass: skipping attribute property " + elementName);
+                            //    continue;
+                                elementName = NamespaceModel.filterAttributePrefix(elementName);
+                            }
                             String multiplicity = attribute.multiplicity();
                             UmlClass elementBaseType = null;
                             try {
@@ -600,7 +605,7 @@ public class CmfWriter {
                 if (substitutionElement != null) {
                     String sustitutionInType = substitutionElement.propertyValue(NiemUmlModel.SUBSTITUTION_TYPE_PROPERTY);
                     if (sustitutionInType != null) {
-                        //String substitutionElementName = NamespaceModel.getPrefixedName(substitutionElement);
+                        String substitutionElementName = NamespaceModel.getPrefixedName(substitutionElement);
                         String substitutionForElement = substitutionElement.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
                         if (substitutionForElement.endsWith(NiemModel.ABSTRACT_NAME) || substitutionForElement.endsWith(NiemModel.REPRESENTATION_NAME)) {
                             Log.debug("exportCmfNamespace: skipping abstract or representation head element " + substitutionForElement);
@@ -608,7 +613,7 @@ public class CmfWriter {
                         }
                         UmlClass substitutionElementType = NiemModel.getBaseType(substitutionElement);
                         if (NiemModel.isAugmentationType(NamespaceModel.getName(substitutionElementType))) {
-                            //Log.debug("exportCmfNamespace: skipping augmentation element " + substitutionElementName);
+                            Log.debug("exportCmfNamespace: skipping augmentation element " + substitutionElementName);
                             if (substitutionElementType != null && substitutionElementType.children() != null)
                                 for (UmlItem item2 : substitutionElementType.children()) {
                                     if (item2 != null && item2.kind() == anItemKind.anAttribute) {
@@ -862,10 +867,14 @@ public class CmfWriter {
                     UmlClassInstance element = model2.getReferencedElement(item);
                     if (element != null) {
                         String elementName = NamespaceModel.getPrefixedName(element);
-                        if (NiemModel.isAugmentation(elementName))
+                        if (NiemModel.isAugmentation(elementName)) {
+                            Log.debug("exportCmfClass: skipping augmentation property  " + elementName);
                             continue;
-                        if (NamespaceModel.isAttribute(elementName))
+                        }
+                        if (NamespaceModel.isAttribute(elementName)) {
+                            Log.debug("exportCmfClass: skipping attribute property " + elementName);
                             continue;
+                        }
                         properties = true;
                         break;
                     }
