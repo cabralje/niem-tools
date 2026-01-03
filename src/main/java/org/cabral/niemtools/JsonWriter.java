@@ -91,7 +91,7 @@ public class JsonWriter {
 
     // OpenAPI defaults
     private static final String OPENAPI_FILE_TYPE = ".openapi.json";
-    private static final String OPENAPI_VERSION = "3.1";
+    private static final String OPENAPI_VERSION = "3.1.0";
 
     private final String directory;
 
@@ -210,27 +210,28 @@ public class JsonWriter {
      * @param sourcePath
      * @param targetItem
      * @return JSON Pointer to a type/element with name tagName from file
-     * sourceFileNAme to targetFileName or "" if unknown prefix or namespace
+     * sourceFileName to targetFileName or "" if unknown prefix or namespace
      */
     private String exportJsonPointer(Path sourcePath, UmlItem targetItem) {
         if (targetItem == null)
             return "";
         String targetPrefix = NamespaceModel.getPrefix(targetItem);
-        if (targetPrefix == null || NamespaceModel.isExternalPrefix(targetPrefix))
+        if (targetPrefix != null && NamespaceModel.isExternalPrefix(targetPrefix))
             return "";
         Path targetPath = getJsonPath(targetItem);
 
         // different file
         String path = "";
-        if (!sourcePath.equals(targetPath)) {
-            path = sourcePath.getParent().relativize(targetPath).toString().replaceAll("\\\\", "/");
-            if (!path.startsWith("/") && (!path.startsWith(".")))
-                path = "./" + path;
-        }
         String prefixedName = NamespaceModel.getPrefixedName(targetItem);
         if (NamespaceModel.isAttribute(prefixedName) && !prefixedName.endsWith(JSON_LD_ID_ELEMENT))
             prefixedName = NamespaceModel.filterAttributePrefix(prefixedName);
-        path += "#/" + "definitions" + "/" + prefixedName;
+        if (sourcePath.compareTo(targetPath) != 0) {
+            path = sourcePath.getParent().relativize(targetPath).toString().replaceAll("\\\\", "/");
+            if (!path.startsWith("/") && (!path.startsWith(".")))
+                path = "./" + path + "#/definitions" + "/" + prefixedName;
+            return path;
+        }
+        path += "#/" + "components/schemas" + "/" + prefixedName;
         //Log.trace("exportJsonPointer: " + sourcePath.toString() + " " + targetPath.toString() + " " + path);
         return path;
     }
@@ -695,7 +696,7 @@ public class JsonWriter {
             if (port == null)
                 continue;
             String portName = port.name();
-            String portPath = port.propertyValue(NiemUmlModel.INTERFACE_PATH_PROPERTY);
+            //String portPath = port.propertyValue(NiemUmlModel.INTERFACE_PATH_PROPERTY);
             // write OpenAPI paths
             TreeSet<String> openapiPaths = new TreeSet<>();
 
@@ -713,6 +714,7 @@ public class JsonWriter {
                     TreeSet<String> openapiOperations = new TreeSet<>();
                     LinkedHashSet<String> openapiPathParameters = new LinkedHashSet<>();
                     LinkedHashSet<String> openapiBodyParameters = new LinkedHashSet<>();
+                    LinkedHashSet<String> openapiRequestBody = new LinkedHashSet<>();
                     LinkedHashSet<String> openapiResponses = new LinkedHashSet<>();
                     UmlOperation operation = (UmlOperation) item;
                     String operationName = operation.name();
@@ -775,7 +777,9 @@ public class JsonWriter {
                                             "name": "%s",
                                             "in": "%s",
                                             "required": %s,
+                                            "schema": {
                                         %s
+                                            }   
                                           }""".formatted(paramName, paramKind, required, paramSchema));
 
                                 continue;
@@ -802,7 +806,9 @@ public class JsonWriter {
                                                         "name": "%s",
                                                         "in": "body",
                                                         "required": true,
+                                                        "schema": {
                                             %s
+                                                        }
                                                       }""".formatted(elementName, inputTypeSchema));
                                 }
                             } else {
@@ -833,14 +839,16 @@ public class JsonWriter {
                                 if (Integer.parseInt(NiemUmlModel.getMinOccurs(mult)) > 0)
                                     jsonRequiredElementsInType.add("\"" + inputMessage + "\"");
                                 // for each input parameter
-                                openapiBodyParameters.add("""
+                                openapiRequestBody.add("""
                                         {
-                                            "name": "%s",
-                                            "in": "body",
                                             "description": "%s request",
                                             "required": true,
-                                            "schema": {
-                                              "$ref": "#/definitions/%s"
+                                            "content": {
+                                              "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/%sRequest"
+                                                }
+                                              }
                                             }
                                           }""".formatted(elementName, operationName, elementName));
                             }
@@ -861,11 +869,11 @@ public class JsonWriter {
                         // export element wrapper
                         String elementSchema = "\"" + elementName + "\": {\n";
                         elementSchema += "\"description\": \"An input message\",";
-                        elementSchema += "\"$ref\": \"#/definitions/" + inputTypeName + "\"" + "\n}\n";
+                        elementSchema += "\"$ref\": \"#/components/schemas/" + inputTypeName + "\"" + "\n}\n";
 
                         // OpenApi code generation tools do not support relative references, rename them to local references
-                        elementSchema = elementSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")", "$1#/$3");
-                        typeSchema = typeSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")", "$1#/$3");
+                        //elementSchema = elementSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")", "$1#/$3");
+                        //typeSchema = typeSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")", "$1#/$3");
 
                         jsonProperties.add(elementSchema);
                         jsonDefinitions.add(typeSchema);
@@ -968,7 +976,7 @@ public class JsonWriter {
                         // export element wrapper
                         String elementSchema = "\"" + elementName + "\": {\n";
                         elementSchema += "\"description\": \"An output message\",";
-                        elementSchema += "\"$ref\": \"#/definitions/" + outputTypeName + "\"" + "\n}\n";
+                        elementSchema += "\"$ref\": \"#/components/schemas/" + outputTypeName + "\"" + "\n}\n";
 
                         // OpenAPI code generation tools do not support relative references, rename them to local references
                         elementSchema = elementSchema.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")", "$1#/$3");
@@ -982,8 +990,12 @@ public class JsonWriter {
 
                                   "200": {
                                     "description": "%s response",
-                                    "schema": {
-                                        "$ref": "#/definitions/%sResponse"
+                                    "content": {
+                                      "application/json": {
+                                        "schema": {
+                                          "$ref": "#/components/schemas/%sResponse"
+                                        }
+                                      }
                                     }
                                   }""".formatted(operationName, operationName));
                         // add error response
@@ -992,8 +1004,12 @@ public class JsonWriter {
                                 
                                   "default": {
                                     "description": "unexpected error",
-                                    "schema": {
-                                      "$ref": "#/definitions/%s"
+                                    "content": {
+                                      "application/json": {
+                                        "schema": {
+                                          "$ref": "#/components/schemas/%s"
+                                        }
+                                      }
                                     }
                                   }
                                 """.formatted(JsonWriter.ERROR_RESPONSE));
@@ -1016,6 +1032,7 @@ public class JsonWriter {
                                         "parameters": [
                                         %s
                                         ],
+                                        "requestBody": %s,
                                         "responses": {
                                         %s
                                         }
@@ -1024,6 +1041,7 @@ public class JsonWriter {
                                         operation.description(),
                                         operationName,
                                         String.join(",", openapiParameters),
+                                        String.join(",", openapiRequestBody),
                                         String.join(",", openapiResponses)
                                       ));
                             }
@@ -1046,11 +1064,9 @@ public class JsonWriter {
                 try (FileWriter fw = new FileWriter(file)) {
                     Log.debug("OpenAPI: " + portName + OPENAPI_FILE_TYPE);
                     fw.write("""
-                            ],
-                            {
+                        {
                               "openapi": "%s",
                               "info": {
-                                "version": "%s",
                                 "title": "%s",
                                 "description": "%s",
                                 "termsOfService": "%s",
@@ -1062,29 +1078,20 @@ public class JsonWriter {
                                 "license": {
                                   "name": "%s",
                                   "url": "%s"
-                                }
+                                },
+                                "version": "%s"
                               },
-                              "host": "host.example.com",
-                              "basePath": "%s",
-                              "schemes": [
-                                "http"
-                              ],
-                              "consumes": [
-                                "application/json"
-                              ],
-                              "produces": [
-                                "application/json"
-                              ],
                               "paths": {
                                 %s
                               },
-                              "definitions": {
+                              "components": {
+                                "schemas": {
                                 %s
+                                }
                               }
                             }
                             """.formatted(
                                 OPENAPI_VERSION,
-                                properties.getProperty(ProjectProperties.IEPD_VERSION),
                                 portName,
                                 port.description(),
                                 properties.getProperty(ProjectProperties.IEPD_TERMS_URL),
@@ -1093,7 +1100,7 @@ public class JsonWriter {
                                 properties.getProperty(ProjectProperties.IEPD_CONTACT),
                                 properties.getProperty(ProjectProperties.IEPD_LICENSE_URL),
                                 properties.getProperty(ProjectProperties.IEPD_LICENSE_URL),
-                                portPath,
+                                properties.getProperty(ProjectProperties.IEPD_VERSION),
                                 String.join(",", openapiPaths),
                                 String.join(",\n", jsonDefinitions)
                             ));
@@ -1178,7 +1185,7 @@ public class JsonWriter {
      * @return JSON filename as a Path
      */
     Path getJsonPath(UmlItem item) {
-        return Paths.get(directory, (NiemUmlModel.isNiem(item)) ? NiemUmlModel.NIEM_DIR + "/" : "", NamespaceModel.getPrefix(item) + JsonWriter.JSON_SCHEMA_FILE_TYPE);
+        return getJsonPath(NamespaceModel.getPrefix(item));
     }
 
     /**
@@ -1186,13 +1193,17 @@ public class JsonWriter {
      * @return JSON filename as a Path
      */
     Path getJsonPath(String prefix) {
+        // If using cmtool, use the configured filename
+        if (NiemUmlModel.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON).equals("true"))
+            return Paths.get(NiemUmlModel.getProperty(ProjectProperties.EXPORT_PROJECT_DIR), getJsonFilename(NiemUmlModel.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE)));
+
         String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
         boolean isNiem = NamespaceModel.getNamespace(schemaURI).getReferenceClassView() != null;
-        return Paths.get(directory, (isNiem) ? NiemUmlModel.NIEM_DIR + "/" : "", prefix + JsonWriter.JSON_SCHEMA_FILE_TYPE);
+        return Paths.get(directory, (isNiem) ? NiemUmlModel.NIEM_DIR + "/" : "", getJsonFilename(prefix));
     }
 
     static String getJsonFilename(String filename) {
-        return filename + JsonWriter.JSON_SCHEMA_FILE_TYPE;
+        return filename + JSON_SCHEMA_FILE_TYPE;
     }
 
 }

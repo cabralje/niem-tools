@@ -385,7 +385,7 @@ public class BoumlPlugout {
                 
             case "publishSpecification":
                 try {  
-                    
+                    /* 
                     // Generate HTML documentation
                     model.exportHtml(project);
                     
@@ -394,14 +394,17 @@ public class BoumlPlugout {
                     
                     // Generate NIEM Mapping CSV
                     model.exportMappingCsv();
-
+                    
                     // Clearing NIEM Models
                     model.deleteNIEM(false);
                     model.createNIEM();
                     model.cacheModels(false);
-                
+                    
                     // Generating NIEM Models
-                    model.createSubsetAndExtension();
+                    //model.createSubsetAndExtension();
+                    */
+                    // Create NIEM models
+                    model.createNIEM();
                     
                     // Cache models
                     model.cacheModels(false);

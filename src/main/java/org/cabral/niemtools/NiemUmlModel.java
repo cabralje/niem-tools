@@ -119,7 +119,7 @@ public class NiemUmlModel {
     static final String WEBSERVICE_STEREOTYPE = "niem-profile:webservice";
     static final String INTERFACE_STEREOTYPE = "niem-profile:interface";
     static final String HTTP_METHODS_PROPERTY = WEBSERVICE_STEREOTYPE + NiemUmlModel.STEREOTYPE_DELIMITER + "HTTPMethods";
-    static final String INTERFACE_PATH_PROPERTY = INTERFACE_STEREOTYPE + NiemUmlModel.STEREOTYPE_DELIMITER + "Path";
+    //static final String INTERFACE_PATH_PROPERTY = INTERFACE_STEREOTYPE + NiemUmlModel.STEREOTYPE_DELIMITER + "Path";
 
     // niem stereotype properties
     static final String URI_PROPERTY = "URI";
