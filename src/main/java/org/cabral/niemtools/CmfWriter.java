@@ -454,6 +454,7 @@ public class CmfWriter {
 
         String typeName = null;
         UmlClass codeListType = null;
+        String externalCodeList;
         String restrictionCmf;
         String id = NamespaceModel.getPrefixedName(type);
         try {
@@ -470,7 +471,11 @@ public class CmfWriter {
                 restrictionCmf += tagRef(restrictionBaseName, "xs:token");
             } else 
                 restrictionCmf += tagRef(restrictionBaseName, NamespaceModel.getPrefixedName(baseType));
-            if (NiemUmlModel.isEnumeration(type))
+
+            // Get external code lists
+            externalCodeList = NiemUmlModel.getExternalCodeList(type);
+
+            if (externalCodeList != null || NiemUmlModel.isEnumeration(type))
                 codeListType = type; 
             // check if base type is a code list
             else {
@@ -484,10 +489,10 @@ public class CmfWriter {
         }
 
         try {
-            // add codeList if not Genericode
-            String notes = type.propertyValue(NiemUmlModel.NOTES_PROPERTY);
+            // add codeList if not external (e.g. Genericode)
+            //String notes = type.propertyValue(NiemUmlModel.NOTES_PROPERTY);
             if (codeListType != null && codeListType.children() != null) {
-                if (notes == null || !notes.contains("Genericode")) {
+                if (externalCodeList == null) {
                     Log.debug("exportCmfClass: exporting code list " + typeName);
                     for (UmlItem item : codeListType.children()) {
                         if (item != null && item.kind() == anItemKind.anAttribute) {
@@ -511,6 +516,12 @@ public class CmfWriter {
                             restrictionCmf += tag(facetName, enumeration);
                         }
                     }
+
+                // Handle Genericode lists
+                } else {
+                    Log.debug("exportCmfClass: linking to Genericode code list " + typeName);
+                    String codelistBinding = tag("CodeListURI", "../codelists/" + typeName + XmlWriter.GC_FILE_TYPE) + tag("CodeListColumnName", "code")+ tag("CodeListConstrainingIndicator", "true") ;
+                    restrictionCmf += tag ("CodeListBinding", codelistBinding);
                 }
             }
             if (isOlderCmfVersion(cmfVersion, "1.0"))
