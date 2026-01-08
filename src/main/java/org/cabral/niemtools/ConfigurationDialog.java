@@ -181,10 +181,13 @@ class ConfigurationDialog {
         
         TextField htmlDirField = new TextField(properties.getProperty(ProjectProperties.EXPORT_HTML_DIR));
         htmlDirField.setPrefColumnCount(60);
+        htmlDirField.setEditable(false); // Make read-only since it's derived from projectDir
         
         TextField mappingFileField = new TextField(properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
         mappingFileField.setPrefColumnCount(60);
+        mappingFileField.setEditable(false); // Make read-only since it's derived from projectDir
         
+        // Update derived fields when project directory changes
         projectDirField.textProperty().addListener((obs, oldVal, newVal) -> {
             String projectDir = sanitize(newVal);
             properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, projectDir);
