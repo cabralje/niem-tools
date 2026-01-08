@@ -70,7 +70,6 @@
 
 package org.cabral.niemtools;
 
-import java.awt.HeadlessException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -81,11 +80,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import javafx.application.Platform;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import fr.bouml.UmlCom;
 import fr.bouml.UmlItem;
@@ -102,13 +103,7 @@ public class BoumlPlugout {
         ArrayList<String> args = new ArrayList<>(Arrays.asList(argv));
         String command = null;
 
-        // set look & feel
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            Log.trace(e.getMessage());
-            System.exit(1);
-        }
+        // No need to set look & feel for JavaFX
 
         // locate the BOUML port
         // the program is called with the socket port number in argument
@@ -317,7 +312,7 @@ public class BoumlPlugout {
                     // Next steps
                     UmlCom.trace("\nNEXT: 'Validating NIEM mapping'");
                     
-                } catch (HeadlessException e) {
+                } catch (Exception e) {
                     Log.trace("Exception in importMapping: " + e.getMessage());
                     System.exit(1);
                 }
@@ -463,20 +458,42 @@ public class BoumlPlugout {
      * @param dialogTitle The title of the file chooser dialog.
      * @return The selected directory path.
      */
-    private static String selectDirectoryProperty(NiemUmlModel model, String propertyName, String dialogTitle) throws HeadlessException {
-        String directory = model.properties.getProperty(propertyName);
-        JFileChooser fc = new JFileChooser(directory);
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fc.setDialogTitle(dialogTitle);
-        if (fc.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
-            if (fc.getSelectedFile() != null) {
-                directory = fc.getSelectedFile().getAbsolutePath();
-                model.properties.setProperty(propertyName, directory);
+    private static String selectDirectoryProperty(NiemUmlModel model, String propertyName, String dialogTitle) {
+        final String directory = model.properties.getProperty(propertyName);
+        
+        CompletableFuture<File> futureDir = new CompletableFuture<>();
+        
+        Runnable selectDir = () -> {
+            DirectoryChooser dc = new DirectoryChooser();
+            dc.setTitle(dialogTitle);
+            if (directory != null && !directory.isEmpty() && new File(directory).exists()) {
+                dc.setInitialDirectory(new File(directory));
             }
+            File selectedDir = dc.showDialog(new Stage());
+            futureDir.complete(selectedDir);
+        };
+        
+        if (Platform.isFxApplicationThread()) {
+            selectDir.run();
         } else {
-            Log.trace("File chooser dialog canceled. No directory selected.");
+            Platform.runLater(selectDir);
         }
-        return directory;
+        
+        String resultDirectory = directory;
+        try {
+            File selectedFile = futureDir.get();
+            if (selectedFile != null) {
+                resultDirectory = selectedFile.getAbsolutePath();
+                model.properties.setProperty(propertyName, resultDirectory);
+            } else {
+                Log.trace("File chooser dialog canceled. No directory selected.");
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
+            Log.trace("Error selecting directory: " + e.getMessage());
+        }
+        
+        return resultDirectory;
     }
 
     /**
@@ -488,23 +505,55 @@ public class BoumlPlugout {
      * @return The selected directory path.
      */
     //@SuppressWarnings("unused")
-    private static String selectFileProperty(NiemUmlModel model, String propertyName, String dialogTitle) throws HeadlessException {
-        String file = model.properties.getProperty(propertyName);
-        JFileChooser fc = new JFileChooser(file);
-        fc.setDialogTitle(dialogTitle);
-        fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV Files", "csv"));
-        if (fc.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
-            if (fc.getSelectedFile() != null) {
-                file = fc.getSelectedFile().getAbsolutePath();
-                model.properties.setProperty(propertyName, file);
+    private static String selectFileProperty(NiemUmlModel model, String propertyName, String dialogTitle) {
+        final String file = model.properties.getProperty(propertyName);
+        
+        CompletableFuture<File> futureFile = new CompletableFuture<>();
+        
+        Runnable selectFile = () -> {
+            FileChooser fc = new FileChooser();
+            fc.setTitle(dialogTitle);
+            fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+            
+            if (file != null && !file.isEmpty()) {
+                File f = new File(file);
+                if (f.getParentFile() != null && f.getParentFile().exists()) {
+                    fc.setInitialDirectory(f.getParentFile());
+                }
+                if (f.exists()) {
+                    fc.setInitialFileName(f.getName());
+                }
             }
+            
+            File selectedFile = fc.showOpenDialog(new Stage());
+            futureFile.complete(selectedFile);
+        };
+        
+        if (Platform.isFxApplicationThread()) {
+            selectFile.run();
         } else {
-            Log.trace("File selection canceled by the user.");
+            Platform.runLater(selectFile);
+        }
+        
+        String resultFile = file;
+        try {
+            File selectedFile = futureFile.get();
+            if (selectedFile != null) {
+                resultFile = selectedFile.getAbsolutePath();
+                model.properties.setProperty(propertyName, resultFile);
+            } else {
+                Log.trace("File selection canceled by the user.");
+                return null;
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
+            Log.trace("Error selecting file: " + e.getMessage());
             return null;
         }
-            model.properties.setProperty(propertyName, file);
+        
+        model.properties.setProperty(propertyName, resultFile);
 
-        return file;
+        return resultFile;
     }
 
     /**

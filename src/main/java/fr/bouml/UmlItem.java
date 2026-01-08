@@ -8,9 +8,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
+import javafx.application.Platform;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 
 import org.cabral.niemtools.NiemUmlModel;
 
@@ -84,19 +87,38 @@ public abstract class UmlItem extends UmlBaseItem implements Comparable {
       if (directory == null)
         directory = new String("/tmp/") + name() + "_html";
       
-      // in java it is very complicated to select
-      // a directory through a dialog, and the dialog
-      // is very slow and ugly
-      JFrame frame = new JFrame();
-      JFileChooser fc = new JFileChooser(directory);
+      // Use JavaFX DirectoryChooser for directory selection
+      CompletableFuture<File> futureDirectory = new CompletableFuture<>();
       
-      fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-      fc.setDialogTitle("Directory where the files will be produced");
-      
-      if (fc.showOpenDialog(frame) != JFileChooser.APPROVE_OPTION)
-        throw new RuntimeException("abort");
-      
-      directory = fc.getSelectedFile().getAbsolutePath();	// !
+      if (Platform.isFxApplicationThread()) {
+        DirectoryChooser dc = new DirectoryChooser();
+        dc.setTitle("Directory where the files will be produced");
+        dc.setInitialDirectory(new File(directory).exists() ? new File(directory) : new File("/tmp"));
+        
+        File selectedDir = dc.showDialog(new Stage());
+        if (selectedDir == null)
+          throw new RuntimeException("abort");
+        directory = selectedDir.getAbsolutePath();
+      } else {
+        Platform.runLater(() -> {
+          DirectoryChooser dc = new DirectoryChooser();
+          dc.setTitle("Directory where the files will be produced");
+          dc.setInitialDirectory(new File(directory).exists() ? new File(directory) : new File("/tmp"));
+          
+          File selectedDir = dc.showDialog(new Stage());
+          futureDirectory.complete(selectedDir);
+        });
+        
+        try {
+          File selectedDir = futureDirectory.get();
+          if (selectedDir == null)
+            throw new RuntimeException("abort");
+          directory = selectedDir.getAbsolutePath();
+        } catch (InterruptedException | ExecutionException e) {
+          Thread.currentThread().interrupt();
+          throw new RuntimeException("abort");
+        }
+      }
       
       ask = true;
       rem = false;
