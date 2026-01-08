@@ -83,8 +83,8 @@ class ConfigurationDialog {
 
     private final ProjectProperties properties;
     private String command = null;
-    private final Stage stage;
-    private final TabPane tabPane;
+    private Stage stage;
+    private TabPane tabPane;
 
     private static final String MAIN_TAB = "Home";
     private static final String IMPORT_TAB = "Reference Model";
@@ -99,16 +99,35 @@ class ConfigurationDialog {
      */
     ConfigurationDialog(ProjectProperties inputProperties) {
         properties = inputProperties;
-        stage = new Stage();
-        stage.setTitle("Niemtools Configuration");
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setWidth(850);
-        stage.setHeight(350);
-        
-        tabPane = new TabPane();
+        // Stage and TabPane must be created on the JavaFX Application Thread.
+        // They will be initialized in showDialog().
     }
 
     String showDialog() {
+        // Ensure Stage is created on the FX Application Thread
+        if (stage == null) {
+            CompletableFuture<Void> initFuture = new CompletableFuture<>();
+            Runnable initStage = () -> {
+                stage = new Stage();
+                stage.setTitle("Niemtools Configuration");
+                stage.initModality(Modality.APPLICATION_MODAL);
+                stage.setWidth(850);
+                stage.setHeight(350);
+                tabPane = new TabPane();
+                initFuture.complete(null);
+            };
+            if (Platform.isFxApplicationThread()) {
+                initStage.run();
+            } else {
+                Platform.runLater(initStage);
+            }
+            try {
+                initFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Failed to initialize JavaFX stage", e);
+            }
+        }
         // Overview panel
         VBox mainPanel = new VBox(10);
         mainPanel.setPadding(new Insets(10));
@@ -368,7 +387,18 @@ class ConfigurationDialog {
         BorderPane.setMargin(okButton, new Insets(10));
 
         Scene scene = new Scene(root);
-        stage.setScene(scene);
+        // Set scene on FX thread
+        if (Platform.isFxApplicationThread()) {
+            stage.setScene(scene);
+        } else {
+            CompletableFuture<Void> setSceneFuture = new CompletableFuture<>();
+            Platform.runLater(() -> { stage.setScene(scene); setSceneFuture.complete(null); });
+            try {
+                setSceneFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
         
         // Show and wait
         if (Platform.isFxApplicationThread()) {

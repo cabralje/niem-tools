@@ -45,6 +45,49 @@
                         <outputDirectory>${project.build.directory}</outputDirectory>
                     </configuration>
                 </execution>
+                <execution>
+                    <id>copy-openjfx</id>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>copy</goal>
+                    </goals>
+                    <configuration>
+                        <artifactItems>
+                            <artifactItem>
+                                <groupId>org.openjfx</groupId>
+                                <artifactId>javafx-base</artifactId>
+                                <version>21.0.1</version>
+                                <classifier>win</classifier>
+                                <overWrite>true</overWrite>
+                                <outputDirectory>${project.build.directory}/javafx-lib</outputDirectory>
+                            </artifactItem>
+                            <artifactItem>
+                                <groupId>org.openjfx</groupId>
+                                <artifactId>javafx-graphics</artifactId>
+                                <version>21.0.1</version>
+                                <classifier>win</classifier>
+                                <overWrite>true</overWrite>
+                                <outputDirectory>${project.build.directory}/javafx-lib</outputDirectory>
+                            </artifactItem>
+                            <artifactItem>
+                                <groupId>org.openjfx</groupId>
+                                <artifactId>javafx-controls</artifactId>
+                                <version>21.0.1</version>
+                                <classifier>win</classifier>
+                                <overWrite>true</overWrite>
+                                <outputDirectory>${project.build.directory}/javafx-lib</outputDirectory>
+                            </artifactItem>
+                            <artifactItem>
+                                <groupId>org.openjfx</groupId>
+                                <artifactId>javafx-fxml</artifactId>
+                                <version>21.0.1</version>
+                                <classifier>win</classifier>
+                                <overWrite>true</overWrite>
+                                <outputDirectory>${project.build.directory}/javafx-lib</outputDirectory>
+                            </artifactItem>
+                        </artifactItems>
+                    </configuration>
+                </execution>
                 </executions>
             </plugin>
             <plugin>

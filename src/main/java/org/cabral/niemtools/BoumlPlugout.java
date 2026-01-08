@@ -83,14 +83,13 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import fr.bouml.UmlCom;
+import fr.bouml.UmlItem;
+import fr.bouml.UmlPackage;
 import javafx.application.Platform;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
-import fr.bouml.UmlCom;
-import fr.bouml.UmlItem;
-import fr.bouml.UmlPackage;
 
 public class BoumlPlugout {
 
@@ -158,9 +157,12 @@ public class BoumlPlugout {
                     break;
                 }
 
+        // Start JavaFX toolkit before any UI interaction
+        startJavaFxIfNeeded();
+
         // handle configuration
         if (!args.isEmpty())
-            command = args.get(0);
+            command = args.get(0); // command is only set if there were extra args beyond the port
         if (command == null) {
             ConfigurationDialog configDialog = new ConfigurationDialog(properties);
             command = configDialog.showDialog();
@@ -448,6 +450,19 @@ public class BoumlPlugout {
         UmlCom.bye(0);
         UmlCom.close();
         System.exit(0);
+    }
+
+    /**
+     * Ensure JavaFX toolkit is initialized. Safe to call multiple times.
+     */
+    private static void startJavaFxIfNeeded() {
+        try {
+            // If toolkit is not initialized, this will start it.
+            // If already initialized, IllegalStateException is thrown and can be ignored.
+            Platform.startup(() -> {});
+        } catch (IllegalStateException alreadyStarted) {
+            // Toolkit already initialized; no action needed.
+        }
     }
 
     /**
