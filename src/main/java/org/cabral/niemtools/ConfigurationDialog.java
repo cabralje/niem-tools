@@ -76,6 +76,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+import javafx.stage.FileChooser;
+
 /**
  * JavaFX-based Configuration Dialog for NIEMtools
  */
@@ -220,14 +222,10 @@ class ConfigurationDialog {
         
         Button browseButton = new Button("Browse...");
         browseButton.setOnAction(e -> {
-            DirectoryChooser dc = new DirectoryChooser();
             String currentDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
-            if (currentDir != null && new File(currentDir).exists()) {
-                dc.setInitialDirectory(new File(currentDir));
-            }
-            File selectedDir = dc.showDialog(stage);
-            if (selectedDir != null) {
-                projectDirField.setText(selectedDir.getAbsolutePath());
+            String newDir = getSelectedDir(currentDir);
+            if (newDir != null) {
+                projectDirField.setText(newDir);
             }
         });
 
@@ -237,10 +235,23 @@ class ConfigurationDialog {
         
         projectPanel.getChildren().addAll(projectDirRow, htmlDirRow, mappingFileRow);
 
+        Button fileButton = new Button("Import Mapping");
+        fileButton.setOnAction(e -> {
+            String currentFile = properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE);
+            String newFile = getSelectedFile(currentFile);
+            if (newFile != null) {
+                mappingFileField.setText(newFile);
+                properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, newFile);
+                command = "importMapping";
+                stage.close();
+            }
+        });
+
         HBox mappingButtons = new HBox(10);
         mappingButtons.getChildren().addAll(
             commandButton("Publish UML Model", "publishUML"),
-            commandButton("Import Mapping File", "importMapping"),
+            fileButton,
+            //commandButton("Import Mapping File", "importMapping"),
             commandButton("Validate NIEM Mapping", "validateMapping")
         );
 
@@ -416,37 +427,40 @@ class ConfigurationDialog {
             }
         }
 
-        // Process external schemas table
-        try {
-            LinkedHashSet<String> externalSchemas2 = new LinkedHashSet<>();
-            for (String[] row : table.getItems()) {
-                String prefix = sanitize(row[0]);
-                String namespace = sanitize(row[1]);
-                String url = sanitize(row[2]);
-                String localPath = sanitize(row[3]);
-                
-                if (url.startsWith("http")) {
-                    try {
-                        URI uri = new URI(url);
-                        uri.toURL();
-                    } catch (MalformedURLException | URISyntaxException e1) {
-                        Log.trace("URL " + url + " is malformed: " + e1.getMessage());
-                        throw new IllegalArgumentException("URL " + url + " is malformed", e1);
-                    }
-                }
-                
-                if (prefix != null && !prefix.isEmpty() && namespace != null && !namespace.isEmpty()
-                        && !url.isEmpty() && !localPath.isEmpty()) {
-                    externalSchemas2.add(prefix + "=" + namespace + "=" + url + "=" + localPath);
-                }
-            }
-            properties.setProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS, String.join(",", externalSchemas2));
-        } catch (IllegalArgumentException | IllegalStateException e1) {
-            Log.trace("ConfigurationDialog: exception " + e1.toString());
-            throw e1;
-        }
+        // External schemas processing is now handled in the OK button action
+        // The table data is captured before the dialog closes to ensure all edits are preserved
 
         return command;
+    }
+
+    private String getSelectedDir(String directory) {
+        DirectoryChooser dc = new DirectoryChooser();
+        if (directory != null && new File(directory).exists()) {
+            dc.setInitialDirectory(new File(directory));
+        }
+        File selectedDir = dc.showDialog(stage);
+        if (selectedDir != null) {
+            directory = selectedDir.getAbsolutePath();
+        }
+        return directory;
+    }
+
+    private String getSelectedFile(String file) {
+        FileChooser fc = new FileChooser();
+        //fc.setDialogTitle(dialogTitle);
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
+        if (file != null) {
+            File f = new File(file);
+            if (f.exists()) {
+                fc.setInitialFileName(file);
+                fc.setInitialDirectory(f.getParentFile());
+            }
+        }
+        File selectedFile = fc.showOpenDialog(stage);
+        if (selectedFile != null) {
+            file = selectedFile.getAbsolutePath();
+        }
+        return file;
     }
 
     private Tab createTab(String title, javafx.scene.Node content) {
