@@ -338,7 +338,7 @@ class NiemModel {
                 Log.debug("addElement: error adding element " + elementName + " of type " + baseType.name());
                 return null;
             }
-            element.set_Description(description);
+            element.set_Description(filterASCII(description));
             String uri = getURI(elementSchemaURI, elementName);
             element.set_PropertyValue(NiemUmlModel.URI_PROPERTY, uri);
             elements.put(uri, element);
@@ -452,7 +452,7 @@ class NiemModel {
             types.put(uri, type);
             Log.debug("addType: added " + typeName);
         }
-        setDescription(type, description);
+        setDescription(type, filterASCII(description));
         setNotes(type, notes);
         return type;
     }
@@ -1053,7 +1053,10 @@ class NiemModel {
      * @return filtered String
      */
     private String filterASCII(String string) {
-        return string.replaceAll("[^\\p{ASCII}]", "");
+        if (string != null)
+            return string.replaceAll("[^\\p{ASCII}]", "");
+        else
+            return null;
     }
 
     /**
@@ -1063,7 +1066,10 @@ class NiemModel {
      * @return filtered String
      */
     String filterEnum(String string) {
-        return string.replaceAll(CODELIST_DELIMITER + "|" + CODELIST_DEFINITION_DELIMITER, "");
+        if (string != null)
+            return string.replaceAll(CODELIST_DELIMITER + "|" + CODELIST_DEFINITION_DELIMITER, "");
+        else
+            return null;
     }
 
     /**
@@ -1073,7 +1079,10 @@ class NiemModel {
      * @return filtered String
      */
     private String filterEnumDefinition(String string) {
-        return string.replaceAll(CODELIST_DELIMITER + "|" + CODELIST_DEFINITION_DELIMITER, "");
+        if (string != null)
+            return string.replaceAll(CODELIST_DELIMITER + "|" + CODELIST_DEFINITION_DELIMITER, "");
+        else
+            return null;
     }
 
     /**
@@ -1083,7 +1092,10 @@ class NiemModel {
      * @return filtered String
      */
     static protected String filterUMLAttribute(String string) {
-        return string.replaceAll("[^A-Za-z0-9_@#$`~,.<?;:'\"\\\\]", "");
+        if (string != null)
+            return string.replaceAll("[^A-Za-z0-9_@#$`~,.<?;:'\"\\\\]", "");
+        else
+            return null;
     }
 
     /**
@@ -1093,7 +1105,10 @@ class NiemModel {
      * @return filtered String
      */
     private String filterUMLElement(String string) {
-        return string.replaceAll("[^A-Za-z0-9_@#$-`~,.<?;:'\"\\\\]", "");
+        if (string != null)
+            return string.replaceAll("[^A-Za-z0-9_@#$-`~,.<?;:'\"\\\\]", "");
+        else
+            return null;
     }
 
     /**
@@ -1103,7 +1118,10 @@ class NiemModel {
      * @return filtered String
      */
     private String filterUMLType(String string) {
-        return string.replaceAll("[^A-Za-z0-9_@#$`~,.<?;:'\"\\\\]", "");
+        if (string != null)
+            return string.replaceAll("[^A-Za-z0-9_@#$`~,.<?;:'\"\\\\]", "");
+        else
+            return null;
     }
 
     /**
