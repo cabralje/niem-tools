@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright (c) 2015, 2019, Gluon and/or its affiliates.
+  All rights reserved. Use is subject to license terms.
+
+  This file is available and licensed under the following license:
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the distribution.
+  - Neither the name of Oracle Corporation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="mainWindow" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cabral.niemtools.AppController">
+  <children>
+    <MenuBar VBox.vgrow="NEVER">
+      <menus>
+        <Menu mnemonicParsing="false" text="File">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#openPreferences" text="Preferences…" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" onAction="#close" text="Quit" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Edit">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#copyTextArea" text="Copy" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" onAction="#selectTextArea" text="Select All" />
+            <MenuItem mnemonicParsing="false" onAction="#unselectTextArea" text="Unselect All" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Help">
+          <items>
+            <MenuItem mnemonicParsing="false" onAction="#aboutNiemtools" text="About NIEMtools" />
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+      <TitledPane text="1. Create Project">
+         <content>
+            <AnchorPane minHeight="-Infinity">
+               <children>
+                  <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <ToolBar maxHeight="-Infinity">
+                          <items>
+                              <Label text="Project Directory" />
+                              <TextField fx:id="ExportProjectDir" maxWidth="1.7976931348623157E308" onAction="#setProjectProperty" prefWidth="400.0" />
+                            <Button mnemonicParsing="false" onAction="#selectProjectDirectory" text="Browse..." />
+                          </items>
+                        </ToolBar>
+                        <HBox>
+                           <children>
+                              <ToolBar orientation="VERTICAL" style="-fx-background-insets: 0;">
+                                <items>
+                                    <Label text="Name">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="Version">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="Status">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="Extension URI">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                </items>
+                              </ToolBar>
+                              <ToolBar orientation="VERTICAL" style="-fx-background-insets: 0;">
+                                 <items>
+                                    <TextField fx:id="IEPDName" onAction="#setProjectProperty" />
+                                    <TextField fx:id="IEPDVersion" onAction="#setProjectProperty" />
+                                    <TextField fx:id="IEPDStatus" onAction="#setProjectProperty" />
+                                    <TextField fx:id="ExportURI" onAction="#setProjectProperty" />
+                                 </items>
+                              </ToolBar>
+                              <ToolBar orientation="VERTICAL" style="-fx-background-insets: 0;">
+                                 <items>
+                                    <Label text="Organization">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="Contact">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="Email">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                 </items>
+                              </ToolBar>
+                              <ToolBar orientation="VERTICAL" style="-fx-background-insets: 0;">
+                                 <items>
+                                    <TextField fx:id="IEPDOrganization" onAction="#setProjectProperty" />
+                                    <TextField fx:id="IEPDContact" onAction="#setProjectProperty" />
+                                    <TextField fx:id="IEPDEmail" onAction="#setProjectProperty" />
+                                 </items>
+                              </ToolBar>
+                              <ToolBar orientation="VERTICAL" style="-fx-background-insets: 0;">
+                                 <items>
+                                    <Label text="License URL">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="ChangeLog">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="Readme">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                 </items>
+                              </ToolBar>
+                              <ToolBar orientation="VERTICAL" style="-fx-background-insets: 0;">
+                                 <items>
+                                    <TextField fx:id="IEPDLicense" onAction="#setProjectProperty" />
+                                    <TextField fx:id="IEPDChangeLogFile" onAction="#setProjectProperty" />
+                                    <TextField fx:id="IEPDReadMeFile" onAction="#setProjectProperty" />
+                                 </items>
+                              </ToolBar>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </AnchorPane>
+         </content>
+      </TitledPane>
+      <TitledPane text="2. Import NIEM Model">
+        <content>
+          <AnchorPane minHeight="-Infinity">
+               <children>
+                  <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <ToolBar>
+                          <items>
+                              <Label text="Version" />
+                              <ComboBox fx:id="ImportNIEMVersion" onAction="#setProjectProperty" prefWidth="100.0" />
+                            <Button mnemonicParsing="false" onAction="#importReferenceModel" text="Import" />
+                          </items>
+                        </ToolBar>
+                        <HBox>
+                           <children>
+                              <ToolBar orientation="VERTICAL" style="-fx-background-insets: 0;">
+                                <items>
+                                    <Label text="Domains:">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="Codes:">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="Facets:">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                </items>
+                              </ToolBar>
+                              <ToolBar orientation="VERTICAL" style="-fx-background-insets: 0;">
+                                 <items>
+                                    <Label text="Include">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label>
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="Maximum">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                 </items>
+                              </ToolBar>
+                              <ToolBar orientation="VERTICAL" style="-fx-background-insets: 0;">
+                                <items>
+                                    <TextField fx:id="ImportIncludeDomains" onAction="#setProjectProperty" />
+                                    <TextField disable="true" />
+                                    <TextField fx:id="ImportMaxFacets" onAction="#setProjectProperty" />
+                                </items>
+                              </ToolBar>
+                              <ToolBar orientation="VERTICAL" style="-fx-background-insets: 0;">
+                                 <items>
+                                    <Label text="Exclude">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                    <Label text="Exclude">
+                                       <padding>
+                                          <Insets top="7.0" />
+                                       </padding>
+                                    </Label>
+                                 </items>
+                              </ToolBar>
+                              <ToolBar orientation="VERTICAL" style="-fx-background-insets: 0;">
+                                 <items>
+                                    <TextField fx:id="ImportExcludeDomains" onAction="#setProjectProperty" />
+                                    <TextField fx:id="ImportExcludeDomains" onAction="#setProjectProperty" />
+                                 </items>
+                              </ToolBar>
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </AnchorPane>
+        </content>
+      </TitledPane>
+      <TitledPane text="3. Define External Namespaces (if needed)">
+         <content>
+            <AnchorPane>
+               <children>
+                  <VBox prefHeight="219.0" prefWidth="697.5" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <TableView fx:id="ExternalNamespaceTable" prefHeight="219.0" prefWidth="697.5">
+                          <columns>
+                            <TableColumn fx:id="PrefixColumn" text="Prefix" />
+                            <TableColumn fx:id="NamespaceColumn" text="Namespace" />
+                              <TableColumn fx:id="URLColumn" text="URL" />
+                              <TableColumn fx:id="LocalPathColumn" text="LocalPath" />
+                          </columns>
+                        </TableView>
+                        <ToolBar prefHeight="40.0" prefWidth="200.0">
+                          <items>
+                            <Button mnemonicParsing="false" onAction="#addNamespace" text="Add namespace" />
+                          </items>
+                        </ToolBar>
+                     </children>
+                  </VBox>
+               </children>
+            </AnchorPane>
+         </content>
+      </TitledPane>
+      <TitledPane text="4. Map UML to NIEM">
+        <content>
+          <AnchorPane>
+               <children>
+                  <ToolBar style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <items>
+                        <Label text="UML -&gt;" />
+                        <Button onAction="#exportMapping" text="Export Mapping" />
+                        <Label text="-&gt; Edit CSV -&gt;" />
+                        <Button fx:id="importMapping" onAction="#importMapping" text="Import Mapping" />
+                        <Label text="-&gt;" />
+                        <Button onAction="#validateMapping" text="Validate Mapping" />
+                        <Label text="-&gt; NIEM Model" />
+                     </items>
+                  </ToolBar>
+               </children>
+            </AnchorPane>
+        </content>
+      </TitledPane>
+      <TitledPane text="5. Generate Models">
+         <content>
+            <AnchorPane>
+               <children>
+                  <ToolBar style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <items>
+                        <Label text="NIEM Model -&gt;" />
+                        <Button onAction="#publishCMF" text="Common Model Format (CMF)" />
+                        <Button onAction="#publishCodelists" text="Codelists" />
+                        <Button onAction="#publishWS" text="Web Services" />
+                        <Button onAction="#publishHTML" text="Documentation" />
+                     </items>
+                  </ToolBar>
+               </children>
+            </AnchorPane>
+         </content>
+      </TitledPane>
+      <TitledPane text="6. Generate Schemas">
+         <content>
+            <AnchorPane>
+               <children>
+                  <ToolBar style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <items>
+                        <Label text="CMF -&gt;" />
+                        <Button onAction="#publishXSDModel" text="XML Model" />
+                        <Button onAction="#publishXSD" text="XML Message" />
+                        <Button onAction="#publishJSON" text="JSON Message" />
+                     </items>
+                  </ToolBar>
+               </children>
+            </AnchorPane>
+         </content>
+      </TitledPane>
+      <TextArea editable="false" minHeight="10.0" VBox.vgrow="ALWAYS" />
+      <Separator prefWidth="200.0" />
+      <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+         <children>
+            <Label minWidth="100.0" text="Left Status" HBox.hgrow="NEVER" />
+            <Region prefHeight="0.0" prefWidth="440.0" HBox.hgrow="ALWAYS" />
+            <Label alignment="CENTER_RIGHT" minWidth="100.0" text="Right Status" HBox.hgrow="NEVER" />
+         </children>
+      </HBox>
+  </children>
+</VBox>

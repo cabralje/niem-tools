@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.HBox?>
+
+<DialogPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cabral.niemtools.PreferencesDialogController">
+   <content>
+      <TabPane minHeight="-Infinity" minWidth="-Infinity">
+         <tabs>
+            <Tab text="Locations">
+               <content>
+                  <HBox>
+                     <children>
+                        <ToolBar orientation="VERTICAL" style="-fx-background-insets: 0;">
+                           <items>
+                              <Label text="Documentation">
+                                 <padding>
+                                    <Insets top="7.0" />
+                                 </padding></Label>
+                              <Label text="Mapping">
+                                 <padding>
+                                    <Insets top="7.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="CMF">
+                                 <padding>
+                                    <Insets top="7.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="XSD Model Schemas">
+                                 <padding>
+                                    <Insets top="7.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="XSD Message Schemas">
+                                 <padding>
+                                    <Insets top="7.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="JSON Message Schemas">
+                                 <padding>
+                                    <Insets top="7.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="Wantlist">
+                                 <padding>
+                                    <Insets top="7.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="WSDL">
+                                 <padding>
+                                    <Insets top="7.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="OpenAPI">
+                                 <padding>
+                                    <Insets top="7.0" />
+                                 </padding>
+                              </Label>
+                           </items>
+                        </ToolBar>
+                        <ToolBar minWidth="400.0" orientation="VERTICAL" style="-fx-background-insets: 0;">
+                           <items>
+                              <TextField fx:id="htmldir" onAction="#setProjectProperty" />
+                              <TextField fx:id="niemmapping" onAction="#setProjectProperty" />
+                              <TextField fx:id="ExportCMFFile" onAction="#setProjectProperty" />
+                              <TextField fx:id="ExportXSDModelDir" onAction="#setProjectProperty" />
+                              <TextField fx:id="ExportXSDDir" onAction="#setProjectProperty" />
+                              <TextField fx:id="ExportJSONDir" onAction="#setProjectProperty" />
+                              <TextField fx:id="ExportWantlistFile" onAction="#setProjectProperty" />
+                              <TextField fx:id="ExportWSDLDir" onAction="#setProjectProperty" />
+                              <TextField fx:id="ExportOpenAPIDir" onAction="#setProjectProperty" />
+                           </items>
+                        </ToolBar>
+                     </children>
+                  </HBox>
+               </content>
+            </Tab>
+            <Tab text="CMFTool">
+               <content>
+                  <HBox style="-fx-background-insets: 0;">
+                     <children>
+                        <ToolBar maxWidth="1.7976931348623157E308" orientation="VERTICAL" style="-fx-background-insets: 0;">
+                           <items>
+                              <Label text="Generate XML Model Schema">
+                                 <padding>
+                                    <Insets top="7.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="Generate XML Message Schema">
+                                 <padding>
+                                    <Insets top="7.0" />
+                                 </padding>
+                              </Label>
+                              <Label text="Generate JSON Message Schema">
+                                 <padding>
+                                    <Insets top="7.0" />
+                                 </padding>
+                              </Label>
+                           </items>
+                        </ToolBar>
+                        <ToolBar maxWidth="1.7976931348623157E308" minWidth="300.0" orientation="VERTICAL" style="-fx-background-insets: 0;" HBox.hgrow="ALWAYS">
+                          <items>
+                              <TextField fx:id="ExportCMFTooltoXSDModel" onAction="#setProjectProperty" />
+                              <TextField fx:id="ExportCMFTooltoXSD" onAction="#setProjectProperty" />
+                              <TextField fx:id="ExportCMFTooltoJSON" onAction="#setProjectProperty" />
+                          </items>
+                        </ToolBar>
+                     </children>
+                  </HBox>
+               </content>
+            </Tab>
+         </tabs>
+      </TabPane>
+   </content>
+</DialogPane>

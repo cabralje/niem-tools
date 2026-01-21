@@ -158,18 +158,56 @@ public class BoumlPlugout {
 
         // Start JavaFX toolkit before any UI interaction
         startJavaFxIfNeeded();
-
-        // handle configuration
-        if (!args.isEmpty())
-            command = args.get(0); // command is only set if there were extra args beyond the port
-        if (command == null) {
-            ConfigurationDialog configDialog = new ConfigurationDialog(properties);
-            command = configDialog.showDialog();
-            properties.store();
-        }
-
+        
+        // Prevent JavaFX from exiting when last window closes - we'll control exit explicitly
+        Platform.setImplicitExit(false);
+        
         // create Platform Independent and Platform Specific UML models
         NiemUmlModel model = new NiemUmlModel(project, properties);
+
+        // Start Java FX from main.fxml
+        Platform.runLater(() -> {
+            try {
+                javafx.stage.Stage stage = new javafx.stage.Stage();
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    BoumlPlugout.class.getResource("/org/cabral/niemtools/App.fxml")
+                );
+                javafx.scene.Parent root = loader.load();
+                
+                // Get the controller and initialize it with project properties, project, and model
+                AppController controller = loader.getController();
+                if (controller != null) {
+                    controller.initializeData(properties, project, model);
+                } else {
+                    Log.trace("Warning: AppController is null after FXML loading");
+                }
+                
+                javafx.scene.Scene scene = new javafx.scene.Scene(root);
+                stage.setScene(scene);
+                stage.setTitle("NIEM Tools");
+                
+                // Handle window close to properly exit application
+                stage.setOnCloseRequest(event -> {
+                    Platform.exit();
+                    UmlCom.bye(0);
+                    UmlCom.close();
+                    System.exit(0);
+                });
+                
+                stage.show();
+            } catch (IOException e) {
+                Log.trace("Error loading App.fxml: " + e.getMessage());
+            }
+        });
+
+        // For now, we're running in GUI mode - command will be set by UI actions
+        // The switch statement below is kept for backward compatibility with command-line mode
+        command = !args.isEmpty() ? args.get(0) : null;
+        
+        if (command == null) {
+            // GUI mode - just keep JavaFX running and return
+            return;
+        }
 
         // Configure project directory
         String projectDirectory = model.properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);

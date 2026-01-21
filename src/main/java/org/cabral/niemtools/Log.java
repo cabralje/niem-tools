@@ -7,8 +7,8 @@ import fr.bouml.UmlCom;
 public class Log {
 
     // Debugging options
-    //private static final Boolean DEBUG = true;
-    private static final Boolean DEBUG = false;
+    private static final Boolean DEBUG = true;
+    //private static final Boolean DEBUG = false;
 
     //private static final Boolean PROFILE = true;
     private static final Boolean PROFILE = false;
