@@ -906,7 +906,7 @@ public class NiemUmlModel {
         //String exportCmf = properties.getProperty(ProjectProperties.EXPORT_CMF);
         String exportXsd = properties.getProperty(ProjectProperties.EXPORT_XSD);
         String exportJson = properties.getProperty(ProjectProperties.EXPORT_JSON);
-        String exportCmfToXsd = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
+        //String exportCmfToXsd = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
         //String exportCmfToJson = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
         String exportWsdl = properties.getProperty(ProjectProperties.EXPORT_WSDL);
         String exportOpenApi = properties.getProperty(ProjectProperties.EXPORT_OPENAPI);
@@ -928,7 +928,8 @@ public class NiemUmlModel {
         XmlWriter xmlWriter = new XmlWriter(xmlDir);
 
         try {
-            if (exportXsd.equals("true") && exportCmfToXsd.equals("false")) {
+//            if (exportXsd.equals("true") && exportCmfToXsd.equals("false")) {
+            if (exportXsd.equals("true")) {
                 // export catalog file
                 xmlWriter.exportXmlCatalog();
             }
@@ -1065,6 +1066,7 @@ public class NiemUmlModel {
         }
 
         if (exportXsd.equals("true")) {
+            /* 
             if (exportCmfToXsd.equals("false")) {
                 try {
 
@@ -1073,6 +1075,7 @@ public class NiemUmlModel {
                     Log.trace("exportSpecification: error exporting MPD catalog " + e.toString());
                 }
             }
+                */
             if (exportWsdl.equals("true")) {
 				try {
                     String wsdlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
@@ -1671,5 +1674,81 @@ public class NiemUmlModel {
         if (item.children() != null)
             for (UmlItem child : item.children())
                 sort(child, sortClassMembers);
+    }
+
+        protected void importReferenceModel(ProjectProperties properties) {
+
+        String importDir = System.getProperty("java.io.tmpdir");
+        try {
+            String githubRepoUrl = "https://github.com/niemopen/niem-model/archive/refs/tags/";
+            String modelUrl = githubRepoUrl + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION) + ".zip";
+            String importFile = importDir + File.separator + "reference_model.zip";
+//                   String targetDirectory = properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR);
+            //if (targetDirectory == null || targetDirectory.isEmpty()) {
+            // Download the reference model from GitHub
+            // Download the reference model from GitHub using HttpURLConnection with timeouts
+            java.net.URL url = java.net.URI.create(modelUrl).toURL();
+            java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(10000); // 10 seconds timeout for connection
+            connection.setReadTimeout(10000);    // 10 seconds timeout for reading
+            try (java.io.InputStream in = connection.getInputStream()) {
+                java.nio.file.Files.copy(in, new File(importFile).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            } finally {
+                connection.disconnect();
+            }
+            // Download the reference model from GitHub using Java's built-in URL/Streams
+            try (java.io.InputStream in = java.net.URI.create(modelUrl).toURL().openStream()) {
+                java.nio.file.Files.copy(in, new File(importFile).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            // Unzip the downloaded file
+            try (java.io.InputStream fis = new java.io.FileInputStream(importFile);
+                    java.util.zip.ZipInputStream zis =
+                        new java.util.zip.ZipInputStream(fis)) {
+                java.util.zip.ZipEntry entry;
+                while ((entry = zis.getNextEntry()) != null) {
+                    File outFile = new File(importDir, entry.getName());
+                    if (entry.isDirectory()) {
+                        outFile.mkdirs();
+                    } else {
+                        outFile.getParentFile().mkdirs();
+                        try (java.io.OutputStream os = new java.io.FileOutputStream(outFile)) {
+                            byte[] buffer = new byte[4096];
+                            int len;
+                            while ((len = zis.read(buffer)) != -1) {
+                                os.write(buffer, 0, len);
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            Log.trace("Exception 1 in importReferenceModel " + e.getMessage());
+            System.exit(1); 
+        }
+
+        try {
+            Log.start("importReferenceModel");
+            String directory = importDir + File.separator + "niem-model-" + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);
+            //String directory = properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR);
+            properties.setProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR, directory);
+            if (directory == null || directory.isEmpty())
+                //directory = selectDirectoryProperty(this, directory,
+                //        "Directory of the reference schemas to be imported");
+                Log.trace("NIEM reference model directory: " + directory + " is invalid");
+            deleteNIEM(true);
+            createNIEM();
+            cacheModels(true);
+            importSchemaDir(directory);
+            Log.stop("importReferenceModel");
+            
+            // Next step
+            UmlCom.trace("\nNEXT STEP: Model content in UML, add NIEM stereotypes, and then select 'Publish UML'");
+        } catch (IOException e) {
+            Log.trace("Exception 2 in importReferenceModel: " + e.getMessage());
+            System.exit(1);
+        }   
+
     }
 }

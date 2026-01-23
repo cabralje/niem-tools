@@ -888,8 +888,8 @@ class NiemModel {
 
         String exportXML = properties.getProperty(ProjectProperties.EXPORT_XSD);
         String exportJSON = properties.getProperty(ProjectProperties.EXPORT_JSON);
-        String exportCmftoXSD = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
-        String exportCmftoJSON = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
+        //String exportCmftoXSD = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
+        //String exportCmftoJSON = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
 
         XmlWriter xmlWriter = new XmlWriter(xmlDir);
         JsonWriter jsonWriter = new JsonWriter(jsonDir);
@@ -959,12 +959,14 @@ class NiemModel {
                             xmlType = xmlWriter.exportXmlTypeSchema(type);
                             if (xmlType != null)
                                 xmlTypes.add(xmlType);
+                            /*
                             if (exportJSON.equals("true") && exportCmftoJSON.equals("false")) {
                                 jsonType = (prefix.equals(NiemModel.XSD_PREFIX)) ? jsonWriter.exportJsonPrimitiveSchemafromXML(type) : 
                                 jsonWriter.exportJsonTypeSchema(this, type, prefix);
                             if (jsonType != null)
                                 jsonDefinitions.add(jsonType);
                             }
+                            */
                         } catch (RuntimeException re) {
                             Log.trace("exportSchemas: error exporting type " + type.name() + " " + re.toString());
                             continue;
@@ -1001,24 +1003,28 @@ class NiemModel {
                                 xmlElements.add(xmlElement);
                             if (baseType != null && !NiemModel.isAbstract(NamespaceModel.getName(baseType))) {
                                 schemaNamespaces.add(NamespaceModel.getPrefix(element));
+                                /*
                                 if (exportJSON.equals("true") && exportCmftoJSON.equals("false")) {
                                     jsonElement = jsonWriter.exportJsonElementSchema(element, prefix);
                                     if (jsonElement != null)
                                         jsonDefinitions.add(jsonElement);
                                 }
+                                */
                                 String messageElement = element.propertyValue(NiemUmlModel.MESSAGE_ELEMENT_PROPERTY);
                                 if (messageElement != null)
                                     Log.debug("exportSchemas: messageElement " + messageElement);
+                                /*
                                 if (exportJSON.equals("true") && exportCmftoJSON.equals("false")
                                     && messageElement != null && !messageElement.isEmpty())
                                         jsonProperties.add(jsonElement);
+                                */
                             }
                         } catch (RuntimeException re) {
                             Log.trace("exportSchemas: error exporting element " + element.name() + " " + re.toString());
                         }
                     }
                 }
-
+            /*
             // export XSDs
             if (exportXML.equals("true") && exportCmftoXSD.equals("false")) {
                 // Open XSD file for each extension schema and write header
@@ -1041,6 +1047,7 @@ class NiemModel {
             openapiDefinitions.addAll(jsonProperties);
             openapiDefinitions.addAll(jsonDefinitions);
             }
+            */
         }
         
         return openapiDefinitions;
@@ -2270,4 +2277,4 @@ class NiemModel {
                 item.set_PropertyValue(NiemUmlModel.NOTES_PROPERTY, currentNotes);
             }
         }
-}
+    }

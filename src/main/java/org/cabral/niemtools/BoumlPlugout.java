@@ -20,78 +20,75 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
  * Entry point for the BoumlPlugout application.
  * <p>
  * This method initializes the application, processes command-line arguments,
- * establishes a connection to the BOUML tool via a specified port, loads project properties,
- * and executes various commands related to NIEM UML model processing and artifact generation.
+ * establishes a connection to the BOUML tool via a specified port, loads
+ * project properties, and executes various commands related to NIEM UML model
+ * processing and artifact generation.
  * </p>
  *
  * <p>
  * The main workflow includes:
  * <ul>
- *   <li>Setting the system look and feel for the UI.</li>
- *   <li>Determining the BOUML port from a test harness file or command-line arguments.</li>
- *   <li>Connecting to the BOUML tool using the specified port.</li>
- *   <li>Loading and configuring project properties.</li>
- *   <li>Handling user commands such as importing reference models, adding/removing stereotypes,
- *       publishing UML, importing and validating mappings, and exporting CMF, XSD, JSON, and message specifications.</li>
- *   <li>Managing NIEM UML models and related artifacts.</li>
- *   <li>Logging and tracing execution steps and errors.</li>
+ * <li>Setting the system look and feel for the UI.</li>
+ * <li>Determining the BOUML port from a test harness file or command-line
+ * arguments.</li>
+ * <li>Connecting to the BOUML tool using the specified port.</li>
+ * <li>Loading and configuring project properties.</li>
+ * <li>Handling user commands such as importing reference models,
+ * adding/removing stereotypes, publishing UML, importing and validating
+ * mappings, and exporting CMF, XSD, JSON, and message specifications.</li>
+ * <li>Managing NIEM UML models and related artifacts.</li>
+ * <li>Logging and tracing execution steps and errors.</li>
  * </ul>
  * </p>
  *
  * <p>
  * Supported commands include:
  * <ul>
- *   <li><b>ImportReferenceModel</b>: Automates the import of reference schemas into the UML model.</li>
- *   <li><b>addStereotype</b>: Adds NIEM stereotypes to UML elements.</li>
- *   <li><b>removeStereotype</b>: Removes NIEM stereotypes from UML elements.</li>
- *   <li><b>publishUML</b>: Generates HTML documentation and mapping files from the UML model.</li>
- *   <li><b>importMapping</b>: Imports NIEM mapping from a CSV file.</li>
- *   <li><b>validateMapping</b>: Validates the imported NIEM mapping and generates subset/extension models.</li>
- *   <li><b>publishCMF</b>: Exports the Canonical Model Format (CMF) for the NIEM model.</li>
- *   <li><b>publishXSD</b>: Generates XSD schemas from the NIEM model or via external tools.</li>
- *   <li><b>publishJSON</b>: Generates JSON schemas from the NIEM model or via external tools.</li>
- *   <li><b>publishSpecification</b>: Generates the message specification documentation.</li>
+ * <li><b>ImportReferenceModel</b>: Automates the import of reference schemas
+ * into the UML model.</li>
+ * <li><b>addStereotype</b>: Adds NIEM stereotypes to UML elements.</li>
+ * <li><b>removeStereotype</b>: Removes NIEM stereotypes from UML elements.</li>
+ * <li><b>publishUML</b>: Generates HTML documentation and mapping files from
+ * the UML model.</li>
+ * <li><b>importMapping</b>: Imports NIEM mapping from a CSV file.</li>
+ * <li><b>validateMapping</b>: Validates the imported NIEM mapping and generates
+ * subset/extension models.</li>
+ * <li><b>publishCMF</b>: Exports the Canonical Model Format (CMF) for the NIEM
+ * model.</li>
+ * <li><b>publishXSD</b>: Generates XSD schemas from the NIEM model or via
+ * external tools.</li>
+ * <li><b>publishJSON</b>: Generates JSON schemas from the NIEM model or via
+ * external tools.</li>
+ * <li><b>publishSpecification</b>: Generates the message specification
+ * documentation.</li>
  * </ul>
  * </p>
  *
  * <p>
- * The method ensures proper cleanup and termination of the connection to BOUML upon completion or error.
+ * The method ensures proper cleanup and termination of the connection to BOUML
+ * upon completion or error.
  * </p>
  *
  * @author James Cabral
  * @version 1.0
  * @param argv Command-line arguments specifying the operation mode and options.
  */
-
 package org.cabral.niemtools;
 
-import java.awt.HeadlessException;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 
 import fr.bouml.UmlCom;
-import fr.bouml.UmlItem;
-import fr.bouml.UmlPackage;
 import javafx.application.Platform;
 
 public class BoumlPlugout {
-
 
     @SuppressWarnings("unused")
     public static void main(String argv[]) {
@@ -102,7 +99,6 @@ public class BoumlPlugout {
         String command = null;
 
         // No need to set look & feel for JavaFX
-
         // locate the BOUML port
         // the program is called with the socket port number in argument
         int boumlPort = 0;
@@ -140,7 +136,7 @@ public class BoumlPlugout {
             System.out.println("Error connecting to BOUML: " + e.getMessage());
             System.exit(1);
         }
-
+        /* 
         // cache UML model
         UmlPackage project = UmlPackage.getProject();
         UmlItem target = UmlCom.targetItem();
@@ -155,37 +151,37 @@ public class BoumlPlugout {
                     umlPackage = (UmlPackage)pkg;
                     break;
                 }
-
+         */
         // Start JavaFX toolkit before any UI interaction
         startJavaFxIfNeeded();
-        
+
         // Prevent JavaFX from exiting when last window closes - we'll control exit explicitly
         Platform.setImplicitExit(false);
-        
-        // create Platform Independent and Platform Specific UML models
-        NiemUmlModel model = new NiemUmlModel(project, properties);
 
+        // create Platform Independent and Platform Specific UML models
+        //NiemUmlModel model = new NiemUmlModel(project, properties);
         // Start Java FX from main.fxml
         Platform.runLater(() -> {
             try {
                 javafx.stage.Stage stage = new javafx.stage.Stage();
                 javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    BoumlPlugout.class.getResource("/org/cabral/niemtools/App.fxml")
+                        BoumlPlugout.class.getResource("/org/cabral/niemtools/App.fxml")
                 );
                 javafx.scene.Parent root = loader.load();
-                
+
                 // Get the controller and initialize it with project properties, project, and model
                 AppController controller = loader.getController();
+                /*
                 if (controller != null) {
                     controller.initializeData(properties, project, model);
                 } else {
                     Log.trace("Warning: AppController is null after FXML loading");
                 }
-                
+                 */
                 javafx.scene.Scene scene = new javafx.scene.Scene(root);
                 stage.setScene(scene);
                 stage.setTitle("NIEM Tools");
-                
+
                 // Handle window close to properly exit application
                 stage.setOnCloseRequest(event -> {
                     Platform.exit();
@@ -193,7 +189,7 @@ public class BoumlPlugout {
                     UmlCom.close();
                     System.exit(0);
                 });
-                
+
                 stage.show();
             } catch (IOException e) {
                 Log.trace("Error loading App.fxml: " + e.getMessage());
@@ -203,12 +199,13 @@ public class BoumlPlugout {
         // For now, we're running in GUI mode - command will be set by UI actions
         // The switch statement below is kept for backward compatibility with command-line mode
         command = !args.isEmpty() ? args.get(0) : null;
-        
+
         if (command == null) {
             // GUI mode - just keep JavaFX running and return
             return;
         }
 
+        /* 
         // Configure project directory
         String projectDirectory = model.properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
 
@@ -220,15 +217,15 @@ public class BoumlPlugout {
             project.memo_ref();
         else
             Log.trace("Warning: project is null. Skipping memorization of references.");
-
+        
         // warn if enumerations are truncated
         String maxEnumsString = properties.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
         if (maxEnumsString != null && !maxEnumsString.isEmpty()) {
             Log.trace("WARNING: NIEM codelists are currently truncated to " + maxEnumsString + " values. To use the complete code lists, import the reference model again.");
         }
-
+         */
         switch (command) {
-            
+            /*
             case "importReferenceModel":
                 String importDir = System.getProperty("java.io.tmpdir");
                 try {
@@ -306,20 +303,21 @@ public class BoumlPlugout {
                     return;
                 }
                 break;
-                
+             */
             case "addStereotype":
-                
-                model.addStereotype(target);
-                break;
-                
-            case "removeStereotype":
-                
-                model.removeStereotype(target);
-                break;
-                
-            case "publishUML":
-                try {
 
+                //model.addStereotype(target);
+                break;
+
+            case "removeStereotype":
+
+                //model.removeStereotype(target);
+                break;
+
+            case "publishUML":
+                /* 
+                try {
+                
                     // Generate HTML documentation
                     model.exportHtml((umlPackage == null) ? project : umlPackage);
                     
@@ -336,10 +334,13 @@ public class BoumlPlugout {
                     Log.trace("Exception in publishUML: " + e.getMessage());
                     System.exit(1);
                 }
+                 */
                 break;
-                
+
             case "importMapping":
+                /*
                 try {
+                    
                     // Delete previous mapping
                     model.deleteMapping();
                     
@@ -353,11 +354,13 @@ public class BoumlPlugout {
                     Log.trace("Exception in importMapping: " + e.getMessage());
                     System.exit(1);
                 }
+                 */
 
                 // automatically validate mapping
-                // break;
-                
+                break;
+
             case "validateMapping":
+                /*
                 // Clearing NIEM Models
                 model.deleteNIEM(false);
                 model.createNIEM();
@@ -369,10 +372,11 @@ public class BoumlPlugout {
                 // Next steps
                 UmlCom.trace("\nNEXT STEP: If any there are any mapping issues above, update " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " and import mappings and validate again as needed.");
                 UmlCom.trace("Otherwise, select 'Publish NIEM schemas` and publish CMF, XSD and/or JSON schemas.");
+                 */
                 break;
-            
-            case "testCMF":
 
+            case "testCMF":
+                /*/
                 //  Validate cmftool is available
                 String execCommandXsd = "cmftool.bat help";
                 try {     
@@ -381,10 +385,11 @@ public class BoumlPlugout {
                     Log.trace("Exception in testCMF: " + e.getMessage());
                     System.exit(1); 
                 }
+                 */
                 break;
 
             case "publishCMF":
-                
+                /*
                 // Create NIEM models
                 model.createNIEM();
 
@@ -403,27 +408,31 @@ public class BoumlPlugout {
 
                 // Next steps
                 UmlCom.trace("\nNEXT STEP: Use cmftools to generate XSD and/or JSON schemas");
+                 */
                 break;
-                
+
             case "publishXSD":
 
-                publishXSD(model);
+                //publishXSD(model);
                 break;
-                
+
             case "publishJSON":
-                
-                publishJSON(model);
+
+                //publishJSON(model);
                 break;
-                
+
             case "publishSpecification":
-                try {  
+
+            /* 
+                try {
                     
+
                     // Generate HTML documentation
                     model.exportHtml(project);
-                    
+
                     // Generate NIEM Mapping HTML
                     model.exportMappingHtml();
-                    
+
                     // Generate NIEM Mapping CSV
                     model.exportMappingCsv();
 
@@ -431,10 +440,10 @@ public class BoumlPlugout {
                     model.deleteNIEM(false);
                     model.createNIEM();
                     model.cacheModels(false);
-                
+
                     // Generating NIEM Models
                     model.createSubsetAndExtension();
-                    
+
                     // Cache models
                     model.cacheModels(false);
 
@@ -462,7 +471,7 @@ public class BoumlPlugout {
                             publishJSON(model);
                         }
                     }
-                    
+
                     // Generate wantlist for the subset
                     model.exportWantlist();
 
@@ -472,8 +481,9 @@ public class BoumlPlugout {
                     Log.trace("Exception in publishSpecification: " + ex.getMessage());
                     System.exit(1);
                 }
+                */
                 break;
-                
+
             default:
                 Log.trace("Error: Unrecognized command '" + command + "'. Please check the available commands and try again.");
                 break;
@@ -494,7 +504,8 @@ public class BoumlPlugout {
         try {
             // If toolkit is not initialized, this will start it.
             // If already initialized, IllegalStateException is thrown and can be ignored.
-            Platform.startup(() -> {});
+            Platform.startup(() -> {
+            });
         } catch (IllegalStateException alreadyStarted) {
             // Toolkit already initialized; no action needed.
         }
@@ -508,6 +519,7 @@ public class BoumlPlugout {
      * @param dialogTitle The title of the file chooser dialog.
      * @return The selected directory path.
      */
+    /*
     private static String selectDirectoryProperty(NiemUmlModel model, String propertyName, String dialogTitle) throws HeadlessException {
         String directory = model.properties.getProperty(propertyName);
         JFileChooser fc = new JFileChooser(directory);
@@ -523,11 +535,14 @@ public class BoumlPlugout {
         }
         return directory;
     }
+    */
 
     /**
      * Executes a command in the system shell.
+     *
      * @param execCommand
-    */
+     */
+    /*
     static int exec(String execCommand) throws IOException, InterruptedException {
 
         int exitCode;
@@ -565,11 +580,13 @@ public class BoumlPlugout {
 
         return exitCode;
     }
-
-        /** * Publish XSD model schemas from the NiemUmlModel.
-     * 
+     */
+    /**
+     * * Publish XSD model schemas from the NiemUmlModel.
+     *
      * @param model
      */
+    /* 
     static void publishXSDModel(NiemUmlModel model) {
         
         String exportCmfToXsdModel = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD_MODEL);
@@ -618,11 +635,13 @@ public class BoumlPlugout {
 
         }  
     }
-
-    /** * Publish XSD schemas from the NiemUmlModel.
-     * 
+     */
+    /**
+     * * Publish XSD schemas from the NiemUmlModel.
+     *
      * @param model
      */
+    /*
     static void publishXSD(NiemUmlModel model) {
         
         String exportCmfToXsd = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
@@ -702,12 +721,13 @@ public class BoumlPlugout {
         }   
 
     }
-
+     */
     /**
      * Publish JSON schemas from the NiemUmlModel.
      *
      * @param model The NiemUmlModel instance.
      */
+    /* 
     static void publishJSON(NiemUmlModel model) {
         String exportCmfToJson = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
         ProjectProperties properties = model.properties;
@@ -775,5 +795,5 @@ public class BoumlPlugout {
             }
         }
     }
+     */
 }
-

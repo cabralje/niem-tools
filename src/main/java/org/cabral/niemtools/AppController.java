@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.bouml.UmlCom;
+import fr.bouml.UmlItem;
+import fr.bouml.UmlPackage;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -21,7 +23,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -29,11 +33,19 @@ import javafx.stage.Stage;
 public class AppController {
 
     private ProjectProperties properties;
-    private fr.bouml.UmlPackage project;
+    private UmlPackage project;
+    private UmlPackage umlPackage;
     private NiemUmlModel model;
+    private CmfToolAdapter cmftool;
 
     @FXML
     private TextField ExportProjectDir;
+
+    @FXML
+    private TextField ExportURI;
+
+    @FXML
+    private TableView<String[]> ExternalNamespaceTable;
 
     @FXML
     private TextField IEPDChangeLogFile;
@@ -63,9 +75,6 @@ public class AppController {
     private TextField IEPDVersion;
 
     @FXML
-    private TextField ExportURI;
-
-    @FXML
     private TextField ImportExcludeDomains;
 
     @FXML
@@ -78,21 +87,40 @@ public class AppController {
     private ComboBox<String> ImportNIEMVersion;
 
     @FXML
-    private TableView<String[]> ExternalNamespaceTable;
+    private TableColumn<String[], String> LocalPathColumn;
 
     @FXML
-    private TableColumn<String[], String> LocalPathColumn;
+    private TextArea LogArea;
+
+    @FXML
+    private TitledPane MapPane;
+
+    @FXML
+    private TitledPane NIEMPane;
 
     @FXML
     private TableColumn<String[], String> NamespaceColumn;
 
     @FXML
+    private TitledPane NamespacePane;
+
+    @FXML
     private TableColumn<String[], String> PrefixColumn;
 
     @FXML
+    private TitledPane ProjectPane;
+
+    @FXML
+    private TitledPane SpecificationPane;
+
+    @FXML
     private TableColumn<String[], String> URLColumn;
+
     @FXML
     private Button importMapping;
+
+    @FXML
+    private VBox mainControls;
 
     @FXML
     private VBox mainWindow;
@@ -102,24 +130,55 @@ public class AppController {
      */
     @FXML
     public void initialize() {
-    }
+        // Redirect logging
+        Log.setLogArea(LogArea);
 
-    /**
-     * Initialize the controller with project properties, UML project, and model.
-     * Sets the initial values of all text fields from the corresponding properties.
-     * Must be called after FXML loading is complete.
-     *
-     * @param properties The ProjectProperties containing configuration values
-     * @param project The UML project
-     * @param model The NIEM UML model
-     */
-    public void initializeData(ProjectProperties properties, fr.bouml.UmlPackage project, NiemUmlModel model) {
-        this.properties = properties;
-        this.project = project;
-        this.model = model;
-        
+        // Find project package
+        project = UmlPackage.getProject();
+        UmlItem target = UmlCom.targetItem();
+        properties = new ProjectProperties(project, ProjectProperties.getDefaults());
+        properties.load();
+
+        // Find UML package
+        umlPackage = null;
+        if (project != null && project.children() != null) {
+            for (UmlItem pkg : project.children()) {
+                if ((pkg.kind() == fr.bouml.anItemKind.aPackage) || pkg.name().equals("UML")) {
+                    umlPackage = (UmlPackage) pkg;
+                    break;
+                }
+            }
+        }
+
+        // create Platform Independent and Platform Specific UML models
+        model = new NiemUmlModel(project, properties);
+
+        // create cmftool adapter
+        cmftool = new CmfToolAdapter(model);
+
+        // cache UML model
+        UmlCom.message("Memorize references ...");
+        if (umlPackage != null) {
+            umlPackage.memo_ref(); 
+        }else if (project != null) {
+            project.memo_ref(); 
+        }else {
+            Log.trace("Warning: project is null. Skipping memorization of references.");
+        }
+
+        // warn if enumerations are truncated
+        String maxEnumsString = properties.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
+        if (maxEnumsString != null && !maxEnumsString.isEmpty()) {
+            Log.trace("WARNING: NIEM codelists are currently truncated to " + maxEnumsString + " values. To use the complete code lists, import the reference model again.");
+        }
+
         // Set text field values from properties
-        ExportProjectDir.setText(properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR));
+        String projectDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
+        ExportProjectDir.setText(projectDir);
+        if (projectDir == null || projectDir.isEmpty()) {
+            ProjectPane.setExpanded(true);
+            ExportProjectDir.setPromptText("Select project directory...");
+        }
         IEPDChangeLogFile.setText(properties.getProperty(ProjectProperties.IEPD_CHANGE_LOG_FILE));
         IEPDContact.setText(properties.getProperty(ProjectProperties.IEPD_CONTACT));
         IEPDEmail.setText(properties.getProperty(ProjectProperties.IEPD_EMAIL));
@@ -133,49 +192,77 @@ public class AppController {
         ImportExcludeDomains.setText(properties.getProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS));
         ImportIncludeDomains.setText(properties.getProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS));
         ImportMaxFacets.setText(properties.getProperty(ProjectProperties.IMPORT_MAX_FACETS));
-        
+
         // Add focus listeners to save properties when focus is lost (e.g., TAB key)
         ExportProjectDir.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, ExportProjectDir.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, ExportProjectDir.getText());
+            }
         });
         IEPDChangeLogFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.IEPD_CHANGE_LOG_FILE, IEPDChangeLogFile.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IEPD_CHANGE_LOG_FILE, IEPDChangeLogFile.getText());
+            }
         });
         IEPDContact.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.IEPD_CONTACT, IEPDContact.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IEPD_CONTACT, IEPDContact.getText());
+            }
         });
         IEPDEmail.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.IEPD_EMAIL, IEPDEmail.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IEPD_EMAIL, IEPDEmail.getText());
+            }
         });
         IEPDLicense.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.IEPD_LICENSE_URL, IEPDLicense.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IEPD_LICENSE_URL, IEPDLicense.getText());
+            }
         });
         IEPDName.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.IEPD_NAME, IEPDName.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IEPD_NAME, IEPDName.getText());
+            }
         });
         IEPDOrganization.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.IEPD_ORGANIZATION, IEPDOrganization.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IEPD_ORGANIZATION, IEPDOrganization.getText());
+            }
         });
         IEPDReadMeFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.IEPD_READ_ME_FILE, IEPDReadMeFile.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IEPD_READ_ME_FILE, IEPDReadMeFile.getText());
+            }
         });
         IEPDStatus.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.IEPD_STATUS, IEPDStatus.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IEPD_STATUS, IEPDStatus.getText());
+            }
         });
         IEPDVersion.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.IEPD_VERSION, IEPDVersion.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IEPD_VERSION, IEPDVersion.getText());
+            }
         });
         ExportURI.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.EXPORT_URI, ExportURI.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.EXPORT_URI, ExportURI.getText());
+            }
         });
         ImportExcludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS, ImportExcludeDomains.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS, ImportExcludeDomains.getText());
+            }
         });
         ImportIncludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS, ImportIncludeDomains.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS, ImportIncludeDomains.getText());
+            }
         });
         ImportMaxFacets.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) properties.setProperty(ProjectProperties.IMPORT_MAX_FACETS, ImportMaxFacets.getText());
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IMPORT_MAX_FACETS, ImportMaxFacets.getText());
+            }
         });
 
         // Populate NIEM version dropdown
@@ -185,28 +272,33 @@ public class AppController {
         }
         populateNiemVersionDropdown(ImportNIEMVersion, niemVersion);
 
+        // Expand NIEM pane if reference model doesn't exist
+        if (!model.verifyNIEM()) {
+            NIEMPane.setExpanded(true);
+        }
+
         // Populate External Schemas table
         String externalSchemasProperty = properties.getProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS, "");
         String[] externalNamespaces = externalSchemasProperty.isEmpty() ? new String[0] : externalSchemasProperty.split(",");
-        
+
         if (ExternalNamespaceTable != null && PrefixColumn != null) {
             // Set up editable text field cells for each column
             PrefixColumn.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue()[0]));
             PrefixColumn.setCellFactory(javafx.scene.control.cell.TextFieldTableCell.forTableColumn());
             PrefixColumn.setOnEditCommit(event -> event.getRowValue()[0] = event.getNewValue());
-            
+
             NamespaceColumn.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue()[1]));
             NamespaceColumn.setCellFactory(javafx.scene.control.cell.TextFieldTableCell.forTableColumn());
             NamespaceColumn.setOnEditCommit(event -> event.getRowValue()[1] = event.getNewValue());
-            
+
             URLColumn.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue()[2]));
             URLColumn.setCellFactory(javafx.scene.control.cell.TextFieldTableCell.forTableColumn());
             URLColumn.setOnEditCommit(event -> event.getRowValue()[2] = event.getNewValue());
-            
+
             LocalPathColumn.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue()[3]));
             LocalPathColumn.setCellFactory(javafx.scene.control.cell.TextFieldTableCell.forTableColumn());
             LocalPathColumn.setOnEditCommit(event -> event.getRowValue()[3] = event.getNewValue());
-            
+
             ExternalNamespaceTable.getItems().clear();
             for (String namespace : externalNamespaces) {
                 String[] parts = namespace.split("=");
@@ -225,25 +317,29 @@ public class AppController {
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("AboutDialog.fxml"));
             javafx.scene.layout.VBox root = loader.load();
-            
+
             // Get the controller and set the stage
             AboutDialogController controller = loader.getController();
-            
+
             // Create a new stage for the dialog
             javafx.stage.Stage stage = new javafx.stage.Stage();
             stage.setTitle("About NIEM Tools");
             stage.setScene(new javafx.scene.Scene(root));
             stage.setResizable(false);
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            
+
             // Get the parent stage and center the dialog on it
             // Replace the Node cast with MenuItem handling
             MenuItem menuItem = (MenuItem) event.getSource();
             Stage parentStage = (Stage) mainWindow.getScene().getWindow();
             stage.initOwner(parentStage);
-            
-            controller.setStage(stage);
-            
+
+            if (controller != null) {
+                controller.setStage(stage);
+            } else {
+                Log.trace("Warning: AboutDialogController is null after FXML loading");
+            }
+
             // Show the dialog
             stage.showAndWait();
         } catch (IOException e) {
@@ -268,18 +364,56 @@ public class AppController {
 
     @FXML
     public void copyTextArea(ActionEvent event) {
+        String selectedText = LogArea.getSelectedText();
+        if (selectedText != null && !selectedText.isEmpty()) {
+            javafx.scene.input.Clipboard clipboard = javafx.scene.input.Clipboard.getSystemClipboard();
+            javafx.scene.input.ClipboardContent content = new javafx.scene.input.ClipboardContent();
+            content.putString(selectedText);
+            clipboard.setContent(content);
+        }
     }
 
     @FXML
     public void exportMapping(ActionEvent event) {
+        mainControls.setDisable(true);
+
+        Log.trace("Exporting mapping to " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
+        model.exportMappingCsv();
+        model.exportMappingHtml();
+        Log.trace("\nMapping exported. Next, edit the CSV mapping file as needed, then 'Import Mapping'.");
+
+        mainControls.setDisable(false);
     }
 
     @FXML
     public void importMapping(ActionEvent event) {
+        mainControls.setDisable(true);
+
+        Log.trace("Importing mapping from " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
+        model.deleteMapping();
+        model.importCsv(model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
+        Log.trace("\nMapping imported. Next, 'Validate Mapping'.");
+
+        mainControls.setDisable(false);
     }
 
     @FXML
     public void importReferenceModel(ActionEvent event) {
+
+        Task<Void> importTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                mainControls.setDisable(true);
+                
+                Log.trace("Importing NIEM Reference Model...");
+                model.importReferenceModel(properties);
+                Log.trace("\nNIEM Reference Model imported. Next: Model in UML, apply the NIEM profile and then 'Export mapping'.");
+
+                mainControls.setDisable(false);
+                return null;
+            }
+        };
+        new Thread(importTask).start();
     }
 
     @FXML
@@ -288,17 +422,17 @@ public class AppController {
             // Load the FXML file
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("PreferencesDialog.fxml"));
-                javafx.scene.control.DialogPane root = loader.load();
-            
+            javafx.scene.control.DialogPane root = loader.load();
+
             // Get the controller and set the stage
             PreferencesDialogController controller = loader.getController();
-            
-             // Initialize controller data
+
+            // Initialize controller data
             if (controller != null) {
                 controller.initializeData(properties);
             } else {
                 Log.trace("Warning: AppController is null after FXML loading");
-                }
+            }
 
             // Create a new stage for the dialog
             javafx.stage.Stage stage = new javafx.stage.Stage();
@@ -306,15 +440,15 @@ public class AppController {
             stage.setScene(new javafx.scene.Scene(root));
             stage.setResizable(false);
             stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-            
+
             // Get the parent stage and center the dialog on it
             // Replace the Node cast with MenuItem handling
             MenuItem menuItem = (MenuItem) event.getSource();
             Stage parentStage = (Stage) mainWindow.getScene().getWindow();
             stage.initOwner(parentStage);
-            
+
             controller.setStage(stage);
-            
+
             // Show the dialog
             stage.showAndWait();
         } catch (IOException e) {
@@ -324,30 +458,60 @@ public class AppController {
 
     @FXML
     public void publishCMF(ActionEvent event) {
-    }
+        mainControls.setDisable(true);
 
-    @FXML
-    public void publishCodelists(ActionEvent event) {
+        Log.trace("Publishing CMF to " + model.properties.getProperty(ProjectProperties.EXPORT_CMF_FILE) + " ...");
+        model.createNIEM();
+        model.cacheModels(false);
+        model.exportCmf();
+        cmftool.publishXSDModel();
+        Log.trace("\nCMF published. Next, generate schemas with 'XML Model Schemas', 'XML MMessage Schemas', and/or 'JSON Message Schemas'.");
+
+        mainControls.setDisable(false);
     }
 
     @FXML
     public void publishHTML(ActionEvent event) {
+        mainControls.setDisable(true);
+
+        Log.trace("Publishing HTML documentation to " + model.properties.getProperty(ProjectProperties.EXPORT_HTML_DIR) + " ...");
+        model.exportHtml((umlPackage == null) ? project : umlPackage);
+        Log.trace("\nHTML documentation published.");
+
+        mainControls.setDisable(false);
     }
 
     @FXML
     public void publishJSON(ActionEvent event) {
-    }
+        mainControls.setDisable(true);
 
-    @FXML
-    public void publishWS(ActionEvent event) {
+        Log.trace("Publishing JSON schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_JSON_DIR) + " ...");
+        cmftool.publishJSON();
+        Log.trace("\nJSON schemas published.");
+
+        mainControls.setDisable(false);
     }
 
     @FXML
     public void publishXSD(ActionEvent event) {
+        mainControls.setDisable(true);
+
+        Log.trace("Publishing XSD schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " ...");
+        cmftool.publishXSD();
+        Log.trace("\nXSD schemas published.");
+
+        mainControls.setDisable(false);
     }
 
     @FXML
     public void publishXSDModel(ActionEvent event) {
+        mainControls.setDisable(true);
+
+        Log.trace("Publishing XSD Model schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_MODEL_DIR) + " ...");
+        cmftool.publishXSDModel();
+        Log.trace("\nXSD Model schemas published.");
+
+        mainControls.setDisable(false);
     }
 
     @FXML
@@ -372,6 +536,7 @@ public class AppController {
 
     @FXML
     public void selectTextArea(ActionEvent event) {
+        LogArea.selectAll();
     }
 
     @FXML
@@ -379,41 +544,54 @@ public class AppController {
         TextField source = (TextField) event.getSource();
         String property = source.getId();
         String value = source.getText();
-        if (property != null && value != null && !property.isEmpty())
+        if (property != null && value != null && !property.isEmpty()) {
             properties.setProperty(property, value);
+        }
     }
 
     @FXML
     public void unselectTextArea(ActionEvent event) {
+        LogArea.deselect();
     }
 
     @FXML
     public void validateMapping(ActionEvent event) {
+        mainControls.setDisable(true);
+
+        Log.trace("Validating mapping from " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
+        model.deleteNIEM(false);
+        model.createNIEM();
+        model.cacheModels(false);
+        model.createSubsetAndExtension();
+        Log.trace("\nNIEM Subset and Extensions created. Next, if any there are any mapping issues above, update " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " and 'Import Mapping' and 'Validate Mapping' again as needed.");
+        Log.trace("Otherwise, generate CMF file with 'Common Model Format (CMF)'.");
+
+        mainControls.setDisable(false);
     }
 
     private void populateNiemVersionDropdown(ComboBox<String> comboBox, String selectedVersion) {
         Log.debug("Starting NIEM version fetch...");
-        
+
         Task<List<String>> task = new Task<List<String>>() {
             @Override
             protected List<String> call() throws Exception {
                 Log.debug("Fetching versions in background task");
                 List<String> versions = new ArrayList<>();
-                
+
                 try {
                     URL url = URI.create("https://api.github.com/repos/niemopen/niem-model/tags").toURL();
                     Log.debug("Connecting to: " + url);
-                    
+
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
                     conn.setRequestProperty("Accept", "application/vnd.github.v3+json");
                     conn.setRequestProperty("User-Agent", "NIEM-Tools/1.0");
                     conn.setConnectTimeout(10000);
                     conn.setReadTimeout(10000);
-                    
+
                     int responseCode = conn.getResponseCode();
                     Log.debug("HTTP Response Code: " + responseCode);
-                    
+
                     if (responseCode == 200) {
                         try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
                             StringBuilder sb = new StringBuilder();
@@ -423,7 +601,7 @@ public class AppController {
                             }
                             String json = sb.toString();
                             Log.debug("JSON Response length: " + json.length());
-                            
+
                             versions = parseVersionsFromJson(json);
                             Log.debug("Found " + versions.size() + " versions");
                         }
@@ -434,11 +612,11 @@ public class AppController {
                     Log.trace("Timeout populating NIEM versions from niem-model GitHub repo: " + e.getMessage());
                     versions.add("6.0");
                 }
-                
+
                 return versions;
             }
         };
-        
+
         task.setOnSucceeded(event -> {
             Log.debug("Task succeeded");
             List<String> versions = task.getValue();
@@ -449,7 +627,7 @@ public class AppController {
                 Log.debug("Retrieved " + versions.size() + " versions");
                 comboBox.getItems().addAll(versions);
             }
-            
+
             if (selectedVersion != null && !selectedVersion.isEmpty()) {
                 for (String version : comboBox.getItems()) {
                     if (selectedVersion.equals(version)) {
@@ -459,28 +637,28 @@ public class AppController {
                 }
             }
         });
-        
+
         task.setOnFailed(event -> {
             Log.debug("Task failed: " + task.getException().getMessage());
             comboBox.getItems().clear();
             comboBox.getItems().add("Error: " + task.getException().getMessage());
         });
-        
+
         new Thread(task).start();
     }
 
     private List<String> parseVersionsFromJson(String json) {
         List<String> versions = new ArrayList<>();
-        
+
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\"name\"\\s*:\\s*\"([^\"]+)\"");
         java.util.regex.Matcher matcher = pattern.matcher(json);
-        
+
         while (matcher.find()) {
             String version = matcher.group(1);
             versions.add(version);
             Log.debug("Parsed version: " + version);
         }
-        
+
         return versions;
     }
 }

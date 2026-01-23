@@ -3,17 +3,19 @@ package org.cabral.niemtools;
 import java.util.concurrent.ConcurrentHashMap;
 
 import fr.bouml.UmlCom;
+import javafx.scene.control.TextArea;
 
 public class Log {
 
     // Debugging options
-    private static final Boolean DEBUG = true;
-    //private static final Boolean DEBUG = false;
+    //private static final Boolean DEBUG = true;
+    private static final Boolean DEBUG = false;
 
     //private static final Boolean PROFILE = true;
     private static final Boolean PROFILE = false;
 
     private static final ConcurrentHashMap<String, Long> timer = new ConcurrentHashMap<>();
+    private static TextArea logArea = null;
 
     /**
      * outputs debugging information
@@ -24,6 +26,7 @@ public class Log {
     static void debug(String output) {
         if (DEBUG) {
             Log.trace(output);
+            UmlCom.trace(output);
         }
     }
 
@@ -31,7 +34,18 @@ public class Log {
      * @param s
      */
     public static void trace(String s) {
-        UmlCom.trace(s);
+        //UmlCom.trace(s);
+        if (logArea != null) {
+            logArea.appendText(s + "\n");
+        }
+    }
+
+    /**
+     * Set the LogArea TextArea for appending log messages
+     * @param area The TextArea to append messages to
+     */
+    public static void setLogArea(TextArea area) {
+        logArea = area;
     }
 
     /**
