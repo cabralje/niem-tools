@@ -3,6 +3,7 @@ package org.cabral.niemtools;
 import java.util.concurrent.ConcurrentHashMap;
 
 import fr.bouml.UmlCom;
+import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 
 public class Log {
@@ -36,7 +37,8 @@ public class Log {
     public static void trace(String s) {
         //UmlCom.trace(s);
         if (logArea != null) {
-            logArea.appendText(s + "\n");
+            // Ensure UI updates happen on JavaFX Application Thread
+            Platform.runLater(() -> logArea.appendText(s + "\n"));
         }
     }
 

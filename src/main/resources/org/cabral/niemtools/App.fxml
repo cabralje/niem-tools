@@ -84,7 +84,7 @@
               </Menu>
             </menus>
           </MenuBar>
-            <TitledPane fx:id="ProjectPane" expanded="false" text="1. Create Project">
+            <TitledPane fx:id="ProjectPane" text="1. Create Project">
                <content>
                   <AnchorPane minHeight="-Infinity">
                      <children>
@@ -93,7 +93,7 @@
                               <ToolBar maxHeight="-Infinity">
                                 <items>
                                     <Label text="Project Directory" />
-                                    <TextField fx:id="ExportProjectDir" maxWidth="1.7976931348623157E308" onAction="#setProjectProperty" prefWidth="400.0" />
+                                    <TextField fx:id="ExportProjectDir" maxWidth="1.7976931348623157E308" onAction="#setProjectProperty" prefWidth="400.0" promptText="Select project directory..." />
                                   <Button mnemonicParsing="false" onAction="#selectProjectDirectory" text="Browse..." />
                                 </items>
                               </ToolBar>
@@ -181,7 +181,7 @@
                   </AnchorPane>
                </content>
             </TitledPane>
-            <TitledPane fx:id="NIEMPane" text="2. Import NIEM Model">
+            <TitledPane fx:id="NIEMPane" expanded="false" text="2. Import NIEM Model">
               <content>
                 <AnchorPane minHeight="-Infinity">
                      <children>
@@ -334,9 +334,9 @@
       <Separator prefWidth="200.0" />
       <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
          <children>
-            <Label minWidth="100.0" text="Left Status" HBox.hgrow="NEVER" />
-            <Region prefHeight="0.0" prefWidth="440.0" HBox.hgrow="ALWAYS" />
-            <Label alignment="CENTER_RIGHT" minWidth="100.0" text="Right Status" HBox.hgrow="NEVER" />
+            <Label fx:id="ProjectStatus" maxWidth="1.7976931348623157E308" minWidth="100.0" text="Label" HBox.hgrow="ALWAYS" />
+            <Region prefWidth="200.0" HBox.hgrow="ALWAYS" />
+            <Label fx:id="NIEMStatus" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" minWidth="100.0" text="Label" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
   </children>
