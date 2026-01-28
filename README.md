@@ -16,6 +16,10 @@ Or install directly from GitHub:
 npm install -g cabralje/niem-tools
 ```
 
+This will automatically download JDK 21 and all dependencies.
+
+For manual installation without npm, see the [HOWTO guide](HOWTO.md#1b-install-niem-tools).
+
 ## Features
 
 The advantages relative to other tools include:

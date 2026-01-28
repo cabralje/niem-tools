@@ -14,22 +14,51 @@ This is a quick HOWTO for getting started with using `BoUML` and `niemtools` to 
 ### 1a.  Install BoUML
 * Download and install the latest version of [BoUML](https://bouml.fr) for Windows, macOS or Linux.
 ### 1b. Install niem-tools
+
+#### Option 1: Using npm (Recommended)
 * Install niem-tools using npm (requires Node.js):
-  ```
+  ```bash
   npm install -g niem-tools
   ```
 * Or install directly from GitHub:
-  ```
+  ```bash
   npm install -g cabralje/niem-tools
   ```
-* The installation will automatically download and install all required dependencies including opencsv, commons-lang3, and JavaFX libraries.
+* The installation will automatically download and install all required dependencies including JDK 21, opencsv, commons-lang3, and JavaFX libraries.
+
+#### Option 2: Manual Installation
+
+If you don't have Node.js/npm installed:
+
+1. **Install JDK 21** (if not already installed)
+   - Download from [Adoptium](https://adoptium.net/), [Oracle](https://www.oracle.com/java/technologies/downloads/), or [Azul Zulu](https://www.azul.com/downloads/)
+
+2. **Download niem-tools**
+   - Download the latest release from the [Releases page](https://github.com/cabralje/niem-tools/releases)
+   - Or clone this repository: `git clone https://github.com/cabralje/niem-tools.git`
+
+3. **Build (if cloning from source)**
+   ```bash
+   mvn clean package
+   npm install
+   npm run build
+   ```
+
+4. **Note the installation directory** for the next step (template setup)
+
 ### 1c. Setup niem-tools template
-* After installation, locate the niem-tools installation directory:
-  - On Windows: `%APPDATA%\npm\node_modules\niem-tools`
-  - On macOS/Linux: Run `npm root -g` to find the global modules directory, then navigate to `niem-tools`
+* Locate the niem-tools installation directory:
+  - **If installed via npm:**
+    - On Windows: `%APPDATA%\npm\node_modules\niem-tools`
+    - On macOS/Linux: Run `npm root -g` to find the global modules directory, then navigate to `niem-tools`
+  - **If installed manually:** Use the directory where you cloned/extracted niem-tools
 * Start BoUML.
 * Click on `Miscellaneous->Set Environment`.
 * Under `Template Project`, select the location of the `bouml-templates/niem-project/niem-project.prj` BoUML project template in the niem-tools installation directory.
+* **For manual installations only:** Configure the BoUML plugout command:
+  - In BoUML, go to the package that uses the plugout
+  - Set the plugout command to: `java -jar /path/to/niem-tools/jdeploy-bundle/niemtools-2.0.jar`
+  - (For npm installations, the `niem-tools` command is automatically available)
 ### 1d. Install cmftool (recommended)
 * Download and extract [cmftool](https://github.com/niemopen/cmftool/tags)
 * Add the `bin` directory to your system path.
