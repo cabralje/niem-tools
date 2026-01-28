@@ -12,7 +12,7 @@ This is a quick HOWTO for getting started with using `BoUML` and `niemtools` to 
 ---
 ## 1. Install BoUML, niem-tools and cmftool
 ### 1a.  Install BoUML
-* Download and install the latest version of [BoUML](https://bouml.fr) for Windows. Mac or Linux.
+* Download and install the latest version of [BoUML](https://bouml.fr) for Windows, macOS or Linux.
 ### 1b. Install niem-tools
 * Install niem-tools using npm (requires Node.js):
   ```
