@@ -1,7 +1,7 @@
 {
     "maven.terminal.favorites": [
         {
-            "command": "package",
+            "command": "clean install",
             "debug": false
         }
     ],
@@ -21,6 +21,6 @@
     "java.compile.nullAnalysis.nullable": [
         "org.jetbrains.annotations.Nullable"
     ],
-    "java.configuration.checkProjectSettingsExcludes": false,
+    "java.configuration.checkProjectSettingsExclusions": false,
     //"problems.decorations.enabled": false
 }

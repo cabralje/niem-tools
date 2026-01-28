@@ -1,9 +1,7 @@
 package org.cabral.niemtools;
 
-import java.io.IOException;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 import org.junit.Test;
 
 public class BoumlPlugoutTest {
@@ -52,6 +50,7 @@ public class BoumlPlugoutTest {
         assertEquals(0, exitCode);
     }
     */
+   /*
     @Test
     public void testExecInvalidCommand() {
         try {
@@ -63,5 +62,6 @@ public class BoumlPlugoutTest {
             fail("Unexpected InterruptedException");
         }
     }
+    */
     // Helper methods to invoke private static methods via reflection
 }

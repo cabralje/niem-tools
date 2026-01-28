@@ -7,6 +7,7 @@
             "mainclass": "org.cabral.niemtools.BoumlPlugout",
             "sourcePaths": ["${workspaceFolder}/src/main/java"],
             "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
             "args": ""
         },
@@ -17,6 +18,7 @@
             "mainclass": "org.cabral.niemtools.BoumlPlugout",
             "sourcePaths": ["${workspaceFolder}/src/main/java"],
             "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
             "args": "publishSpecification"
         },
@@ -27,6 +29,7 @@
             "mainclass": "org.cabral.niemtools.BoumlPlugout",
             "sourcePaths": ["${workspaceFolder}/src/main/java"],
             "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
             "args": "publishUML"
         },
@@ -37,6 +40,7 @@
             "mainclass": "org.cabral.niemtools.BoumlPlugout",
             "sourcePaths": ["${workspaceFolder}/src/main/java"],
             "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
             "args": "importMapping"
         },
@@ -47,6 +51,7 @@
             "mainclass": "org.cabral.niemtools.BoumlPlugout",
             "sourcePaths": ["${workspaceFolder}/src/main/java"],
             "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
             "args": "validateMapping"
         },
@@ -57,6 +62,7 @@
             "mainclass": "org.cabral.niemtools.BoumlPlugout",
             "sourcePaths": ["${workspaceFolder}/src/main/java"],
             "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
             "args": "publishCMF"
         },
@@ -67,6 +73,7 @@
             "mainclass": "org.cabral.niemtools.BoumlPlugout",
             "sourcePaths": ["${workspaceFolder}/src/main/java"],
             "classPaths": ["${workspaceFolder}/target/classes",
+                            "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
             "args": "publishXSD"
         },

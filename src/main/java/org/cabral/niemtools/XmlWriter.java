@@ -109,7 +109,7 @@ public class XmlWriter {
     private static final String GC_CODELIST_DEFINITION = "definition";
     private static final String GC_APPINFO_PREFIX = "gca";
     private static final String GC_APPINFO_URI = "http://example.org/namespace/genericode-appinfo";
-    private static final String GC_FILE_TYPE = ".gc";
+    static final String GC_FILE_TYPE = ".gc";
     private static final String GC_LOCATION = "https://docs.oasis-open.org/codelist/cs-genericode-1.0/xsd/genericode.xsd";
     private static final String GC_CODELIST_URI = "http://reference.niem.gov/niem/specification/code-lists/1.0/";
     
@@ -864,10 +864,12 @@ public class XmlWriter {
                     UmlAttribute attribute = (UmlAttribute) item;
                     if (NiemUmlModel.isFacet(attribute))
                         continue;
+                    String name = attribute.name();
                     String codeValue = attribute.defaultValue();
+                    if (codeValue == null || codeValue.isEmpty())
+                        codeValue = name;
                     String codeDescription = attribute.description();
                     String facet;
-                    String name = attribute.name();
                     if (!NiemUmlModel.isFacet(attribute))
                         name = "enumeration";
                     facet = "<xs:" + name + " value=\"" + codeValue + "\">";                        

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<DialogPane minHeight="-Infinity" minWidth="400.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cabral.niemtools.PreferencesDialogController">
+   <content>
+      <TabPane>
+         <tabs>
+            <Tab text="Generation">
+               <content>
+                  <GridPane>
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" />
+                      <ColumnConstraints hgrow="ALWAYS" minWidth="400.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="NIEM Mapping (CSV)">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding></Label>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" GridPane.rowIndex="5">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding></Label>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" GridPane.rowIndex="4">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding></Label>
+                        <TextField fx:id="htmldir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                        <TextField fx:id="niemmapping" onAction="#setProjectProperty" GridPane.columnIndex="1" />
+                        <TextField fx:id="ExportCMFFile" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="ExportOpenAPIDir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                        <TextField fx:id="ExportWSDLDir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <TextField fx:id="ExportWantlistFile" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                        <TextField fx:id="ExportJSONDir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <TextField fx:id="ExportXSDDir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <TextField fx:id="ExportXSDModelDir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Button mnemonicParsing="false" onAction="#selectDocumentationDirectory" text="Browse..." GridPane.columnIndex="2" GridPane.rowIndex="9" />
+                        <Button mnemonicParsing="false" onAction="#selectMappingFile" text="Browse..." GridPane.columnIndex="2" />
+                        <CheckBox fx:id="ExportXSDModel" mnemonicParsing="false" onAction="#toggleProjectProperty" text="XML Model Schemas" GridPane.rowIndex="2" />
+                        <CheckBox fx:id="ExportXSD" mnemonicParsing="false" onAction="#toggleProjectProperty" text="XML Message Schemas" GridPane.rowIndex="5" />
+                        <CheckBox fx:id="ExportJSON" mnemonicParsing="false" onAction="#toggleProjectProperty" text="JSON Message Schema" GridPane.rowIndex="6" />
+                        <CheckBox fx:id="ExportWantlist" mnemonicParsing="false" onAction="#toggleProjectProperty" text="SSGT Wantlist" GridPane.rowIndex="8" />
+                        <CheckBox fx:id="ExportWSDL" mnemonicParsing="false" onAction="#toggleProjectProperty" text="+ Web Services (WSDL)" GridPane.rowIndex="4" />
+                        <CheckBox fx:id="ExportOpenAPI" mnemonicParsing="false" onAction="#toggleProjectProperty" text="+ OpenAPI" GridPane.rowIndex="7" />
+                        <CheckBox fx:id="ExportCodelists" mnemonicParsing="false" onAction="#toggleProjectProperty" text="+ Genericode Codelists" GridPane.rowIndex="3" />
+                        <TextField fx:id="ExportCodeListsDir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <CheckBox fx:id="ExportCMF" mnemonicParsing="false" onAction="#toggleProjectProperty" text="Common Model Format (CMF)" GridPane.rowIndex="1" />
+                        <CheckBox fx:id="ExportHTML" mnemonicParsing="false" onAction="#toggleProjectProperty" text="Documentation (HTML)" GridPane.rowIndex="9" />
+                     </children>
+                  </GridPane>
+               </content>
+            </Tab>
+            <Tab text="cmftool">
+               <content>
+                  <GridPane>
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" />
+                      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="CMF -&gt; XML Model Schemas">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding></Label>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="CMF -&gt; XML Message Schemas" GridPane.rowIndex="1">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding></Label>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="CMF -&gt; JSON Message Schema" GridPane.rowIndex="2">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding></Label>
+                        <TextField fx:id="ExportCMFTooltoXSDModel" onAction="#setProjectProperty" GridPane.columnIndex="1" />
+                        <TextField fx:id="ExportCMFTooltoXSD" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="ExportCMFTooltoJSON" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                     </children>
+                  </GridPane>
+               </content>
+            </Tab>
+            <Tab text="Logging">
+               <content>
+                  <GridPane>
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <CheckBox fx:id="LogDebug" mnemonicParsing="false" onAction="#toggleProjectProperty" text="Debug Logs" />
+                        <CheckBox fx:id="LogProfile" mnemonicParsing="false" onAction="#toggleProjectProperty" text="Profile Logs" GridPane.rowIndex="1" />
+                     </children>
+                  </GridPane>
+               </content>
+            </Tab>
+         </tabs>
+      </TabPane>
+   </content>
+</DialogPane>

@@ -1,4 +1,4 @@
-I'm# HOWTO: niem-tools BoUML Plugout
+# HOWTO: niem-tools BoUML Plugout
 
 This is a quick HOWTO for getting started with using `BoUML` and `niemtools` to develop NIEM message specifications.  The steps include:
 
@@ -112,7 +112,7 @@ This is a quick HOWTO for getting started with using `BoUML` and `niemtools` to 
 | **NIEM Multiplicity** | Min and max occurrences | `0,1` |
 | **Old XPath** | Full path from a mapping to a previous reference model (e.g. GJXDM) | `ecf:CourtEventAugmentation/ecf:ConnectedDocument` |
 | **Old Multiplicity** | Min and max occurrences from a mapping to a previous reference model | `0,1` |
-| **NIEM Mapping Notes** | Optional mapping notes; maybe the name of a Genericode code list | Genericode code list CourtLocationCode.gc|
+| **NIEM Mapping Notes** | Optional mapping notes; maybe the name of a Genericode code list | CourtLocationCode.gc|
 | **Code List** | Extension code list values and definitions in the format "code1=definition1; code2=definition2" | `civil=Civil Case Type; criminal=Criminal Case Type; domestic=Domestic Case Type` |
 
 **Mapping Tips:**

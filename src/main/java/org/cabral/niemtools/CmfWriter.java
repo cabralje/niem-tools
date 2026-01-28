@@ -296,7 +296,7 @@ public class CmfWriter {
             Log.debug("exportCmfClass: exporting class " + typeName);
 
             if (NamespaceModel.isAttribute(typeName)) {
-                Log.debug("exportCmfClass: skipping attribute class " + typeName);
+                Log.trace("exportCmfClass: skipping attribute class " + typeName);
                 return "";
             }
 
@@ -364,10 +364,15 @@ public class CmfWriter {
                         UmlClassInstance element = model2.getReferencedElement(item);
                         if (element != null) {
                             String elementName = NamespaceModel.getPrefixedName(element);
-                            if (NiemModel.isAugmentation(elementName))
+                            if (NiemModel.isAugmentation(elementName)) {
+                                Log.debug("exportCmfClass: skipping augmentation property " + elementName);
                                 continue;
-                            if (NamespaceModel.isAttribute(elementName))
-                                continue;
+                            }
+                            if (NamespaceModel.isAttribute(elementName)) {
+                            //    Log.trace("exportCmfClass: skipping attribute property " + elementName);
+                            //    continue;
+                                elementName = NamespaceModel.filterAttributePrefix(elementName);
+                            }
                             String multiplicity = attribute.multiplicity();
                             UmlClass elementBaseType = null;
                             try {
@@ -449,6 +454,7 @@ public class CmfWriter {
 
         String typeName = null;
         UmlClass codeListType = null;
+        String externalCodeList;
         String restrictionCmf;
         String id = NamespaceModel.getPrefixedName(type);
         try {
@@ -465,7 +471,11 @@ public class CmfWriter {
                 restrictionCmf += tagRef(restrictionBaseName, "xs:token");
             } else 
                 restrictionCmf += tagRef(restrictionBaseName, NamespaceModel.getPrefixedName(baseType));
-            if (NiemUmlModel.isEnumeration(type))
+
+            // Get external code lists
+            externalCodeList = NiemUmlModel.getExternalCodeList(type);
+
+            if (externalCodeList != null || NiemUmlModel.isEnumeration(type))
                 codeListType = type; 
             // check if base type is a code list
             else {
@@ -479,17 +489,19 @@ public class CmfWriter {
         }
 
         try {
-            // add codeList if not Genericode
-            String notes = type.propertyValue(NiemUmlModel.NOTES_PROPERTY);
+            // add codeList if not external (e.g. Genericode)
+            //String notes = type.propertyValue(NiemUmlModel.NOTES_PROPERTY);
             if (codeListType != null && codeListType.children() != null) {
-                if (notes == null || !notes.contains("Genericode")) {
+                if (externalCodeList == null) {
                     Log.debug("exportCmfClass: exporting code list " + typeName);
                     for (UmlItem item : codeListType.children()) {
                         if (item != null && item.kind() == anItemKind.anAttribute) {
                             UmlAttribute attribute = (UmlAttribute) item;
-                            String codeValue = attribute.defaultValue();
-                            String codeDescription = attribute.description();
                             String name = attribute.name();
+                            String codeValue = attribute.defaultValue();
+                            if (codeValue == null || codeValue.isEmpty())
+                                codeValue = name;
+                            String codeDescription = attribute.description();
                             if (!NiemUmlModel.isFacet(attribute))
                                 name = "enumeration";
                             String enumeration;
@@ -506,6 +518,12 @@ public class CmfWriter {
                             restrictionCmf += tag(facetName, enumeration);
                         }
                     }
+
+                // Handle Genericode lists
+                } else {
+                    Log.debug("exportCmfClass: linking to Genericode code list " + typeName);
+                    String codelistBinding = tag("CodeListURI", "../codelists/" + typeName + XmlWriter.GC_FILE_TYPE) + tag("CodeListColumnName", "code")+ tag("CodeListConstrainingIndicator", "true") ;
+                    restrictionCmf += tag ("CodeListBinding", codelistBinding);
                 }
             }
             if (isOlderCmfVersion(cmfVersion, "1.0"))
@@ -600,7 +618,7 @@ public class CmfWriter {
                 if (substitutionElement != null) {
                     String sustitutionInType = substitutionElement.propertyValue(NiemUmlModel.SUBSTITUTION_TYPE_PROPERTY);
                     if (sustitutionInType != null) {
-                        //String substitutionElementName = NamespaceModel.getPrefixedName(substitutionElement);
+                        String substitutionElementName = NamespaceModel.getPrefixedName(substitutionElement);
                         String substitutionForElement = substitutionElement.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
                         if (substitutionForElement.endsWith(NiemModel.ABSTRACT_NAME) || substitutionForElement.endsWith(NiemModel.REPRESENTATION_NAME)) {
                             Log.debug("exportCmfNamespace: skipping abstract or representation head element " + substitutionForElement);
@@ -608,7 +626,7 @@ public class CmfWriter {
                         }
                         UmlClass substitutionElementType = NiemModel.getBaseType(substitutionElement);
                         if (NiemModel.isAugmentationType(NamespaceModel.getName(substitutionElementType))) {
-                            //Log.debug("exportCmfNamespace: skipping augmentation element " + substitutionElementName);
+                            Log.debug("exportCmfNamespace: skipping augmentation element " + substitutionElementName);
                             if (substitutionElementType != null && substitutionElementType.children() != null)
                                 for (UmlItem item2 : substitutionElementType.children()) {
                                     if (item2 != null && item2.kind() == anItemKind.anAttribute) {
@@ -862,10 +880,14 @@ public class CmfWriter {
                     UmlClassInstance element = model2.getReferencedElement(item);
                     if (element != null) {
                         String elementName = NamespaceModel.getPrefixedName(element);
-                        if (NiemModel.isAugmentation(elementName))
+                        if (NiemModel.isAugmentation(elementName)) {
+                            Log.debug("exportCmfClass: skipping augmentation property  " + elementName);
                             continue;
-                        if (NamespaceModel.isAttribute(elementName))
+                        }
+                        if (NamespaceModel.isAttribute(elementName)) {
+                            Log.debug("exportCmfClass: skipping attribute property " + elementName);
                             continue;
+                        }
                         properties = true;
                         break;
                     }

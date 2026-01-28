@@ -119,7 +119,7 @@ public class NiemUmlModel {
     static final String WEBSERVICE_STEREOTYPE = "niem-profile:webservice";
     static final String INTERFACE_STEREOTYPE = "niem-profile:interface";
     static final String HTTP_METHODS_PROPERTY = WEBSERVICE_STEREOTYPE + NiemUmlModel.STEREOTYPE_DELIMITER + "HTTPMethods";
-    static final String INTERFACE_PATH_PROPERTY = INTERFACE_STEREOTYPE + NiemUmlModel.STEREOTYPE_DELIMITER + "Path";
+    //static final String INTERFACE_PATH_PROPERTY = INTERFACE_STEREOTYPE + NiemUmlModel.STEREOTYPE_DELIMITER + "Path";
 
     // niem stereotype properties
     static final String URI_PROPERTY = "URI";
@@ -132,6 +132,7 @@ public class NiemUmlModel {
     static final String SUBSTITUTION_TYPE_PROPERTY = "substitutesIn";
     static final String SUBSTITUTION_MULTIPLICITY_PROPERTY = "subMultiplicity";
     static final String CODELIST_PROPERTY = "codeList";
+    static final String EXTERNAL_CODELIST_PROPERTY = "externalCodeList";
     static final String FILE_PATH_PROPERTY = "path";
     //static final String FACETS_PROPERTY = "facets";
     static final String TRUNCATED_PROPERTY = "isTruncated";
@@ -188,11 +189,19 @@ public class NiemUmlModel {
     }
 
     /**
-     * @param element
+     * @param item
      * @return codelist associated with the element
      */
     static String getCodeList(UmlItem item) {
         return item.propertyValue(CODELIST_PROPERTY);
+    }
+
+    /**
+     * @param item
+     * @return external codelist associated with the element
+     */
+    static String getExternalCodeList(UmlItem item) {
+        return item.propertyValue(EXTERNAL_CODELIST_PROPERTY);
     }
 
     /**
@@ -434,7 +443,7 @@ public class NiemUmlModel {
     public void cacheModels(boolean referenceOnly) {
 
         Log.start("cacheModels");
-        UmlCom.message("Caching models ...");
+        //UmlCom.message("Caching models ...");
         Log.trace("Caching models");
         try {
             NamespaceModel.cacheExternalSchemas();
@@ -455,7 +464,7 @@ public class NiemUmlModel {
      *
      */
     public void createNIEM() {
-        UmlCom.message("Resetting NIEM models");
+        //UmlCom.message("Resetting NIEM models");
         Log.trace("Resetting NIEM models");
         UmlPackage pimPackage;
         // Find or create NIEM packages
@@ -475,7 +484,7 @@ public class NiemUmlModel {
     public void createSubsetAndExtension() {
 
         Log.start("createSubsetAndExtension");
-        UmlCom.message("Generating NIEM subset and extension models");
+        //UmlCom.message("Generating NIEM subset and extension models");
         Log.trace("Generating NIEM subset and extension models");
 
         Log.start("createSubsetAndExtension - add types");
@@ -627,7 +636,7 @@ public class NiemUmlModel {
                 NiemModel model = NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(baseTypeName2)) ? SubsetModel : ExtensionModel;
                 UmlClass baseType = model.getType(NamespaceModel.getSchemaURI(baseTypeName2), baseTypeName2);
                 if (baseType == null && !baseTypeName.isEmpty())
-                    Log.trace("createSubsetAndExtension: error - base type " + baseTypeName2 + " not in model");
+                    Log.trace("createSubsetAndExtension: error - base type " + baseTypeName2 + " not included in model");
                 
                 UmlClassInstance element;
                 if (NamespaceModel.isNiemPrefix(NamespaceModel.getPrefix(elementName))) {
@@ -666,27 +675,31 @@ public class NiemUmlModel {
                 }
                 if (codeList != null && !codeList.isEmpty() && (!substitution || representation)) {
                     setCodeList(element, codeList);
-                    if (baseType != null && !isNiem(baseType) && mappingNotes != null && !mappingNotes.contains("Genericode") && codeList.trim().contains(NiemModel.CODELIST_DELIMITER)) {
-                        Log.debug("createSubsetAndExtension: exporting enumerations for " + baseType.name());
-                        baseType.set_Stereotype(NiemUmlModel.ENUM_STEREOTYPE);
-                        String[] codes = codeList.split(NiemModel.CODELIST_DELIMITER);
-                        int anonymousEnums = 0;
-                        for (String code : codes) {
-                            String[] pairs = code.split(NiemModel.CODELIST_DEFINITION_DELIMITER);
-                            String value = pairs[0].trim();
-                            String definition = pairs.length > 1 ? pairs[1].trim() : "";
-                            Log.debug("createSubsetAndExtension: adding " + value + " to type " + baseType.name());
-                            UmlAttribute attribute;
-                            try {
-                                attribute = UmlAttribute.create(baseType, NiemModel.filterUMLAttribute(value));
-                            } catch (RuntimeException re) {
-                                attribute = UmlAttribute.create(baseType, NiemModel.filterUMLAttribute("Enum" + anonymousEnums++));
-                                //Log.trace("importCodeList: error - cannot add attribute " + value + " in type " + type.name());
-                                //continue;
-                            }
-                            if (attribute != null) {
-                                attribute.set_DefaultValue(value);
-                                attribute.set_Description(definition);
+                    if (baseType != null && !isNiem(baseType)) {
+                        if (mappingNotes != null && mappingNotes.contains(XmlWriter.GC_FILE_TYPE))
+                            setExternalCodeList(baseType, mappingNotes.trim());
+                        else if (codeList.trim().contains(NiemModel.CODELIST_DELIMITER)) {
+                            Log.debug("createSubsetAndExtension: exporting enumerations for " + baseType.name());
+                            baseType.set_Stereotype(NiemUmlModel.ENUM_STEREOTYPE);
+                            String[] codes = codeList.split(NiemModel.CODELIST_DELIMITER);
+                            int anonymousEnums = 0;
+                            for (String code : codes) {
+                                String[] pairs = code.split(NiemModel.CODELIST_DEFINITION_DELIMITER);
+                                String value = pairs[0].trim();
+                                String definition = pairs.length > 1 ? pairs[1].trim() : "";
+                                Log.debug("createSubsetAndExtension: adding " + value + " to type " + baseType.name());
+                                UmlAttribute attribute;
+                                try {
+                                    attribute = UmlAttribute.create(baseType, NiemModel.filterUMLAttribute(value));
+                                } catch (RuntimeException re) {
+                                    attribute = UmlAttribute.create(baseType, NiemModel.filterUMLAttribute("Enum" + anonymousEnums++));
+                                    //Log.trace("importCodeList: error - cannot add attribute " + value + " in type " + type.name());
+                                    //continue;
+                                }
+                                if (attribute != null) {
+                                    attribute.set_DefaultValue(value);
+                                    attribute.set_Description(definition);
+                                }
                             }
                         }
                     }
@@ -795,7 +808,7 @@ public class NiemUmlModel {
             //target.set_dir(0,null);
             try {
                 UmlItem.frame();
-                UmlCom.message("Indexes ...");
+                //UmlCom.message("Indexes ...");
                 Log.start("generate_indexes");
                 UmlItem.generate_indexes();
                 Log.stop("generate_indexes");
@@ -837,7 +850,7 @@ public class NiemUmlModel {
             }
         }
 
-        UmlCom.message("Generating NIEM Mapping CSV ...");
+        //UmlCom.message("Generating NIEM Mapping CSV ...");
         Log.trace("Generating NIEM Mapping CSV at " + filename);
         NamespaceModel.cacheExternalSchemas();
 
@@ -876,7 +889,7 @@ public class NiemUmlModel {
                 return;
             }
         }
-        UmlCom.message("Generating NIEM Mapping HTML ...");
+        //UmlCom.message("Generating NIEM Mapping HTML ...");
         Log.trace("Generating NIEM Mapping HTML at " + filename);
         NamespaceModel.cacheExternalSchemas();
         // cache NIEM namespaces, elements and types
@@ -906,7 +919,7 @@ public class NiemUmlModel {
         //String exportCmf = properties.getProperty(ProjectProperties.EXPORT_CMF);
         String exportXsd = properties.getProperty(ProjectProperties.EXPORT_XSD);
         String exportJson = properties.getProperty(ProjectProperties.EXPORT_JSON);
-        String exportCmfToXsd = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
+        //String exportCmfToXsd = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
         //String exportCmfToJson = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
         String exportWsdl = properties.getProperty(ProjectProperties.EXPORT_WSDL);
         String exportOpenApi = properties.getProperty(ProjectProperties.EXPORT_OPENAPI);
@@ -928,7 +941,8 @@ public class NiemUmlModel {
         XmlWriter xmlWriter = new XmlWriter(xmlDir);
 
         try {
-            if (exportXsd.equals("true") && exportCmfToXsd.equals("false")) {
+//            if (exportXsd.equals("true") && exportCmfToXsd.equals("false")) {
+            if (exportXsd.equals("true")) {
                 // export catalog file
                 xmlWriter.exportXmlCatalog();
             }
@@ -1065,6 +1079,7 @@ public class NiemUmlModel {
         }
 
         if (exportXsd.equals("true")) {
+            /* 
             if (exportCmfToXsd.equals("false")) {
                 try {
 
@@ -1073,6 +1088,7 @@ public class NiemUmlModel {
                     Log.trace("exportSpecification: error exporting MPD catalog " + e.toString());
                 }
             }
+                */
             if (exportWsdl.equals("true")) {
 				try {
                     String wsdlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
@@ -1152,7 +1168,7 @@ public class NiemUmlModel {
         }
         
         Log.start("exportWantlist");
-        UmlCom.message("Generating NIEM Wantlist ...");
+        //UmlCom.message("Generating NIEM Wantlist ...");
         Log.trace("Generating NIEM Wantlist in " + directory + "\\" + filename);
         //XmlWriter xmlWriter = new XmlWriter(dir);
 
@@ -1295,6 +1311,8 @@ public class NiemUmlModel {
                                                 continue;
                                             UmlAttribute attribute = (UmlAttribute) item3;
                                             String value = attribute.defaultValue();
+                                            if (value.isEmpty())
+                                                value = attribute.name();
                                             //String codeList = type.propertyValue(CODELIST_PROPERTY);
                                             //if (codeList != null && codeList.contains(NiemModel.CODELIST_DELIMITER)) {
                                             // trace("exportWantlist: exporting enumerations for " + getPrefixedName(type));
@@ -1395,11 +1413,11 @@ public class NiemUmlModel {
      */
     public void importSchemaDir(String dir) throws IOException {
 
-        UmlCom.message("Importing NIEM schema");
-        Log.trace("Importing NIEM reference model.");
+        //UmlCom.message("Importing NIEM schema");
+        Log.debug("Importing NIEM reference model.");
         String maxEnumsString = properties.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
         if (maxEnumsString != null && !maxEnumsString.isEmpty())
-            Log.trace("Code lists/facets will be limited to " + maxEnumsString + " values.");
+            Log.debug("Code lists/facets will be limited to " + maxEnumsString + " values.");
             
         // Configure DOM
         Path path = FileSystems.getDefault().getPath(dir);
@@ -1410,12 +1428,18 @@ public class NiemUmlModel {
         // Walk directory to import in passes (0: types, 1: elements, 2: elements in types
         for (importPass = 0; importPass < passes; importPass++) {
             switch (importPass) {
-                case 0 ->
+                case 0 -> {
                     Log.trace("\nImporting types");
-                case 1 ->
+                    Log.start("importTypes");
+                }
+                case 1 -> {
                     Log.trace("\nImporting elements and attributes");
-                case 2 ->
+                    Log.start("importElements");
+                }
+                case 2 -> {
                     Log.trace("\nImporting elements and attributes in types");
+                    Log.start("importElementsInTypes");
+                }
             }
             Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                 @Override
@@ -1454,41 +1478,62 @@ public class NiemUmlModel {
                             Log.trace("importSchemaDir: skipping domain " + filepath + " - not on include list");
                                 return FileVisitResult.CONTINUE;
                         }
-                        String excludes = properties.getProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS);
+/*                         String excludes = properties.getProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS);
                         if (!excludes.isEmpty() && (excludes.contains(filepath2))) {
                             Log.trace("importSchemaDir: skipping excluded domain " + filepath2);
                                 return FileVisitResult.CONTINUE;
-                        }
+                        } */
                     }
                     
                     // check for included or excluded codes
-                    if (filepath.contains("/codes/")) {
+/*                     if (filepath.contains("/codes/")) {
+                        String includes = properties.getProperty(ProjectProperties.IMPORT_INCLUDE_CODES);
+                        if (!includes.isEmpty() && (!includes.contains(filepath2))) {
+                            Log.trace("importSchemaDir: skipping codes " + filepath + " - not on include list");
+                                return FileVisitResult.CONTINUE;
+                        }
                         String excludes = properties.getProperty(ProjectProperties.IMPORT_EXCLUDE_CODES);
                         if (!excludes.isEmpty() && (excludes.contains(filepath2))) {
                             Log.trace("importSchemaDir: skipping excluded codes " + filepath);
                                 return FileVisitResult.CONTINUE;
                         }
-                    }
+                    } */
                     if (filename.endsWith(XmlWriter.XSD_FILE_TYPE)) {
-                        Log.trace("Importing " + filepath);
-                        switch (importPass) {
-                            case 0 -> {
-                                Namespace ns = ReferenceModel.importTypes(doc, filename);
-                                if (ns != null) {
-                                    UmlClassView classView = ns.getReferenceClassView();
-                                    if (classView != null)
-                                        classView.set_PropertyValue(FILE_PATH_PROPERTY, NIEM_DIR + filepath);
+                        Log.debug("Importing " + filepath);
+                        try {
+                            switch (importPass) {
+                                case 0 -> {
+                                    Namespace ns = ReferenceModel.importTypes(doc, filename);
+                                    if (ns != null) {
+                                        UmlClassView classView = ns.getReferenceClassView();
+                                        if (classView != null)
+                                            classView.set_PropertyValue(FILE_PATH_PROPERTY, NIEM_DIR + filepath);
+                                    }
                                 }
+                                case 1 ->
+                                    ReferenceModel.importElements(doc, filename);
+                                case 2 ->
+                                    ReferenceModel.importElementsInTypes(doc, filename);
                             }
-                            case 1 ->
-                                ReferenceModel.importElements(doc, filename);
-                            case 2 ->
-                                ReferenceModel.importElementsInTypes(doc, filename);
+                        } catch (RuntimeException e) {
+                            // TODO Auto-generated catch block
+                             e.printStackTrace();
                         }
                     }
                     return FileVisitResult.CONTINUE;
                 }
             });
+             switch (importPass) {
+                case 0 -> {
+                    Log.stop("importTypes");
+                }
+                case 1 -> {
+                    Log.stop("importElements");
+                }
+                case 2 -> {
+                    Log.stop("importElementsInTypes");
+                }
+            } 
         }
 
         // Sorting
@@ -1496,6 +1541,7 @@ public class NiemUmlModel {
         ReferenceModel.getModelPackage().sortChildren();
         Log.trace("Namespaces: " + NamespaceModel.getSize());
         Log.trace("Elements: " + ReferenceModel.getSize());
+        Log.setImportStatusText("");
     }
 
     /**
@@ -1600,12 +1646,23 @@ public class NiemUmlModel {
     }
 
     /**
-     * @param type
-     * @param codelist
-     * @return set codelist associated with the type
+     * Sets the codelist associated with the item.
+     * 
+     * @param item the UML item to set the codelist for
+     * @param codelist the codelist value to set
      */
     static void setCodeList(UmlItem item, String codelist) {
         item.set_PropertyValue(CODELIST_PROPERTY, codelist);
+    }
+
+    /**
+     * Sets the external codelist associated with the item.
+     * 
+     * @param item the UML item to set the external codelist for
+     * @param codelist the external codelist value to set
+     */
+    static void setExternalCodeList(UmlItem item, String codelist) {
+        item.set_PropertyValue(EXTERNAL_CODELIST_PROPERTY, codelist);
     }
 
     /**
@@ -1671,5 +1728,73 @@ public class NiemUmlModel {
         if (item.children() != null)
             for (UmlItem child : item.children())
                 sort(child, sortClassMembers);
+    }
+
+    protected void importReferenceModel(ProjectProperties properties) {
+
+        String importDir = System.getProperty("java.io.tmpdir");
+        try {
+            String githubRepoUrl = "https://github.com/niemopen/niem-model/archive/refs/tags/";
+            String modelUrl = githubRepoUrl + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION) + ".zip";
+            String importFile = importDir + File.separator + "reference_model.zip";
+//                   String targetDirectory = properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR);
+            //if (targetDirectory == null || targetDirectory.isEmpty()) {
+            // Download the reference model from GitHub
+            // Download the reference model from GitHub using HttpURLConnection with timeouts
+            java.net.URL url = java.net.URI.create(modelUrl).toURL();
+            java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(10000); // 10 seconds timeout for connection
+            connection.setReadTimeout(10000);    // 10 seconds timeout for reading
+            try (java.io.InputStream in = connection.getInputStream()) {
+                java.nio.file.Files.copy(in, new File(importFile).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            } finally {
+                connection.disconnect();
+            }
+
+            // Unzip the downloaded file
+            try (java.io.InputStream fis = new java.io.FileInputStream(importFile);
+                    java.util.zip.ZipInputStream zis =
+                        new java.util.zip.ZipInputStream(fis)) {
+                java.util.zip.ZipEntry entry;
+                while ((entry = zis.getNextEntry()) != null) {
+                    File outFile = new File(importDir, entry.getName());
+                    if (entry.isDirectory()) {
+                        outFile.mkdirs();
+                    } else {
+                        outFile.getParentFile().mkdirs();
+                        try (java.io.OutputStream os = new java.io.FileOutputStream(outFile)) {
+                            byte[] buffer = new byte[4096];
+                            int len;
+                            while ((len = zis.read(buffer)) != -1) {
+                                os.write(buffer, 0, len);
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            Log.trace("Exception 1 in importReferenceModel " + e.getMessage());
+            System.exit(1); 
+        }
+
+        try {
+            Log.start("importReferenceModel");
+            String directory = importDir + File.separator + "niem-model-" + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);
+            //String directory = properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR);
+            properties.setProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR, directory);
+            deleteNIEM(true);
+            createNIEM();
+            cacheModels(true);
+            importSchemaDir(directory);
+            Log.stop("importReferenceModel");
+            
+            // Next step
+            //Log.trace("\nNEXT STEP: Model content in UML, add NIEM stereotypes, and then select 'Publish UML'");
+        } catch (IOException e) {
+            Log.trace("Exception 2 in importReferenceModel: " + e.getMessage());
+            System.exit(1);
+        }   
+
     }
 }
