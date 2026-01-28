@@ -3,6 +3,10 @@
         {
             "command": "clean install",
             "debug": false
+        },
+        {
+            "command": "clean package",
+            "debug": false
         }
     ],
     "python.testing.pytestArgs": [

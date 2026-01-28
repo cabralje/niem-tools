@@ -20,122 +20,24 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.cabral.niemtools.BoumlPlugout</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>org.cabral.niemtools.BoumlPlugout</mainClass>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.1</version>
-                <executions>
-                <execution>
-                    <id>copy-dependencies</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>copy-dependencies</goal>
-                    </goals>
-                    <configuration>
-                        <includeScope>provided</includeScope>
-                        <includeTypes>jar</includeTypes>
-                        <excludeTransitive>true</excludeTransitive>
-                        <outputDirectory>${project.build.directory}</outputDirectory>
-                    </configuration>
-                </execution>
-                <execution>
-                    <id>copy-openjfx</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>copy</goal>
-                    </goals>
-                    <configuration>
-                        <artifactItems>
-                            <artifactItem>
-                                <groupId>org.openjfx</groupId>
-                                <artifactId>javafx-base</artifactId>
-                                <version>21.0.1</version>
-                                <overWrite>true</overWrite>
-                                <outputDirectory>${project.build.directory}/javafx-lib</outputDirectory>
-                            </artifactItem>
-                            <artifactItem>
-                                <groupId>org.openjfx</groupId>
-                                <artifactId>javafx-graphics</artifactId>
-                                <version>21.0.1</version>
-                                <overWrite>true</overWrite>
-                                <outputDirectory>${project.build.directory}/javafx-lib</outputDirectory>
-                            </artifactItem>
-                            <artifactItem>
-                                <groupId>org.openjfx</groupId>
-                                <artifactId>javafx-controls</artifactId>
-                                <version>21.0.1</version>
-                                <overWrite>true</overWrite>
-                                <outputDirectory>${project.build.directory}/javafx-lib</outputDirectory>
-                            </artifactItem>
-                            <artifactItem>
-                                <groupId>org.openjfx</groupId>
-                                <artifactId>javafx-fxml</artifactId>
-                                <version>21.0.1</version>
-                                <overWrite>true</overWrite>
-                                <outputDirectory>${project.build.directory}/javafx-lib</outputDirectory>
-                            </artifactItem>
-                            <artifactItem>
-                                <groupId>org.openjfx</groupId>
-                                <artifactId>javafx-base</artifactId>
-                                <version>21.0.1</version>
-                                <classifier>win</classifier>
-                                <overWrite>true</overWrite>
-                                <outputDirectory>${project.build.directory}/javafx-lib</outputDirectory>
-                            </artifactItem>
-                            <artifactItem>
-                                <groupId>org.openjfx</groupId>
-                                <artifactId>javafx-graphics</artifactId>
-                                <version>21.0.1</version>
-                                <classifier>win</classifier>
-                                <overWrite>true</overWrite>
-                                <outputDirectory>${project.build.directory}/javafx-lib</outputDirectory>
-                            </artifactItem>
-                            <artifactItem>
-                                <groupId>org.openjfx</groupId>
-                                <artifactId>javafx-controls</artifactId>
-                                <version>21.0.1</version>
-                                <classifier>win</classifier>
-                                <overWrite>true</overWrite>
-                                <outputDirectory>${project.build.directory}/javafx-lib</outputDirectory>
-                            </artifactItem>
-                            <artifactItem>
-                                <groupId>org.openjfx</groupId>
-                                <artifactId>javafx-fxml</artifactId>
-                                <version>21.0.1</version>
-                                <classifier>win</classifier>
-                                <overWrite>true</overWrite>
-                                <outputDirectory>${project.build.directory}/javafx-lib</outputDirectory>
-                            </artifactItem>
-                        </artifactItems>
-                    </configuration>
-                </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/assembly/dist.xml</descriptor>
-                    </descriptors>
-                    <outputDirectory>${project.basedir}/dist</outputDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                        <phase>package</phase> <!-- bind to the packaging phase -->
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>    
@@ -144,13 +46,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.18.0</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
             <version>5.11</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>

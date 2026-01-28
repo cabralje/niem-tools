@@ -4,6 +4,20 @@ This is a [BOUML](http://bouml.fr "BOUML") "plugout" that supports developing [N
 [Jim Cabral](mailto:jim@cabral.org) developed this UML-based tool for developing and managing NIEM architectures.  
 Portions of this work were supported by [MTG Management Consultants LLC](http://mtgmc.com "MTG") and [InfoTrack US](https://infotrack.com "InfoTrack").
 
+## Installation
+
+Install niem-tools using npm:
+```bash
+npm install -g niem-tools
+```
+
+Or install directly from GitHub:
+```bash
+npm install -g cabralje/niem-tools
+```
+
+## Features
+
 The advantages relative to other tools include:
 
 <b>Standards-Based</b> – Conforms to UML 2.0 and NIEM Naming and Design Rules (NDR).
