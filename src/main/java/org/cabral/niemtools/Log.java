@@ -58,16 +58,16 @@ public class Log {
     }
 
         /**
-     * Set the LogArea TextArea for appending log messages
-     * @param area The TextArea to append messages to
+     * Enable or disable debug logging.
+     * @param debug true to enable debug logging, false to disable
      */
     public static void setDebug(boolean debug) {
         DEBUG = debug;
     }
 
         /**
-     * Set the LogArea TextArea for appending log messages
-     * @param area The TextArea to append messages to
+     * Enable or disable profiling timers.
+     * @param profile true to enable profiling, false to disable
      */
     public static void setProfile(boolean profile) {
         PROFILE = profile;
