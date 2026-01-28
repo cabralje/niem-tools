@@ -487,9 +487,11 @@ public class CmfWriter {
                     for (UmlItem item : codeListType.children()) {
                         if (item != null && item.kind() == anItemKind.anAttribute) {
                             UmlAttribute attribute = (UmlAttribute) item;
-                            String codeValue = attribute.defaultValue();
-                            String codeDescription = attribute.description();
                             String name = attribute.name();
+                            String codeValue = attribute.defaultValue();
+                            if (codeValue.isEmpty())
+                                codeValue = name;
+                            String codeDescription = attribute.description();
                             if (!NiemUmlModel.isFacet(attribute))
                                 name = "enumeration";
                             String enumeration;

@@ -4,19 +4,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import fr.bouml.UmlCom;
 import javafx.application.Platform;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 
 public class Log {
 
     // Debugging options
-    //private static final Boolean DEBUG = true;
-    private static final Boolean DEBUG = false;
-
-    //private static final Boolean PROFILE = true;
-    private static final Boolean PROFILE = false;
+    private static Boolean DEBUG = false;
+    private static Boolean PROFILE = false;
 
     private static final ConcurrentHashMap<String, Long> timer = new ConcurrentHashMap<>();
     private static TextArea logArea = null;
+    private static Label importStatus = null;
 
     /**
      * outputs debugging information
@@ -43,6 +42,14 @@ public class Log {
     }
 
     /**
+     * Set the importStatus Label for displaying import status messages
+     * @param label The Label to display messages on
+     */
+    public static void setImportStatus(Label label) {
+        importStatus = label;
+    }
+
+    /**
      * Set the LogArea TextArea for appending log messages
      * @param area The TextArea to append messages to
      */
@@ -50,12 +57,28 @@ public class Log {
         logArea = area;
     }
 
+        /**
+     * Set the LogArea TextArea for appending log messages
+     * @param area The TextArea to append messages to
+     */
+    public static void setDebug(boolean debug) {
+        DEBUG = debug;
+    }
+
+        /**
+     * Set the LogArea TextArea for appending log messages
+     * @param area The TextArea to append messages to
+     */
+    public static void setProfile(boolean profile) {
+        PROFILE = profile;
+    }
+
     /**
      * @param s
      */
     public static void start(String s) {
         if (PROFILE) {
-            trace("ELAPSED TIME (" + s + "): starting timer");
+            //trace("ELAPSED TIME (" + s + "): starting timer");
             timer.put(s, System.nanoTime());
         }
     }
@@ -74,6 +97,12 @@ public class Log {
             long elapsedTime = (stopTime - startTime) / 1000000000L;
             trace("ELAPSED TIME (" + s + "): " + elapsedTime + " sec");
             timer.remove(s);
+        }
+    }
+
+    public static void setImportStatusText(String message) {
+        if (importStatus != null) {
+            Platform.runLater(() -> importStatus.setText(message));
         }
     }
 }

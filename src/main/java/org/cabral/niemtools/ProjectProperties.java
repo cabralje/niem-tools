@@ -74,8 +74,9 @@ public class ProjectProperties extends Properties {
     static final String IMPORT_CODE_DESCRIPTIONS = "ImportCodeDescriptions";
     static final String IMPORT_MAX_FACETS = "ImportMaxFacets";
     static final String IMPORT_INCLUDE_DOMAINS = "ImportIncludeDomains";
-    static final String IMPORT_EXCLUDE_DOMAINS = "ImportExcludeDomains";
-    static final String IMPORT_EXCLUDE_CODES = "ImportExcludeCodes";
+    //static final String IMPORT_EXCLUDE_DOMAINS = "ImportExcludeDomains";
+    //static final String IMPORT_INCLUDE_CODES = "ImportIncludeCodes";
+    //static final String IMPORT_EXCLUDE_CODES = "ImportExcludeCodes";
 
     // generation properties
     static final String EXPORT_URI = "ExportURI";
@@ -135,6 +136,10 @@ public class ProjectProperties extends Properties {
     static final String EXPORT_WANTLIST_FILE = "ExportWantlistFile";
     static final String EXPORT_CODELISTS_DIR = "ExportCodeListsDir";
 
+    // logging properties
+    static final String LOG_DEBUG = "LogDebug";
+    static final String LOG_PROFILE = "LogProfile";
+
     //private static final long serialVersionUID = 1L;
     private final UmlPackage project;
 
@@ -161,10 +166,11 @@ public class ProjectProperties extends Properties {
         Properties defaults = new Properties();
         defaults.setProperty(IMPORT_NIEM_VERSION, "6.0");
         defaults.setProperty(IMPORT_CODE_DESCRIPTIONS, "true");
-        defaults.setProperty(IMPORT_MAX_FACETS, "300");
-        defaults.setProperty(IMPORT_INCLUDE_DOMAINS, "justice, hs");
-        defaults.setProperty(IMPORT_EXCLUDE_DOMAINS, "");
-        defaults.setProperty(IMPORT_EXCLUDE_CODES, "");
+        defaults.setProperty(IMPORT_MAX_FACETS, "100");
+        defaults.setProperty(IMPORT_INCLUDE_DOMAINS, "");
+        //defaults.setProperty(IMPORT_EXCLUDE_DOMAINS, "");
+        //defaults.setProperty(IMPORT_INCLUDE_CODES, "");
+        //defaults.setProperty(IMPORT_EXCLUDE_CODES, "");
 
         // export defaults
         defaults.setProperty(EXPORT_URI, "http://local");
@@ -227,6 +233,10 @@ public class ProjectProperties extends Properties {
         defaults.setProperty(EXPORT_WANTLIST_FILE,"model\\mapping\\wantlist");
         defaults.setProperty(EXPORT_CODELISTS_DIR,"codelists");
 
+        // logging defaults
+        defaults.setProperty(LOG_DEBUG, "false");
+        defaults.setProperty(LOG_PROFILE, "false");
+        
         return defaults;
     }
     /**

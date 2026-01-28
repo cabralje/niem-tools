@@ -136,6 +136,7 @@ public class BoumlPlugout {
             System.out.println("Error connecting to BOUML: " + e.getMessage());
             System.exit(1);
         }
+        UmlCom.message("Running NIEM Tools...");
         /* 
         // cache UML model
         UmlPackage project = UmlPackage.getProject();

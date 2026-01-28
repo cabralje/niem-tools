@@ -11,6 +11,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class PreferencesDialogController {
+
     private Stage stage;
     private ProjectProperties properties;
 
@@ -75,6 +76,12 @@ public class PreferencesDialogController {
     private TextField ExportXSDModelDir;
 
     @FXML
+    private CheckBox LogDebug;
+
+    @FXML
+    private CheckBox LogProfile;
+
+    @FXML
     private TextField htmldir;
 
     @FXML
@@ -88,88 +95,118 @@ public class PreferencesDialogController {
         ExportCMFFile.setText(properties.getProperty(ProjectProperties.EXPORT_CMF_FILE));
         ExportCMFFile.setDisable(!ExportCMF.isSelected());
         ExportCMFFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(ExportCMFFile, null));
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportCMFFile, null));
+            }
         });
 
         ExportXSDModel.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.EXPORT_XSD_MODEL)));
         ExportXSDModelDir.setText(properties.getProperty(ProjectProperties.EXPORT_XSD_MODEL_DIR));
         ExportXSDModelDir.setDisable(!ExportXSDModel.isSelected());
         ExportXSDModelDir.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(ExportXSDModelDir, null));
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportXSDModelDir, null));
+            }
         });
 
         ExportCodelists.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.EXPORT_CODELISTS)));
         ExportCodeListsDir.setText(properties.getProperty(ProjectProperties.EXPORT_CODELISTS_DIR));
         ExportCodeListsDir.setDisable(!ExportCodelists.isSelected());
         ExportCodeListsDir.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(ExportCodeListsDir, null));
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportCodeListsDir, null));
+            }
         });
 
         ExportWSDL.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.EXPORT_WSDL)));
         ExportWSDLDir.setText(properties.getProperty(ProjectProperties.EXPORT_WSDL_DIR));
         ExportWSDLDir.setDisable(!ExportWSDL.isSelected());
         ExportWSDLDir.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(ExportWSDLDir, null));
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportWSDLDir, null));
+            }
         });
 
         ExportXSD.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.EXPORT_XSD)));
         ExportXSDDir.setText(properties.getProperty(ProjectProperties.EXPORT_XSD_DIR));
         ExportXSDDir.setDisable(!ExportXSD.isSelected());
         ExportXSDDir.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(ExportXSDDir, null));
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportXSDDir, null));
+            }
         });
 
         ExportJSON.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.EXPORT_JSON)));
         ExportJSONDir.setText(properties.getProperty(ProjectProperties.EXPORT_JSON_DIR));
         ExportJSONDir.setDisable(!ExportJSON.isSelected());
         ExportJSONDir.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(ExportJSONDir, null));
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportJSONDir, null));
+            }
         });
 
         ExportOpenAPI.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.EXPORT_OPENAPI)));
         ExportOpenAPIDir.setText(properties.getProperty(ProjectProperties.EXPORT_OPENAPI_DIR));
         ExportOpenAPIDir.setDisable(!ExportOpenAPI.isSelected());
         ExportOpenAPIDir.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(ExportOpenAPIDir, null));
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportOpenAPIDir, null));
+            }
         });
 
         ExportWantlist.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.EXPORT_WANTLIST)));
         ExportWantlistFile.setText(properties.getProperty(ProjectProperties.EXPORT_WANTLIST_FILE));
         ExportWantlistFile.setDisable(!ExportWantlist.isSelected());
         ExportWantlistFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(ExportWantlistFile, null));
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportWantlistFile, null));
+            }
         });
 
         ExportHTML.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.EXPORT_HTML)));
         htmldir.setText(properties.getProperty(ProjectProperties.EXPORT_HTML_DIR));
         htmldir.setDisable(!ExportHTML.isSelected());
         htmldir.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(htmldir, null));
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(htmldir, null));
+            }
         });
 
         niemmapping.setText(properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
         niemmapping.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(niemmapping, null));
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(niemmapping, null));
+            }
         });
 
         // cmftool tab
         ExportCMFTooltoXSDModel.setText(properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_XSD_MODEL));
         ExportCMFTooltoXSDModel.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(ExportCMFTooltoXSDModel, null));
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportCMFTooltoXSDModel, null));
+            }
         });
 
         ExportCMFTooltoXSD.setText(properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_XSD));
         ExportCMFTooltoXSD.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(ExportCMFTooltoXSD, null));
-        });
-        
-        ExportCMFTooltoJSON.setText(properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_JSON));
-        ExportCMFTooltoJSON.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) setProjectProperty(new ActionEvent(ExportCMFTooltoJSON, null));
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportCMFTooltoXSD, null));
+            }
         });
 
+        ExportCMFTooltoJSON.setText(properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_JSON));
+        ExportCMFTooltoJSON.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportCMFTooltoJSON, null));
+            }
+        });
+
+        // logging tab
+        LogDebug.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.LOG_DEBUG)));
+        LogProfile.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.LOG_PROFILE)));
+
     }
-    
+
     @FXML
     void selectDocumentationDirectory(ActionEvent event) {
         //Node source = (Node) event.getSource();
@@ -223,23 +260,60 @@ public class PreferencesDialogController {
             property = ProjectProperties.EXPORT_MAPPING_FILE;
         }
         String value = source.getText();
-        if (property != null && value != null && !property.isEmpty())
+        if (property != null && value != null && !property.isEmpty()) {
             properties.setProperty(property, value);
+        }
     }
 
     @FXML
     void toggleProjectProperty(ActionEvent event) {
         CheckBox source = (CheckBox) event.getSource();
         switch (source.getId()) {
-            case "ExportCMF" -> ExportCMFFile.setDisable(!source.isSelected());
-            case "ExportXSDModel" -> ExportXSDModelDir.setDisable(!source.isSelected());
-            case "ExportCodelists" -> ExportCodeListsDir.setDisable(!source.isSelected());
-            case "ExportWSDL" -> ExportWSDLDir.setDisable(!source.isSelected());
-            case "ExportXSD" -> ExportXSDDir.setDisable(!source.isSelected());
-            case "ExportJSON" -> ExportJSONDir.setDisable(!source.isSelected());
-            case "ExportOpenAPI" -> ExportOpenAPIDir.setDisable(!source.isSelected());
-            case "ExportWantlist" -> ExportWantlistFile.setDisable(!source.isSelected());
-            case "ExportHTML" -> htmldir.setDisable(!source.isSelected());
+            case "ExportCMF" -> {
+                ExportCMFFile.setDisable(!source.isSelected());
+                properties.setProperty(ProjectProperties.EXPORT_CMF, Boolean.toString(source.isSelected()));
+            }
+            case "ExportXSDModel" -> {
+                ExportXSDModelDir.setDisable(!source.isSelected());
+                properties.setProperty(ProjectProperties.EXPORT_XSD_MODEL, Boolean.toString(source.isSelected()));
+            }
+            case "ExportCodelists" -> {
+                ExportCodeListsDir.setDisable(!source.isSelected());
+                properties.setProperty(ProjectProperties.EXPORT_CODELISTS, Boolean.toString(source.isSelected()));
+            }
+            case "ExportWSDL" -> {
+                ExportWSDLDir.setDisable(!source.isSelected());
+                properties.setProperty(ProjectProperties.EXPORT_WSDL, Boolean.toString(source.isSelected()));
+            }
+            case "ExportXSD" -> {
+                ExportXSDDir.setDisable(!source.isSelected());
+                properties.setProperty(ProjectProperties.EXPORT_XSD, Boolean.toString(source.isSelected()));
+            }
+            case "ExportJSON" -> {
+                ExportJSONDir.setDisable(!source.isSelected());
+                properties.setProperty(ProjectProperties.EXPORT_JSON, Boolean.toString(source.isSelected()));
+            }
+            case "ExportOpenAPI" -> {
+                ExportOpenAPIDir.setDisable(!source.isSelected());
+                properties.setProperty(ProjectProperties.EXPORT_OPENAPI, Boolean.toString(source.isSelected()));
+            }
+            case "ExportWantlist" -> {
+                ExportWantlistFile.setDisable(!source.isSelected());
+                properties.setProperty(ProjectProperties.EXPORT_WANTLIST, Boolean.toString(source.isSelected()));
+            }
+            case "ExportHTML" -> {
+                htmldir.setDisable(!source.isSelected());
+                properties.setProperty(ProjectProperties.EXPORT_HTML, Boolean.toString(source.isSelected()));
+            }
+            case "LogDebug" -> {
+                properties.setProperty(ProjectProperties.LOG_DEBUG, Boolean.toString(source.isSelected()));
+                Log.setDebug(source.isSelected());
+
+            }
+            case "LogProfile" -> {
+                properties.setProperty(ProjectProperties.LOG_PROFILE, Boolean.toString(source.isSelected()));
+                Log.setProfile(source.isSelected());
+            }
             default -> {
             }
         }
@@ -251,7 +325,7 @@ public class PreferencesDialogController {
         }
         this.stage = stage;
     }
-    
+
     @FXML
     public void closeDialog() {
         if (stage != null) {

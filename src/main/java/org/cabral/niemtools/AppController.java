@@ -19,6 +19,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -76,7 +77,16 @@ public class AppController {
     private TextField IEPDVersion;
 
     @FXML
+    private CheckBox ImportCodeDescriptions;
+/*
+    @FXML
     private TextField ImportExcludeDomains;
+
+     @FXML
+    private TextField ImportExcludeCodes;
+
+    @FXML
+    private TextField ImportIncludeCodes; */
 
     @FXML
     private TextField ImportIncludeDomains;
@@ -86,6 +96,9 @@ public class AppController {
 
     @FXML
     private ComboBox<String> ImportNIEMVersion;
+
+    @FXML
+    private Label ImportStatus;
 
     @FXML
     private TableColumn<String[], String> LocalPathColumn;
@@ -98,7 +111,7 @@ public class AppController {
 
     @FXML
     private TitledPane NIEMPane;
-    
+
     @FXML
     private Label NIEMStatus;
 
@@ -137,14 +150,18 @@ public class AppController {
      */
     @FXML
     public void initialize() {
-        // Redirect logging
-        Log.setLogArea(LogArea);
 
         // Find project package
         project = UmlPackage.getProject();
         UmlItem target = UmlCom.targetItem();
         properties = new ProjectProperties(project, ProjectProperties.getDefaults());
         properties.load();
+
+        // Redirect logging
+        Log.setImportStatus(ImportStatus);
+        Log.setLogArea(LogArea);
+        Log.setDebug(properties.getProperty(ProjectProperties.LOG_DEBUG).equals("true"));
+        Log.setProfile(properties.getProperty(ProjectProperties.LOG_PROFILE).equals("true"));
 
         // Find UML package
         umlPackage = null;
@@ -164,12 +181,12 @@ public class AppController {
         cmftool = new CmfToolAdapter(model);
 
         // cache UML model
-        UmlCom.message("Memorize references ...");
+        //("Memorize references ...");
         if (umlPackage != null) {
-            umlPackage.memo_ref(); 
-        }else if (project != null) {
-            project.memo_ref(); 
-        }else {
+            umlPackage.memo_ref();
+        } else if (project != null) {
+            project.memo_ref();
+        } else {
             Log.trace("Warning: project is null. Skipping memorization of references.");
         }
 
@@ -193,9 +210,12 @@ public class AppController {
         IEPDStatus.setText(properties.getProperty(ProjectProperties.IEPD_STATUS));
         IEPDVersion.setText(properties.getProperty(ProjectProperties.IEPD_VERSION));
         ExportURI.setText(properties.getProperty(ProjectProperties.EXPORT_URI));
-        ImportExcludeDomains.setText(properties.getProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS));
+        //ImportExcludeDomains.setText(properties.getProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS));
         ImportIncludeDomains.setText(properties.getProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS));
+        //ImportExcludeCodes.setText(properties.getProperty(ProjectProperties.IMPORT_EXCLUDE_CODES));
+        //ImportIncludeCodes.setText(properties.getProperty(ProjectProperties.IMPORT_INCLUDE_CODES));
         ImportMaxFacets.setText(properties.getProperty(ProjectProperties.IMPORT_MAX_FACETS));
+        ImportCodeDescriptions.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.IMPORT_CODE_DESCRIPTIONS)));
 
         // Add focus listeners to save properties when focus is lost (e.g., TAB key)
         ExportProjectDir.focusedProperty().addListener((obs, oldVal, newVal) -> {
@@ -253,16 +273,28 @@ public class AppController {
                 properties.setProperty(ProjectProperties.EXPORT_URI, ExportURI.getText());
             }
         });
-        ImportExcludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
+/*         ImportExcludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 properties.setProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS, ImportExcludeDomains.getText());
             }
-        });
+        }); */
         ImportIncludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 properties.setProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS, ImportIncludeDomains.getText());
             }
         });
+        /*
+        ImportExcludeCodes.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IMPORT_EXCLUDE_CODES, ImportExcludeCodes.getText());
+            }
+        });
+        ImportIncludeCodes.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                properties.setProperty(ProjectProperties.IMPORT_INCLUDE_CODES, ImportIncludeCodes.getText());
+            }
+        });
+        */
         ImportMaxFacets.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 properties.setProperty(ProjectProperties.IMPORT_MAX_FACETS, ImportMaxFacets.getText());
@@ -314,6 +346,7 @@ public class AppController {
         // Set status
         ProjectStatus.setText(properties.getProperty(ProjectProperties.IEPD_NAME));
         NIEMStatus.setText("NIEM " + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION));
+        ImportStatus.setText("");
     }
 
     @FXML
@@ -383,7 +416,7 @@ public class AppController {
     public void exportMapping(ActionEvent event) {
 
         Task<Void> task = new Task<Void>() {
-        @Override
+            @Override
             protected Void call() throws Exception {
                 mainControls.setDisable(true);
                 Log.trace("Exporting mapping to " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
@@ -401,7 +434,7 @@ public class AppController {
     public void importMapping(ActionEvent event) {
 
         Task<Void> task = new Task<Void>() {
-        @Override
+            @Override
             protected Void call() throws Exception {
                 mainControls.setDisable(true);
                 Log.trace("Importing mapping from " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
@@ -412,8 +445,7 @@ public class AppController {
                 return null;
             }
         };
-        new Thread(task).start();    
-
+        new Thread(task).start();
 
     }
 
@@ -478,7 +510,7 @@ public class AppController {
     public void publishCMF(ActionEvent event) {
 
         Task<Void> task = new Task<Void>() {
-        @Override
+            @Override
             protected Void call() throws Exception {
                 mainControls.setDisable(true);
                 Log.trace("Publishing CMF to " + model.properties.getProperty(ProjectProperties.EXPORT_CMF_FILE) + " ...");
@@ -498,7 +530,7 @@ public class AppController {
     public void publishHTML(ActionEvent event) {
 
         Task<Void> task = new Task<Void>() {
-        @Override
+            @Override
             protected Void call() throws Exception {
                 mainControls.setDisable(true);
                 Log.trace("Publishing HTML documentation to " + model.properties.getProperty(ProjectProperties.EXPORT_HTML_DIR) + " ...");
@@ -515,7 +547,7 @@ public class AppController {
     public void publishJSON(ActionEvent event) {
 
         Task<Void> task = new Task<Void>() {
-        @Override
+            @Override
             protected Void call() throws Exception {
                 mainControls.setDisable(true);
                 Log.trace("Publishing JSON schema to " + model.properties.getProperty(ProjectProperties.EXPORT_JSON_DIR) + " ...");
@@ -532,7 +564,7 @@ public class AppController {
     public void publishXSD(ActionEvent event) {
 
         Task<Void> task = new Task<Void>() {
-        @Override
+            @Override
             protected Void call() throws Exception {
                 mainControls.setDisable(true);
                 Log.trace("Publishing XSD schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " ...");
@@ -549,7 +581,7 @@ public class AppController {
     public void publishXSDModel(ActionEvent event) {
 
         Task<Void> task = new Task<Void>() {
-        @Override
+            @Override
             protected Void call() throws Exception {
                 mainControls.setDisable(true);
                 Log.trace("Publishing XSD Model schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_MODEL_DIR) + " ...");
@@ -598,6 +630,17 @@ public class AppController {
     }
 
     @FXML
+    void toggleProjectProperty(ActionEvent event) {
+        CheckBox source = (CheckBox) event.getSource();
+        switch (source.getId()) {
+            case "ImportCodeDescriptions" ->
+                properties.setProperty(ProjectProperties.IMPORT_CODE_DESCRIPTIONS, Boolean.toString(source.isSelected()));
+            default -> {
+            }
+        }
+    }
+
+    @FXML
     public void unselectTextArea(ActionEvent event) {
         LogArea.deselect();
     }
@@ -606,7 +649,7 @@ public class AppController {
     public void validateMapping(ActionEvent event) {
 
         Task<Void> task = new Task<Void>() {
-        @Override
+            @Override
             protected Void call() throws Exception {
                 mainControls.setDisable(true);
                 Log.trace("Validating mapping from " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
