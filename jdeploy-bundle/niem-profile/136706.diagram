@@ -1,0 +1,26 @@
+format 209
+
+classcanvas 128002 class_ref 132226 // BaseMessage
+  classdiagramsettings hide_attributes yes member_max_width 0 end
+  xyz 418 46 2000
+end
+classcanvas 128386 class_ref 133250 // FilingListQueryMessage
+  classdiagramsettings member_max_width 0 end
+  xyz 379 123 2006
+end
+classcanvas 128642 class_ref 133378 // TimeRange
+  classdiagramsettings member_max_width 0 end
+  xyz 394 266 2000
+end
+relationcanvas 128514 relation_ref 128386 // <generalisation>
+  from ref 128386 z 2007 to ref 128002
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 128770 relation_ref 162306 // <directional aggregation>
+  decenter_end 546
+  from ref 128386 z 2007 to ref 128642
+  role_a_pos 489 241 3000 no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+end

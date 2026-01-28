@@ -1,0 +1,79 @@
+format 209
+
+classcanvas 128002 class_ref 135938 // FilingPayment
+  classdiagramsettings member_max_width 0 end
+  xyz 267 47 2000
+end
+classcanvas 128130 class_ref 130946 // AllowanceCharge
+  classdiagramsettings member_max_width 0 end
+  xyz 288 225 2000
+end
+classcanvas 128386 class_ref 135810 // PaymentMeans
+  classdiagramsettings member_max_width 0 end
+  xyz 287 370 2000
+end
+classcanvas 128642 class_ref 143362 // CreditAccount
+  classdiagramsettings member_max_width 0 end
+  xyz 42 371 2000
+end
+classcanvas 128898 class_ref 135682 // Payment
+  classdiagramsettings member_max_width 0 end
+  xyz 223 485 2000
+end
+classcanvas 129282 class_ref 136066 // CardAccount
+  classdiagramsettings member_max_width 0 end
+  xyz 425 485 2000
+end
+classcanvas 129538 class_ref 136194 // FinancialAccount
+  classdiagramsettings member_max_width 0 end
+  xyz 730 347 2000
+end
+classcanvas 129794 class_ref 147842 // Branch
+  classdiagramsettings member_max_width 0 end
+  xyz 737 489 2000
+end
+classcanvas 130050 class_ref 147970 // FinancialInstitution
+  classdiagramsettings member_max_width 0 end
+  xyz 695 625 2000
+end
+relationcanvas 128258 relation_ref 168834 // <directional aggregation>
+  from ref 128002 z 2001 to ref 128130
+  role_a_pos 407 200 3000 no_role_b
+  multiplicity_a_pos 381 200 3000 no_multiplicity_b
+end
+relationcanvas 128514 relation_ref 168962 // <directional aggregation>
+  from ref 128130 z 2001 to ref 128386
+  role_a_pos 401 345 3000 no_role_b
+  multiplicity_a_pos 355 345 3000 no_multiplicity_b
+end
+relationcanvas 128770 relation_ref 169090 // <directional aggregation>
+  from ref 128386 z 2001 to ref 128642
+  role_a_pos 202 375 3000 no_role_b
+  multiplicity_a_pos 202 408 3000 no_multiplicity_b
+end
+relationcanvas 129026 relation_ref 169218 // <directional aggregation>
+  from ref 128386 z 2001 to ref 128898
+  role_a_pos 347 460 3000 no_role_b
+  multiplicity_a_pos 301 460 3000 no_multiplicity_b
+end
+relationcanvas 129410 relation_ref 169346 // <directional aggregation>
+  from ref 128386 z 2001 to ref 129282
+  role_a_pos 467 460 3000 no_role_b
+  multiplicity_a_pos 421 460 3000 no_multiplicity_b
+end
+relationcanvas 129666 relation_ref 169474 // <directional aggregation>
+  from ref 128386 z 2001 to ref 129538
+  role_a_pos 605 373 3000 no_role_b
+  multiplicity_a_pos 693 406 3000 no_multiplicity_b
+end
+relationcanvas 129922 relation_ref 169602 // <directional aggregation>
+  from ref 129538 z 2001 to ref 129794
+  role_a_pos 841 464 3000 no_role_b
+  multiplicity_a_pos 815 464 3000 no_multiplicity_b
+end
+relationcanvas 130178 relation_ref 169730 // <directional aggregation>
+  from ref 129794 z 2001 to ref 130050
+  role_a_pos 837 600 3000 no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+end

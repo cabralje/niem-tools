@@ -1,0 +1,100 @@
+format 224
+"UML" // UML
+  revision 3
+  modified_by 2 "JamesCabral"
+  // class settings
+  
+  classdiagramsettings member_max_width 0 end
+  
+  classcompositediagramsettings end
+  
+  usecasediagramsettings end
+  
+  sequencediagramsettings end
+  
+  collaborationdiagramsettings end
+  
+  objectdiagramsettings end
+  
+  objectcompositediagramsettings end
+  
+  componentdiagramsettings
+   end
+  
+  deploymentdiagramsettings
+   end
+  
+  statediagramsettings
+   end
+  
+  activitydiagramsettings
+   end
+  
+  usecaseview 134658 "Use Cases"
+    
+    usecasediagramsettings end
+    
+    sequencediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    activitydiagramsettings
+     end
+    usecasediagram 134530 "Use Cases"
+      usecasediagramsettings end
+      size A4
+    end
+  end
+
+  componentview 134530 "Components"
+    //component diagram settings
+    componentdiagramsettings
+     end
+    componentdiagram 141058 "Components"
+      componentdiagramsettings
+       end
+      size A4
+    end
+  end
+
+  classview 179330 "Interfaces and Operations"
+    
+    classdiagramsettings member_max_width 0 end
+    
+    classcompositediagramsettings end
+    
+    collaborationdiagramsettings end
+    
+    objectdiagramsettings end
+    
+    objectcompositediagramsettings end
+    
+    sequencediagramsettings end
+    
+    statediagramsettings
+     end
+    
+    
+    activitydiagramsettings
+     end
+    sequencediagram 141186 "Sequence"
+      sequencediagramsettings end
+      overlapping_bars size A4
+    end
+  end
+
+  package_ref 147586 // Messages
+
+  package_ref 147714 // Base Classes
+end

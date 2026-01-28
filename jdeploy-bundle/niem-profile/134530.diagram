@@ -1,0 +1,43 @@
+format 209
+
+classcanvas 128002 class_ref 146178 // CaseTypeSpecificInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 413 53 2000
+end
+classcanvas 128130 class_ref 136322 // BankruptcyCaseInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 367 135 2000
+end
+classcanvas 128386 class_ref 136450 // BankruptcyStatute
+  classdiagramsettings member_max_width 0 end
+  xyz 303 434 2000
+end
+classcanvas 128642 class_ref 136578 // Debtor
+  classdiagramsettings member_max_width 0 end
+  xyz 575 451 2000
+end
+classcanvas 128770 class_ref 162946 // Entity
+  classdiagramsettings member_max_width 0 end
+  xyz 918 615 2000
+end
+relationcanvas 128258 relation_ref 179330 // <generalisation>
+  from ref 128130 z 2001 stereotype "<<ECF>>" xyz 491 126 3000 to ref 128002
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 128514 relation_ref 179458 // <directional aggregation>
+  from ref 128130 z 2001 stereotype "<<ECF>>" xyz 379 419 3000 to ref 128386
+  role_a_pos 421 409 3000 no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 129026 relation_ref 179714 // <directional aggregation>
+  from ref 128130 z 2001 stereotype "<<ECF>>" xyz 553 427 3000 to ref 128642
+  role_a_pos 606 426 3000 no_role_b
+  multiplicity_a_pos 560 426 3000 no_multiplicity_b
+end
+relationcanvas 129794 relation_ref 179586 // <directional aggregation>
+  from ref 128642 z 2001 stereotype "<<ECF>>" xyz 752 568.5 3000 to ref 128770
+  role_a_pos 871 607 3000 no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+end

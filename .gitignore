@@ -69,9 +69,6 @@ node_modules/
 package-lock.json
 CLAUDE.md
 
-# jDeploy
-jdeploy-bundle/
-
 # Old distribution archives (replaced by jDeploy)
 dist/*.tar.gz
 dist/*.tar.bz2

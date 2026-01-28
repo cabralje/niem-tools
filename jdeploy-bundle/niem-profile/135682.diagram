@@ -1,0 +1,143 @@
+format 209
+
+classcanvas 128002 class_ref 132226 // BaseMessage
+  classdiagramsettings hide_attributes yes member_max_width 0 end
+  xyz 462 60 2000
+end
+classcanvas 128130 class_ref 145282 // CaseResponseMessage
+  classdiagramsettings member_max_width 0 end
+  xyz 422 220 2000
+end
+classcanvas 128258 class_ref 132866 // ResponseMessage
+  classdiagramsettings member_max_width 0 end
+  xyz 443 134 2006
+end
+classcanvas 128642 class_ref 146306 // CaseInformation
+  classdiagramsettings member_max_width 0 end
+  xyz 414 299 2000
+end
+classcanvas 128898 class_ref 149506 // CaseParticipant
+  classdiagramsettings member_max_width 0 end
+  xyz 738 267 2000
+end
+classcanvas 129282 class_ref 149378 // JudicialOfficer
+  classdiagramsettings member_max_width 0 end
+  xyz 737 367 2000
+end
+classcanvas 129538 class_ref 170242 // CaseStatus
+  classdiagramsettings member_max_width 0 end
+  xyz 130 324 2000
+end
+classcanvas 129794 class_ref 148354 // CaseDocketEntry
+  classdiagramsettings member_max_width 0 end
+  xyz 399 462 2000
+end
+classcanvas 130050 class_ref 149122 // CalendarEvent
+  classdiagramsettings member_max_width 0 end
+  xyz 801 460 2000
+end
+classcanvas 130434 class_ref 148482 // LeadDocument
+  classdiagramsettings member_max_width 0 end
+  xyz 657 667 2000
+end
+classcanvas 130690 class_ref 148610 // ConnectedDocument
+  classdiagramsettings member_max_width 0 end
+  xyz 660 765 2000
+end
+classcanvas 130946 class_ref 148866 // Actor
+  classdiagramsettings member_max_width 0 end
+  xyz 283 664 2005
+end
+classcanvas 131202 class_ref 148994 // ActedOnBehalfOf
+  classdiagramsettings member_max_width 0 end
+  xyz 468 665 2010
+end
+classcanvas 131458 class_ref 148738 // RelatedDocketEntry
+  classdiagramsettings member_max_width 0 end
+  xyz 84 661 2000
+end
+classcanvas 131714 class_ref 131842 // Person
+  classdiagramsettings hide_attributes yes member_max_width 0 end
+  xyz 959 276 2000
+end
+relationcanvas 128386 relation_ref 151170 // <generalisation>
+  from ref 128258 z 2007 to ref 128002
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 128514 relation_ref 130690 // <generalisation>
+  from ref 128130 z 2007 to ref 128258
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 128770 relation_ref 151810 // <directional aggregation>
+  from ref 128130 z 2001 to ref 128642
+  role_a_pos 526 274 3000 no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 129026 relation_ref 151938 // <directional aggregation>
+  from ref 128642 z 2001 to ref 128898
+  role_a_pos 617 282 3000 no_role_b
+  multiplicity_a_pos 721 315 3000 no_multiplicity_b
+end
+relationcanvas 129410 relation_ref 152066 // <directional aggregation>
+  from ref 128642 z 2001 to ref 129282
+  role_a_pos 631 359 3000 no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 129666 relation_ref 152194 // <directional aggregation>
+  from ref 128642 z 2001 to ref 129538
+  role_a_pos 306 337 3000 no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 129922 relation_ref 152322 // <directional aggregation>
+  from ref 128642 z 2001 to ref 129794
+  role_a_pos 527 437 3000 no_role_b
+  multiplicity_a_pos 484 437 3000 no_multiplicity_b
+end
+relationcanvas 130178 relation_ref 152450 // <directional aggregation>
+  from ref 129794 z 2001 to ref 130050
+  role_a_pos 690 507 3000 no_role_b
+  multiplicity_a_pos 784 540 3000 no_multiplicity_b
+end
+relationcanvas 130306 relation_ref 152578 // <directional aggregation>
+  from ref 129794 z 2001 to ref 129282
+  role_a_pos 669 397 3000 no_role_b
+  multiplicity_a_pos 741 430 3000 no_multiplicity_b
+end
+relationcanvas 130562 relation_ref 152706 // <directional aggregation>
+  from ref 129794 z 2001 to ref 130434
+  role_a_pos 694 629 3000 no_role_b
+  multiplicity_a_pos 669 682 3000 no_multiplicity_b
+end
+relationcanvas 130818 relation_ref 152834 // <directional aggregation>
+  from ref 130434 z 2001 to ref 130690
+  role_a_pos 756 740 3000 no_role_b
+  multiplicity_a_pos 730 740 3000 no_multiplicity_b
+end
+relationcanvas 131074 relation_ref 152962 // <directional aggregation>
+  from ref 129794 z 2006 to ref 130946
+  role_a_pos 402 629 3000 no_role_b
+  multiplicity_a_pos 402 662 3000 no_multiplicity_b
+end
+relationcanvas 131330 relation_ref 153090 // <directional aggregation>
+  from ref 129794 z 2011 to ref 131202
+  role_a_pos 554 640 3000 no_role_b
+  multiplicity_a_pos 528 640 3000 no_multiplicity_b
+end
+relationcanvas 131586 relation_ref 153218 // <directional aggregation>
+  from ref 129794 z 2001 to ref 131458
+  role_a_pos 243 632 3000 no_role_b
+  multiplicity_a_pos 243 665 3000 no_multiplicity_b
+end
+relationcanvas 131842 relation_ref 153346 // <generalisation>
+  from ref 128898 z 2001 to ref 131714
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+relationcanvas 131970 relation_ref 153474 // <generalisation>
+  from ref 129282 z 2001 to ref 131714
+  no_role_a no_role_b
+  no_multiplicity_a no_multiplicity_b
+end
+end

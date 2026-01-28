@@ -55,12 +55,14 @@ The BoUML templates are installed in the niem-tools package directory:
 2. Generate the jDeploy bundle:
    ```bash
    npm install
-   npx jdeploy install
+   npm run build
    ```
+
+   This runs `jdeploy install` and automatically fixes a jDeploy bug (see Known Issues below).
 
 3. Test locally:
    ```bash
-   npx jdeploy run
+   niem-tools
    ```
 
 ### Publishing
@@ -68,8 +70,9 @@ The BoUML templates are installed in the niem-tools package directory:
 To publish a new version to npm:
 
 1. Update the version in `package.json`
-2. Build the project: `mvn clean package`
-3. Publish to npm: `npm publish`
+2. Build the project: `mvn clean package && npm run build`
+3. Commit all changes including the updated `jdeploy-bundle/jdeploy.js`
+4. Publish to npm: `npm publish`
 
 ### Configuration
 
@@ -81,14 +84,52 @@ The jDeploy configuration in `package.json`:
 - `mainClass`: "org.cabral.niemtools.BoumlPlugout" - Main class to run
 - `files`: Includes the `bouml-templates` directory in the distribution
 
+#### pom.xml Configuration
+
+The `maven-jar-plugin` must be configured to add the Main-Class manifest attribute:
+
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-jar-plugin</artifactId>
+    <version>3.3.0</version>
+    <configuration>
+        <archive>
+            <manifest>
+                <mainClass>org.cabral.niemtools.BoumlPlugout</mainClass>
+            </manifest>
+        </archive>
+    </configuration>
+</plugin>
+```
+
+Without this, the JAR will fail with "no main manifest attribute" error.
+
 ### Dependencies
 
-Dependencies are now managed automatically through Maven's standard dependency resolution:
+#### Runtime Dependencies (package.json)
+
+jDeploy requires these Node.js dependencies for JDK downloading and extraction:
+- `node-fetch`: ^2.7.0 - HTTP client for downloading JDK
+- `yauzl`: ^2.10.0 - ZIP extraction (Windows)
+- `tar`: ^7.4.3 - TAR extraction (macOS/Linux)
+
+#### Java Dependencies (pom.xml)
+
+Dependencies are managed through Maven's standard dependency resolution:
 - opencsv 5.11
 - commons-lang3 3.18.0
 - JavaFX 21.0.1 (controls and fxml)
 
-All dependencies are included in the JAR's classpath and downloaded automatically by jDeploy during installation.
+All Java dependencies are included in the JAR's classpath and downloaded automatically by jDeploy during installation.
+
+### Known Issues
+
+#### jDeploy Java Version Bug
+
+jDeploy 5.5.15 has a bug where it ignores the `"jdk": 21` setting in package.json and generates `jdeploy.js` with Java 11. 
+
+**Workaround**: The `npm run build` script automatically runs `scripts/fix-jdeploy-java-version.js` after `jdeploy install` to fix the generated file. This ensures the correct Java version is used.
 
 ## Migration from Manual Distribution
 

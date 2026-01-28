@@ -1,12 +1,13 @@
 {
   "name": "niem-tools",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "This is a BOUML plugout that supports developing NIEM message specifications in UML.",
   "bin": {
     "niem-tools": "jdeploy-bundle/jdeploy.js"
   },
   "preferGlobal": true,
   "scripts": {
+    "build": "jdeploy install && node scripts/fix-jdeploy-java-version.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,6 +17,11 @@
   "keywords": ["niem", "uml", "bouml", "xml", "schema"],
   "author": "Jim Cabral <jim@cabral.org>",
   "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^2.7.0",
+    "yauzl": "^2.10.0",
+    "tar": "^7.4.3"
+  },
   "devDependencies": {
     "jdeploy": "^5.5.15"
   },
