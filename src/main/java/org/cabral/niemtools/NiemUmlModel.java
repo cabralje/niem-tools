@@ -1748,10 +1748,6 @@ public class NiemUmlModel {
             } finally {
                 connection.disconnect();
             }
-            // Download the reference model from GitHub using Java's built-in URL/Streams
-            try (java.io.InputStream in = java.net.URI.create(modelUrl).toURL().openStream()) {
-                java.nio.file.Files.copy(in, new File(importFile).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            }
 
             // Unzip the downloaded file
             try (java.io.InputStream fis = new java.io.FileInputStream(importFile);
