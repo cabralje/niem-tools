@@ -866,7 +866,7 @@ public class XmlWriter {
                         continue;
                     String name = attribute.name();
                     String codeValue = attribute.defaultValue();
-                    if (codeValue.isEmpty())
+                    if (codeValue == null || codeValue.isEmpty())
                         codeValue = name;
                     String codeDescription = attribute.description();
                     String facet;
