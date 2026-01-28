@@ -67,6 +67,7 @@ target/maven-archiver/**
 # npm
 node_modules/
 package-lock.json
+CLAUDE.md
 
 # jDeploy
 jdeploy-bundle/
