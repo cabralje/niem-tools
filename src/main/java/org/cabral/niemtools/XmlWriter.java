@@ -864,10 +864,12 @@ public class XmlWriter {
                     UmlAttribute attribute = (UmlAttribute) item;
                     if (NiemUmlModel.isFacet(attribute))
                         continue;
+                    String name = attribute.name();
                     String codeValue = attribute.defaultValue();
+                    if (codeValue.isEmpty())
+                        codeValue = name;
                     String codeDescription = attribute.description();
                     String facet;
-                    String name = attribute.name();
                     if (!NiemUmlModel.isFacet(attribute))
                         name = "enumeration";
                     facet = "<xs:" + name + " value=\"" + codeValue + "\">";                        

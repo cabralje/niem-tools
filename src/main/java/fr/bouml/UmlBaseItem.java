@@ -418,6 +418,32 @@ static { _all = new Hashtable(997); }  protected final void read_if_needed_() {
     return result;
   }
 
+  protected final UmlAttribute[] createMultiple_(anItemKind k, String[] s, String[] v, String[] d) throws RuntimeException {
+    
+    int anonymousEnums = 0;
+    int l = s.length;
+    UmlAttribute[] ch = new UmlAttribute[l];
+
+    for (int index = 0; index != l; index++) {
+      UmlCom.send_cmd(identifier_(), OnInstanceCmd.createCmd, k, s[index]);
+      UmlAttribute result = (UmlAttribute) UmlBaseItem.read_();
+      if (result == null) {
+        UmlCom.send_cmd(identifier_(), OnInstanceCmd.createCmd, k, String.format("Enum%d", anonymousEnums++));
+        result = (UmlAttribute) UmlBaseItem.read_();
+      }
+      if (result != null) {
+        if (!v[index].isEmpty())
+          result.set_DefaultValue(v[index]);
+        if (!d[index].isEmpty())
+          result.set_Description(d[index]);
+        ch[index] = result;
+        ((UmlBaseItem) result)._parent = (UmlItem) this;
+      } 
+    }
+    _children = ch;
+    return ch;
+  }
+
   @SuppressWarnings("unchecked")
 protected void read_uml_() {
     _stereotype = UmlCom.read_string();

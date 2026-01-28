@@ -1,8 +1,5 @@
 package fr.bouml;
 
-
-import java.util.*;
-
 /**
  *   Manage the class's attributs
  */
@@ -18,6 +15,14 @@ abstract class UmlBaseAttribute extends UmlClassMember {
   public static UmlAttribute create(UmlClass parent, String s) throws RuntimeException
   {
     return (UmlAttribute) parent.create_(anItemKind.anAttribute, s);
+  }
+
+  /** 
+   * returns a set of new attributes created under 'parent'
+   */
+  public static UmlAttribute[] createMultiple(UmlClass parent, String[] s, String[] v, String[] d) throws RuntimeException
+  {
+    return parent.createMultiple_(anItemKind.anAttribute, s, v, d);
   }
 
   /**
