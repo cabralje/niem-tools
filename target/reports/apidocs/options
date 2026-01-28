@@ -1,0 +1,24 @@
+-classpath
+'/home/runner/.m2/repository/org/apache/commons/commons-lang3/3.18.0/commons-lang3-3.18.0.jar:/home/runner/.m2/repository/com/opencsv/opencsv/5.11/opencsv-5.11.jar:/home/runner/.m2/repository/org/apache/commons/commons-text/1.13.0/commons-text-1.13.0.jar:/home/runner/.m2/repository/commons-beanutils/commons-beanutils/1.10.0/commons-beanutils-1.10.0.jar:/home/runner/.m2/repository/commons-logging/commons-logging/1.3.4/commons-logging-1.3.4.jar:/home/runner/.m2/repository/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar:/home/runner/.m2/repository/org/apache/commons/commons-collections4/4.4/commons-collections4-4.4.jar:/home/runner/.m2/repository/org/openjfx/javafx-controls/21.0.1/javafx-controls-21.0.1.jar:/home/runner/.m2/repository/org/openjfx/javafx-controls/21.0.1/javafx-controls-21.0.1-linux.jar:/home/runner/.m2/repository/org/openjfx/javafx-graphics/21.0.1/javafx-graphics-21.0.1.jar:/home/runner/.m2/repository/org/openjfx/javafx-graphics/21.0.1/javafx-graphics-21.0.1-linux.jar:/home/runner/.m2/repository/org/openjfx/javafx-base/21.0.1/javafx-base-21.0.1.jar:/home/runner/.m2/repository/org/openjfx/javafx-base/21.0.1/javafx-base-21.0.1-linux.jar:/home/runner/.m2/repository/org/openjfx/javafx-fxml/21.0.1/javafx-fxml-21.0.1.jar:/home/runner/.m2/repository/org/openjfx/javafx-fxml/21.0.1/javafx-fxml-21.0.1-linux.jar'
+-encoding
+'UTF-8'
+-protected
+--release
+21
+-sourcepath
+'/home/runner/work/niem-tools/niem-tools/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2026. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/runner/work/niem-tools/niem-tools/target/reports/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'niemtools 2.0 API'
+-use
+-version
+-windowtitle
+'niemtools 2.0 API'

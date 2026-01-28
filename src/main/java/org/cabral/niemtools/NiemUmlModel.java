@@ -189,7 +189,7 @@ public class NiemUmlModel {
     }
 
     /**
-     * @param element
+     * @param item
      * @return codelist associated with the element
      */
     static String getCodeList(UmlItem item) {
@@ -197,7 +197,7 @@ public class NiemUmlModel {
     }
 
     /**
-     * @param element
+     * @param item
      * @return external codelist associated with the element
      */
     static String getExternalCodeList(UmlItem item) {
