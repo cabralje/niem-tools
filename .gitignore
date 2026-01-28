@@ -63,3 +63,16 @@ src/test/resources/**
 target/surefire-reports/**
 target/maven-status/**
 target/maven-archiver/**
+
+# npm
+node_modules/
+package-lock.json
+
+# jDeploy
+jdeploy-bundle/
+
+# Old distribution archives (replaced by jDeploy)
+dist/*.tar.gz
+dist/*.tar.bz2
+dist/*.zip
+

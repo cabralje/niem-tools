@@ -14,12 +14,22 @@ This is a quick HOWTO for getting started with using `BoUML` and `niemtools` to 
 ### 1a.  Install BoUML
 * Download and install the latest version of [BoUML](https://bouml.fr) for Windows. Mac or Linux.
 ### 1b. Install niem-tools
-* Download and extract [niemtools](dist).
-* Add the `niemtools` and `opencsv` JAR files in the `niemtools` download to the system environment property `CLASSPATH`.
+* Install niem-tools using npm (requires Node.js):
+  ```
+  npm install -g niem-tools
+  ```
+* Or install directly from GitHub:
+  ```
+  npm install -g cabralje/niem-tools
+  ```
+* The installation will automatically download and install all required dependencies including opencsv, commons-lang3, and JavaFX libraries.
 ### 1c. Setup niem-tools template
+* After installation, locate the niem-tools installation directory:
+  - On Windows: `%APPDATA%\npm\node_modules\niem-tools`
+  - On macOS/Linux: Run `npm root -g` to find the global modules directory, then navigate to `niem-tools`
 * Start BoUML.
 * Click on `Miscellaneous->Set Environment`.
-* Under `Template Project`, select the location of the `bouml/niem-project/niem-project.prj` BoUML project template in the `niemtools` download.
+* Under `Template Project`, select the location of the `bouml-templates/niem-project/niem-project.prj` BoUML project template in the niem-tools installation directory.
 ### 1d. Install cmftool (recommended)
 * Download and extract [cmftool](https://github.com/niemopen/cmftool/tags)
 * Add the `bin` directory to your system path.
