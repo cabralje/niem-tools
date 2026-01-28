@@ -1646,18 +1646,20 @@ public class NiemUmlModel {
     }
 
     /**
-     * @param type
-     * @param codelist
-     * @return set codelist associated with the type
+     * Sets the codelist associated with the item.
+     * 
+     * @param item the UML item to set the codelist for
+     * @param codelist the codelist value to set
      */
     static void setCodeList(UmlItem item, String codelist) {
         item.set_PropertyValue(CODELIST_PROPERTY, codelist);
     }
 
     /**
-     * @param type
-     * @param codelist
-     * @return set external codelist associated with the type
+     * Sets the external codelist associated with the item.
+     * 
+     * @param item the UML item to set the external codelist for
+     * @param codelist the external codelist value to set
      */
     static void setExternalCodeList(UmlItem item, String codelist) {
         item.set_PropertyValue(EXTERNAL_CODELIST_PROPERTY, codelist);
