@@ -499,7 +499,7 @@ public class CmfWriter {
                             UmlAttribute attribute = (UmlAttribute) item;
                             String name = attribute.name();
                             String codeValue = attribute.defaultValue();
-                            if (codeValue.isEmpty())
+                            if (codeValue == null || codeValue.isEmpty())
                                 codeValue = name;
                             String codeDescription = attribute.description();
                             if (!NiemUmlModel.isFacet(attribute))
