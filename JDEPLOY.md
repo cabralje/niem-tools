@@ -82,7 +82,8 @@ The jDeploy configuration in `package.json`:
 - `javafx`: true - Enables JavaFX support
 - `jar`: "target/niemtools-2.0.jar" - Path to the main JAR
 - `mainClass`: "org.cabral.niemtools.BoumlPlugout" - Main class to run
-- `files`: Includes the `bouml-templates` directory in the distribution
+
+The BoUML templates are packaged via the top-level `files` array in `package.json` (so they are present in the npm package), but are not duplicated inside the jDeploy bundle.
 
 #### pom.xml Configuration
 

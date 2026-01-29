@@ -32,10 +32,7 @@
     "jar": "target/niemtools-2.0.jar",
     "mainClass": "org.cabral.niemtools.BoumlPlugout",
     "title": "NIEM Tools",
-    "description": "A BOUML plugout for developing NIEM message specifications",
-    "files": [
-      "bouml-templates"
-    ]
+    "description": "A BOUML plugout for developing NIEM message specifications"
   },
   "files": [
     "jdeploy-bundle",
