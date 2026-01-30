@@ -112,7 +112,7 @@ public class NamespaceModel {
         if (external != null)
             for (String external1 : external) {
                 String[] part = external1.split("=");
-                if (part.length > 2) {
+                if (part.length >= 4) {
                     String prefix = part[0].trim();
                     String schemaURI = part[1].trim();
                     String schemaLocation = part[2].trim();

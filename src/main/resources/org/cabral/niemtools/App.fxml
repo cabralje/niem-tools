@@ -57,7 +57,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainWindow" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cabral.niemtools.AppController">
+<VBox fx:id="mainWindow" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cabral.niemtools.AppController">
   <children>
       <VBox fx:id="mainControls">
          <children>
@@ -94,7 +94,7 @@
                               <ToolBar maxHeight="-Infinity">
                                 <items>
                                     <Label text="Project Directory" />
-                                    <TextField fx:id="ExportProjectDir" maxWidth="1.7976931348623157E308" onAction="#setProjectProperty" prefWidth="400.0" promptText="Select project directory..." />
+                                    <TextField fx:id="ExportProjectDir" maxWidth="1.7976931348623157E308" onAction="#setProjectProperty" prefWidth="400.0" promptText="Select project directory" />
                                   <Button mnemonicParsing="false" onAction="#selectProjectDirectory" text="Browse..." />
                                 </items>
                               </ToolBar>
@@ -134,10 +134,10 @@
                                           <Insets right="10.0" />
                                        </padding>
                                     </Label>
-                                    <TextField fx:id="IEPDName" onAction="#setProjectProperty" GridPane.columnIndex="1" />
-                                    <TextField fx:id="IEPDVersion" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <TextField fx:id="IEPDStatus" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                    <TextField fx:id="ExportURI" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <TextField fx:id="IEPDName" onAction="#setProjectProperty" promptText="Integrated Justice Specification" GridPane.columnIndex="1" />
+                                    <TextField fx:id="IEPDVersion" onAction="#setProjectProperty" promptText="1.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <TextField fx:id="IEPDStatus" onAction="#setProjectProperty" promptText="Draft" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <TextField fx:id="ExportURI" onAction="#setProjectProperty" promptText="https://example.com" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                                     <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Organization" GridPane.columnIndex="2">
                                        <padding>
                                           <Insets right="10.0" />
@@ -153,9 +153,9 @@
                                           <Insets right="10.0" />
                                        </padding>
                                     </Label>
-                                    <TextField fx:id="IEPDOrganization" onAction="#setProjectProperty" GridPane.columnIndex="3" />
-                                    <TextField fx:id="IEPDContact" onAction="#setProjectProperty" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                                    <TextField fx:id="IEPDEmail" onAction="#setProjectProperty" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                                    <TextField fx:id="IEPDOrganization" onAction="#setProjectProperty" promptText="Example Company" GridPane.columnIndex="3" />
+                                    <TextField fx:id="IEPDContact" onAction="#setProjectProperty" promptText="John Doe" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                    <TextField fx:id="IEPDEmail" onAction="#setProjectProperty" promptText="john@example.com" GridPane.columnIndex="3" GridPane.rowIndex="2" />
                                     <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="License URL" GridPane.columnIndex="4">
                                        <padding>
                                           <Insets right="10.0" />
@@ -171,9 +171,9 @@
                                           <Insets right="10.0" />
                                        </padding>
                                     </Label>
-                                    <TextField fx:id="IEPDLicense" onAction="#setProjectProperty" GridPane.columnIndex="5" />
-                                    <TextField fx:id="IEPDChangeLogFile" onAction="#setProjectProperty" GridPane.columnIndex="5" GridPane.rowIndex="1" />
-                                    <TextField fx:id="IEPDReadMeFile" onAction="#setProjectProperty" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+                                    <TextField fx:id="IEPDLicense" onAction="#setProjectProperty" promptText="https://example.com/license" GridPane.columnIndex="5" />
+                                    <TextField fx:id="IEPDChangeLogFile" onAction="#setProjectProperty" promptText="changelog.md" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                                    <TextField fx:id="IEPDReadMeFile" onAction="#setProjectProperty" promptText="README.md" GridPane.columnIndex="5" GridPane.rowIndex="2" />
                                  </children>
                               </GridPane>
                            </children>
@@ -182,7 +182,7 @@
                   </AnchorPane>
                </content>
             </TitledPane>
-            <TitledPane fx:id="NIEMPane" expanded="false" text="2. Import NIEM Model">
+            <TitledPane fx:id="NIEMPane" text="2. Import NIEM Model">
               <content>
                 <AnchorPane minHeight="-Infinity">
                      <children>
@@ -199,7 +199,6 @@
                                 <columnConstraints>
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                 </columnConstraints>
@@ -234,9 +233,9 @@
                                           <Insets right="10.0" top="7.0" />
                                        </padding>
                                     </Label>
-                                    <TextField fx:id="ImportIncludeDomains" onAction="#setProjectProperty" GridPane.columnIndex="2" />
-                                    <TextField fx:id="ImportMaxFacets" onAction="#setProjectProperty" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                    <CheckBox fx:id="ImportCodeDescriptions" mnemonicParsing="false" onAction="#toggleProjectProperty" selected="true" text="Include Descriptions" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+                                    <TextField fx:id="ImportIncludeDomains" onAction="#setProjectProperty" promptText="jxdm, hs" GridPane.columnIndex="2" />
+                                    <TextField fx:id="ImportMaxFacets" onAction="#setProjectProperty" promptText="Importing all values is slow." GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <CheckBox fx:id="ImportCodeDescriptions" alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#toggleProjectProperty" selected="true" text="Include Descriptions" GridPane.columnIndex="3" GridPane.rowIndex="1" />
                                  </children>
                               </GridPane>
                            </children>
@@ -317,7 +316,7 @@
             <Label fx:id="ProjectStatus" maxWidth="1.7976931348623157E308" minWidth="100.0" text="Label" HBox.hgrow="SOMETIMES" />
             <Label fx:id="NIEMStatus" minWidth="75.0" text="Label" HBox.hgrow="SOMETIMES" />
             <Region prefWidth="200.0" HBox.hgrow="ALWAYS" />
-            <Label fx:id="ImportStatus" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" minWidth="100.0" text="Label" HBox.hgrow="SOMETIMES" />
+            <Label fx:id="MessageStatus" alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" minWidth="100.0" text="Label" HBox.hgrow="SOMETIMES" />
          </children>
       </HBox>
   </children>

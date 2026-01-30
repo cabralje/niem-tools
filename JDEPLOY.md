@@ -33,9 +33,11 @@ niem-tools
 
 ### Template Location
 
-The BoUML templates are installed in the niem-tools package directory:
-- On Windows: `%APPDATA%\npm\node_modules\niem-tools\bouml-templates`
-- On macOS/Linux: Find using `npm root -g` then navigate to `niem-tools/bouml-templates`
+The BoUML templates are installed in the user's home directory:
+- On Windows: `%USERPROFILE%\niem-tools\bouml-templates`
+- On macOS/Linux: `~/niem-tools/bouml-templates`
+
+The original npm package directory still contains the templates, but the home directory copy is the recommended location.
 
 ## For Developers
 

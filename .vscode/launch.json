@@ -9,6 +9,7 @@
             "classPaths": ["${workspaceFolder}/target/classes",
                             "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
+                    "vmArgs": "--module-path ${workspaceFolder}/target/javafx-lib --add-modules javafx.controls,javafx.fxml",
             "args": ""
         },
         {
@@ -20,6 +21,7 @@
             "classPaths": ["${workspaceFolder}/target/classes",
                             "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
+            "vmArgs": "--module-path ${workspaceFolder}/target/javafx-lib --add-modules javafx.controls,javafx.fxml",
             "args": "publishSpecification"
         },
         {
@@ -31,6 +33,7 @@
             "classPaths": ["${workspaceFolder}/target/classes",
                             "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
+            "vmArgs": "--module-path ${workspaceFolder}/target/javafx-lib --add-modules javafx.controls,javafx.fxml",
             "args": "publishUML"
         },
                 {
@@ -42,6 +45,7 @@
             "classPaths": ["${workspaceFolder}/target/classes",
                             "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
+                    "vmArgs": "--module-path ${workspaceFolder}/target/javafx-lib --add-modules javafx.controls,javafx.fxml",
             "args": "importMapping"
         },
         {
@@ -53,6 +57,7 @@
             "classPaths": ["${workspaceFolder}/target/classes",
                             "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
+            "vmArgs": "--module-path ${workspaceFolder}/target/javafx-lib --add-modules javafx.controls,javafx.fxml",
             "args": "validateMapping"
         },
                 {
@@ -64,6 +69,7 @@
             "classPaths": ["${workspaceFolder}/target/classes",
                             "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
+                    "vmArgs": "--module-path ${workspaceFolder}/target/javafx-lib --add-modules javafx.controls,javafx.fxml",
             "args": "publishCMF"
         },
         {
@@ -75,6 +81,7 @@
             "classPaths": ["${workspaceFolder}/target/classes",
                             "${workspaceFolder}/target/javafx-lib/*",
                             "${workspaceFolder}/target/*"],
+            "vmArgs": "--module-path ${workspaceFolder}/target/javafx-lib --add-modules javafx.controls,javafx.fxml",
             "args": "publishXSD"
         },
     ]

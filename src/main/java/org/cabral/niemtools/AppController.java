@@ -98,9 +98,6 @@ public class AppController {
     private ComboBox<String> ImportNIEMVersion;
 
     @FXML
-    private Label ImportStatus;
-
-    @FXML
     private TableColumn<String[], String> LocalPathColumn;
 
     @FXML
@@ -108,6 +105,9 @@ public class AppController {
 
     @FXML
     private TitledPane MapPane;
+
+    @FXML
+    private Label MessageStatus;
 
     @FXML
     private TitledPane NIEMPane;
@@ -158,7 +158,7 @@ public class AppController {
         properties.load();
 
         // Redirect logging
-        Log.setImportStatus(ImportStatus);
+        Log.setMessageStatusLabel(MessageStatus);
         Log.setLogArea(LogArea);
         Log.setDebug(properties.getProperty(ProjectProperties.LOG_DEBUG).equals("true"));
         Log.setProfile(properties.getProperty(ProjectProperties.LOG_PROFILE).equals("true"));
@@ -346,7 +346,7 @@ public class AppController {
         // Set status
         ProjectStatus.setText(properties.getProperty(ProjectProperties.IEPD_NAME));
         NIEMStatus.setText("NIEM " + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION));
-        ImportStatus.setText("");
+        MessageStatus.setText("");
     }
 
     @FXML
@@ -621,9 +621,19 @@ public class AppController {
 
     @FXML
     public void setProjectProperty(ActionEvent event) {
-        TextField source = (TextField) event.getSource();
-        String property = source.getId();
-        String value = source.getText();
+        Object source = event.getSource();
+        String property = null;
+        String value = null;
+        
+        if (source instanceof TextField textField) {
+            property = textField.getId();
+            value = textField.getText();
+        } else if (source instanceof ComboBox<?> comboBox) {
+            property = comboBox.getId();
+            Object selectedValue = comboBox.getValue();
+            value = selectedValue != null ? selectedValue.toString() : null;
+        }
+        
         if (property != null && value != null && !property.isEmpty()) {
             properties.setProperty(property, value);
         }
