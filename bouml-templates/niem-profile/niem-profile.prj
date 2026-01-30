@@ -1,6 +1,6 @@
 format 224
 "niem-profile"
-  revision 163
+  revision 164
   modified_by 2 "JamesCabral"
 
 
@@ -45,7 +45,7 @@ format 224
   mark_for_import
   
   stereotype "profile"
-  ncouples 71
+  ncouples 72
   key "" value ""
   key "" value ""
   key "" value ""
@@ -76,7 +76,7 @@ format 224
   key "ExportExternalSchemas" value "cac=urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonAggregateComponents-2.1.xsd,cbc=urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2=http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/common/UBL-CommonBasicComponents-2.1.xsd,ds=http://www.w3.org/2000/09/xmldsig#=https://www.w3.org/TR/xmldsig-core/xmldsig-core-schema.xsd"
   key "IEPDEmail" value "email@example.com"
   key "ImportExcludeCodes" value ""
-  key "ExportCMFTooltoJSON" value "cmftool.bat m2jmsg -o"
+  key "ExportCMFTooltoJSON" value "~/niem-tools/cmftool/bin/cmftool.bat m2jmsg -o"
   key "IEPDLicense" value "https://opensource.org/licenses/BSD-3-Clause"
   key "IEPDStatus" value "Draft"
   key "ExportJSONSchemaDir" value "json\\schema"
@@ -86,7 +86,7 @@ format 224
   key "ExportCMFDir" value "cmf"
   key "ExportCMFVersion" value "0.8"
   key "ExportCMFtoJSON" value "true"
-  key "ExportCMFTooltoXSD" value "cmftool.bat m2xmsg -d -c -o"
+  key "ExportCMFTooltoXSD" value "~/niem-tools/cmftool/bin/cmftool.bat m2xmsg -d -c -o"
   key "ExportURI" value "http://local"
   key "IEPDVersion" value "1.0"
   key "IEPDTermsOfService" value "example.com/terms"
@@ -117,6 +117,7 @@ format 224
   key "IEPDChangeLogFile" value "changelog.txt"
   key "ExportWSDLDir" value "WS-SIP"
   key "IEPDConformanceFile" value "conformance-assertion.pdf"
+  key "ExportCMFTooltoXSDModel" value "~/niem-tools/cmftool/bin/cmftool.bat m2x -d -c -o"
   classview 172802 "Stereotypes"
     
     classdiagramsettings member_max_width 0 end

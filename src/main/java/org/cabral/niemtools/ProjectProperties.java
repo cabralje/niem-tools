@@ -181,14 +181,14 @@ public class ProjectProperties extends Properties {
         defaults.setProperty(EXPORT_CMF,"true");
         defaults.setProperty(EXPORT_XSD_MODEL,"true");
         //defaults.setProperty(EXPORT_CMF_TO_XSD_MODEL,"true");
-        defaults.setProperty(EXPORT_CMFTOOL_TO_XSD_MODEL,"cmftool.bat m2x -d -c -o");
+        defaults.setProperty(EXPORT_CMFTOOL_TO_XSD_MODEL,"~\\niem-tools\\cmftool\\bin\\cmftool.bat m2x -d -c -o");
         defaults.setProperty(EXPORT_HTML,"true");
         defaults.setProperty(EXPORT_XSD,"true");
         //defaults.setProperty(EXPORT_CMF_TO_XSD,"true");
-        defaults.setProperty(EXPORT_CMFTOOL_TO_XSD,"cmftool.bat m2xmsg -d -c -o");
+        defaults.setProperty(EXPORT_CMFTOOL_TO_XSD,"~\\niem-tools\\cmftool\\bin\\cmftool.bat m2xmsg -d -c -o");
         defaults.setProperty(EXPORT_JSON,"true");
         //defaults.setProperty(EXPORT_CMF_TO_JSON,"true");
-        defaults.setProperty(EXPORT_CMFTOOL_TO_JSON,"cmftool.bat m2jmsg -o");
+        defaults.setProperty(EXPORT_CMFTOOL_TO_JSON,"~\\niem-tools\\cmftool\\bin\\cmftool.bat m2jmsg -o");
         defaults.setProperty(EXPORT_CODELISTS,"true");
         defaults.setProperty(EXPORT_WSDL,"true");
         defaults.setProperty(EXPORT_OPENAPI,"true");
