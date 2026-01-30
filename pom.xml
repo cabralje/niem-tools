@@ -176,6 +176,7 @@
             <activation>
                 <os>
                     <family>Unix</family>
+                    <name>!Mac OS X</name>
                 </os>
             </activation>
             <properties>
