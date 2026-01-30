@@ -93,7 +93,7 @@ class CmfToolAdapter {
             try {
                 Files.createDirectories(xsdPath);
             } catch (IOException e) {
-                Log.trace("Exception 1 in publishXSDModel: could not create directory " + xsdDir + ": " + e.getMessage());
+                Log.trace("Exception in publishXSDModel: could not create directory " + xsdDir + ": " + e.getMessage());
                 return;
             }
         }
@@ -103,7 +103,7 @@ class CmfToolAdapter {
             try {
                 Files.createDirectories(cmfPath);
             } catch (IOException e) {
-                Log.trace("Exception 2 in publishXSDModel: could not create directory " + cmfPath + ": " + e.getMessage());
+                Log.trace("Exception in publishXSDModel: could not create directory " + cmfPath + ": " + e.getMessage());
                 return;
             }
         }
@@ -113,8 +113,8 @@ class CmfToolAdapter {
         try {
             exec(execCommandXsd);
         } catch (IOException | InterruptedException e) {
-            Log.trace("Exception 3 in publishXSDModel: " + e.getMessage());
-            System.exit(1);
+            Log.trace("Exception in publishXSDModel: " + e.getMessage());
+            //System.exit(1);
         }
 
         //}  
@@ -146,7 +146,7 @@ class CmfToolAdapter {
             try {
                 Files.createDirectories(xsdPath);
             } catch (IOException e) {
-                Log.trace("Exception 1 in publishXSD: could not create directory " + xsdDir + ": " + e.getMessage());
+                Log.trace("Exception in publishXSD: could not create directory " + xsdDir + ": " + e.getMessage());
                 return;
             }
         }
@@ -156,7 +156,7 @@ class CmfToolAdapter {
             try {
                 Files.createDirectories(cmfPath);
             } catch (IOException e) {
-                Log.trace("Exception 2 in publishXSD: could not create directory " + cmfPath + ": " + e.getMessage());
+                Log.trace("Exception in publishXSD: could not create directory " + cmfPath + ": " + e.getMessage());
                 return;
             }
         }
@@ -166,8 +166,8 @@ class CmfToolAdapter {
         try {
             exec(execCommandXsd);
         } catch (IOException | InterruptedException e) {
-            Log.trace("Exception 3 in publishXSD: " + e.getMessage());
-            System.exit(1);
+            Log.trace("Exception in publishXSD: " + e.getMessage());
+            //System.exit(1);
         }
 
         /* } else {
@@ -229,7 +229,7 @@ class CmfToolAdapter {
             try {
                 Files.createDirectories(jsonPath);
             } catch (IOException e) {
-                Log.trace("Exception 1 in publish JSON: could not create directory " + jsonPath + ": " + e.getMessage());
+                Log.trace("Exception in publishJSON: could not create directory " + jsonPath + ": " + e.getMessage());
                 return;
             }
         }
@@ -240,7 +240,7 @@ class CmfToolAdapter {
             try {
                 Files.createDirectories(cmfPath);
             } catch (IOException e) {
-                Log.trace("Exception 2 in publishJSON: could not create directory " + cmfPath + ": " + e.getMessage());
+                Log.trace("Exception in publishJSON: could not create directory " + cmfPath + ": " + e.getMessage());
                 return;
             }
         }
@@ -252,8 +252,8 @@ class CmfToolAdapter {
         try {
             exec(execCommandXsd);
         } catch (IOException | InterruptedException e) {
-            Log.trace("Exception 3 in publishJSON: " + e.getMessage());
-            System.exit(1);
+            Log.trace("Exception in publishJSON: " + e.getMessage());
+            //System.exit(1);
         }
         /* } else {
             // generate JSON schema in niem-tools

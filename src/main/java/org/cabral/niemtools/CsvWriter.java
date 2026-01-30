@@ -152,20 +152,17 @@ public class CsvWriter {
             File parentFile = file.getParentFile();
             if (parentFile != null)
                 parentFile.mkdirs();
-            FileWriter fw = new FileWriter(file);
-            CSVWriter writer = null;
-            try {
-                writer = new CSVWriter(fw);
-            } finally {
-
+            
+            try (FileWriter fw = new FileWriter(file);
+                 CSVWriter writer = new CSVWriter(fw)) {
+                
                 // Write header
                 final String[][] map = NiemUmlModel.getNiemMap();
                 String[] nextLine = new String[map.length];
                 for (int column = 0; column < map.length; column++)
                     nextLine[column] = map[column][0];
                 try {
-                    if (writer != null)
-                        writer.writeNext(nextLine);
+                    writer.writeNext(nextLine);
                 } catch (Exception e) {
                     Log.trace("exportCsv: writing error" + e.toString());
                 }
@@ -183,8 +180,7 @@ public class CsvWriter {
                         continue;
                     nextLine = getItemCsv(thisClass);
                     Log.debug("exportCsv: write line");
-                    if (writer != null)
-                        writer.writeNext(nextLine);
+                    writer.writeNext(nextLine);
 
                     // Export NIEM Mapping for Attributes and Relations
                     if (thisClass.children() != null)
@@ -193,12 +189,10 @@ public class CsvWriter {
                                 continue;
                             nextLine = getItemCsv(item);
                             Log.debug("exportCsv: write line");
-                            if (writer != null && nextLine != null)
+                            if (nextLine != null)
                                 writer.writeNext(nextLine);
                         }
                 }
-                if (writer != null)
-                    writer.close();
                 Log.debug("exportCsv: CSV file created " + file.toString());
             }
 
