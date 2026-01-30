@@ -1447,7 +1447,7 @@ class NiemModel {
                 String elementName = elementElement.getAttribute("name");
                 if (NamespaceModel.getPrefix(elementName) == null)
                     elementName = NamespaceModel.getPrefixedName(targetPrefix, elementName);
-                Log.setImportStatusText("Importing " + elementName);
+                Log.setMessageStatus("Importing " + elementName);
                 String abstractAttribute = elementElement.getAttribute("abstract");
                 String baseTypeSchemaURI = null;
                 String baseTypeName = elementElement.getAttribute("type");
@@ -1713,7 +1713,7 @@ class NiemModel {
                 String typeName = typeElement.getAttribute("name");
                 if (NamespaceModel.getPrefix(typeName) == null)
                     typeName = NamespaceModel.getPrefixedName(targetPrefix, typeName);
-                Log.setImportStatusText("Importing elements in " + typeName);
+                Log.setMessageStatus("Importing elements in " + typeName);
                 UmlClass type = getType(ns.getSchemaURI(), typeName);
                 if (type == null)
                     continue;
@@ -2104,7 +2104,7 @@ class NiemModel {
                 String typeName = typeElement.getAttribute("name");
                 if (NamespaceModel.getPrefix(typeName) == null)
                     typeName = NamespaceModel.getPrefixedName(targetPrefix, typeName);
-                Log.setImportStatusText("Importing " + typeName);
+                Log.setMessageStatus("Importing " + typeName);
                 UmlClass type = null;
                 try {
                     if (nodeDocumentationXPath != null)

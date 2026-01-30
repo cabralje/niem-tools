@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class CmfToolAdapter {
 
@@ -38,7 +40,8 @@ class CmfToolAdapter {
         String[] parts = execCommand.split(" (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
         if (parts != null) {
             for (String part : parts) {
-                commandList.add(part.replace("\"", ""));
+                String cleaned = part.replace("\"", "");
+                commandList.add(expandEnvVars(cleaned));
             }
         }
 
@@ -67,6 +70,53 @@ class CmfToolAdapter {
         return exitCode;
     }
 
+    private static String expandEnvVars(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+
+        String expanded = value;
+
+        Pattern percentPattern = Pattern.compile("%([^%]+)%");
+        Matcher percentMatcher = percentPattern.matcher(expanded);
+        StringBuffer percentBuffer = new StringBuffer();
+        while (percentMatcher.find()) {
+            String key = percentMatcher.group(1);
+            String env = System.getenv(key);
+            if (env == null) {
+                env = percentMatcher.group(0);
+            }
+            percentMatcher.appendReplacement(percentBuffer, Matcher.quoteReplacement(env));
+        }
+        percentMatcher.appendTail(percentBuffer);
+        expanded = percentBuffer.toString();
+
+        Pattern bracePattern = Pattern.compile("\\$\\{([^}]+)\\}");
+        Matcher braceMatcher = bracePattern.matcher(expanded);
+        StringBuffer braceBuffer = new StringBuffer();
+        while (braceMatcher.find()) {
+            String key = braceMatcher.group(1);
+            String env = System.getenv(key);
+            if (env == null) {
+                env = braceMatcher.group(0);
+            }
+            braceMatcher.appendReplacement(braceBuffer, Matcher.quoteReplacement(env));
+        }
+        braceMatcher.appendTail(braceBuffer);
+        expanded = braceBuffer.toString();
+
+        if (expanded.startsWith("~")) {
+            String home = System.getProperty("user.home");
+            if (expanded.equals("~")) {
+                expanded = home;
+            } else if (expanded.startsWith("~/") || expanded.startsWith("~\\")) {
+                expanded = home + expanded.substring(1);
+            }
+        }
+
+        return expanded;
+    }
+
     /**
      * * Publish XSD model schemas from the NiemUmlModel.
      *
@@ -93,7 +143,7 @@ class CmfToolAdapter {
             try {
                 Files.createDirectories(xsdPath);
             } catch (IOException e) {
-                Log.trace("Exception 1 in publishXSDModel: could not create directory " + xsdDir + ": " + e.getMessage());
+                Log.trace("Exception in publishXSDModel: could not create directory " + xsdDir + ": " + e.getMessage());
                 return;
             }
         }
@@ -103,7 +153,7 @@ class CmfToolAdapter {
             try {
                 Files.createDirectories(cmfPath);
             } catch (IOException e) {
-                Log.trace("Exception 2 in publishXSDModel: could not create directory " + cmfPath + ": " + e.getMessage());
+                Log.trace("Exception in publishXSDModel: could not create directory " + cmfPath + ": " + e.getMessage());
                 return;
             }
         }
@@ -113,8 +163,8 @@ class CmfToolAdapter {
         try {
             exec(execCommandXsd);
         } catch (IOException | InterruptedException e) {
-            Log.trace("Exception 3 in publishXSDModel: " + e.getMessage());
-            System.exit(1);
+            Log.trace("Exception in publishXSDModel: " + e.getMessage());
+            //System.exit(1);
         }
 
         //}  
@@ -146,7 +196,7 @@ class CmfToolAdapter {
             try {
                 Files.createDirectories(xsdPath);
             } catch (IOException e) {
-                Log.trace("Exception 1 in publishXSD: could not create directory " + xsdDir + ": " + e.getMessage());
+                Log.trace("Exception in publishXSD: could not create directory " + xsdDir + ": " + e.getMessage());
                 return;
             }
         }
@@ -156,7 +206,7 @@ class CmfToolAdapter {
             try {
                 Files.createDirectories(cmfPath);
             } catch (IOException e) {
-                Log.trace("Exception 2 in publishXSD: could not create directory " + cmfPath + ": " + e.getMessage());
+                Log.trace("Exception in publishXSD: could not create directory " + cmfPath + ": " + e.getMessage());
                 return;
             }
         }
@@ -166,8 +216,8 @@ class CmfToolAdapter {
         try {
             exec(execCommandXsd);
         } catch (IOException | InterruptedException e) {
-            Log.trace("Exception 3 in publishXSD: " + e.getMessage());
-            System.exit(1);
+            Log.trace("Exception in publishXSD: " + e.getMessage());
+            //System.exit(1);
         }
 
         /* } else {
@@ -229,7 +279,7 @@ class CmfToolAdapter {
             try {
                 Files.createDirectories(jsonPath);
             } catch (IOException e) {
-                Log.trace("Exception 1 in publish JSON: could not create directory " + jsonPath + ": " + e.getMessage());
+                Log.trace("Exception in publishJSON: could not create directory " + jsonPath + ": " + e.getMessage());
                 return;
             }
         }
@@ -240,7 +290,7 @@ class CmfToolAdapter {
             try {
                 Files.createDirectories(cmfPath);
             } catch (IOException e) {
-                Log.trace("Exception 2 in publishJSON: could not create directory " + cmfPath + ": " + e.getMessage());
+                Log.trace("Exception in publishJSON: could not create directory " + cmfPath + ": " + e.getMessage());
                 return;
             }
         }
@@ -252,8 +302,8 @@ class CmfToolAdapter {
         try {
             exec(execCommandXsd);
         } catch (IOException | InterruptedException e) {
-            Log.trace("Exception 3 in publishJSON: " + e.getMessage());
-            System.exit(1);
+            Log.trace("Exception in publishJSON: " + e.getMessage());
+            //System.exit(1);
         }
         /* } else {
             // generate JSON schema in niem-tools

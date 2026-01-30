@@ -1444,12 +1444,19 @@ public class NiemUmlModel {
             Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    String filename = file.toString();
+                    
+                    // Only process XSD files - skip all other file types
+                    if (!filename.endsWith(XmlWriter.XSD_FILE_TYPE)) {
+                        Log.debug("importSchemaDir: skipping non-XSD file " + filename);
+                        return FileVisitResult.CONTINUE;
+                    }
+
                     // Configure DOM
                     DocumentBuilder db;
                     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
                     docBuilderFactory.setNamespaceAware(true);
                     Document doc;
-                    String filename = file.toString();
 
                     try {
                         db = docBuilderFactory.newDocumentBuilder();
@@ -1498,28 +1505,29 @@ public class NiemUmlModel {
                                 return FileVisitResult.CONTINUE;
                         }
                     } */
-                    if (filename.endsWith(XmlWriter.XSD_FILE_TYPE)) {
-                        Log.debug("Importing " + filepath);
-                        try {
-                            switch (importPass) {
-                                case 0 -> {
-                                    Namespace ns = ReferenceModel.importTypes(doc, filename);
-                                    if (ns != null) {
-                                        UmlClassView classView = ns.getReferenceClassView();
-                                        if (classView != null)
-                                            classView.set_PropertyValue(FILE_PATH_PROPERTY, NIEM_DIR + filepath);
-                                    }
+                    
+                    // Process the XSD file
+                    Log.debug("Importing " + filepath);
+                    try {
+                        switch (importPass) {
+                            case 0 -> {
+                                Namespace ns = ReferenceModel.importTypes(doc, filename);
+                                if (ns != null) {
+                                    UmlClassView classView = ns.getReferenceClassView();
+                                    if (classView != null)
+                                        classView.set_PropertyValue(FILE_PATH_PROPERTY, NIEM_DIR + filepath);
                                 }
-                                case 1 ->
-                                    ReferenceModel.importElements(doc, filename);
-                                case 2 ->
-                                    ReferenceModel.importElementsInTypes(doc, filename);
                             }
-                        } catch (RuntimeException e) {
-                            // TODO Auto-generated catch block
-                             e.printStackTrace();
+                            case 1 ->
+                                ReferenceModel.importElements(doc, filename);
+                            case 2 ->
+                                ReferenceModel.importElementsInTypes(doc, filename);
                         }
+                    } catch (RuntimeException e) {
+                        // TODO Auto-generated catch block
+                         e.printStackTrace();
                     }
+                    
                     return FileVisitResult.CONTINUE;
                 }
             });
@@ -1541,7 +1549,7 @@ public class NiemUmlModel {
         ReferenceModel.getModelPackage().sortChildren();
         Log.trace("Namespaces: " + NamespaceModel.getSize());
         Log.trace("Elements: " + ReferenceModel.getSize());
-        Log.setImportStatusText("");
+        Log.setMessageStatus("");
     }
 
     /**

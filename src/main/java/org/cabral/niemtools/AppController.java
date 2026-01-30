@@ -98,9 +98,6 @@ public class AppController {
     private ComboBox<String> ImportNIEMVersion;
 
     @FXML
-    private Label ImportStatus;
-
-    @FXML
     private TableColumn<String[], String> LocalPathColumn;
 
     @FXML
@@ -108,6 +105,9 @@ public class AppController {
 
     @FXML
     private TitledPane MapPane;
+
+    @FXML
+    private Label MessageStatus;
 
     @FXML
     private TitledPane NIEMPane;
@@ -158,7 +158,7 @@ public class AppController {
         properties.load();
 
         // Redirect logging
-        Log.setImportStatus(ImportStatus);
+        Log.setMessageStatusLabel(MessageStatus);
         Log.setLogArea(LogArea);
         Log.setDebug(properties.getProperty(ProjectProperties.LOG_DEBUG).equals("true"));
         Log.setProfile(properties.getProperty(ProjectProperties.LOG_PROFILE).equals("true"));
@@ -346,7 +346,7 @@ public class AppController {
         // Set status
         ProjectStatus.setText(properties.getProperty(ProjectProperties.IEPD_NAME));
         NIEMStatus.setText("NIEM " + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION));
-        ImportStatus.setText("");
+        MessageStatus.setText("");
     }
 
     @FXML
@@ -415,37 +415,49 @@ public class AppController {
     @FXML
     public void exportMapping(ActionEvent event) {
 
-        Task<Void> task = new Task<Void>() {
+         Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
-                mainControls.setDisable(true);
-                Log.trace("Exporting mapping to " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
-                model.exportMappingCsv();
-                model.exportMappingHtml();
-                Log.trace("\nMapping exported. Next, edit the CSV mapping file as needed, then 'Import Mapping'.\n");
-                mainControls.setDisable(false);
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Exporting mapping to " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
+                    model.exportMappingCsv();
+                    model.exportMappingHtml();
+                    Log.trace("\nMapping exported. Next, edit the CSV mapping file as needed, then 'Import Mapping'.\n");
+                } catch (Exception e) {
+                    Log.trace("Error exporting mapping: " + e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
                 return null;
-            }
+             }
         };
-        new Thread(task).start();
+        new Thread(task).start(); 
     }
 
     @FXML
     public void importMapping(ActionEvent event) {
 
-        Task<Void> task = new Task<Void>() {
+         Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
-                mainControls.setDisable(true);
-                Log.trace("Importing mapping from " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
-                model.deleteMapping();
-                model.importCsv(model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
-                Log.trace("\nMapping imported. Next, 'Validate Mapping'.\n");
-                mainControls.setDisable(false);
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Importing mapping from " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
+                    model.deleteMapping();
+                    model.importCsv(model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
+                    Log.trace("\nMapping imported. Next, 'Validate Mapping'.\n");
+                } catch (Exception e) {
+                    Log.trace("Error importing mapping: " + e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
                 return null;
-            }
+             }
         };
-        new Thread(task).start();
+        new Thread(task).start(); 
 
     }
 
@@ -455,11 +467,17 @@ public class AppController {
         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
-                mainControls.setDisable(true);
-                Log.trace("Importing NIEM Reference Model...");
-                model.importReferenceModel(properties);
-                Log.trace("\nNIEM Reference Model imported. Next: Model in UML, apply the NIEM profile and then 'Export mapping'.\n");
-                mainControls.setDisable(false);
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Importing NIEM Reference Model...");
+                    model.importReferenceModel(properties);
+                    Log.trace("\nNIEM Reference Model imported. Next: Model in UML, apply the NIEM profile and then 'Export mapping'.\n");
+                } catch (Exception e) {
+                    Log.trace("Error importing reference model: " + e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
                 return null;
             }
         };
@@ -509,89 +527,118 @@ public class AppController {
     @FXML
     public void publishCMF(ActionEvent event) {
 
-        Task<Void> task = new Task<Void>() {
+         Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
-                mainControls.setDisable(true);
-                Log.trace("Publishing CMF to " + model.properties.getProperty(ProjectProperties.EXPORT_CMF_FILE) + " ...");
-                model.createNIEM();
-                model.cacheModels(false);
-                model.exportCmf();
-                cmftool.publishXSDModel();
-                Log.trace("\nCMF published. Next, generate schemas with 'XML Model Schemas', 'XML MMessage Schemas', and/or 'JSON Message Schemas'.\n");
-                mainControls.setDisable(false);
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try { 
+                    Log.trace("Publishing CMF to " + model.properties.getProperty(ProjectProperties.EXPORT_CMF_FILE) + " ...");
+                    model.createNIEM();
+                    model.cacheModels(false);
+                    model.exportCmf();
+                    Log.trace("\nCMF published. Next, generate schemas with 'XML Model Schemas', 'XML MMessage Schemas', and/or 'JSON Message Schemas'.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing CMF: " + e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
                 return null;
-            }
+             }
         };
-        new Thread(task).start();
+        new Thread(task).start(); 
     }
 
     @FXML
     public void publishHTML(ActionEvent event) {
 
-        Task<Void> task = new Task<Void>() {
+         Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
-                mainControls.setDisable(true);
-                Log.trace("Publishing HTML documentation to " + model.properties.getProperty(ProjectProperties.EXPORT_HTML_DIR) + " ...");
-                model.exportHtml((umlPackage == null) ? project : umlPackage);
-                Log.trace("\nHTML documentation published.\n");
-                mainControls.setDisable(false);
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Publishing HTML documentation to " + model.properties.getProperty(ProjectProperties.EXPORT_HTML_DIR) + " ...");
+                    model.exportHtml((umlPackage == null) ? project : umlPackage);
+                    Log.trace("\nHTML documentation published.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing HTML: " + e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
                 return null;
-            }
+             }
         };
-        new Thread(task).start();
+        new Thread(task).start(); 
     }
 
     @FXML
     public void publishJSON(ActionEvent event) {
 
-        Task<Void> task = new Task<Void>() {
+         Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
-                mainControls.setDisable(true);
-                Log.trace("Publishing JSON schema to " + model.properties.getProperty(ProjectProperties.EXPORT_JSON_DIR) + " ...");
-                cmftool.publishJSON();
-                Log.trace("\nJSON schema published.\n");
-                mainControls.setDisable(false);
-                return null;
-            }
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Publishing JSON schema to " + model.properties.getProperty(ProjectProperties.EXPORT_JSON_DIR) + " ...");
+                    cmftool.publishJSON();
+                    Log.trace("\nJSON schema published.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing JSON: " + e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
+                 return null;
+             }
         };
-        new Thread(task).start();
+        new Thread(task).start(); 
     }
 
     @FXML
     public void publishXSD(ActionEvent event) {
 
-        Task<Void> task = new Task<Void>() {
+         Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
-                mainControls.setDisable(true);
-                Log.trace("Publishing XSD schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " ...");
-                cmftool.publishXSD();
-                Log.trace("\nXSD schemas published.\n");
-                mainControls.setDisable(false);
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Publishing XSD schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " ...");
+                    cmftool.publishXSD();
+                    Log.trace("\nXSD schemas published.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing XSD: " + e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
                 return null;
-            }
+             }
         };
-        new Thread(task).start();
+        new Thread(task).start(); 
     }
 
     @FXML
     public void publishXSDModel(ActionEvent event) {
 
-        Task<Void> task = new Task<Void>() {
+         Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
-                mainControls.setDisable(true);
-                Log.trace("Publishing XSD Model schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_MODEL_DIR) + " ...");
-                cmftool.publishXSDModel();
-                Log.trace("\nXSD Model schemas published.\n");
-                mainControls.setDisable(false);
-                return null;
-            }
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Publishing XSD Model schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_MODEL_DIR) + " ...");
+                    cmftool.publishXSDModel();
+                    Log.trace("\nXSD Model schemas published.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing XSD Model: " + e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
+               return null;
+             }
         };
-        new Thread(task).start();
+        new Thread(task).start(); 
     }
 
     @FXML
@@ -621,9 +668,19 @@ public class AppController {
 
     @FXML
     public void setProjectProperty(ActionEvent event) {
-        TextField source = (TextField) event.getSource();
-        String property = source.getId();
-        String value = source.getText();
+        Object source = event.getSource();
+        String property = null;
+        String value = null;
+        
+        if (source instanceof TextField textField) {
+            property = textField.getId();
+            value = textField.getText();
+        } else if (source instanceof ComboBox<?> comboBox) {
+            property = comboBox.getId();
+            Object selectedValue = comboBox.getValue();
+            value = selectedValue != null ? selectedValue.toString() : null;
+        }
+        
         if (property != null && value != null && !property.isEmpty()) {
             properties.setProperty(property, value);
         }
@@ -648,23 +705,29 @@ public class AppController {
     @FXML
     public void validateMapping(ActionEvent event) {
 
-        Task<Void> task = new Task<Void>() {
+         Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception {
-                mainControls.setDisable(true);
-                Log.trace("Validating mapping from " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
-                model.deleteNIEM(false);
-                model.createNIEM();
-                model.cacheModels(false);
-                model.createSubsetAndExtension();
-                Log.trace("\nNIEM Subset and Extensions created. Next, if any there are any mapping issues above, update " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " and 'Import Mapping' and 'Validate Mapping' again as needed.");
-                Log.trace("Otherwise, generate CMF file with 'Common Model Format (CMF)'.\n");
-                mainControls.setDisable(false);
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Validating mapping from " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
+                    model.deleteNIEM(false);
+                    model.createNIEM();
+                    model.cacheModels(false);
+                    model.createSubsetAndExtension();
+                    Log.trace("\nNIEM Subset and Extensions created. Next, if any there are any mapping issues above, update " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " and 'Import Mapping' and 'Validate Mapping' again as needed.");
+                    Log.trace("Otherwise, generate CMF file with 'Common Model Format (CMF)'.\n");
+                } catch (Exception e) {
+                    Log.trace("Error validating mapping: " + e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
                 return null;
-            }
+             }
         };
-        new Thread(task).start();
-    }
+        new Thread(task).start(); 
+    } 
 
     private void populateNiemVersionDropdown(ComboBox<String> comboBox, String selectedVersion) {
         Log.debug("Starting NIEM version fetch...");

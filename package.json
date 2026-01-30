@@ -1,6 +1,6 @@
 {
   "name": "niem-tools",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "This is a BOUML plugout that supports developing NIEM message specifications in UML.",
   "bin": {
     "niem-tools": "jdeploy-bundle/jdeploy.js"
@@ -8,6 +8,7 @@
   "preferGlobal": true,
   "scripts": {
     "build": "jdeploy install && node scripts/fix-jdeploy-java-version.js",
+    "postinstall": "node scripts/install-bouml-templates.js && node scripts/install-cmftool.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

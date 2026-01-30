@@ -44,20 +44,30 @@ If you don't have Node.js/npm installed:
    npm run build
    ```
 
-4. **Note the installation directory** for the next step (template setup)
+4. **Collect runtime dependencies (for manual runs)**
+  - The manual install requires these runtime JARs: **opencsv**, **commons-lang3**, and **JavaFX**.
+  - Copy non-JavaFX runtime dependencies into `target/dependency`:
+    ```bash
+    mvn -DincludeScope=runtime dependency:copy-dependencies -DoutputDirectory=target/dependency
+    ```
+  - JavaFX runtime JARs are copied to `target/javafx-lib` during the build.
+
+5. **Note the installation directory** for the next step (template setup)
 
 ### 1c. Setup niem-tools template
-* Locate the niem-tools installation directory:
-  - **If installed via npm:**
-    - On Windows: `%APPDATA%\npm\node_modules\niem-tools`
-    - On macOS/Linux: Run `npm root -g` to find the global modules directory, then navigate to `niem-tools`
-  - **If installed manually:** Use the directory where you cloned/extracted niem-tools
+* Locate the niem-tools templates directory:
+  - **If installed via npm (recommended):**
+    - On Windows: `%USERPROFILE%\niem-tools\bouml-templates`
+    - On macOS/Linux: `~/niem-tools/bouml-templates`
+  - **If installed manually:** Use the directory where you cloned/extracted niem-tools, then `bouml-templates`
 * Start BoUML.
 * Click on `Miscellaneous->Set Environment`.
-* Under `Template Project`, select the location of the `bouml-templates/niem-project/niem-project.prj` BoUML project template in the niem-tools installation directory.
+* Under `Template Project`, select the location of the `niem-project/niem-project.prj` BoUML project template inside the templates directory.
 * **For manual installations only:** Configure the BoUML plugout command:
   - In BoUML, go to the package that uses the plugout
-  - Set the plugout command to: `java -jar /path/to/niem-tools/jdeploy-bundle/niemtools-2.0.jar`
+  - Set the plugout command to include runtime dependencies:
+    - **Windows:** `java -cp "C:\\path\\to\\niem-tools\\target\\niemtools-2.0.jar;C:\\path\\to\\niem-tools\\target\\dependency\\*;C:\\path\\to\\niem-tools\\target\\javafx-lib\\*" org.cabral.niemtools.BoumlPlugout`
+    - **macOS/Linux:** `java -cp "/path/to/niem-tools/target/niemtools-2.0.jar:/path/to/niem-tools/target/dependency/*:/path/to/niem-tools/target/javafx-lib/*" org.cabral.niemtools.BoumlPlugout`
   - (For npm installations, the `niem-tools` command is automatically available)
 ### 1d. Install cmftool (recommended)
 * Download and extract [cmftool](https://github.com/niemopen/cmftool/tags)

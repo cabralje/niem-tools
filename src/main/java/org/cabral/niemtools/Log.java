@@ -15,7 +15,7 @@ public class Log {
 
     private static final ConcurrentHashMap<String, Long> timer = new ConcurrentHashMap<>();
     private static TextArea logArea = null;
-    private static Label importStatus = null;
+    private static Label messageStatus = null;
 
     /**
      * outputs debugging information
@@ -45,8 +45,8 @@ public class Log {
      * Set the importStatus Label for displaying import status messages
      * @param label The Label to display messages on
      */
-    public static void setImportStatus(Label label) {
-        importStatus = label;
+    public static void setMessageStatusLabel(Label label) {
+        messageStatus = label;
     }
 
     /**
@@ -100,9 +100,9 @@ public class Log {
         }
     }
 
-    public static void setImportStatusText(String message) {
-        if (importStatus != null) {
-            Platform.runLater(() -> importStatus.setText(message));
+    public static void setMessageStatus(String message) {
+        if (messageStatus != null) {
+            Platform.runLater(() -> messageStatus.setText(message));
         }
     }
 }

@@ -30,41 +30,11 @@
  * </p>
  *
  * <p>
- * The main workflow includes:
- * <ul>
- * <li>Setting the system look and feel for the UI.</li>
- * <li>Determining the BOUML port from a test harness file or command-line
- * arguments.</li>
- * <li>Connecting to the BOUML tool using the specified port.</li>
- * <li>Loading and configuring project properties.</li>
- * <li>Handling user commands such as importing reference models,
- * adding/removing stereotypes, publishing UML, importing and validating
- * mappings, and exporting CMF, XSD, JSON, and message specifications.</li>
- * <li>Managing NIEM UML models and related artifacts.</li>
- * <li>Logging and tracing execution steps and errors.</li>
- * </ul>
- * </p>
- *
- * <p>
  * Supported commands include:
  * <ul>
- * <li><b>ImportReferenceModel</b>: Automates the import of reference schemas
- * into the UML model.</li>
  * <li><b>addStereotype</b>: Adds NIEM stereotypes to UML elements.</li>
  * <li><b>removeStereotype</b>: Removes NIEM stereotypes from UML elements.</li>
- * <li><b>publishUML</b>: Generates HTML documentation and mapping files from
- * the UML model.</li>
- * <li><b>importMapping</b>: Imports NIEM mapping from a CSV file.</li>
- * <li><b>validateMapping</b>: Validates the imported NIEM mapping and generates
- * subset/extension models.</li>
- * <li><b>publishCMF</b>: Exports the Canonical Model Format (CMF) for the NIEM
- * model.</li>
- * <li><b>publishXSD</b>: Generates XSD schemas from the NIEM model or via
- * external tools.</li>
- * <li><b>publishJSON</b>: Generates JSON schemas from the NIEM model or via
- * external tools.</li>
- * <li><b>publishSpecification</b>: Generates the message specification
- * documentation.</li>
+ * <li><b>test</b>: Run in debugger mode.</li>
  * </ul>
  * </p>
  *
@@ -80,31 +50,33 @@
 package org.cabral.niemtools;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import fr.bouml.UmlCom;
-import javafx.application.Platform;
+import fr.bouml.UmlItem;
+import fr.bouml.UmlPackage;
 
 public class BoumlPlugout {
 
+    public static String filename = System.getProperty("java.io.tmpdir") + File.separator + "boumlport.txt";
+
     @SuppressWarnings("unused")
     public static void main(String argv[]) {
-        Log.start("main");
 
         // get arguments
         ArrayList<String> args = new ArrayList<>(Arrays.asList(argv));
         String command = null;
 
-        // No need to set look & feel for JavaFX
         // locate the BOUML port
         // the program is called with the socket port number in argument
         int boumlPort = 0;
         try {
             // check for BOUML port from test harness
-            File file = new File(TestHarness.filename);
+            File file = new File(filename);
             String buffer = new String(Files.readAllBytes(file.toPath()));
             boumlPort = Integer.parseInt(buffer);
             if (!file.delete()) {
@@ -125,11 +97,26 @@ public class BoumlPlugout {
             System.out.println("No BOUML port.  Exiting.");
             System.exit(1);
         }
+
+        command = !args.isEmpty() ? args.get(0) : null;
+
+        // handle test mode
+        if (command != null && command.equals("test")) {
+            // test mode - just write the port to the temp file and exit
+            try {
+                try (FileWriter out = new FileWriter(filename)) {
+                    out.write(Integer.toString(boumlPort));
+                }
+            } catch (IOException e) {
+                // nothing to do
+            }
+            System.exit(0);
+        }
+
+        // connect to BOUML port
         System.out.println("Connecting to BOUML on port " + boumlPort);
         Log.debug("Port: " + boumlPort + "\n");
         Log.debug("Classpath: " + System.getProperty("java.class.path") + "\n");
-
-        // connect to BOUML port
         try {
             UmlCom.connect(boumlPort);
         } catch (RuntimeException e) {
@@ -137,664 +124,47 @@ public class BoumlPlugout {
             System.exit(1);
         }
         UmlCom.message("Running NIEM Tools...");
-        /* 
-        // cache UML model
-        UmlPackage project = UmlPackage.getProject();
-        UmlItem target = UmlCom.targetItem();
-        ProjectProperties properties = new ProjectProperties(project, ProjectProperties.getDefaults());
-        properties.load();
 
-        // Find UML package
-        UmlPackage umlPackage = null;
-        if (project != null && project.children() != null)
-            for (UmlItem pkg : project.children())
-                if ((pkg.kind() == fr.bouml.anItemKind.aPackage) || pkg.name().equals("UML")) {   
-                    umlPackage = (UmlPackage)pkg;
+        if (command != null) {
+
+            UmlPackage project = UmlPackage.getProject();
+            UmlItem target = UmlCom.targetItem();
+            ProjectProperties properties = new ProjectProperties(project, ProjectProperties.getDefaults());
+            properties.load();
+
+            NiemUmlModel model = new NiemUmlModel(project, properties);
+
+            switch (command) {
+                case "addStereotype":
+                    model.addStereotype(target);
                     break;
-                }
-         */
-        // Start JavaFX toolkit before any UI interaction
-        startJavaFxIfNeeded();
-
-        // Prevent JavaFX from exiting when last window closes - we'll control exit explicitly
-        Platform.setImplicitExit(false);
-
-        // create Platform Independent and Platform Specific UML models
-        //NiemUmlModel model = new NiemUmlModel(project, properties);
-        // Start Java FX from main.fxml
-        Platform.runLater(() -> {
-            try {
-                javafx.stage.Stage stage = new javafx.stage.Stage();
-                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                        BoumlPlugout.class.getResource("/org/cabral/niemtools/App.fxml")
-                );
-                javafx.scene.Parent root = loader.load();
-
-                // Get the controller and initialize it with project properties, project, and model
-                AppController controller = loader.getController();
-                /*
-                if (controller != null) {
-                    controller.initializeData(properties, project, model);
-                } else {
-                    Log.trace("Warning: AppController is null after FXML loading");
-                }
-                 */
-                javafx.scene.Scene scene = new javafx.scene.Scene(root);
-                stage.setScene(scene);
-                stage.setTitle("NIEM Tools");
-
-                // Handle window close to properly exit application
-                stage.setOnCloseRequest(event -> {
-                    Platform.exit();
-                    UmlCom.bye(0);
-                    UmlCom.close();
-                    System.exit(0);
-                });
-
-                stage.show();
-            } catch (IOException e) {
-                Log.trace("Error loading App.fxml: " + e.getMessage());
+                case "removeStereotype":
+                    model.removeStereotype(target);
+                    break;
             }
-        });
+            Log.trace("Done");
+            UmlCom.message("");
+            // must be called to cleanly inform that all is done
+            UmlCom.bye(0);
+            UmlCom.close();
+            System.exit(0);
+        }
 
-        // For now, we're running in GUI mode - command will be set by UI actions
-        // The switch statement below is kept for backward compatibility with command-line mode
-        command = !args.isEmpty() ? args.get(0) : null;
-
-        if (command == null) {
-            // GUI mode - just keep JavaFX running and return
+        // Start JavaFX UI via launcher (loaded only when available)
+        if (!isJavaFxAvailable()) {
+            Log.trace("JavaFX not available. Skipping UI.");
             return;
         }
-
-        /* 
-        // Configure project directory
-        String projectDirectory = model.properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
-
-        // cache UML model
-        UmlCom.message("Memorize references ...");
-        if (umlPackage != null)
-            umlPackage.memo_ref();
-        else if (project != null)
-            project.memo_ref();
-        else
-            Log.trace("Warning: project is null. Skipping memorization of references.");
-        
-        // warn if enumerations are truncated
-        String maxEnumsString = properties.getProperty(ProjectProperties.IMPORT_MAX_FACETS);
-        if (maxEnumsString != null && !maxEnumsString.isEmpty()) {
-            Log.trace("WARNING: NIEM codelists are currently truncated to " + maxEnumsString + " values. To use the complete code lists, import the reference model again.");
-        }
-         */
-        switch (command) {
-            /*
-            case "importReferenceModel":
-                String importDir = System.getProperty("java.io.tmpdir");
-                try {
-                    String githubRepoUrl = "https://github.com/niemopen/niem-model/archive/refs/tags/";
-                    String modelUrl = githubRepoUrl + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION) + ".zip";
-                    String importFile = importDir + File.separator + "reference_model.zip";
-//                   String targetDirectory = properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR);
-                    //if (targetDirectory == null || targetDirectory.isEmpty()) {
-                    // Download the reference model from GitHub
-                    // Download the reference model from GitHub using HttpURLConnection with timeouts
-                    java.net.URL url = java.net.URI.create(modelUrl).toURL();
-                    java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
-                    connection.setConnectTimeout(10000); // 10 seconds timeout for connection
-                    connection.setReadTimeout(10000);    // 10 seconds timeout for reading
-                    try (java.io.InputStream in = connection.getInputStream()) {
-                        java.nio.file.Files.copy(in, new File(importFile).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                    } finally {
-                        connection.disconnect();
-                    }
-                    // Download the reference model from GitHub using Java's built-in URL/Streams
-                    try (java.io.InputStream in = java.net.URI.create(modelUrl).toURL().openStream()) {
-                        java.nio.file.Files.copy(in, new File(importFile).toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                    }
-
-                    // Unzip the downloaded file
-                    try (java.io.InputStream fis = new java.io.FileInputStream(importFile);
-                         java.util.zip.ZipInputStream zis =
-                             new java.util.zip.ZipInputStream(fis)) {
-                        java.util.zip.ZipEntry entry;
-                        while ((entry = zis.getNextEntry()) != null) {
-                            File outFile = new File(importDir, entry.getName());
-                            if (entry.isDirectory()) {
-                                outFile.mkdirs();
-                            } else {
-                                outFile.getParentFile().mkdirs();
-                                try (java.io.OutputStream os = new java.io.FileOutputStream(outFile)) {
-                                    byte[] buffer = new byte[4096];
-                                    int len;
-                                    while ((len = zis.read(buffer)) != -1) {
-                                        os.write(buffer, 0, len);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                } catch (IOException e) {
-                    Log.trace("Exception 1 in importReferenceModel " + e.getMessage());
-                    System.exit(1); 
-                }
-
-                try {
-                    Log.start("importReferenceModel");
-                    String directory = importDir + File.separator + "niem-model-" + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);
-                    //String directory = properties.getProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR);
-                    properties.setProperty(ProjectProperties.IMPORT_REFERENCE_MODEL_DIR, directory);
-                    if (directory == null || directory.isEmpty())
-                        directory = selectDirectoryProperty(model, directory,
-                                "Directory of the reference schemas to be imported");
-                    model.deleteNIEM(true);
-                    model.createNIEM();
-                    model.cacheModels(true);
-                    model.importSchemaDir(directory);
-                    Log.stop("importReferenceModel");
-                    
-                    // Next step
-                    UmlCom.trace("\nNEXT STEP: Model content in UML, add NIEM stereotypes, and then select 'Publish UML'");
-                } catch (IOException e) {
-                    Log.trace("Exception 2 in importReferenceModel: " + e.getMessage());
-                    System.exit(1);
-                }
-                
-                if (!model.verifyNIEM()) {
-                    UmlCom.trace("NEXT STEP: Select `Import Reference Model`");
-                    return;
-                }
-                break;
-             */
-            case "addStereotype":
-
-                //model.addStereotype(target);
-                break;
-
-            case "removeStereotype":
-
-                //model.removeStereotype(target);
-                break;
-
-            case "publishUML":
-                /* 
-                try {
-                
-                    // Generate HTML documentation
-                    model.exportHtml((umlPackage == null) ? project : umlPackage);
-                    
-                    // Generate NIEM Mapping HTML
-                    model.exportMappingHtml();
-                    
-                    // Generate NIEM Mapping CSV
-                    model.exportMappingCsv();
-                    
-                    // Next steps
-                    String mappingFile = model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE);
-                    UmlCom.trace("\nNEXT STEP: map content to NIEM in " + mappingFile + " and then select 'Import Mapping File'");
-                } catch (Exception e) {
-                    Log.trace("Exception in publishUML: " + e.getMessage());
-                    System.exit(1);
-                }
-                 */
-                break;
-
-            case "importMapping":
-                /*
-                try {
-                    
-                    // Delete previous mapping
-                    model.deleteMapping();
-                    
-                    // Import mapping
-                    model.importCsv(model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE));
-                    
-                    // Next steps
-                    UmlCom.trace("\nNEXT: 'Validating NIEM mapping'");
-                    
-                } catch (Exception e) {
-                    Log.trace("Exception in importMapping: " + e.getMessage());
-                    System.exit(1);
-                }
-                 */
-
-                // automatically validate mapping
-                break;
-
-            case "validateMapping":
-                /*
-                // Clearing NIEM Models
-                model.deleteNIEM(false);
-                model.createNIEM();
-                model.cacheModels(false);
-                
-                // Generating NIEM Models
-                model.createSubsetAndExtension();
-                
-                // Next steps
-                UmlCom.trace("\nNEXT STEP: If any there are any mapping issues above, update " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " and import mappings and validate again as needed.");
-                UmlCom.trace("Otherwise, select 'Publish NIEM schemas` and publish CMF, XSD and/or JSON schemas.");
-                 */
-                break;
-
-            case "testCMF":
-                /*/
-                //  Validate cmftool is available
-                String execCommandXsd = "cmftool.bat help";
-                try {     
-                    exec(execCommandXsd);
-                } catch (IOException | InterruptedException e) {
-                    Log.trace("Exception in testCMF: " + e.getMessage());
-                    System.exit(1); 
-                }
-                 */
-                break;
-
-            case "publishCMF":
-                /*
-                // Create NIEM models
-                model.createNIEM();
-
-                // Cache models
-                model.cacheModels(false);
-                
-                // Export CMF
-                model.exportCmf();
-                
-                // Export XSD model from CMF
-                String exportXsdModel = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD_MODEL);
-                if (exportXsdModel.equals("true")) {
-                    Log.trace("Exporting XSD model");
-                    publishXSDModel(model);
-                }
-
-                // Next steps
-                UmlCom.trace("\nNEXT STEP: Use cmftools to generate XSD and/or JSON schemas");
-                 */
-                break;
-
-            case "publishXSD":
-
-                //publishXSD(model);
-                break;
-
-            case "publishJSON":
-
-                //publishJSON(model);
-                break;
-
-            case "publishSpecification":
-
-            /* 
-                try {
-                    
-
-                    // Generate HTML documentation
-                    model.exportHtml(project);
-
-                    // Generate NIEM Mapping HTML
-                    model.exportMappingHtml();
-
-                    // Generate NIEM Mapping CSV
-                    model.exportMappingCsv();
-                    
-                    // Clearing NIEM Models
-                    model.deleteNIEM(false);
-                    model.createNIEM();
-                    model.cacheModels(false);
-
-                    // Generating NIEM Models
-                    model.createSubsetAndExtension();
-
-                    // Cache models
-                    model.cacheModels(false);
-
-                    // Export CMF
-                    String exportCmf = model.properties.getProperty(ProjectProperties.EXPORT_CMF);
-                    if (exportCmf.equals("true")) {
-                        Log.trace("Exporting CMF");
-                        model.exportCmf();
-
-                        String exportXsdModel2 = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD_MODEL);
-                        if (exportXsdModel2.equals("true")) {
-                            Log.trace("Exporting XSD model");
-                            publishXSDModel(model);
-                        }
-
-                        String exportXsd = model.properties.getProperty(ProjectProperties.EXPORT_XSD);
-                        if (exportXsd.equals("true")) {
-                            Log.trace("Exporting XSD");
-                            publishXSD(model);
-                        }
-
-                        String exportJson = model.properties.getProperty(ProjectProperties.EXPORT_JSON);
-                        if (exportJson.equals("true")) {
-                            Log.trace("Exporting JSON schema");
-                            publishJSON(model);
-                        }
-                    }
-
-                    // Generate wantlist for the subset
-                    model.exportWantlist();
-
-                    // Generate message specification
-                    model.exportSpecification();
-                } catch (Exception ex) {
-                    Log.trace("Exception in publishSpecification: " + ex.getMessage());
-                    System.exit(1);
-                }
-                */
-                break;
-
-            default:
-                Log.trace("Error: Unrecognized command '" + command + "'. Please check the available commands and try again.");
-                break;
-        }
-        Log.trace("Done");
-        UmlCom.message("");
-        Log.stop("main");
-        // must be called to cleanly inform that all is done
-        UmlCom.bye(0);
-        UmlCom.close();
-        System.exit(0);
+        JavaFxLauncher.launch();
+        return;
     }
 
-    /**
-     * Ensure JavaFX toolkit is initialized. Safe to call multiple times.
-     */
-    private static void startJavaFxIfNeeded() {
+    private static boolean isJavaFxAvailable() {
         try {
-            // If toolkit is not initialized, this will start it.
-            // If already initialized, IllegalStateException is thrown and can be ignored.
-            Platform.startup(() -> {
-            });
-        } catch (IllegalStateException alreadyStarted) {
-            // Toolkit already initialized; no action needed.
+            Class.forName("javafx.application.Platform", false, BoumlPlugout.class.getClassLoader());
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
         }
     }
-
-    /**
-     * Select a directory property using a file chooser dialog.
-     *
-     * @param model The NiemUmlModel instance.
-     * @param propertyName The name of the property to set.
-     * @param dialogTitle The title of the file chooser dialog.
-     * @return The selected directory path.
-     */
-    /*
-    private static String selectDirectoryProperty(NiemUmlModel model, String propertyName, String dialogTitle) throws HeadlessException {
-        String directory = model.properties.getProperty(propertyName);
-        JFileChooser fc = new JFileChooser(directory);
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        fc.setDialogTitle(dialogTitle);
-        if (fc.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
-            if (fc.getSelectedFile() != null) {
-                directory = fc.getSelectedFile().getAbsolutePath();
-                model.properties.setProperty(propertyName, directory);
-            }
-        } else {
-            Log.trace("File chooser dialog canceled. No directory selected.");
-        }
-        return directory;
-    }
-    */
-
-    /**
-     * Executes a command in the system shell.
-     *
-     * @param execCommand
-     */
-    /*
-    static int exec(String execCommand) throws IOException, InterruptedException {
-
-        int exitCode;
-        Log.trace("Executing command: " + execCommand);
-
-        // parse the command into a list of arguments
-        List<String> commandList = new ArrayList<>();
-        String[] parts = execCommand.split(" (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-        if (parts != null)
-            for (String part : parts) {
-                commandList.add(part.replace("\"", ""));
-            }
-        ProcessBuilder pb = new ProcessBuilder(commandList);
-        Process process = pb.start();
-
-        // Read the output of the command
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Log.trace(line);
-            }
-        }
-
-        // Read the error stream of the command
-        try (BufferedReader reader2 = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-            String line2;
-            while ((line2 = reader2.readLine()) != null) {
-                Log.trace(line2);
-            }
-        }
-
-        // Wait for the command to complete
-        exitCode = process.waitFor();
-        Log.debug("Command exited with code: " + exitCode);
-
-        return exitCode;
-    }
-     */
-    /**
-     * * Publish XSD model schemas from the NiemUmlModel.
-     *
-     * @param model
-     */
-    /* 
-    static void publishXSDModel(NiemUmlModel model) {
-        
-        String exportCmfToXsdModel = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD_MODEL);
-
-        ProjectProperties properties = model.properties;
-        // use cmftool to generate XSDs from CMF
-        if (exportCmfToXsdModel.equals("true")) {
-            Log.trace("Exporting CMF to XSD using cmftool");
-            // Export CMF to XSD
-
-            String xsdDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                properties.getProperty(ProjectProperties.EXPORT_XSD_MODEL_DIR);
-            String cmfFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                CmfWriter.getCmfFilename(properties.getProperty(ProjectProperties.EXPORT_CMF_FILE), 
-                    properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION)); 
-
-            //Verify xsdDir exists
-            Path xsdPath = Paths.get(xsdDir);
-            if (!Files.exists(xsdPath)) {
-                try {
-                    Files.createDirectories(xsdPath);
-                } catch (IOException e) {
-                    Log.trace("Exception 1 in publishXSDModel: could not create directory " + xsdDir + ": " + e.getMessage());
-                    return;
-                }
-            }
-            // Verify cmfFile directory exists
-            Path cmfPath = Paths.get(cmfFile).getParent();
-            if (!Files.exists(cmfPath)) {
-                try {
-                    Files.createDirectories(cmfPath);
-                } catch (IOException e) {
-                    Log.trace("Exception 2 in publishXSDModel: could not create directory " + cmfPath + ": " + e.getMessage());
-                    return;
-                }
-            }
-            
-            String execCommandXsd = properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_XSD_MODEL) + " " 
-                + xsdDir + " " + cmfFile;
-            try {     
-                exec(execCommandXsd);
-            } catch (IOException | InterruptedException e) {
-                Log.trace("Exception 3 in publishXSDModel: " + e.getMessage());
-                System.exit(1); 
-            }
-
-        }  
-    }
-     */
-    /**
-     * * Publish XSD schemas from the NiemUmlModel.
-     *
-     * @param model
-     */
-    /*
-    static void publishXSD(NiemUmlModel model) {
-        
-        String exportCmfToXsd = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
-
-        ProjectProperties properties = model.properties;
-        // use cmftool to generate XSDs from CMF
-        if (exportCmfToXsd.equals("true")) {
-            Log.trace("Exporting CMF to XSD using cmftool");
-            // Export CMF to XSD
-
-            String xsdDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
-            String cmfFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                CmfWriter.getCmfFilename(properties.getProperty(ProjectProperties.EXPORT_CMF_FILE), 
-                    properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION)); 
-
-            //Verify xsdDir exists
-            Path xsdPath = Paths.get(xsdDir);
-            if (!Files.exists(xsdPath)) {
-                try {
-                    Files.createDirectories(xsdPath);
-                } catch (IOException e) {
-                    Log.trace("Exception 1 in publishXSD: could not create directory " + xsdDir + ": " + e.getMessage());
-                    return;
-                }
-            }
-            // Verify cmfFile directory exists
-            Path cmfPath = Paths.get(cmfFile).getParent();
-            if (!Files.exists(cmfPath)) {
-                try {
-                    Files.createDirectories(cmfPath);
-                } catch (IOException e) {
-                    Log.trace("Exception 2 in publishXSD: could not create directory " + cmfPath + ": " + e.getMessage());
-                    return;
-                }
-            }
-
-            String execCommandXsd = properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_XSD) + " " 
-                + xsdDir + " " + cmfFile;
-            try {     
-                exec(execCommandXsd);
-            } catch (IOException | InterruptedException e) {
-                Log.trace("Exception 3 in publishXSD: " + e.getMessage());
-                System.exit(1); 
-            }
-
-        } else {
-            // generate XSDs in niem-tools
-            Log.trace("Exporting XSDs using niem-tools");
-            try {
-                
-                // Create NIEM models
-                model.createNIEM();
-                
-                // Cache models
-                model.cacheModels(false);
-                
-                // export code lists
-                String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                        properties.getProperty(ProjectProperties.EXPORT_CODELISTS_DIR);
-                XmlWriter xmlWriter = new XmlWriter(xmlDir);
-                xmlWriter.exportCodeLists(NiemUmlModel.getExtensionModel());
-                xmlWriter.exportCodeLists(NiemUmlModel.getSubsetModel());
-                
-                // Generate XSD extension schemas
-                model.exportSpecification();
-                
-                // export XML catalog
-                xmlWriter.exportXmlCatalog();
-                
-                // Next steps
-                UmlCom.trace("\nNEXT STEP: Select 'Publish Message Specification'");
-            } catch (IOException e) {
-                Log.trace("Exception 4 in publishXSD: " + e.getMessage());
-                System.exit(1);
-            }
-        }   
-
-    }
-     */
-    /**
-     * Publish JSON schemas from the NiemUmlModel.
-     *
-     * @param model The NiemUmlModel instance.
-     */
-    /* 
-    static void publishJSON(NiemUmlModel model) {
-        String exportCmfToJson = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
-        ProjectProperties properties = model.properties;
-
-        // use cmftool to generate JSON schemas from CMF
-        if (exportCmfToJson.equals("true")) {
-            Log.trace("Exporting CMF to JSON schema using cmftool");
-
-            String jsonFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                JsonWriter.getJsonFilename(properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE));
-            String cmfFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                CmfWriter.getCmfFilename(properties.getProperty(ProjectProperties.EXPORT_CMF_FILE), 
-                    properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION));
-
-            // Verify jsonFile directory exists
-            Path jsonPath = Paths.get(jsonFile).getParent();
-            if (!Files.exists(jsonPath)) {
-                try {
-                    Files.createDirectories(jsonPath);
-                } catch (IOException e) {
-                    Log.trace("Exception 1 in publish JSON: could not create directory " + jsonPath + ": " + e.getMessage());
-                    return;
-                }
-            }
-
-            // Verify cmfFile directory exists
-            Path cmfPath = Paths.get(cmfFile).getParent();
-            if (!Files.exists(cmfPath)) {
-                try {
-                    Files.createDirectories(cmfPath);
-                } catch (IOException e) {
-                    Log.trace("Exception 2 in publishJSON: could not create directory " + cmfPath + ": " + e.getMessage());
-                    return;
-                }
-            }
-
-            // Export CMF to XSD
-            String execCommandXsd =
-                properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_JSON) + " " +
-                jsonFile + " " + cmfFile + " ";
-            try {     
-                exec(execCommandXsd);
-            } catch (IOException | InterruptedException e) {
-                Log.trace("Exception 3 in publishJSON: " + e.getMessage());
-                System.exit(1);
-            }
-        } else {
-            // generate JSON schema in niem-tools
-            Log.trace("Exporting JSON schema using niem-tools");
-            try {
-                // Create NIEM models
-                model.createNIEM();
-
-                // Cache models
-                model.cacheModels(false);
-                
-                // Generate JSON subset and extension schemas
-                model.exportSpecification();
-                
-                // Next steps
-                UmlCom.trace("\nNEXT STEP: Select 'Publish Message Specification'");
-            } catch (Exception e) {
-                Log.trace("Exception 4 in publishJSON: " + e.getMessage());
-                System.exit(1);
-            }
-        }
-    }
-     */
 }

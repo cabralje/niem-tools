@@ -21,6 +21,7 @@ npm install -g cabralje/niem-tools
 This will:
 - Automatically download the required JDK 21 (if not already installed)
 - Install all dependencies (opencsv, commons-lang3, JavaFX)
+- Install cmftool (NIEM Common Model Format tools)
 - Create a globally available `niem-tools` command
 
 ### Running
@@ -31,11 +32,30 @@ After installation, you can run niem-tools from anywhere:
 niem-tools
 ```
 
-### Template Location
+### Installed Components
 
-The BoUML templates are installed in the niem-tools package directory:
-- On Windows: `%APPDATA%\npm\node_modules\niem-tools\bouml-templates`
-- On macOS/Linux: Find using `npm root -g` then navigate to `niem-tools/bouml-templates`
+#### BoUML Templates
+
+The BoUML templates are installed in the user's home directory:
+- On Windows: `%USERPROFILE%\niem-tools\bouml-templates`
+- On macOS/Linux: `~/niem-tools/bouml-templates`
+
+The original npm package directory still contains the templates, but the home directory copy is the recommended location.
+
+#### cmftool
+
+The cmftool suite (Common Model Format tools) is installed in the user's home directory:
+- On Windows: `%USERPROFILE%\niem-tools\cmftool`
+- On macOS/Linux: `~/niem-tools/cmftool`
+
+cmftool includes command-line utilities for working with NIEM:
+- `cmftool` - Main CMF tool for model transformations
+- `niemtran` - NIEM transformation utilities
+- `scheval` - Schema evaluation tools
+
+To use cmftool commands, either:
+- Add the bin directory to your PATH: `~/niem-tools/cmftool/bin` (or `%USERPROFILE%\niem-tools\cmftool\bin` on Windows)
+- Use the full path to the executables
 
 ## For Developers
 

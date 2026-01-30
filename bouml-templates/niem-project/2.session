@@ -4,13 +4,12 @@ diagrams
   active  classdiagram_ref 141314 // Message1
     1615 1048 100 A4 0 0
 end
-show_stereotypes
-selected class_ref 212610 // Message1
+selected 
+  package_ref 129 // niem-project
 open
   usecaseview_ref 134658 // Use Cases
   classview_ref 179330 // Interfaces and Operations
   classview_ref 179586 // Message1
-  
-  package_ref 147714 // Base Classes
+  classview_ref 179970 // Primitive Types
 end
 end
