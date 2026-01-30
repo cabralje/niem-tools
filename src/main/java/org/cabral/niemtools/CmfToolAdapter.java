@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class CmfToolAdapter {
 
@@ -38,7 +40,8 @@ class CmfToolAdapter {
         String[] parts = execCommand.split(" (?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
         if (parts != null) {
             for (String part : parts) {
-                commandList.add(part.replace("\"", ""));
+                String cleaned = part.replace("\"", "");
+                commandList.add(expandEnvVars(cleaned));
             }
         }
 
@@ -65,6 +68,53 @@ class CmfToolAdapter {
         Log.debug("Command exited with code: " + exitCode);
 
         return exitCode;
+    }
+
+    private static String expandEnvVars(String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+
+        String expanded = value;
+
+        Pattern percentPattern = Pattern.compile("%([^%]+)%");
+        Matcher percentMatcher = percentPattern.matcher(expanded);
+        StringBuffer percentBuffer = new StringBuffer();
+        while (percentMatcher.find()) {
+            String key = percentMatcher.group(1);
+            String env = System.getenv(key);
+            if (env == null) {
+                env = percentMatcher.group(0);
+            }
+            percentMatcher.appendReplacement(percentBuffer, Matcher.quoteReplacement(env));
+        }
+        percentMatcher.appendTail(percentBuffer);
+        expanded = percentBuffer.toString();
+
+        Pattern bracePattern = Pattern.compile("\\$\\{([^}]+)\\}");
+        Matcher braceMatcher = bracePattern.matcher(expanded);
+        StringBuffer braceBuffer = new StringBuffer();
+        while (braceMatcher.find()) {
+            String key = braceMatcher.group(1);
+            String env = System.getenv(key);
+            if (env == null) {
+                env = braceMatcher.group(0);
+            }
+            braceMatcher.appendReplacement(braceBuffer, Matcher.quoteReplacement(env));
+        }
+        braceMatcher.appendTail(braceBuffer);
+        expanded = braceBuffer.toString();
+
+        if (expanded.startsWith("~")) {
+            String home = System.getProperty("user.home");
+            if (expanded.equals("~")) {
+                expanded = home;
+            } else if (expanded.startsWith("~/") || expanded.startsWith("~\\")) {
+                expanded = home + expanded.substring(1);
+            }
+        }
+
+        return expanded;
     }
 
     /**

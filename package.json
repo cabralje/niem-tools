@@ -8,7 +8,7 @@
   "preferGlobal": true,
   "scripts": {
     "build": "jdeploy install && node scripts/fix-jdeploy-java-version.js",
-    "postinstall": "node scripts/install-bouml-templates.js",
+    "postinstall": "node scripts/install-bouml-templates.js && node scripts/install-cmftool.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
