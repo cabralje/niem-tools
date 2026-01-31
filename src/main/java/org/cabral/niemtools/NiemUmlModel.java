@@ -1578,20 +1578,23 @@ public class NiemUmlModel {
      * @param item
      */
     public void addStereotype(UmlItem item) {
-        Log.trace("addStereotype: " + item.name());
+        Log.debug("addStereotype: " + item.name());
         try {
             anItemKind kind = item.kind();
             if (kind == anItemKind.aClass
                     || kind == anItemKind.aClassInstance
                     || kind == anItemKind.anAttribute) {
-
-                item.set_Stereotype(NIEM_STEREOTYPE);
-                item.applyStereotype();
+                if (item.stereotype() == null || item.stereotype().isEmpty()) {
+                    item.set_Stereotype(NIEM_STEREOTYPE);
+                    item.applyStereotype();
+                }
             } else if (item.kind() == anItemKind.aRelation) {
                 UmlRelation r = (UmlRelation) item;
                 if (r.relationKind() != aRelationKind.aGeneralisation) {
-                    item.set_Stereotype(NIEM_STEREOTYPE);
-                    item.applyStereotype();
+                    if (item.stereotype() == null || item.stereotype().isEmpty()) {
+                        item.set_Stereotype(NIEM_STEREOTYPE);
+                        item.applyStereotype();
+                    }
                 }
             }
         } catch (RuntimeException e) {
@@ -1609,7 +1612,7 @@ public class NiemUmlModel {
      * @param item
      */
     public void removeStereotype(UmlItem item) {
-        Log.trace("removeStereotype: " + item.name());
+        Log.debug("removeStereotype: " + item.name());
         try {
             anItemKind kind = item.kind();
             if (kind == anItemKind.aClass

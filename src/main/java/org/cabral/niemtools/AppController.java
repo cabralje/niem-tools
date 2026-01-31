@@ -35,6 +35,8 @@ public class AppController {
     private ProjectProperties properties;
     private UmlPackage project;
     private UmlPackage umlPackage;
+    private UmlPackage messagePackage;
+    private UmlPackage baseTypesPackage;
     private NiemUmlModel model;
     private CmfToolAdapter cmftool;
 
@@ -155,6 +157,18 @@ public class AppController {
             for (UmlItem pkg : project.children()) {
                 if ((pkg.kind() == fr.bouml.anItemKind.aPackage) || pkg.name().equals("UML")) {
                     umlPackage = (UmlPackage) pkg;
+                    for (UmlItem subpkg : umlPackage.children()) {
+                        if (subpkg.name().equals("Messages")) {
+                            messagePackage = (UmlPackage) subpkg;
+                            break;
+                        }
+                    }
+                    for (UmlItem subpkg : umlPackage.children()) {
+                        if (subpkg.name().equals("Base Classes")) {
+                            baseTypesPackage = (UmlPackage) subpkg;
+                            break;
+                        }
+                    }
                     break;
                 }
             }
@@ -403,6 +417,9 @@ public class AppController {
             protected Void call() throws Exception { 
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
+                    Log.trace ("Adding NIEM profile to Messages and Base Classes");
+                    model.addStereotype(messagePackage);
+                    model.addStereotype(baseTypesPackage);
                     Log.trace("Exporting mapping to " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
                     model.exportMappingCsv();
                     model.exportMappingHtml();
