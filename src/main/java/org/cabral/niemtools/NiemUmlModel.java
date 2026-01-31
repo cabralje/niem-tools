@@ -502,6 +502,7 @@ public class NiemUmlModel {
                 continue;
 
             Log.debug("createSubsetAndExtension: " + item.name());
+            Log.setMessageStatus(item.name());
             String typeName = item.propertyValue(NIEM_STEREOTYPE_TYPENAME).trim();
             //String elementName = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
             //String notes = item.propertyValue(NIEM_STEREOTYPE_NOTES).trim();
@@ -549,6 +550,8 @@ public class NiemUmlModel {
             if (typeName.isEmpty() || isNiemType(typeName))
                 continue;
 
+            Log.setMessageStatus(item.name());
+
             String elementName = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
             String baseTypeName = item.propertyValue(NIEM_STEREOTYPE_BASE_TYPE).trim();
 
@@ -593,6 +596,8 @@ public class NiemUmlModel {
         for (UmlItem item : all) {
             if (!isNiemUml(item))
                 continue;
+
+            Log.setMessageStatus(item.name());
 
             String typeName = item.propertyValue(NIEM_STEREOTYPE_TYPENAME).trim();
             String elementList = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
@@ -718,6 +723,7 @@ public class NiemUmlModel {
             Log.trace("createSubsetAndExtension: sorting extension model");
             sort(extension, properties.getProperty(ProjectProperties.EXPORT_SORT_EXTENSION).equals("true"));
         }
+        Log.setMessageStatus("");
         Log.stop("createSubsetAndExtension");
     }
 
@@ -1700,6 +1706,11 @@ public class NiemUmlModel {
                     java.util.Arrays.sort(v, (a, b) -> {
                         String seqA = a.propertyValue(SEQUENCE_ID_PROPERTY);
                         String seqB = b.propertyValue(SEQUENCE_ID_PROPERTY);
+                        boolean attA = NamespaceModel.isAttribute(a);
+                        boolean attB = NamespaceModel.isAttribute(b);
+                        // Handle attributes - they should sort last
+                        if (attA && !attB) return 1;
+                        if (!attA && attB) return -1;
                         // Handle nulls and empty strings as "infinite" (sort last)
                         boolean emptyA = (seqA == null || seqA.isEmpty());
                         boolean emptyB = (seqB == null || seqB.isEmpty());

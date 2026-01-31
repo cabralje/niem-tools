@@ -112,6 +112,7 @@ public class CsvReader {
                             if (attributeName.isEmpty()) {
                                 // import NIEM mapping to class
                                 Log.debug("importCsv: importing NIEM mapping for " + className);
+                                Log.setMessageStatus(className);
                                 IntStream.range(5, Math.min(mapLength, nextLine.length))
                                 .forEach(column -> type.set_PropertyValue(NiemUmlModel.getNiemProperty(column), nextLine[column]));
                             } else {
@@ -127,6 +128,7 @@ public class CsvReader {
                         if (element != null) {
                             // import NIEM mapping to class instance
                             Log.debug("importCsv: importing NIEM mapping for " + attributeName);
+                            Log.setMessageStatus(attributeName);
                             IntStream.range(5, Math.min(mapLength, nextLine.length))
                                 .forEach(column -> element.set_PropertyValue(NiemUmlModel.getNiemProperty(column), nextLine[column]));
                         }
@@ -141,6 +143,7 @@ public class CsvReader {
         } catch (IOException e) {
             Log.trace("importCsv: error - IO exception" + e.toString());
         }
+    Log.setMessageStatus("");
     }
 
 }
