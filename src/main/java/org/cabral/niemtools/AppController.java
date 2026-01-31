@@ -591,6 +591,28 @@ public class AppController {
     }
 
     @FXML
+    void publishSpecification(ActionEvent event) {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Publishing WSDL/OpenAPI specifications to " + model.properties.getProperty(ProjectProperties.EXPORT_HTML_DIR) + " ...");
+                    model.exportSpecification();
+                    Log.trace("\nWSDL/OpenAPI specifications published.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing WSDL/OpenAPI specifications: " + e.getMessage());
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
+                return null;
+             }
+        };
+        new Thread(task).start(); 
+
+    }
+
+    @FXML
     public void publishXSD(ActionEvent event) {
 
          Task<Void> task = new Task<Void>() {

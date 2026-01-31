@@ -299,6 +299,7 @@
                               <Button onAction="#publishXSDModel" text="XML Model Schemas" />
                               <Button onAction="#publishXSD" text="XML Message Schemas" />
                               <Button onAction="#publishJSON" text="JSON Message Schema" />
+                              <Button onAction="#publishSpecification" text="WSDL/OpenAPI" />
                               <Separator orientation="VERTICAL" />
                               <Button onAction="#publishHTML" text="Documentation (HTML)" />
                            </items>
