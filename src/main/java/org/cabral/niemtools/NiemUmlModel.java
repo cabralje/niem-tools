@@ -87,7 +87,6 @@ import fr.bouml.UmlAttribute;
 import fr.bouml.UmlClass;
 import fr.bouml.UmlClassInstance;
 import fr.bouml.UmlClassView;
-import fr.bouml.UmlCom;
 import fr.bouml.UmlItem;
 import fr.bouml.UmlOperation;
 import fr.bouml.UmlPackage;
@@ -961,7 +960,7 @@ public class NiemUmlModel {
         // cache list of ports and message elements
         Log.debug("exportSpecification: cache ports and message elements");
         Map<String, UmlClass> ports = new TreeMap<>();
-        Map<String, UmlClassInstance> messages = new TreeMap<>();
+        //Map<String, UmlClassInstance> messages = new TreeMap<>();
         Set<String> messageNamespaces = new TreeSet<>();
         messageNamespaces.add(NiemModel.XSD_PREFIX);
         @SuppressWarnings("unchecked")
@@ -1011,7 +1010,7 @@ public class NiemUmlModel {
                             UmlClassInstance element = model.getElementByURI(NiemModel.getURI(NamespaceModel.getSchemaURI(inputMessage), inputMessage));
                             if (element != null) {
                                 element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
-                                messages.put(inputMessage, element);
+                                //messages.put(inputMessage, element);
                                 Log.debug("exportSpecification: element " + element.name() + " is input message element for operation " + operationName);
                             }
                         }
@@ -1041,7 +1040,7 @@ public class NiemUmlModel {
                     UmlClassInstance element = model.getElementByURI(NiemModel.getURI(NamespaceModel.getSchemaURI(outputMessage), outputMessage));
                     if (element != null) {
                         element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
-                        messages.put(outputMessage, element);
+                        //messages.put(outputMessage, element);
                         Log.debug("exportSpecification: element " + element.name() + " is output message element for operation " + operationName);
                     }
                 }
@@ -1524,8 +1523,7 @@ public class NiemUmlModel {
                                 ReferenceModel.importElementsInTypes(doc, filename);
                         }
                     } catch (RuntimeException e) {
-                        // TODO Auto-generated catch block
-                         e.printStackTrace();
+                        Log.trace("importSchemaDir: error importing " + filepath + " - " + e.toString());
                     }
                     
                     return FileVisitResult.CONTINUE;

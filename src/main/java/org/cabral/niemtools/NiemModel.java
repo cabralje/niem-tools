@@ -55,7 +55,6 @@
  */
 package org.cabral.niemtools;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -879,10 +878,10 @@ class NiemModel {
      */
     TreeSet<String> exportSchemas(ProjectProperties properties) {
 
-        String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                        properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
-        String jsonFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                         properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE);
+        //String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+        //                properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
+        //String jsonFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+        //                 properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE);
         //String jsonDir = Paths.get(jsonFile).getParent().toString();
 
         //String exportXML = properties.getProperty(ProjectProperties.EXPORT_XSD);
@@ -890,7 +889,7 @@ class NiemModel {
         //String exportCmftoXSD = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
         //String exportCmftoJSON = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
 
-        XmlWriter xmlWriter = new XmlWriter(xmlDir);
+        //XmlWriter xmlWriter = new XmlWriter(xmlDir);
         //JsonWriter jsonWriter = new JsonWriter(jsonDir);
         TreeSet<String> openapiDefinitions = new TreeSet<>();
 
@@ -912,20 +911,20 @@ class NiemModel {
             Log.debug("exportSchemas: exporting schema " + prefix);
 
             // build list of referenced namespaces
-            TreeSet<String> schemaNamespaces = new TreeSet<>();
-            schemaNamespaces.add(XSD_PREFIX);
+            //TreeSet<String> schemaNamespaces = new TreeSet<>();
+            //schemaNamespaces.add(XSD_PREFIX);
 
             // add structures namespaces (for base types)
-            schemaNamespaces.add(STRUCTURES_PREFIX);
+            //schemaNamespaces.add(STRUCTURES_PREFIX);
 
-            TreeSet<String> xmlTypes = new TreeSet<>();
+            //TreeSet<String> xmlTypes = new TreeSet<>();
             //TreeSet<String> jsonDefinitions = new TreeSet<>();
-            TreeSet<String> xmlElements = new TreeSet<>();
+            //TreeSet<String> xmlElements = new TreeSet<>();
             //TreeSet<String> jsonProperties = new TreeSet<>();
             //TreeSet<String> jsonRequired = new TreeSet<>();
 
             Log.debug("exportSchemas: exporting types and elements");
-            String xmlType;
+            //String xmlType;
             //String jsonType;
             if (classView.children() != null)
                 for (UmlItem item : classView.children()) {
@@ -935,17 +934,17 @@ class NiemModel {
 
                         // add referenced namespaces
                         try {
-                            schemaNamespaces.add(NamespaceModel.getPrefix(type));
+                            //schemaNamespaces.add(NamespaceModel.getPrefix(type));
                             UmlClass baseType = getBaseType(type);
                             if (baseType != null)
-                                schemaNamespaces.add(NamespaceModel.getPrefix(baseType));
+                                //schemaNamespaces.add(NamespaceModel.getPrefix(baseType));
                             if (type.children() != null && !NiemUmlModel.isEnumeration(type))
                                 for (UmlItem item2 : type.children()) {
                                     if (item2.kind() == anItemKind.anAttribute) {
-                                        NiemModel model2 = NiemUmlModel.getModel(getURI(item2));
-                                        UmlClassInstance element = model2.getReferencedElement(item2);
-                                        if (element != null)
-                                            schemaNamespaces.add(NamespaceModel.getPrefix(element));
+                                        //NiemModel model2 = NiemUmlModel.getModel(getURI(item2));
+                                        //UmlClassInstance element = model2.getReferencedElement(item2);
+                                        //if (element != null)
+                                            //schemaNamespaces.add(NamespaceModel.getPrefix(element));
                                     }
                                 }
                         } catch (RuntimeException re) {
@@ -955,9 +954,9 @@ class NiemModel {
 
                         // get type schema
                         try {
-                            xmlType = xmlWriter.exportXmlTypeSchema(type);
-                            if (xmlType != null)
-                                xmlTypes.add(xmlType);
+                            //xmlType = xmlWriter.exportXmlTypeSchema(type);
+                            //if (xmlType != null)
+                                //xmlTypes.add(xmlType);
                             /*
                             if (exportJSON.equals("true") && exportCmftoJSON.equals("false")) {
                                 jsonType = (prefix.equals(NiemModel.XSD_PREFIX)) ? jsonWriter.exportJsonPrimitiveSchemafromXML(type) : 
@@ -972,7 +971,7 @@ class NiemModel {
                         }
                     }
                     // add elements and attributes
-                    String xmlElement;
+                    //String xmlElement;
                     //String jsonElement = null;
                     if (item.kind() == anItemKind.aClassInstance) {
                         UmlClassInstance element = (UmlClassInstance) item;
@@ -980,12 +979,12 @@ class NiemModel {
 
                         // add referenced namespaces
                         try {
-                            schemaNamespaces.add(NamespaceModel.getPrefix(element));
-                            if (baseType != null)
-                                schemaNamespaces.add(NamespaceModel.getPrefix(baseType));
-                            String headElement = element.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
-                            if (headElement != null)
-                                schemaNamespaces.add(NamespaceModel.getPrefix(headElement));
+                            //schemaNamespaces.add(NamespaceModel.getPrefix(element));
+                            //if (baseType != null)
+                                //schemaNamespaces.add(NamespaceModel.getPrefix(baseType));
+                            //String headElement = element.propertyValue(NiemUmlModel.SUBSTITUTION_PROPERTY);
+                            //if (headElement != null)
+                                //schemaNamespaces.add(NamespaceModel.getPrefix(headElement));
                         } catch (RuntimeException re) {
                             Log.trace("exportSchemas: error adding namespace " + element.name() + " " + re.toString());
                             continue;
@@ -994,14 +993,14 @@ class NiemModel {
                         // get element schema
                         try {
                             Log.debug("exportSchemas: exporting element " + element.name());
-                            if (NamespaceModel.isAttribute(element.name()))
-                                xmlElement = xmlWriter.exportXmlAttributeSchema(element);
-                            else
-                                xmlElement = xmlWriter.exportXmlElementSchema(element);
-                            if (xmlElement != null)
-                                xmlElements.add(xmlElement);
+                            //if (NamespaceModel.isAttribute(element.name()))
+                            //    xmlElement = xmlWriter.exportXmlAttributeSchema(element);
+                            //else
+                            //    xmlElement = xmlWriter.exportXmlElementSchema(element);
+                            //if (xmlElement != null)
+                                //xmlElements.add(xmlElement);
                             if (baseType != null && !NiemModel.isAbstract(NamespaceModel.getName(baseType))) {
-                                schemaNamespaces.add(NamespaceModel.getPrefix(element));
+                                //schemaNamespaces.add(NamespaceModel.getPrefix(element));
                                 /*
                                 if (exportJSON.equals("true") && exportCmftoJSON.equals("false")) {
                                     jsonElement = jsonWriter.exportJsonElementSchema(element, prefix);

@@ -3,7 +3,6 @@ package fr.bouml;
 /**
  *   Manage the class's attributs
  */
-@SuppressWarnings("unused")
 abstract class UmlBaseAttribute extends UmlClassMember {
   /**
    *  returns a new attribute named 'name' created under 'parent'
@@ -28,6 +27,7 @@ abstract class UmlBaseAttribute extends UmlClassMember {
   /**
    *  returns the kind of the item
    */
+  @Override
   public anItemKind kind() {
     return anItemKind.anAttribute;
   }
@@ -37,6 +37,7 @@ abstract class UmlBaseAttribute extends UmlClassMember {
    * 
    *  On error : return FALSE in C++, produce a RuntimeException in Java
    */
+  @Override
   public void set_isClassMember(boolean y) throws RuntimeException {
     if (!y)
       _cpp_thread_local = false;
@@ -518,6 +519,7 @@ abstract class UmlBaseAttribute extends UmlClassMember {
    *  to unload the object to free memory, it will be reloaded
    *  automatically if needed. args unused
    */
+  @Override
   public void unload(boolean rec, boolean del) {
     _type = null;
     _default_value = null;
@@ -568,6 +570,7 @@ abstract class UmlBaseAttribute extends UmlClassMember {
    */
   public UmlBaseAttribute(long id, String n) { super(id, n); }
 
+  @Override
   protected void read_uml_() {
     super.read_uml_();
     _type = new UmlTypeSpec();
@@ -585,6 +588,7 @@ abstract class UmlBaseAttribute extends UmlClassMember {
     _set_oper = (UmlOperation) UmlBaseItem.read_();
   }
 
+  @Override
   protected void read_cpp_() {
     super.read_cpp_();
     _cpp_mutable = UmlCom.read_bool();
@@ -592,11 +596,13 @@ abstract class UmlBaseAttribute extends UmlClassMember {
     _cpp_thread_local = UmlCom.read_bool();
   }
 
+  @Override
   protected void read_java_() {
     super.read_java_();
     _java_transient = UmlCom.read_bool();
   }
 
+  @Override
   protected void read_php_() {
     super.read_php_();
   }
@@ -604,10 +610,12 @@ abstract class UmlBaseAttribute extends UmlClassMember {
   /**
    * internal, do NOT use it
    */
+  @Override
   protected void read_python_() {
     super.read_python_();
   }
 
+  @Override
   protected void read_idl_() {
     super.read_idl_();
     _idl_case = (UmlAttribute) UmlBaseItem.read_();
@@ -618,6 +626,7 @@ abstract class UmlBaseAttribute extends UmlClassMember {
   /**
    * internal, do NOT use it
    */
+  @Override
   protected void read_mysql_() {
     super.read_mysql_();
     

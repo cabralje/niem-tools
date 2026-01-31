@@ -57,7 +57,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="mainWindow" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cabral.niemtools.AppController">
+<VBox fx:id="mainWindow" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cabral.niemtools.AppController">
   <children>
       <VBox fx:id="mainControls">
          <children>
@@ -244,7 +244,7 @@
                   </AnchorPane>
               </content>
             </TitledPane>
-            <TitledPane fx:id="NamespacePane" expanded="false" text="3. Define External Namespaces (if needed)">
+            <TitledPane expanded="false" text="3. Define External Namespaces (if needed)">
                <content>
                   <AnchorPane>
                      <children>
@@ -269,7 +269,7 @@
                   </AnchorPane>
                </content>
             </TitledPane>
-            <TitledPane fx:id="MapPane" text="4. Map UML to NIEM">
+            <TitledPane text="4. Map UML to NIEM">
               <content>
                 <AnchorPane>
                      <children>
@@ -289,7 +289,7 @@
                   </AnchorPane>
               </content>
             </TitledPane>
-            <TitledPane fx:id="SpecificationPane" text="5. Generate Specification">
+            <TitledPane text="5. Generate Specification">
                <content>
                   <AnchorPane>
                      <children>

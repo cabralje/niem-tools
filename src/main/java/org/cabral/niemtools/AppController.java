@@ -18,11 +18,9 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -104,9 +102,6 @@ public class AppController {
     private TextArea LogArea;
 
     @FXML
-    private TitledPane MapPane;
-
-    @FXML
     private Label MessageStatus;
 
     @FXML
@@ -119,9 +114,6 @@ public class AppController {
     private TableColumn<String[], String> NamespaceColumn;
 
     @FXML
-    private TitledPane NamespacePane;
-
-    @FXML
     private TableColumn<String[], String> PrefixColumn;
 
     @FXML
@@ -131,13 +123,7 @@ public class AppController {
     private Label ProjectStatus;
 
     @FXML
-    private TitledPane SpecificationPane;
-
-    @FXML
     private TableColumn<String[], String> URLColumn;
-
-    @FXML
-    private Button importMapping;
 
     @FXML
     private VBox mainControls;
@@ -153,7 +139,7 @@ public class AppController {
 
         // Find project package
         project = UmlPackage.getProject();
-        UmlItem target = UmlCom.targetItem();
+        //UmlItem target = UmlCom.targetItem();
         properties = new ProjectProperties(project, ProjectProperties.getDefaults());
         properties.load();
 
@@ -369,15 +355,12 @@ public class AppController {
 
             // Get the parent stage and center the dialog on it
             // Replace the Node cast with MenuItem handling
-            MenuItem menuItem = (MenuItem) event.getSource();
+            //MenuItem menuItem = (MenuItem) event.getSource();
             Stage parentStage = (Stage) mainWindow.getScene().getWindow();
             stage.initOwner(parentStage);
 
-            if (controller != null) {
+            if (controller != null)
                 controller.setStage(stage);
-            } else {
-                Log.trace("Warning: AboutDialogController is null after FXML loading");
-            }
 
             // Show the dialog
             stage.showAndWait();
@@ -426,7 +409,6 @@ public class AppController {
                     Log.trace("\nMapping exported. Next, edit the CSV mapping file as needed, then 'Import Mapping'.\n");
                 } catch (Exception e) {
                     Log.trace("Error exporting mapping: " + e.getMessage());
-                    e.printStackTrace();
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
@@ -450,7 +432,6 @@ public class AppController {
                     Log.trace("\nMapping imported. Next, 'Validate Mapping'.\n");
                 } catch (Exception e) {
                     Log.trace("Error importing mapping: " + e.getMessage());
-                    e.printStackTrace();
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
@@ -474,7 +455,6 @@ public class AppController {
                     Log.trace("\nNIEM Reference Model imported. Next: Model in UML, apply the NIEM profile and then 'Export mapping'.\n");
                 } catch (Exception e) {
                     Log.trace("Error importing reference model: " + e.getMessage());
-                    e.printStackTrace();
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
@@ -511,11 +491,12 @@ public class AppController {
 
             // Get the parent stage and center the dialog on it
             // Replace the Node cast with MenuItem handling
-            MenuItem menuItem = (MenuItem) event.getSource();
+            //MenuItem menuItem = (MenuItem) event.getSource();
             Stage parentStage = (Stage) mainWindow.getScene().getWindow();
             stage.initOwner(parentStage);
 
-            controller.setStage(stage);
+            if (controller != null)
+                controller.setStage(stage);
 
             // Show the dialog
             stage.showAndWait();
@@ -539,7 +520,6 @@ public class AppController {
                     Log.trace("\nCMF published. Next, generate schemas with 'XML Model Schemas', 'XML MMessage Schemas', and/or 'JSON Message Schemas'.\n");
                 } catch (Exception e) {
                     Log.trace("Error publishing CMF: " + e.getMessage());
-                    e.printStackTrace();
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
@@ -562,7 +542,6 @@ public class AppController {
                     Log.trace("\nHTML documentation published.\n");
                 } catch (Exception e) {
                     Log.trace("Error publishing HTML: " + e.getMessage());
-                    e.printStackTrace();
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
@@ -585,7 +564,6 @@ public class AppController {
                     Log.trace("\nJSON schema published.\n");
                 } catch (Exception e) {
                     Log.trace("Error publishing JSON: " + e.getMessage());
-                    e.printStackTrace();
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
@@ -608,7 +586,6 @@ public class AppController {
                     Log.trace("\nXSD schemas published.\n");
                 } catch (Exception e) {
                     Log.trace("Error publishing XSD: " + e.getMessage());
-                    e.printStackTrace();
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
@@ -631,7 +608,6 @@ public class AppController {
                     Log.trace("\nXSD Model schemas published.\n");
                 } catch (Exception e) {
                     Log.trace("Error publishing XSD Model: " + e.getMessage());
-                    e.printStackTrace();
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
@@ -672,13 +648,18 @@ public class AppController {
         String property = null;
         String value = null;
         
-        if (source instanceof TextField textField) {
-            property = textField.getId();
-            value = textField.getText();
-        } else if (source instanceof ComboBox<?> comboBox) {
-            property = comboBox.getId();
-            Object selectedValue = comboBox.getValue();
-            value = selectedValue != null ? selectedValue.toString() : null;
+        switch (source) {
+            case TextField textField -> {
+                property = textField.getId();
+                value = textField.getText();
+            }
+            case ComboBox<?> comboBox -> {
+                property = comboBox.getId();
+                Object selectedValue = comboBox.getValue();
+                value = selectedValue != null ? selectedValue.toString() : null;
+            }
+            default -> {
+            }
         }
         
         if (property != null && value != null && !property.isEmpty()) {
@@ -719,7 +700,6 @@ public class AppController {
                     Log.trace("Otherwise, generate CMF file with 'Common Model Format (CMF)'.\n");
                 } catch (Exception e) {
                     Log.trace("Error validating mapping: " + e.getMessage());
-                    e.printStackTrace();
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }

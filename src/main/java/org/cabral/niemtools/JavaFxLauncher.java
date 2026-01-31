@@ -25,7 +25,7 @@ public class JavaFxLauncher {
                         BoumlPlugout.class.getResource("/org/cabral/niemtools/App.fxml")
                 );
                 javafx.scene.Parent root = loader.load();
-                AppController controller = loader.getController();
+                //AppController controller = loader.getController();
                 javafx.scene.Scene scene = new javafx.scene.Scene(root);
                 stage.setScene(scene);
                 stage.setTitle("NIEM Tools");
