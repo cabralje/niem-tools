@@ -1750,9 +1750,8 @@ public class NiemUmlModel {
                 sort(child, sortClassMembers);
     }
 
-    protected void importReferenceModel(ProjectProperties properties) {
-
-        String importDir = System.getProperty("java.io.tmpdir");
+    protected void downloadReferenceModel(ProjectProperties properties) {
+       String importDir = System.getProperty("java.io.tmpdir");
         try {
             String githubRepoUrl = "https://github.com/niemopen/niem-model/archive/refs/tags/";
             String modelUrl = githubRepoUrl + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION) + ".zip";
@@ -1797,7 +1796,10 @@ public class NiemUmlModel {
             Log.trace("Exception 1 in importReferenceModel " + e.getMessage());
             System.exit(1); 
         }
+    }
 
+    protected void importReferenceModel(ProjectProperties properties) {
+       String importDir = System.getProperty("java.io.tmpdir");
         try {
             Log.start("importReferenceModel");
             String directory = importDir + File.separator + "niem-model-" + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);

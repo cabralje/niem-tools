@@ -21,6 +21,7 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -39,6 +40,10 @@ public class AppController {
     private UmlPackage baseTypesPackage;
     private NiemUmlModel model;
     private CmfToolAdapter cmftool;
+
+    
+    @FXML
+    private ListView<String> DomainListView;
 
     @FXML
     private TextField ExportProjectDir;
@@ -468,6 +473,7 @@ public class AppController {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Importing NIEM Reference Model...");
+                    model.downloadReferenceModel(properties);
                     model.importReferenceModel(properties);
                     Log.trace("\nNIEM Reference Model imported. Next: Model in UML, apply the NIEM profile and then 'Export mapping'.\n");
                 } catch (Exception e) {
