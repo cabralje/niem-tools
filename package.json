@@ -1,6 +1,6 @@
 {
   "name": "niem-tools",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "This is a BOUML plugout that supports developing NIEM message specifications in UML.",
   "bin": {
     "niem-tools": "jdeploy-bundle/jdeploy.js"
