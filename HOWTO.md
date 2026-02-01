@@ -57,7 +57,8 @@ If you don't have Node.js/npm installed:
 ### 1c. Setup niem-tools template
 * Locate the niem-tools templates directory:
   - **If installed via npm (recommended):**
-    - On Windows/macOS/Linux: `~\niem-tools\bouml-templates`
+    - On macOS/Linux: `~/niem-tools/bouml-templates`
+    - On Windows: `%USERPROFILE%\niem-tools\bouml-templates`
   - **If installed manually:** Use the directory where you cloned/extracted niem-tools, then `bouml-templates`
 * Start BoUML.
 * Click on `Miscellaneous->Set Environment`.
