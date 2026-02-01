@@ -769,7 +769,7 @@ public class AppController {
             properties.setProperty(property, value);
         }
 
-        if (property.equals("ImportNIEMVersion")) {
+        if ("ImportNIEMVersion".equals(property)) {
             model.downloadReferenceModel(properties);
             reloadDomains();
         }   
