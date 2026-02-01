@@ -84,7 +84,7 @@ If you don't have Node.js/npm installed:
   * To import only specific NIEM domains, enter a comma-separated list domains to import under `Domains -> Only include`.
   * To limit the number of values to import from NIEM code lists, enter a number under `Codes -> Max Values`
   * To import the description of each code value, check the box for `Codes -> Include Descriptions`
-* Select the `Import` button to import the the selected portion of the NIEM model. (It will take several minutes at least. If all code values are included, it could take an hour.)
+* Select the `Import` button to import the selected portion of the NIEM model. (It will take several minutes at least. If all code values are included, it could take an hour.)
 ### 2c. Configure external schemas (if needed)
 * In NIEMtools, expand `Define External Namespaces`
 * For each non-NIEM namespace, select `Add namespace` and enter the prefix, name and URL of the external namespace.
