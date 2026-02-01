@@ -1818,7 +1818,12 @@ public class NiemUmlModel {
         }
         float versionNumber;
         try {
-            versionNumber = Float.parseFloat(version);
+            String numericVersion = version;
+            int dashIndex = version.indexOf('-');
+            if (dashIndex > 0) {
+                numericVersion = version.substring(0, dashIndex);
+            }
+            versionNumber = Float.parseFloat(numericVersion);
         } catch (NumberFormatException e) {
             versionNumber = 6.0f;
         }
