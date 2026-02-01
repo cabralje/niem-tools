@@ -142,8 +142,9 @@ public class CsvReader {
             Log.trace("importCsv: error - file not found" + e.toString());
         } catch (IOException e) {
             Log.trace("importCsv: error - IO exception" + e.toString());
+        } finally {
+            Log.setMessageStatus("");
         }
-    Log.setMessageStatus("");
     }
 
 }
