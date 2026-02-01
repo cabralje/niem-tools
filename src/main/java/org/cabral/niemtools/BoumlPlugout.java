@@ -124,6 +124,7 @@ public class BoumlPlugout {
         }
         UmlCom.message("Running NIEM Tools...");
 
+        // Handle command line operations
         if (command != null) {
 
             UmlPackage project = UmlPackage.getProject();
@@ -134,15 +135,16 @@ public class BoumlPlugout {
             NiemUmlModel model = new NiemUmlModel(project, properties);
 
             switch (command) {
-                case "addStereotype" -> model.addStereotype(target);
-                case "removeStereotype" -> model.removeStereotype(target);
+                case "addStereotype" -> {
+                    model.addStereotype(target);
+                    exitGracefully();
+                }
+                case "removeStereotype" -> {
+                    model.removeStereotype(target);
+                    exitGracefully();
+                }
+                case "debug" -> properties.setProperty(ProjectProperties.LOG_DEBUG, "true");
             }
-            Log.trace("Done");
-            UmlCom.message("");
-            // must be called to cleanly inform that all is done
-            UmlCom.bye(0);
-            UmlCom.close();
-            System.exit(0);
         }
 
         // Start JavaFX UI via launcher (loaded only when available)
@@ -160,5 +162,14 @@ public class BoumlPlugout {
         } catch (ClassNotFoundException e) {
             return false;
         }
+    }
+
+    private static void exitGracefully() {
+        Log.trace("Done");
+        UmlCom.message("");
+        // must be called to cleanly inform that all is done
+        UmlCom.bye(0);
+        UmlCom.close();
+        System.exit(0);
     }
 }

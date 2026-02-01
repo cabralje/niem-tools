@@ -257,7 +257,13 @@ public class ProjectProperties extends Properties {
 
     @Override
     public synchronized Object setProperty(String key, String value) {
-        project.set_PropertyValue(key, value);
+        if (project != null) {
+            try {
+                project.set_PropertyValue(key, value);
+            } catch (RuntimeException ex) {
+                Log.trace("Warning: unable to set project property '" + key + "': " + ex.getMessage());
+            }
+        }
         return put(key, value);
     }
 
@@ -265,11 +271,18 @@ public class ProjectProperties extends Properties {
      * Stores all properties from this Properties object into the BOUML project.
      */
     public void store() {
+        if (project == null) {
+            return;
+        }
         Enumeration<?> names = this.propertyNames();
         while (names.hasMoreElements()) {
             String propertyName = (String) names.nextElement();
             String value = this.getProperty(propertyName);
-            project.set_PropertyValue(propertyName, value);
+            try {
+                project.set_PropertyValue(propertyName, value);
+            } catch (RuntimeException ex) {
+                Log.trace("Warning: unable to store project property '" + propertyName + "': " + ex.getMessage());
+            }
         }
     }
 }
