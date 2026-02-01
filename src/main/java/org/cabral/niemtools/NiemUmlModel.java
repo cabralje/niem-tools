@@ -1827,11 +1827,13 @@ public class NiemUmlModel {
         try {
             Path dirPath = Paths.get(directory);
             if (Files.exists(dirPath) && Files.isDirectory(dirPath)) {
-                domains = Files.walk(dirPath)
-                    .filter(path -> path.getFileName().toString().endsWith(".xsd"))
-                    .map(path -> path.getFileName().toString().replace(".xsd", ""))
-                    .sorted()
-                    .toArray(String[]::new);
+                try (java.util.stream.Stream<Path> stream = Files.walk(dirPath)) {
+                    domains = stream
+                        .filter(path -> path.getFileName().toString().endsWith(".xsd"))
+                        .map(path -> path.getFileName().toString().replace(".xsd", ""))
+                        .sorted()
+                        .toArray(String[]::new);
+                }
             }
         } catch (IOException e) {
             Log.trace("getReferenceModelDomains: error reading directory " + directory + " - " + e.toString());
