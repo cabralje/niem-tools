@@ -64,12 +64,11 @@ public class BoumlPlugout {
 
     public static String filename = System.getProperty("java.io.tmpdir") + File.separator + "boumlport.txt";
 
-    @SuppressWarnings("unused")
     public static void main(String argv[]) {
 
         // get arguments
         ArrayList<String> args = new ArrayList<>(Arrays.asList(argv));
-        String command = null;
+        String command;
 
         // locate the BOUML port
         // the program is called with the socket port number in argument
@@ -135,12 +134,8 @@ public class BoumlPlugout {
             NiemUmlModel model = new NiemUmlModel(project, properties);
 
             switch (command) {
-                case "addStereotype":
-                    model.addStereotype(target);
-                    break;
-                case "removeStereotype":
-                    model.removeStereotype(target);
-                    break;
+                case "addStereotype" -> model.addStereotype(target);
+                case "removeStereotype" -> model.removeStereotype(target);
             }
             Log.trace("Done");
             UmlCom.message("");
@@ -156,7 +151,6 @@ public class BoumlPlugout {
             return;
         }
         JavaFxLauncher.launch();
-        return;
     }
 
     private static boolean isJavaFxAvailable() {

@@ -164,7 +164,7 @@ public class ProjectProperties extends Properties {
 
         // import defaults
         Properties defaults = new Properties();
-        defaults.setProperty(IMPORT_NIEM_VERSION, "6.0");
+        defaults.setProperty(IMPORT_NIEM_VERSION, "6.0-ps02");
         defaults.setProperty(IMPORT_CODE_DESCRIPTIONS, "true");
         defaults.setProperty(IMPORT_MAX_FACETS, "100");
         defaults.setProperty(IMPORT_INCLUDE_DOMAINS, "");

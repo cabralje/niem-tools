@@ -57,37 +57,39 @@ If you don't have Node.js/npm installed:
 ### 1c. Setup niem-tools template
 * Locate the niem-tools templates directory:
   - **If installed via npm (recommended):**
-    - On Windows: `%USERPROFILE%\niem-tools\bouml-templates`
     - On macOS/Linux: `~/niem-tools/bouml-templates`
+    - On Windows: `%USERPROFILE%\niem-tools\bouml-templates`
   - **If installed manually:** Use the directory where you cloned/extracted niem-tools, then `bouml-templates`
 * Start BoUML.
 * Click on `Miscellaneous->Set Environment`.
-* Under `Template Project`, select the location of the `niem-project/niem-project.prj` BoUML project template inside the templates directory.
+* Under `Template Project`, select the location of the `~/niem-tools/bouml-templates/niem-project/niem-project.prj` BoUML project template inside the templates directory.
 * **For manual installations only:** Configure the BoUML plugout command:
   - In BoUML, go to the package that uses the plugout
   - Set the plugout command to include runtime dependencies:
     - **Windows:** `java -cp "C:\\path\\to\\niem-tools\\target\\niemtools-2.0.jar;C:\\path\\to\\niem-tools\\target\\dependency\\*;C:\\path\\to\\niem-tools\\target\\javafx-lib\\*" org.cabral.niemtools.BoumlPlugout`
     - **macOS/Linux:** `java -cp "/path/to/niem-tools/target/niemtools-2.0.jar:/path/to/niem-tools/target/dependency/*:/path/to/niem-tools/target/javafx-lib/*" org.cabral.niemtools.BoumlPlugout`
   - (For npm installations, the `niem-tools` command is automatically available)
-### 1d. Install cmftool (recommended)
-* Download and extract [cmftool](https://github.com/niemopen/cmftool/tags)
-* Add the `bin` directory to your system path.
+  - Install cmftool
+    - Download and extract [cmftool](https://github.com/niemopen/cmftool/tags)
+    - Add the `bin` directory to your system path.
 ## 2. Model messages in UML
 ### 2a. Create a NIEM Message Specification Project
 * In BoUML, click on `Project -> Create from Template`.
 * Select the location for your BoUML project.
+* Start NIEMtools with `Tools -> Launch NIEMtools`
+* Expand `Create Project` and click `Browse` to select the project directory.
+* Enter the fields to describe the Message Specification.
 ### 2b. Import the NIEM reference model
-* Download the expand the release of the [NIEM reference model](https://github.com/niemopen/niem-model/tags) to use.
-* In Bouml, click on `Tools -> Import Reference Model`.
-* There are several options to control the NIEM domains and codes to be included in the model:
-  * To import only specific NIEM domains, enter a comma-separated list domains to import under `Include domains`.
-  * To import all NIEM domains except certain domains, enter a comma-separated list of domains not to import under `Exclude domains`.
-  * To import all NIEM codes except specific codelists, enter a comma-separated list of codes not to import under `Exclude codes`.
-* Select `Import NIEM Reference Model` to import the the selected portion of the NIEM model. (It will take several minutes.)
-* Save the BoUML project.
+* In NIEMtools, expand `Import NIEM Model`
+* Select the NIEM domains and scope of codes to be included in the model:
+  * To import only specific NIEM domains, enter a comma-separated list domains to import under `Domains -> Only include`.
+  * To limit the number of values to import from NIEM code lists, enter a number under `Codes -> Max Values`
+  * To import the description of each code value, check the box for `Codes -> Include Descriptions`
+* Select the `Import` button to import the selected portion of the NIEM model. (It will take several minutes at least. If all code values are included, it could take an hour.)
 ### 2c. Configure external schemas (if needed)
-* In Bouml, select `Tools -> Define External Schemas`
+* In NIEMtools, expand `Define External Namespaces`
 * For each non-NIEM namespace, select `Add namespace` and enter the prefix, name and URL of the external namespace.
+* Exit NIEMtools and save the BoUML project.
 ### 2d. Model the Message(s) and Data Content
 * In BouML, model the data requirements for each message as follows
   * In the `Messages` package, right click and select `New class view` to create a folder for each message.
@@ -99,40 +101,35 @@ If you don't have Node.js/npm installed:
 * In BouML, select the `Messages` package, right click and select `Tools -> Add NIEM stereotype`.
 * Save the BoUML project.
 ### 2e. Publish the UML model
-* In the BoUML menu, select `Tools -> Map to NIEM`.
-* Click `Browse` to select the project directory.
-* Select `Publish UML model`.
-* The UML model will be published to the `model` folder under the project directory.
+* Start NIEMtools with `Tools -> Launch NIEMtools`
+* Expand `Map UML to NIEM` and select `Export Mapping`.
+* The UML model will be published to the `model\mapping` folder under the project directory.
   * The HTML documentation will be saved on `index-withframe.html`
   * The mapping of the UML model to NIEM will be saved in `niem-mapping.csv` (CSV format) and `niem-mapping.html` (HTML format).
 ## 3. Map the UML models to NIEM 
 ### 3a. Input the mappings for each message to NIEM
 * Open `niem-mapping.csv` in a spreadsheet application (e.g. Excel).
 * Map each UML class and attribute to NIEM using the [NIEM mapping format](#appendix-niem-mapping-file-format)
-### 3b. Import the NIEM mappings
-* Save `model/niem-mapping.csv`.
-* In BoUML, run `Tools -> Import NIEM Mapping` to import mappings.
-* Select the `model/niem-mapping.csv` file.
-* Save the BoUML project. 
-### 3c. Validate the NIEM mappings
-* In BoUML, select `Tools -> Validate NIEM mapping`.
+* Save `model/mapping/niem-mapping.csv`.
+### 3b. Import and Validate the NIEM mappings
+* In NIEMtools, expand `Map UML to NIEM` and select `Import Mapping`.
+* Select `Validate mapping`.
 * The `niem-mapping.csv` and `niem-mapping.html` files will be regenerated.
   - Invalid mappings to NIEM types or multiplicities will be reported and shown in red in `model/niem-mapping.html`.
-* As needed, repeat 3a-c to resolve any invalid mappings.
+* As needed, repeat 3a-b to resolve any invalid mappings.
 ## 4. Publish the NIEM model and schemas
 ### 4a. Publish the NIEM model in Common Model Format (CMF)
-* In BouML, select  `Tools -> Publish CMF`.
-* Select the version of the CMF to generate.
+* In NIEMtools, expand `Map UML to NIEM` and select `Common Model Format (CMF)` to generate the model in the `model\cmf` folder.
 ### 4b. Publish the XSD and/or JSON schema representation(s) of the NIEM model
-* There are several options for publishing representations of the NIEM model in XSD and/or JSON schema format, including
-  * Upload the CMF to the [NIEM Toolbox](https://niemopen.github.io/niem-toolbox/) tool.
-  * In BoUML, select `Tools -> Publish XSD` or `Tools -> Publish JSON`.
-    * To use `cmftool`, select the `Use cmftool to generate XSDs (or JSON) from CMF` options.
-    * Extension schemas will be published in the `schema` folder.
-    * If `cmtool` is not used, the NIEM subset wantlist for import into the [NIEM Subset Schema Generator Tool](https://tools.niem.gov/niemtools/ssgt/index.iepd) will be in the `schema\wantlist.xml` file.
-  * Use a XML/JSON editor (e.g. Oxygen, XMLSpy) to generate XML or JSON examples of each message from the schemas.
-    * Validate the examples satisfy the data requirements modeled in step 2.
-    * If necessary, repeat steps 3 and 4, until the examples are acceptable.
+* In NIEMtools, expand `Generate Specification` and select the appropriate buttons to publish the model.
+* To generate the model in XML format in the `model\xsd` folder, select `XML Model Schemas`
+* To generate message schemas in XML format in the `xml\schemas` foder, select `XML Message Schemas`
+* To generate message schemas in JSON format in the `json\schemas` folder, select `JSON Message Schema`
+* Use a XML/JSON editor (e.g. Oxygen, XMLSpy) to generate XML or JSON examples of each message from the schemas.
+  * Validate the examples satisfy the data requirements modeled in step 2.
+  * If necessary, repeat steps 3 and 4, until the examples are acceptable.
+### 4c. Publish the documentation in HTML format
+* To generate HTML documentation of the UML model in the `model\mapping` folder.
 ## 5. Model components and interfaces
 ### 5a. Create Components
 * In BoUML, select the `Components` package and right click and select `New component diagram` for each component.

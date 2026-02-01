@@ -87,7 +87,6 @@ import fr.bouml.UmlAttribute;
 import fr.bouml.UmlClass;
 import fr.bouml.UmlClassInstance;
 import fr.bouml.UmlClassView;
-import fr.bouml.UmlCom;
 import fr.bouml.UmlItem;
 import fr.bouml.UmlOperation;
 import fr.bouml.UmlPackage;
@@ -180,6 +179,8 @@ public class NiemUmlModel {
     // globals
     //final UmlPackage project;
     final ProjectProperties properties;
+
+    String importDir = System.getProperty("java.io.tmpdir");
 
     /**
      * @return the NIEM Extension Model as a NiemModel
@@ -503,6 +504,7 @@ public class NiemUmlModel {
                 continue;
 
             Log.debug("createSubsetAndExtension: " + item.name());
+            Log.setMessageStatus(item.name());
             String typeName = item.propertyValue(NIEM_STEREOTYPE_TYPENAME).trim();
             //String elementName = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
             //String notes = item.propertyValue(NIEM_STEREOTYPE_NOTES).trim();
@@ -550,6 +552,8 @@ public class NiemUmlModel {
             if (typeName.isEmpty() || isNiemType(typeName))
                 continue;
 
+            Log.setMessageStatus(item.name());
+
             String elementName = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
             String baseTypeName = item.propertyValue(NIEM_STEREOTYPE_BASE_TYPE).trim();
 
@@ -594,6 +598,8 @@ public class NiemUmlModel {
         for (UmlItem item : all) {
             if (!isNiemUml(item))
                 continue;
+
+            Log.setMessageStatus(item.name());
 
             String typeName = item.propertyValue(NIEM_STEREOTYPE_TYPENAME).trim();
             String elementList = item.propertyValue(NIEM_STEREOTYPE_PROPERTY).trim();
@@ -719,6 +725,7 @@ public class NiemUmlModel {
             Log.trace("createSubsetAndExtension: sorting extension model");
             sort(extension, properties.getProperty(ProjectProperties.EXPORT_SORT_EXTENSION).equals("true"));
         }
+        Log.setMessageStatus("");
         Log.stop("createSubsetAndExtension");
     }
 
@@ -961,7 +968,7 @@ public class NiemUmlModel {
         // cache list of ports and message elements
         Log.debug("exportSpecification: cache ports and message elements");
         Map<String, UmlClass> ports = new TreeMap<>();
-        Map<String, UmlClassInstance> messages = new TreeMap<>();
+        //Map<String, UmlClassInstance> messages = new TreeMap<>();
         Set<String> messageNamespaces = new TreeSet<>();
         messageNamespaces.add(NiemModel.XSD_PREFIX);
         @SuppressWarnings("unchecked")
@@ -1011,7 +1018,7 @@ public class NiemUmlModel {
                             UmlClassInstance element = model.getElementByURI(NiemModel.getURI(NamespaceModel.getSchemaURI(inputMessage), inputMessage));
                             if (element != null) {
                                 element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
-                                messages.put(inputMessage, element);
+                                //messages.put(inputMessage, element);
                                 Log.debug("exportSpecification: element " + element.name() + " is input message element for operation " + operationName);
                             }
                         }
@@ -1041,7 +1048,7 @@ public class NiemUmlModel {
                     UmlClassInstance element = model.getElementByURI(NiemModel.getURI(NamespaceModel.getSchemaURI(outputMessage), outputMessage));
                     if (element != null) {
                         element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
-                        messages.put(outputMessage, element);
+                        //messages.put(outputMessage, element);
                         Log.debug("exportSpecification: element " + element.name() + " is output message element for operation " + operationName);
                     }
                 }
@@ -1524,8 +1531,7 @@ public class NiemUmlModel {
                                 ReferenceModel.importElementsInTypes(doc, filename);
                         }
                     } catch (RuntimeException e) {
-                        // TODO Auto-generated catch block
-                         e.printStackTrace();
+                        Log.trace("importSchemaDir: error importing " + filepath + " - " + e.toString());
                     }
                     
                     return FileVisitResult.CONTINUE;
@@ -1574,20 +1580,23 @@ public class NiemUmlModel {
      * @param item
      */
     public void addStereotype(UmlItem item) {
-        Log.trace("addStereotype: " + item.name());
+        Log.debug("addStereotype: " + item.name());
         try {
             anItemKind kind = item.kind();
             if (kind == anItemKind.aClass
                     || kind == anItemKind.aClassInstance
                     || kind == anItemKind.anAttribute) {
-
-                item.set_Stereotype(NIEM_STEREOTYPE);
-                item.applyStereotype();
+                if (item.stereotype() == null || item.stereotype().isEmpty()) {
+                    item.set_Stereotype(NIEM_STEREOTYPE);
+                    item.applyStereotype();
+                }
             } else if (item.kind() == anItemKind.aRelation) {
                 UmlRelation r = (UmlRelation) item;
                 if (r.relationKind() != aRelationKind.aGeneralisation) {
-                    item.set_Stereotype(NIEM_STEREOTYPE);
-                    item.applyStereotype();
+                    if (item.stereotype() == null || item.stereotype().isEmpty()) {
+                        item.set_Stereotype(NIEM_STEREOTYPE);
+                        item.applyStereotype();
+                    }
                 }
             }
         } catch (RuntimeException e) {
@@ -1605,7 +1614,7 @@ public class NiemUmlModel {
      * @param item
      */
     public void removeStereotype(UmlItem item) {
-        Log.trace("removeStereotype: " + item.name());
+        Log.debug("removeStereotype: " + item.name());
         try {
             anItemKind kind = item.kind();
             if (kind == anItemKind.aClass
@@ -1702,6 +1711,11 @@ public class NiemUmlModel {
                     java.util.Arrays.sort(v, (a, b) -> {
                         String seqA = a.propertyValue(SEQUENCE_ID_PROPERTY);
                         String seqB = b.propertyValue(SEQUENCE_ID_PROPERTY);
+                        boolean attA = NamespaceModel.isAttribute(a);
+                        boolean attB = NamespaceModel.isAttribute(b);
+                        // Handle attributes - they should sort last
+                        if (attA && !attB) return 1;
+                        if (!attA && attB) return -1;
                         // Handle nulls and empty strings as "infinite" (sort last)
                         boolean emptyA = (seqA == null || seqA.isEmpty());
                         boolean emptyB = (seqB == null || seqB.isEmpty());
@@ -1738,9 +1752,16 @@ public class NiemUmlModel {
                 sort(child, sortClassMembers);
     }
 
-    protected void importReferenceModel(ProjectProperties properties) {
-
-        String importDir = System.getProperty("java.io.tmpdir");
+    protected void downloadReferenceModel(ProjectProperties properties) {
+        String directory = importDir + File.separator + "niem-model-" + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);
+        
+        // If directory already exists, exit
+        Path directoryPath = Paths.get(directory);
+        if (Files.exists(directoryPath)) {
+            Log.debug("downloadReferenceModel: directory already exists, skipping download");
+            return;
+        }
+        
         try {
             String githubRepoUrl = "https://github.com/niemopen/niem-model/archive/refs/tags/";
             String modelUrl = githubRepoUrl + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION) + ".zip";
@@ -1785,7 +1806,48 @@ public class NiemUmlModel {
             Log.trace("Exception 1 in importReferenceModel " + e.getMessage());
             System.exit(1); 
         }
+    }
 
+    protected String[] getReferenceModelDomains(ProjectProperties properties) {
+        String[] domains = new String[0];
+        String version = properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);
+        
+        // If version property is not set, return empty array
+        if (version == null || version.isEmpty()) {
+            return domains;
+        }
+        float versionNumber;
+        try {
+            String numericVersion = version;
+            int dashIndex = version.indexOf('-');
+            if (dashIndex > 0) {
+                numericVersion = version.substring(0, dashIndex);
+            }
+            versionNumber = Float.parseFloat(numericVersion);
+        } catch (NumberFormatException e) {
+            versionNumber = 6.0f;
+        }
+        String directory = importDir + File.separator + "niem-model-" + version + File.separator + (versionNumber < 5 ? "niem" : "xsd") + File.separator + "domains";
+        
+        try {
+            Path dirPath = Paths.get(directory);
+            if (Files.exists(dirPath) && Files.isDirectory(dirPath)) {
+                try (java.util.stream.Stream<Path> stream = Files.walk(dirPath)) {
+                    domains = stream
+                        .filter(path -> path.getFileName().toString().endsWith(".xsd"))
+                        .map(path -> path.getFileName().toString().replace(".xsd", ""))
+                        .sorted()
+                        .toArray(String[]::new);
+                }
+            }
+        } catch (IOException e) {
+            Log.trace("getReferenceModelDomains: error reading directory " + directory + " - " + e.toString());
+        }
+        
+        return domains;
+    }
+
+    protected void importReferenceModel(ProjectProperties properties) {
         try {
             Log.start("importReferenceModel");
             String directory = importDir + File.separator + "niem-model-" + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);
