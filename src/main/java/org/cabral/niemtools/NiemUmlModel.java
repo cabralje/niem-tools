@@ -1816,7 +1816,7 @@ public class NiemUmlModel {
         if (version == null || version.isEmpty()) {
             return domains;
         }
-        Float versionNumber;
+        float versionNumber;
         try {
             versionNumber = Float.parseFloat(version);
         } catch (NumberFormatException e) {
