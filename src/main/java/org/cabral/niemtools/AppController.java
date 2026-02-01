@@ -334,6 +334,11 @@ public class AppController {
             }
         });
 
+        // Add listener to update domains when selection changes
+        DomainListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            updateDomainSelection();
+        });
+
         // Populate External Schemas table
         String externalSchemasProperty = properties.getProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS, "");
         String[] externalNamespaces = externalSchemasProperty.isEmpty() ? new String[0] : externalSchemasProperty.split(",");
@@ -379,11 +384,6 @@ public class AppController {
             DomainListView.getItems().clear();
             DomainListView.getItems().addAll(domains);
             DomainListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            
-            // Add listener to update domains when selection changes
-            DomainListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-                updateDomainSelection();
-            });
             
             // Select domains that match IMPORT_INCLUDE_DOMAINS property
             String includeDomains = properties.getProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS);
