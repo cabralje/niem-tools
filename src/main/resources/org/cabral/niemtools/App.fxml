@@ -58,7 +58,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="mainWindow" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cabral.niemtools.AppController">
+<VBox fx:id="mainWindow" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cabral.niemtools.AppController">
   <children>
       <VBox fx:id="mainControls">
          <children>
