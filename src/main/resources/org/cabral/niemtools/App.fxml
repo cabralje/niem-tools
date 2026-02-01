@@ -44,7 +44,6 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
@@ -58,7 +57,6 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
 <VBox fx:id="mainWindow" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cabral.niemtools.AppController">
   <children>
@@ -198,38 +196,38 @@
                                   <Button mnemonicParsing="false" onAction="#importReferenceModel" text="Import" />
                                 </items>
                               </ToolBar>
-                              <SplitPane dividerPositions="0.29797979797979796" prefHeight="160.0" prefWidth="200.0">
-                                <items>
-                                    <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                              <HBox maxWidth="1.7976931348623157E308">
+                                 <children>
+                                    <TitledPane animated="false" text="Codes (default all)">
+                                      <content>
+                                        <AnchorPane>
+                                             <children>
+                                                <VBox alignment="CENTER" maxWidth="1.7976931348623157E308" spacing="10.0">
+                                                   <children>
+                                                      <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Limit values per code list to">
+                                                         <padding>
+                                                            <Insets top="10.0" />
+                                                         </padding>
+                                                      </Label>
+                                                      <TextField fx:id="ImportMaxFacets" maxWidth="1.7976931348623157E308" onAction="#setProjectProperty" promptText="Unlimited (slow)" />
+                                                      <CheckBox fx:id="ImportCodeDescriptions" mnemonicParsing="false" onAction="#toggleProjectProperty" text="Include Descriptions" />
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </AnchorPane>
+                                      </content>
+                                    </TitledPane>
+                                    <TitledPane animated="false" maxWidth="1.7976931348623157E308" text="Domains (default all)" HBox.hgrow="ALWAYS">
                                        <content>
-                                          <ListView fx:id="DomainListView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" />
+                                          <ScrollPane maxHeight="1.7976931348623157E308">
+                                             <content>
+                                                <ListView fx:id="DomainListView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" />
+                                             </content>
+                                          </ScrollPane>
                                        </content>
-                                    </ScrollPane>
-                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-                                       <children>
-                                          <ToolBar orientation="VERTICAL">
-                                            <items>
-                                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Codes:">
-                                                   <font>
-                                                      <Font name="System Bold" size="12.0" />
-                                                   </font>
-                                                   <padding>
-                                                      <Insets right="10.0" top="7.0" />
-                                                   </padding>
-                                                </Label>
-                                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Max values">
-                                                   <padding>
-                                                      <Insets right="10.0" top="7.0" />
-                                                   </padding>
-                                                </Label>
-                                                <TextField fx:id="ImportMaxFacets" onAction="#setProjectProperty" promptText="Importing all values is slow." />
-                                                <CheckBox fx:id="ImportCodeDescriptions" alignment="CENTER" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#toggleProjectProperty" selected="true" text="Include Descriptions" />
-                                            </items>
-                                          </ToolBar>
-                                       </children>
-                                    </AnchorPane>
-                                </items>
-                              </SplitPane>
+                                    </TitledPane>
+                                 </children>
+                              </HBox>
                            </children>
                         </VBox>
                      </children>

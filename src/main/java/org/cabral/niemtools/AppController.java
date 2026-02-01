@@ -317,6 +317,23 @@ public class AppController {
         // Expand NIEM pane if reference model doesn't exist
         NIEMPane.setExpanded(!model.verifyNIEM());
 
+        if (NIEMPane.isExpanded()) {
+            mainControls.setDisable(true);
+            model.downloadReferenceModel(properties);
+            reloadDomains();
+            mainControls.setDisable(false);
+        }
+
+        // Download and reload when NIEM pane is expanded
+        NIEMPane.expandedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                mainControls.setDisable(true);
+                model.downloadReferenceModel(properties);
+                reloadDomains();
+                mainControls.setDisable(false);
+            }
+        });
+
         // Populate External Schemas table
         String externalSchemasProperty = properties.getProperty(ProjectProperties.EXPORT_EXTERNAL_SCHEMAS, "");
         String[] externalNamespaces = externalSchemasProperty.isEmpty() ? new String[0] : externalSchemasProperty.split(",");
@@ -348,9 +365,6 @@ public class AppController {
             }
             ExternalNamespaceTable.setEditable(true);
         }
-
-        model.downloadReferenceModel(properties);
-        reloadDomains();
 
         // Set status
         ProjectStatus.setText(properties.getProperty(ProjectProperties.IEPD_NAME));
