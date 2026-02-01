@@ -180,6 +180,8 @@ public class NiemUmlModel {
     //final UmlPackage project;
     final ProjectProperties properties;
 
+    String importDir = System.getProperty("java.io.tmpdir");
+
     /**
      * @return the NIEM Extension Model as a NiemModel
      */
@@ -1751,7 +1753,15 @@ public class NiemUmlModel {
     }
 
     protected void downloadReferenceModel(ProjectProperties properties) {
-       String importDir = System.getProperty("java.io.tmpdir");
+        String directory = importDir + File.separator + "niem-model-" + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);
+        
+        // If directory already exists, exit
+        Path directoryPath = Paths.get(directory);
+        if (Files.exists(directoryPath)) {
+            Log.debug("downloadReferenceModel: directory already exists, skipping download");
+            return;
+        }
+        
         try {
             String githubRepoUrl = "https://github.com/niemopen/niem-model/archive/refs/tags/";
             String modelUrl = githubRepoUrl + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION) + ".zip";
@@ -1798,8 +1808,39 @@ public class NiemUmlModel {
         }
     }
 
+    protected String[] getReferenceModelDomains(ProjectProperties properties) {
+        String[] domains = new String[0];
+        String version = properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);
+        
+        // If version property is not set, return empty array
+        if (version == null || version.isEmpty()) {
+            return domains;
+        }
+        Float versionNumber;
+        try {
+            versionNumber = Float.parseFloat(version);
+        } catch (NumberFormatException e) {
+            versionNumber = 6.0f;
+        }
+        String directory = importDir + File.separator + "niem-model-" + version + File.separator + (versionNumber < 5 ? "niem" : "xsd") + File.separator + "domains";
+        
+        try {
+            Path dirPath = Paths.get(directory);
+            if (Files.exists(dirPath) && Files.isDirectory(dirPath)) {
+                domains = Files.walk(dirPath)
+                    .filter(path -> path.getFileName().toString().endsWith(".xsd"))
+                    .map(path -> path.getFileName().toString().replace(".xsd", ""))
+                    .sorted()
+                    .toArray(String[]::new);
+            }
+        } catch (IOException e) {
+            Log.trace("getReferenceModelDomains: error reading directory " + directory + " - " + e.toString());
+        }
+        
+        return domains;
+    }
+
     protected void importReferenceModel(ProjectProperties properties) {
-       String importDir = System.getProperty("java.io.tmpdir");
         try {
             Log.start("importReferenceModel");
             String directory = importDir + File.separator + "niem-model-" + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);

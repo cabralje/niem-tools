@@ -22,6 +22,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -91,10 +92,10 @@ public class AppController {
     private TextField ImportExcludeCodes;
 
     @FXML
-    private TextField ImportIncludeCodes; */
+    private TextField ImportIncludeCodes;
 
     @FXML
-    private TextField ImportIncludeDomains;
+    private TextField ImportIncludeDomains; */
 
     @FXML
     private TextField ImportMaxFacets;
@@ -216,7 +217,7 @@ public class AppController {
         IEPDVersion.setText(properties.getProperty(ProjectProperties.IEPD_VERSION));
         ExportURI.setText(properties.getProperty(ProjectProperties.EXPORT_URI));
         //ImportExcludeDomains.setText(properties.getProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS));
-        ImportIncludeDomains.setText(properties.getProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS));
+        //ImportIncludeDomains.setText(properties.getProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS));
         //ImportExcludeCodes.setText(properties.getProperty(ProjectProperties.IMPORT_EXCLUDE_CODES));
         //ImportIncludeCodes.setText(properties.getProperty(ProjectProperties.IMPORT_INCLUDE_CODES));
         ImportMaxFacets.setText(properties.getProperty(ProjectProperties.IMPORT_MAX_FACETS));
@@ -283,11 +284,11 @@ public class AppController {
                 properties.setProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS, ImportExcludeDomains.getText());
             }
         }); */
-        ImportIncludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
+/*         ImportIncludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 properties.setProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS, ImportIncludeDomains.getText());
             }
-        });
+        }); */
         /*
         ImportExcludeCodes.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
@@ -348,10 +349,52 @@ public class AppController {
             ExternalNamespaceTable.setEditable(true);
         }
 
+        model.downloadReferenceModel(properties);
+        reloadDomains();
+
         // Set status
         ProjectStatus.setText(properties.getProperty(ProjectProperties.IEPD_NAME));
         NIEMStatus.setText("NIEM " + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION));
         MessageStatus.setText("");
+    }
+
+    private void reloadDomains() {
+        // Populate Domain List View
+        String[] domains = model.getReferenceModelDomains(properties);
+       if (domains != null && DomainListView != null) {
+            DomainListView.getItems().clear();
+            DomainListView.getItems().addAll(domains);
+            DomainListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+            
+            // Add listener to update domains when selection changes
+            DomainListView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                updateDomainSelection();
+            });
+            
+            // Select domains that match IMPORT_INCLUDE_DOMAINS property
+            String includeDomains = properties.getProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS);
+            if (includeDomains != null && !includeDomains.isEmpty()) {
+                String[] domainsToInclude = includeDomains.split(",");
+                for (String domain : domainsToInclude) {
+                    String trimmedDomain = domain.trim();
+                    for (int i = 0; i < DomainListView.getItems().size(); i++) {
+                        if (DomainListView.getItems().get(i).equals(trimmedDomain)) {
+                            DomainListView.getSelectionModel().select(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void updateDomainSelection() {
+        if (DomainListView != null) {
+            List<String> selectedDomains = DomainListView.getSelectionModel().getSelectedItems();
+            String includeDomains = String.join(", ", selectedDomains);
+            //ImportIncludeDomains.setText(includeDomains);
+            properties.setProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS, includeDomains);
+        }
     }
 
     @FXML
@@ -473,6 +516,7 @@ public class AppController {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Importing NIEM Reference Model...");
+                    //updateIncludeDomains();
                     model.downloadReferenceModel(properties);
                     model.importReferenceModel(properties);
                     Log.trace("\nNIEM Reference Model imported. Next: Model in UML, apply the NIEM profile and then 'Export mapping'.\n");
@@ -710,6 +754,11 @@ public class AppController {
         if (property != null && value != null && !property.isEmpty()) {
             properties.setProperty(property, value);
         }
+
+        if (property.equals("ImportNIEMVersion")) {
+            model.downloadReferenceModel(properties);
+            reloadDomains();
+        }   
     }
 
     @FXML
