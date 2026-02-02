@@ -531,9 +531,12 @@ public class AppController {
                 try {
                     Log.trace("Importing NIEM Reference Model...");
                     //updateIncludeDomains();
-                    if (model.downloadReferenceModel(properties))
+                    if (model.downloadReferenceModel(properties)) {
                         model.importReferenceModel(properties);
-                    Log.trace("\nNIEM Reference Model imported. Next: Model in UML, apply the NIEM profile and then 'Export mapping'.\n");
+                        Log.trace("\nNIEM Reference Model imported. Next: Model in UML, apply the NIEM profile and then 'Export mapping'.\n");
+                    } else {
+                        Log.trace("NIEM Reference Model download failed or was skipped; import not performed.");
+                    }
                 } catch (Exception e) {
                     Log.trace("Error importing reference model: " + e.getMessage());
                 } finally {
