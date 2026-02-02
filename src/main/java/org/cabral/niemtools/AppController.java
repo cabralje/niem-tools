@@ -226,7 +226,7 @@ public class AppController {
         // Add focus listeners to save properties when focus is lost (e.g., TAB key)
         ExportProjectDir.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
-                properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, ExportProjectDir.getText());
+                updateProjectDirectory(ExportProjectDir.getText());
             }
         });
         IEPDChangeLogFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
@@ -252,6 +252,7 @@ public class AppController {
         IEPDName.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 properties.setProperty(ProjectProperties.IEPD_NAME, IEPDName.getText());
+                ProjectStatus.setText(properties.getProperty(ProjectProperties.IEPD_NAME));
             }
         });
         IEPDOrganization.focusedProperty().addListener((obs, oldVal, newVal) -> {
@@ -739,8 +740,14 @@ public class AppController {
         }
         if (newDir != null) {
             ExportProjectDir.setText(newDir);
-            properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, newDir);
+            updateProjectDirectory(newDir);
         }
+    }
+
+    public void updateProjectDirectory(String newDir) {
+        properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, newDir);
+        properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, newDir + "/model/mapping/niem-mapping.csv");
+        properties.setProperty(ProjectProperties.EXPORT_HTML_DIR, newDir + "/model/html");
     }
 
     @FXML
@@ -775,7 +782,12 @@ public class AppController {
         if ("ImportNIEMVersion".equals(property)) {
             if (model.downloadReferenceModel(properties)) {
                 reloadDomains();
+                NIEMStatus.setText("NIEM " + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION));
             }
+        }
+        
+        if ("IEPDName".equals(property)) {
+            ProjectStatus.setText(properties.getProperty(ProjectProperties.IEPD_NAME));
         }   
     }
 

@@ -847,12 +847,16 @@ public class NiemUmlModel {
 
         //Verify directory exists
         Path modelPath = Paths.get(filename).getParent();
+        if (modelPath == null) {
+            Log.trace("exportCsv: mapping directory not set. Select Project Directory first");
+            return;
+        }
         if (!Files.exists(modelPath)) {
-            Log.debug("exportCsv: model directory does not exist, creating " + modelPath);
+            Log.debug("exportCsv: mapping directory does not exist, creating " + modelPath);
             try {
                 Files.createDirectories(modelPath);
             } catch (IOException e) {
-                Log.trace("exportCsv: error creating model directory " + e.toString());
+                Log.trace("exportCsv: error creating mapping directory " + e.toString());
                 return;
             }
         }
