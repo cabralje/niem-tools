@@ -3,9 +3,6 @@ package org.cabral.niemtools;
 import java.util.concurrent.ConcurrentHashMap;
 
 import fr.bouml.UmlCom;
-import javafx.application.Platform;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 
 public class Log {
 
@@ -14,8 +11,8 @@ public class Log {
     private static Boolean PROFILE = false;
 
     private static final ConcurrentHashMap<String, Long> timer = new ConcurrentHashMap<>();
-    private static TextArea logArea = null;
-    private static Label messageStatus = null;
+    private static Object logArea = null;
+    private static Object messageStatus = null;
 
     /**
      * outputs debugging information
@@ -36,8 +33,21 @@ public class Log {
     public static void trace(String s) {
         //UmlCom.trace(s);
         if (logArea != null) {
-            // Ensure UI updates happen on JavaFX Application Thread
-            Platform.runLater(() -> logArea.appendText(s + "\n"));
+            // Ensure UI updates happen on JavaFX Application Thread using reflection
+            try {
+                Class<?> platformClass = Class.forName("javafx.application.Platform");
+                var runLaterMethod = platformClass.getMethod("runLater", Runnable.class);
+                runLaterMethod.invoke(null, (Runnable) () -> {
+                    try {
+                        var appendTextMethod = logArea.getClass().getMethod("appendText", String.class);
+                        appendTextMethod.invoke(logArea, s + "\n");
+                    } catch (Exception e) {
+                        // Silently fail if reflection fails
+                    }
+                });
+            } catch (Exception e) {
+                // JavaFX not available, fail silently
+            }
         }
     }
 
@@ -45,7 +55,7 @@ public class Log {
      * Set the importStatus Label for displaying import status messages
      * @param label The Label to display messages on
      */
-    public static void setMessageStatusLabel(Label label) {
+    public static void setMessageStatusLabel(Object label) {
         messageStatus = label;
     }
 
@@ -53,7 +63,7 @@ public class Log {
      * Set the LogArea TextArea for appending log messages
      * @param area The TextArea to append messages to
      */
-    public static void setLogArea(TextArea area) {
+    public static void setLogArea(Object area) {
         logArea = area;
     }
 
@@ -102,7 +112,20 @@ public class Log {
 
     public static void setMessageStatus(String message) {
         if (messageStatus != null) {
-            Platform.runLater(() -> messageStatus.setText(message));
+            try {
+                Class<?> platformClass = Class.forName("javafx.application.Platform");
+                var runLaterMethod = platformClass.getMethod("runLater", Runnable.class);
+                runLaterMethod.invoke(null, (Runnable) () -> {
+                    try {
+                        var setTextMethod = messageStatus.getClass().getMethod("setText", String.class);
+                        setTextMethod.invoke(messageStatus, message);
+                    } catch (Exception e) {
+                        // Silently fail if reflection fails
+                    }
+                });
+            } catch (Exception e) {
+                // JavaFX not available, fail silently
+            }
         }
     }
 }

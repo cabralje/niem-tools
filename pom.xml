@@ -28,6 +28,8 @@
                 <version>3.13.0</version>
                 <configuration>
                     <release>21</release>
+                    <debug>true</debug>
+                    <debuglevel>source,lines,vars</debuglevel>
                 </configuration>
             </plugin>
             <plugin>

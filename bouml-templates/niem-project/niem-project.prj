@@ -1,6 +1,6 @@
 format 224
 "niem-project"
-  revision 16
+  revision 17
   modified_by 2 "JamesCabral"
 
 
@@ -90,7 +90,7 @@ format 224
   key "ExportCMFtoXSDModel" value "true"
   key "ExportCMFTooltoXSDModel" value "~/niem-tools/cmftool/bin/cmftool.bat m2x -d -c -o"
   key "ExportXSDModelDir" value "model\\xsd"
-  key "ImportNIEMVersion" value "6.0"
+  key "ImportNIEMVersion" value "6.0-ps02"
   package_ref 141058 // UML
 
   package_ref 134530 // niem-profile
