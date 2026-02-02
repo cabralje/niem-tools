@@ -1752,14 +1752,14 @@ public class NiemUmlModel {
                 sort(child, sortClassMembers);
     }
 
-    protected void downloadReferenceModel(ProjectProperties properties) {
+    protected boolean downloadReferenceModel(ProjectProperties properties) {
         String directory = importDir + File.separator + "niem-model-" + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION);
         
         // If directory already exists, exit
         Path directoryPath = Paths.get(directory);
         if (Files.exists(directoryPath)) {
             Log.debug("downloadReferenceModel: directory already exists, skipping download");
-            return;
+            return true;
         }
         
         try {
@@ -1803,9 +1803,10 @@ public class NiemUmlModel {
             }
 
         } catch (IOException e) {
-            Log.trace("Exception 1 in importReferenceModel " + e.getMessage());
-            System.exit(1); 
+            Log.trace("Exception in downloadReferenceModel " + e.getMessage());
+            return false; 
         }
+        return true;
     }
 
     protected String[] getReferenceModelDomains(ProjectProperties properties) {

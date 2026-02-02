@@ -319,8 +319,8 @@ public class AppController {
 
         if (NIEMPane.isExpanded()) {
             mainControls.setDisable(true);
-            model.downloadReferenceModel(properties);
-            reloadDomains();
+            if (model.downloadReferenceModel(properties))
+                reloadDomains();
             mainControls.setDisable(false);
         }
 
@@ -328,8 +328,8 @@ public class AppController {
         NIEMPane.expandedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
                 mainControls.setDisable(true);
-                model.downloadReferenceModel(properties);
-                reloadDomains();
+                if (model.downloadReferenceModel(properties))
+                    reloadDomains();
                 mainControls.setDisable(false);
             }
         });
@@ -531,8 +531,8 @@ public class AppController {
                 try {
                     Log.trace("Importing NIEM Reference Model...");
                     //updateIncludeDomains();
-                    model.downloadReferenceModel(properties);
-                    model.importReferenceModel(properties);
+                    if (model.downloadReferenceModel(properties))
+                        model.importReferenceModel(properties);
                     Log.trace("\nNIEM Reference Model imported. Next: Model in UML, apply the NIEM profile and then 'Export mapping'.\n");
                 } catch (Exception e) {
                     Log.trace("Error importing reference model: " + e.getMessage());
@@ -770,8 +770,9 @@ public class AppController {
         }
 
         if ("ImportNIEMVersion".equals(property)) {
-            model.downloadReferenceModel(properties);
-            reloadDomains();
+            if (model.downloadReferenceModel(properties)) {
+                reloadDomains();
+            }
         }   
     }
 
