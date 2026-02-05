@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.junit.Test;
@@ -52,7 +53,7 @@ public class CsvWriterTest {
             assertTrue(csv.length > 0);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             fail("Reflection failed: " + e.getMessage());
-        } catch (java.lang.reflect.InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             // Acceptable if static BOUML state causes issues during method invocation
             System.err.println("Warning: Test invocation failed, possibly due to BOUML static state: " + e.getCause());
         }
@@ -82,7 +83,7 @@ public class CsvWriterTest {
             assertTrue(result instanceof String[]);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             fail("Reflection failed: " + e.getMessage());
-        } catch (java.lang.reflect.InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             // Acceptable if static BOUML state causes issues during method invocation
             System.err.println("Warning: Test invocation failed, possibly due to BOUML static state: " + e.getCause());
         }
@@ -115,7 +116,7 @@ public class CsvWriterTest {
             assertTrue(result instanceof String[]);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             fail("Reflection failed: " + e.getMessage());
-        } catch (java.lang.reflect.InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             // Acceptable if static BOUML state causes issues during method invocation
             System.err.println("Warning: Test invocation failed, possibly due to BOUML static state: " + e.getCause());
         }
@@ -143,7 +144,7 @@ public class CsvWriterTest {
             assertTrue(result instanceof String[]);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             fail("Reflection failed: " + e.getMessage());
-        } catch (java.lang.reflect.InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
             // Acceptable if static BOUML state causes issues during method invocation
             System.err.println("Warning: Test invocation failed, possibly due to BOUML static state: " + e.getCause());
         }
