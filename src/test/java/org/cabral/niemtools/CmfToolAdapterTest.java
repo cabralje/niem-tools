@@ -2,6 +2,7 @@ package org.cabral.niemtools;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -134,10 +135,5 @@ public class CmfToolAdapterTest {
         } catch (IOException | InterruptedException e) {
             fail("exec with quoted args should not throw: " + e.getMessage());
         }
-    }
-
-    // Helper to import assertNull which is needed above
-    private void assertNull(Object obj) {
-        org.junit.Assert.assertNull(obj);
     }
 }
