@@ -14,7 +14,6 @@ import fr.bouml.UmlClass;
 import fr.bouml.UmlClassInstance;
 import fr.bouml.UmlItem;
 import fr.bouml.UmlRelation;
-import fr.bouml.UmlTypeSpec;
 import fr.bouml.aRelationKind;
 import fr.bouml.anItemKind;
 
