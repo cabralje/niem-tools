@@ -9,6 +9,13 @@
 - **Repository:** https://github.com/cabralje/niem-tools
 - **Current Version:** 2.0 (Maven) / 2.0.6 (npm)
 
+## Which AI Reads Which File
+
+This repo may be used with multiple AI coding tools. Instruction-file behavior varies by tool:
+
+- **GitHub Copilot in VS Code:** Reads `CLAUDE.md` and may also read `.github/copilot-instructions.md`.
+- **OpenAI Codex (ChatGPT agent / Codex CLI):** Guided by `AGENTS.md`. Prefer keeping `CLAUDE.md` as the source of truth and having `AGENTS.md` point here plus a few hard rules.
+
 ## Build System
 
 ### Prerequisites
