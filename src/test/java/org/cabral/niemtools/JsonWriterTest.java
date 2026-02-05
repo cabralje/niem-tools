@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.lang.reflect.Method;
 
 import org.junit.Test;
@@ -15,7 +16,7 @@ public class JsonWriterTest {
 
     @Test
     public void testConstructor() {
-        JsonWriter writer = new JsonWriter("/tmp/test");
+        JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir") + File.separator + "test");
         assertNotNull(writer);
     }
 
@@ -49,7 +50,7 @@ public class JsonWriterTest {
 
     @Test
     public void testFilterQuotesRemovesDoubleQuotes() {
-        JsonWriter writer = new JsonWriter("/tmp");
+        JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
             Method m = JsonWriter.class.getDeclaredMethod("filterQuotes", String.class);
             m.setAccessible(true);
@@ -62,7 +63,7 @@ public class JsonWriterTest {
 
     @Test
     public void testFilterQuotesRemovesNewlines() {
-        JsonWriter writer = new JsonWriter("/tmp");
+        JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
             Method m = JsonWriter.class.getDeclaredMethod("filterQuotes", String.class);
             m.setAccessible(true);
@@ -75,7 +76,7 @@ public class JsonWriterTest {
 
     @Test
     public void testFilterQuotesRemovesBackslashes() {
-        JsonWriter writer = new JsonWriter("/tmp");
+        JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
             Method m = JsonWriter.class.getDeclaredMethod("filterQuotes", String.class);
             m.setAccessible(true);
@@ -88,7 +89,7 @@ public class JsonWriterTest {
 
     @Test
     public void testFilterQuotesEmptyString() {
-        JsonWriter writer = new JsonWriter("/tmp");
+        JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
             Method m = JsonWriter.class.getDeclaredMethod("filterQuotes", String.class);
             m.setAccessible(true);
@@ -101,7 +102,7 @@ public class JsonWriterTest {
 
     @Test
     public void testFilterQuotesPlainString() {
-        JsonWriter writer = new JsonWriter("/tmp");
+        JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
             Method m = JsonWriter.class.getDeclaredMethod("filterQuotes", String.class);
             m.setAccessible(true);
@@ -116,7 +117,7 @@ public class JsonWriterTest {
 
     @Test
     public void testConvertMultiplicityBasic() {
-        JsonWriter writer = new JsonWriter("/tmp");
+        JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
             Method m = JsonWriter.class.getDeclaredMethod("convertMultiplicity", String.class);
             m.setAccessible(true);
@@ -128,7 +129,7 @@ public class JsonWriterTest {
 
     @Test
     public void testConvertMultiplicityUnbounded() {
-        JsonWriter writer = new JsonWriter("/tmp");
+        JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
             Method m = JsonWriter.class.getDeclaredMethod("convertMultiplicity", String.class);
             m.setAccessible(true);
@@ -140,7 +141,7 @@ public class JsonWriterTest {
 
     @Test
     public void testConvertMultiplicitySingle() {
-        JsonWriter writer = new JsonWriter("/tmp");
+        JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
             Method m = JsonWriter.class.getDeclaredMethod("convertMultiplicity", String.class);
             m.setAccessible(true);
@@ -152,7 +153,7 @@ public class JsonWriterTest {
 
     @Test
     public void testConvertMultiplicityEmpty() {
-        JsonWriter writer = new JsonWriter("/tmp");
+        JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
             Method m = JsonWriter.class.getDeclaredMethod("convertMultiplicity", String.class);
             m.setAccessible(true);
@@ -164,7 +165,7 @@ public class JsonWriterTest {
 
     @Test
     public void testConvertMultiplicityZeroToOne() {
-        JsonWriter writer = new JsonWriter("/tmp");
+        JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
             Method m = JsonWriter.class.getDeclaredMethod("convertMultiplicity", String.class);
             m.setAccessible(true);
