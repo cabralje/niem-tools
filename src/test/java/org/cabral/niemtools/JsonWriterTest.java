@@ -1,13 +1,11 @@
 package org.cabral.niemtools;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.lang.reflect.Method;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 
 public class JsonWriterTest {
@@ -49,6 +47,7 @@ public class JsonWriterTest {
     // --- filterQuotes (private) tests via reflection ---
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testFilterQuotesRemovesDoubleQuotes() {
         JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
@@ -62,6 +61,7 @@ public class JsonWriterTest {
     }
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testFilterQuotesRemovesNewlines() {
         JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
@@ -75,6 +75,7 @@ public class JsonWriterTest {
     }
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testFilterQuotesRemovesBackslashes() {
         JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
@@ -88,6 +89,7 @@ public class JsonWriterTest {
     }
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testFilterQuotesEmptyString() {
         JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
@@ -101,6 +103,7 @@ public class JsonWriterTest {
     }
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testFilterQuotesPlainString() {
         JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
@@ -116,6 +119,7 @@ public class JsonWriterTest {
     // --- convertMultiplicity (private) tests via reflection ---
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testConvertMultiplicityBasic() {
         JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
@@ -128,6 +132,7 @@ public class JsonWriterTest {
     }
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testConvertMultiplicityUnbounded() {
         JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
@@ -140,6 +145,7 @@ public class JsonWriterTest {
     }
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testConvertMultiplicitySingle() {
         JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
@@ -152,6 +158,7 @@ public class JsonWriterTest {
     }
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testConvertMultiplicityEmpty() {
         JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {
@@ -164,6 +171,7 @@ public class JsonWriterTest {
     }
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testConvertMultiplicityZeroToOne() {
         JsonWriter writer = new JsonWriter(System.getProperty("java.io.tmpdir"));
         try {

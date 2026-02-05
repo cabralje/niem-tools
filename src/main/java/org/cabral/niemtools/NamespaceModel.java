@@ -379,6 +379,8 @@ public class NamespaceModel {
      * @return schemaURI for type or element with name tagname as a String
      */
     static String getSchemaURIForPrefix(String prefix) {
+        if (prefix == null)
+            return null;
         String schemaURI = Prefixes.get(prefix);
         if (schemaURI == null)
             schemaURI = getExtensionSchema(prefix);
@@ -408,6 +410,8 @@ public class NamespaceModel {
      * @param prefix
      */
     static Boolean isInfrastructurePrefix(String prefix) {
+        if (prefix == null)
+            return false;
         return (prefix.equals(NiemModel.LOCAL_PREFIX) || prefix.equals(NiemModel.XSD_PREFIX) || prefix.equals(NiemModel.STRUCTURES_PREFIX) || prefix.equals(NiemModel.PROXY_PREFIX));
     }
 

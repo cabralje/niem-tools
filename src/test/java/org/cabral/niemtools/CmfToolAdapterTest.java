@@ -1,17 +1,19 @@
 package org.cabral.niemtools;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 
 public class CmfToolAdapterTest {
+
+    private static boolean isWindows() {
+        String os = System.getProperty("os.name");
+        return os != null && os.toLowerCase().contains("win");
+    }
 
     // --- expandEnvVars tests (private, via reflection) ---
 
@@ -88,7 +90,8 @@ public class CmfToolAdapterTest {
     @Test
     public void testExecEchoCommand() {
         try {
-            int exitCode = CmfToolAdapter.exec("echo hello");
+            String cmd = isWindows() ? "cmd /c echo hello" : "echo hello";
+            int exitCode = CmfToolAdapter.exec(cmd);
             assertEquals(0, exitCode);
         } catch (IOException | InterruptedException e) {
             fail("exec echo should not throw: " + e.getMessage());
@@ -98,7 +101,8 @@ public class CmfToolAdapterTest {
     @Test
     public void testExecTrueCommand() {
         try {
-            int exitCode = CmfToolAdapter.exec("true");
+            String cmd = isWindows() ? "cmd /c exit 0" : "true";
+            int exitCode = CmfToolAdapter.exec(cmd);
             assertEquals(0, exitCode);
         } catch (IOException | InterruptedException e) {
             fail("exec true should not throw: " + e.getMessage());
@@ -108,7 +112,8 @@ public class CmfToolAdapterTest {
     @Test
     public void testExecFalseCommand() {
         try {
-            int exitCode = CmfToolAdapter.exec("false");
+            String cmd = isWindows() ? "cmd /c exit 1" : "false";
+            int exitCode = CmfToolAdapter.exec(cmd);
             assertEquals(1, exitCode);
         } catch (IOException | InterruptedException e) {
             fail("exec false should not throw: " + e.getMessage());
@@ -130,7 +135,8 @@ public class CmfToolAdapterTest {
     @Test
     public void testExecCommandWithQuotedArgs() {
         try {
-            int exitCode = CmfToolAdapter.exec("echo \"hello world\"");
+            String cmd = isWindows() ? "cmd /c echo \"hello world\"" : "echo \"hello world\"";
+            int exitCode = CmfToolAdapter.exec(cmd);
             assertEquals(0, exitCode);
         } catch (IOException | InterruptedException e) {
             fail("exec with quoted args should not throw: " + e.getMessage());

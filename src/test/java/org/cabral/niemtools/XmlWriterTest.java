@@ -1,11 +1,5 @@
 package org.cabral.niemtools;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,6 +7,10 @@ import java.lang.reflect.Method;
 
 import javax.xml.XMLConstants;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 
 public class XmlWriterTest {
@@ -102,6 +100,7 @@ public class XmlWriterTest {
     // --- xmlAttribute (private) via reflection ---
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testXmlAttributeViaReflection() {
         XmlWriter writer = new XmlWriter("/tmp");
         try {
@@ -115,6 +114,7 @@ public class XmlWriterTest {
     }
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testXmlAttributeEmptyValue() {
         XmlWriter writer = new XmlWriter("/tmp");
         try {
@@ -130,6 +130,7 @@ public class XmlWriterTest {
     // --- writeXmlAttribute (private) via reflection with file ---
 
     @Test
+    @SuppressWarnings("UseSpecificCatch")
     public void testWriteXmlAttributeToFile() throws IOException {
         File tempFile = File.createTempFile("xmlAttrTest", ".xml");
         tempFile.deleteOnExit();

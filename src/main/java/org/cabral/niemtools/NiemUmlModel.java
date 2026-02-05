@@ -211,7 +211,7 @@ public class NiemUmlModel {
      */
     static String getMaxOccurs(String multiplicity) {
         String maxOccurs;
-        if (multiplicity.isEmpty())
+        if (multiplicity == null || multiplicity.isEmpty())
             maxOccurs = "1"; 
         else if (multiplicity.contains(","))
             maxOccurs = multiplicity.split(",")[1]; 
@@ -232,7 +232,7 @@ public class NiemUmlModel {
      */
     static String getMinOccurs(String multiplicity) {
         String minOccurs;
-        if (multiplicity.isEmpty())
+        if (multiplicity == null || multiplicity.isEmpty())
             minOccurs = "1"; 
         else if (multiplicity.contains(","))
             minOccurs = multiplicity.split(",")[0]; 
@@ -303,7 +303,10 @@ public class NiemUmlModel {
      * spreadsheet as a String
      */
     static String getNiemProperty(int p) {
-        return NIEM_STEREOTYPE + STEREOTYPE_DELIMITER + NIEM_STEREOTYPE_MAP[p][1];
+        String propertyName = NIEM_STEREOTYPE_MAP[p][1];
+        if (propertyName == null || propertyName.isEmpty())
+            return "";
+        return NIEM_STEREOTYPE + STEREOTYPE_DELIMITER + propertyName;
     }
 
     /**
@@ -365,7 +368,10 @@ public class NiemUmlModel {
         if ((elementName == null) || elementName.isEmpty() || elementName.equals("??")
                 || NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(elementName)))
             return false;
-        String schemaURI = NamespaceModel.getSchemaURIForPrefix(NamespaceModel.getPrefix(elementName));
+        String prefix = NamespaceModel.getPrefix(elementName);
+        if (prefix == null)
+            return false;
+        String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
         if (schemaURI == null)
             return false;
         return ReferenceModel.getElementByURI(NiemModel.getURI(schemaURI, elementName)) != null;
@@ -381,6 +387,8 @@ public class NiemUmlModel {
             return false;
         UmlClassInstance element = ReferenceModel.getElement(NamespaceModel.getSchemaURI(elementName), elementName);
         List<UmlClassInstance> elementList = ReferenceModel.getElementsInType(NiemModel.getURI(NamespaceModel.getSchemaURI(typeName), typeName));
+        if (elementList == null)
+            return false;
         for (UmlClassInstance element2 : elementList)
             if (element.equals(element2))
                 return true;
@@ -395,7 +403,10 @@ public class NiemUmlModel {
     static Boolean isNiemType(String name) {
         if ((name == null) || name.isEmpty() || name.equals("??") || NamespaceModel.isExternalPrefix(NamespaceModel.getPrefix(name)))
             return false;
-        String schemaURI = NamespaceModel.getSchemaURIForPrefix(NamespaceModel.getPrefix(name));
+        String prefix = NamespaceModel.getPrefix(name);
+        if (prefix == null)
+            return false;
+        String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
         if (schemaURI == null)
             return false;
         return ReferenceModel.getTypeByURI(NiemModel.getURI(schemaURI, name)) != null;
