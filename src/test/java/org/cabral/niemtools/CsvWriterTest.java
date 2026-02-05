@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.junit.Test;
@@ -50,8 +51,12 @@ public class CsvWriterTest {
             assertTrue(result instanceof String[]);
             String[] csv = (String[]) result;
             assertTrue(csv.length > 0);
-        } catch (Exception e) {
-            // Acceptable if static BOUML state causes issues
+        } catch (NoSuchMethodException e) {
+            fail("Reflection failed - method not found: " + e.getMessage());
+        } catch (IllegalAccessException e) {
+            fail("Reflection failed - illegal access: " + e.getMessage());
+        } catch (InvocationTargetException e) {
+            // Acceptable if static BOUML state causes issues with mocked objects
         }
     }
 
@@ -77,8 +82,12 @@ public class CsvWriterTest {
             Object result = m.invoke(writer, mockAttr);
             assertNotNull(result);
             assertTrue(result instanceof String[]);
-        } catch (Exception e) {
-            // Acceptable if static BOUML state causes issues
+        } catch (NoSuchMethodException e) {
+            fail("Reflection failed - method not found: " + e.getMessage());
+        } catch (IllegalAccessException e) {
+            fail("Reflection failed - illegal access: " + e.getMessage());
+        } catch (InvocationTargetException e) {
+            // Acceptable if static BOUML state causes issues with mocked objects
         }
     }
 
@@ -107,8 +116,12 @@ public class CsvWriterTest {
             Object result = m.invoke(writer, mockRel);
             assertNotNull(result);
             assertTrue(result instanceof String[]);
-        } catch (Exception e) {
-            // Acceptable if static BOUML state causes issues
+        } catch (NoSuchMethodException e) {
+            fail("Reflection failed - method not found: " + e.getMessage());
+        } catch (IllegalAccessException e) {
+            fail("Reflection failed - illegal access: " + e.getMessage());
+        } catch (InvocationTargetException e) {
+            // Acceptable if static BOUML state causes issues with mocked objects
         }
     }
 
@@ -132,8 +145,12 @@ public class CsvWriterTest {
             Object result = m.invoke(writer, mockInstance);
             assertNotNull(result);
             assertTrue(result instanceof String[]);
-        } catch (Exception e) {
-            // Acceptable if static BOUML state causes issues
+        } catch (NoSuchMethodException e) {
+            fail("Reflection failed - method not found: " + e.getMessage());
+        } catch (IllegalAccessException e) {
+            fail("Reflection failed - illegal access: " + e.getMessage());
+        } catch (InvocationTargetException e) {
+            // Acceptable if static BOUML state causes issues with mocked objects
         }
     }
 }
