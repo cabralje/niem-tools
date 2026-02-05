@@ -50,8 +50,11 @@ public class CsvWriterTest {
             assertTrue(result instanceof String[]);
             String[] csv = (String[]) result;
             assertTrue(csv.length > 0);
-        } catch (Exception e) {
-            // Acceptable if static BOUML state causes issues
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            fail("Reflection failed: " + e.getMessage());
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            // Acceptable if static BOUML state causes issues during method invocation
+            System.err.println("Warning: Test invocation failed, possibly due to BOUML static state: " + e.getCause());
         }
     }
 
@@ -77,8 +80,11 @@ public class CsvWriterTest {
             Object result = m.invoke(writer, mockAttr);
             assertNotNull(result);
             assertTrue(result instanceof String[]);
-        } catch (Exception e) {
-            // Acceptable if static BOUML state causes issues
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            fail("Reflection failed: " + e.getMessage());
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            // Acceptable if static BOUML state causes issues during method invocation
+            System.err.println("Warning: Test invocation failed, possibly due to BOUML static state: " + e.getCause());
         }
     }
 
@@ -107,8 +113,11 @@ public class CsvWriterTest {
             Object result = m.invoke(writer, mockRel);
             assertNotNull(result);
             assertTrue(result instanceof String[]);
-        } catch (Exception e) {
-            // Acceptable if static BOUML state causes issues
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            fail("Reflection failed: " + e.getMessage());
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            // Acceptable if static BOUML state causes issues during method invocation
+            System.err.println("Warning: Test invocation failed, possibly due to BOUML static state: " + e.getCause());
         }
     }
 
@@ -132,8 +141,11 @@ public class CsvWriterTest {
             Object result = m.invoke(writer, mockInstance);
             assertNotNull(result);
             assertTrue(result instanceof String[]);
-        } catch (Exception e) {
-            // Acceptable if static BOUML state causes issues
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            fail("Reflection failed: " + e.getMessage());
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            // Acceptable if static BOUML state causes issues during method invocation
+            System.err.println("Warning: Test invocation failed, possibly due to BOUML static state: " + e.getCause());
         }
     }
 }
