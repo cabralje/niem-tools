@@ -407,7 +407,7 @@ class NiemModel {
             Log.debug("addElementInTypes: error - no model for type " + typeName);
             return null;
         }
-        List<UmlClassInstance> elementInTypeList = model.getElementsInType(getURI(type));
+        List<UmlClassInstance> elementInTypeList = model.getOrCreateElementsInType(getURI(type));
         if (!elementInTypeList.contains(element)) {
             elementInTypeList.add(element);
             Log.debug("addElementInTypes: inserted " + elementInTypeName + " to " + typeName);
@@ -1241,6 +1241,10 @@ class NiemModel {
      * @return a list of elements in a type with uri typeURI as a List
      */
     List<UmlClassInstance> getElementsInType(String typeURI) {
+        return elementsInType.get(typeURI);
+    }
+
+    List<UmlClassInstance> getOrCreateElementsInType(String typeURI) {
         List<UmlClassInstance> elementInTypeList = elementsInType.get(typeURI);
         if (elementInTypeList == null) {
             elementInTypeList = new ArrayList<>();

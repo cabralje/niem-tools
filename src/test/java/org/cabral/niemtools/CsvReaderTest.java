@@ -25,107 +25,6 @@ public class CsvReaderTest {
         }
     }
 
-    /*
-    @Test
-    public void testImportCsvWithClassMapping() throws Exception {
-        // Prepare CSV content
-        String[] header = {"ClassName", "AttributeName", "col2", "col3", "col4", "col5", "col6"};
-        String[] row = {"TestClass", "", "", "", "", "val5", "val6"};
-        writeCsv(tempFile, header, row);
-
-        // Mock UmlItem.all
-        UmlClass mockClass = mock(UmlClass.class);
-        when(mockClass.kind()).thenReturn(anItemKind.aClass);
-        when(mockClass.name()).thenReturn("TestClass");
-        when(mockClass.propertyValue(anyString())).thenReturn("");
-        when(NiemUmlModel.isNiemUml(mockClass)).thenReturn(true);
-
-        Vector<UmlItem> all = new Vector<>();
-        all.add(mockClass);
-        setStaticField(UmlItem.class, "all", all);
-
-        // Mock NiemUmlModel.getNiemMap and getNiemProperty
-        String[][] niemMap = new String[7][2];
-        setStaticField(NiemUmlModel.class, "niemMap", niemMap);
-        mockStatic(NiemUmlModel.class);
-        when(NiemUmlModel.getNiemMap()).thenReturn(niemMap);
-        when(NiemUmlModel.getNiemProperty(anyInt())).thenReturn("property");
-
-        CsvReader reader = new CsvReader();
-        reader.importCsv(tempFile.getAbsolutePath());
-
-        verify(mockClass, atLeastOnce()).set_PropertyValue(eq("property"), anyString());
-    }
-    
-    @Test
-    public void testImportCsvWithAttributeMapping() throws Exception {
-        // Prepare CSV content
-        String[] header = {"ClassName", "AttributeName", "col2", "col3", "col4", "col5", "col6"};
-        String[] row = {"TestClass", "TestAttr", "", "", "", "val5", "val6"};
-        writeCsv(tempFile, header, row);
-
-        UmlClass mockClass = mock(UmlClass.class);
-        when(mockClass.kind()).thenReturn(anItemKind.aClass);
-        when(mockClass.name()).thenReturn("TestClass");
-        when(NiemUmlModel.isNiemUml(mockClass)).thenReturn(true);
-
-        UmlItem mockAttr = mock(UmlItem.class);
-        when(mockAttr.name()).thenReturn("TestAttr");
-        when(NiemUmlModel.isNiemUml(mockAttr)).thenReturn(true);
-
-        Vector<UmlItem> children = new Vector<>();
-        children.add(mockAttr);
-        when(mockClass.children()).thenReturn(children);
-
-        Vector<UmlItem> all = new Vector<>();
-        all.add(mockClass);
-        setStaticField(UmlItem.class, "all", all);
-
-        // Mock NiemUmlModel.getNiemMap and getNiemProperty
-        String[][] niemMap = new String[7][2];
-        setStaticField(NiemUmlModel.class, "niemMap", niemMap);
-        mockStatic(NiemUmlModel.class);
-        when(NiemUmlModel.getNiemMap()).thenReturn(niemMap);
-        when(NiemUmlModel.getNiemProperty(anyInt())).thenReturn("property");
-
-        CsvReader reader = new CsvReader();
-        reader.importCsv(tempFile.getAbsolutePath());
-
-        verify(mockAttr, atLeastOnce()).set_PropertyValue(eq("property"), anyString());
-    }
-    
-
-    @Test
-    public void testImportCsvWithClassInstanceMapping() throws Exception {
-        // Prepare CSV content
-        String[] header = {"ClassName", "AttributeName", "col2", "col3", "col4", "col5", "col6"};
-        String[] row = {"", "TestInstance", "", "", "", "val5", "val6"};
-        writeCsv(tempFile, header, row);
-
-        UmlClassInstance mockInstance = mock(UmlClassInstance.class);
-        when(mockInstance.name()).thenReturn("TestInstance");
-        when(NiemUmlModel.isNiemUml(mockInstance)).thenReturn(true);
-
-        Vector<UmlItem> all = new Vector<>();
-        setStaticField(UmlItem.class, "all", all);
-
-        // Mock NiemUmlModel.getNiemMap and getNiemProperty
-        String[][] niemMap = new String[7][2];
-        setStaticField(NiemUmlModel.class, "niemMap", niemMap);
-        mockStatic(NiemUmlModel.class);
-        when(NiemUmlModel.getNiemMap()).thenReturn(niemMap);
-        when(NiemUmlModel.getNiemProperty(anyInt())).thenReturn("property");
-
-        // Patch UMLInstances map
-        // (You may need to refactor CsvReader for better testability if this is not accessible)
-
-        CsvReader reader = new CsvReader();
-        reader.importCsv(tempFile.getAbsolutePath());
-
-        // No exception means success; you can add more verifications if you refactor CsvReader
-    }
-    */
-
     @Test
     public void testImportCsvFileNotFound() {
         CsvReader reader = new CsvReader();
@@ -143,16 +42,68 @@ public class CsvReaderTest {
         reader.importCsv(tempFile.getAbsolutePath());
         // Should not throw, should log error
     }
-    // Mockito static mocking helpers (requires mockito-inline or mockito-core 3.4+)
-    // This is a placeholder for static mocking, which may require PowerMockito or Mockito's inline mock maker.
-    // In real projects, use @PrepareForTest and PowerMockito.mockStatic, or Mockito.mockStatic if available.
-    /*
-    private <T> T anyInt() {
-    return Mockito.anyInt();
+
+    @Test
+    public void testImportCsvEmptyFile() throws Exception {
+        // Write an empty file
+        try (FileWriter fw = new FileWriter(tempFile)) {
+            fw.write("");
+        }
+        CsvReader reader = new CsvReader();
+        reader.importCsv(tempFile.getAbsolutePath());
+        // Should not throw
     }
-    private <T> T anyString() {
-    return Mockito.anyString();
+
+    @Test
+    public void testImportCsvHeaderOnly() throws Exception {
+        // Write only a header row (should be skipped, no data rows)
+        try (FileWriter fw = new FileWriter(tempFile)) {
+            fw.write("ClassName,AttributeName,Type,Multiplicity,Definition,XPath,NIEMType,Property,BaseType,NIEMMultiplicity,OldXPath,OldMultiplicity,Notes,CodeList\n");
+        }
+        CsvReader reader = new CsvReader();
+        reader.importCsv(tempFile.getAbsolutePath());
+        // Should not throw, should process zero data rows
     }
-     */    // Reflection helpers for static fields
-    // --- Helper methods ---
+
+    @Test
+    public void testImportCsvWithExtraColumns() throws Exception {
+        // CSV with more columns than expected
+        try (FileWriter fw = new FileWriter(tempFile)) {
+            fw.write("Col1,Col2,Col3,Col4,Col5,Col6,Col7,Col8,Col9,Col10,Col11,Col12,Col13,Col14,ExtraCol\n");
+            fw.write("Class1,,,,desc,xpath,type,prop,base,1,,,,code,extra\n");
+        }
+        CsvReader reader = new CsvReader();
+        reader.importCsv(tempFile.getAbsolutePath());
+        // Should not throw
+    }
+
+    @Test
+    public void testImportCsvWithSpecialCharacters() throws Exception {
+        // CSV with special characters in values
+        try (FileWriter fw = new FileWriter(tempFile)) {
+            fw.write("Col1,Col2,Col3,Col4,Col5,Col6,Col7,Col8,Col9,Col10,Col11,Col12,Col13,Col14\n");
+            fw.write("\"Class with, comma\",\"attr \"\"quoted\"\"\",type,1,\"desc with\nnewline\",xpath,type,prop,base,1,,,notes,code\n");
+        }
+        CsvReader reader = new CsvReader();
+        reader.importCsv(tempFile.getAbsolutePath());
+        // Should not throw
+    }
+
+    @Test
+    public void testImportCsvWithFewerColumns() throws Exception {
+        // CSV with fewer columns than expected
+        try (FileWriter fw = new FileWriter(tempFile)) {
+            fw.write("Col1,Col2\n");
+            fw.write("Class1,attr1\n");
+        }
+        CsvReader reader = new CsvReader();
+        reader.importCsv(tempFile.getAbsolutePath());
+        // Should not throw
+    }
+
+    @Test
+    public void testConstructor() {
+        CsvReader reader = new CsvReader();
+        org.junit.Assert.assertNotNull(reader);
+    }
 }
