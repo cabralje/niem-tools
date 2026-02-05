@@ -51,7 +51,7 @@ public class CsvWriterTest {
             String[] csv = (String[]) result;
             assertTrue(csv.length > 0);
         } catch (Exception e) {
-            // Acceptable if static BOUML state causes issues
+            fail("Reflection failed: " + e.getMessage());
         }
     }
 
@@ -78,7 +78,7 @@ public class CsvWriterTest {
             assertNotNull(result);
             assertTrue(result instanceof String[]);
         } catch (Exception e) {
-            // Acceptable if static BOUML state causes issues
+            fail("Reflection failed: " + e.getMessage());
         }
     }
 
@@ -108,7 +108,7 @@ public class CsvWriterTest {
             assertNotNull(result);
             assertTrue(result instanceof String[]);
         } catch (Exception e) {
-            // Acceptable if static BOUML state causes issues
+            fail("Reflection failed: " + e.getMessage());
         }
     }
 
@@ -133,7 +133,7 @@ public class CsvWriterTest {
             assertNotNull(result);
             assertTrue(result instanceof String[]);
         } catch (Exception e) {
-            // Acceptable if static BOUML state causes issues
+            fail("Reflection failed: " + e.getMessage());
         }
     }
 }
