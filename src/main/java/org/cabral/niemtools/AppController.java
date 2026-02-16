@@ -42,7 +42,6 @@ public class AppController {
     private NiemUmlModel model;
     private CmfToolAdapter cmftool;
 
-    
     @FXML
     private ListView<String> DomainListView;
 
@@ -84,7 +83,7 @@ public class AppController {
 
     @FXML
     private CheckBox ImportCodeDescriptions;
-/*
+    /*
     @FXML
     private TextField ImportExcludeDomains;
 
@@ -280,17 +279,17 @@ public class AppController {
                 properties.setProperty(ProjectProperties.EXPORT_URI, ExportURI.getText());
             }
         });
-/*         ImportExcludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
+        /*         ImportExcludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 properties.setProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS, ImportExcludeDomains.getText());
             }
         }); */
-/*         ImportIncludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
+ /*         ImportIncludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 properties.setProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS, ImportIncludeDomains.getText());
             }
         }); */
-        /*
+ /*
         ImportExcludeCodes.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 properties.setProperty(ProjectProperties.IMPORT_EXCLUDE_CODES, ImportExcludeCodes.getText());
@@ -301,7 +300,7 @@ public class AppController {
                 properties.setProperty(ProjectProperties.IMPORT_INCLUDE_CODES, ImportIncludeCodes.getText());
             }
         });
-        */
+         */
         ImportMaxFacets.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 properties.setProperty(ProjectProperties.IMPORT_MAX_FACETS, ImportMaxFacets.getText());
@@ -320,8 +319,9 @@ public class AppController {
 
         if (NIEMPane.isExpanded()) {
             mainControls.setDisable(true);
-            if (model.downloadReferenceModel(properties))
+            if (model.downloadReferenceModel(properties)) {
                 reloadDomains();
+            }
             mainControls.setDisable(false);
         }
 
@@ -329,8 +329,9 @@ public class AppController {
         NIEMPane.expandedProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal) {
                 mainControls.setDisable(true);
-                if (model.downloadReferenceModel(properties))
+                if (model.downloadReferenceModel(properties)) {
                     reloadDomains();
+                }
                 mainControls.setDisable(false);
             }
         });
@@ -378,31 +379,6 @@ public class AppController {
         MessageStatus.setText("");
     }
 
-    private void reloadDomains() {
-        // Populate Domain List View
-        String[] domains = model.getReferenceModelDomains(properties);
-       if (domains != null && DomainListView != null) {
-            DomainListView.getItems().clear();
-            DomainListView.getItems().addAll(domains);
-            DomainListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-            
-            // Select domains that match IMPORT_INCLUDE_DOMAINS property
-            String includeDomains = properties.getProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS);
-            if (includeDomains != null && !includeDomains.isEmpty()) {
-                String[] domainsToInclude = includeDomains.split(",");
-                for (String domain : domainsToInclude) {
-                    String trimmedDomain = domain.trim();
-                    for (int i = 0; i < DomainListView.getItems().size(); i++) {
-                        if (DomainListView.getItems().get(i).equals(trimmedDomain)) {
-                            DomainListView.getSelectionModel().select(i);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public void updateDomainSelection() {
         if (DomainListView != null) {
             List<String> selectedDomains = DomainListView.getSelectionModel().getSelectedItems();
@@ -436,8 +412,9 @@ public class AppController {
             Stage parentStage = (Stage) mainWindow.getScene().getWindow();
             stage.initOwner(parentStage);
 
-            if (controller != null)
+            if (controller != null) {
                 controller.setStage(stage);
+            }
 
             // Show the dialog
             stage.showAndWait();
@@ -475,12 +452,12 @@ public class AppController {
     @FXML
     public void exportMapping(ActionEvent event) {
 
-         Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception { 
+            protected Void call() throws Exception {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
-                    Log.trace ("Adding NIEM profile to Messages and Base Classes");
+                    Log.trace("Adding NIEM profile to Messages and Base Classes");
                     model.addStereotype(messagePackage);
                     model.addStereotype(baseTypesPackage);
                     Log.trace("Exporting mapping to " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
@@ -493,17 +470,17 @@ public class AppController {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
                 return null;
-             }
+            }
         };
-        new Thread(task).start(); 
+        new Thread(task).start();
     }
 
     @FXML
     public void importMapping(ActionEvent event) {
 
-         Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception { 
+            protected Void call() throws Exception {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Importing mapping from " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
@@ -516,9 +493,9 @@ public class AppController {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
                 return null;
-             }
+            }
         };
-        new Thread(task).start(); 
+        new Thread(task).start();
 
     }
 
@@ -580,8 +557,9 @@ public class AppController {
             Stage parentStage = (Stage) mainWindow.getScene().getWindow();
             stage.initOwner(parentStage);
 
-            if (controller != null)
+            if (controller != null) {
                 controller.setStage(stage);
+            }
 
             // Show the dialog
             stage.showAndWait();
@@ -592,11 +570,11 @@ public class AppController {
 
     @FXML
     public void publishCmf(ActionEvent event) {
-         Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception { 
+            protected Void call() throws Exception {
                 Platform.runLater(() -> mainControls.setDisable(true));
-                try { 
+                try {
                     Log.trace("Publishing CMF to " + model.properties.getProperty(ProjectProperties.EXPORT_CMF_FILE) + " ...");
                     model.createNIEM();
                     model.cacheModels(false);
@@ -608,16 +586,16 @@ public class AppController {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
                 return null;
-             }
+            }
         };
-        new Thread(task).start(); 
+        new Thread(task).start();
     }
 
     @FXML
     public void publishCodelists(ActionEvent event) {
-         Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception { 
+            protected Void call() throws Exception {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Publishing Codelists to " + model.properties.getProperty(ProjectProperties.EXPORT_CODELISTS_DIR) + " ...");
@@ -629,16 +607,16 @@ public class AppController {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
                 return null;
-             }
+            }
         };
-        new Thread(task).start(); 
+        new Thread(task).start();
     }
 
     @FXML
     public void publishHtml(ActionEvent event) {
-         Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception { 
+            protected Void call() throws Exception {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Publishing HTML documentation to " + model.properties.getProperty(ProjectProperties.EXPORT_HTML_DIR) + " ...");
@@ -650,16 +628,16 @@ public class AppController {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
                 return null;
-             }
+            }
         };
-        new Thread(task).start(); 
+        new Thread(task).start();
     }
 
     @FXML
     public void publishJson(ActionEvent event) {
-         Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception { 
+            protected Void call() throws Exception {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Publishing JSON schema to " + model.properties.getProperty(ProjectProperties.EXPORT_JSON_DIR) + " ...");
@@ -670,20 +648,22 @@ public class AppController {
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
-                 return null;
-             }
+                return null;
+            }
         };
-        new Thread(task).start(); 
+        new Thread(task).start();
     }
 
     @FXML
     public void publishMpdCatalog(ActionEvent event) {
-         Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception { 
+            protected Void call() throws Exception {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Publishing MPD catalog to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " ...");
+                    //model.createNIEM();
+                    //model.cacheModels(false);
                     model.exportMpdCatalog();
                     Log.trace("\nMPD catalog published.\n");
                 } catch (Exception e) {
@@ -692,19 +672,21 @@ public class AppController {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
                 return null;
-             }
+            }
         };
-        new Thread(task).start(); 
+        new Thread(task).start();
     }
 
     @FXML
     public void publishXmlCatalog(ActionEvent event) {
-         Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception { 
+            protected Void call() throws Exception {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Publishing XML catalog to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " ...");
+                    model.createNIEM();
+                    model.cacheModels(false);
                     model.exportXmlCatalog();
                     Log.trace("\nXML catalog published.\n");
                 } catch (Exception e) {
@@ -713,59 +695,17 @@ public class AppController {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
                 return null;
-             }
+            }
         };
-        new Thread(task).start(); 
-    }
-
-    @FXML
-    void publishWsdl(ActionEvent event) {
-        Task<Void> task = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception { 
-                Platform.runLater(() -> mainControls.setDisable(true));
-                try {
-                    Log.trace("Publishing WSDL documents to " + model.properties.getProperty(ProjectProperties.EXPORT_WSDL_DIR) + " ...");
-                    model.exportWsdls();
-                    Log.trace("\nWSDL documents published.\n");
-                } catch (Exception e) {
-                    Log.trace("Error publishing WSDL documents: " + e.getMessage());
-                } finally {
-                    Platform.runLater(() -> mainControls.setDisable(false));
-                }
-                return null;
-             }
-        };
-        new Thread(task).start(); 
-    }
-
-    @FXML
-    void publishOpenApi(ActionEvent event) {
-        Task<Void> task = new Task<Void>() {
-            @Override
-            protected Void call() throws Exception { 
-                Platform.runLater(() -> mainControls.setDisable(true));
-                try {
-                    Log.trace("Publishing OpenAPI documents to " + model.properties.getProperty(ProjectProperties.EXPORT_OPENAPI_DIR) + " ...");
-                    model.exportOpenApis();
-                    Log.trace("\nOpenAPI documents published.\n");
-                } catch (Exception e) {
-                    Log.trace("Error publishing OpenAPI documents: " + e.getMessage());
-                } finally {
-                    Platform.runLater(() -> mainControls.setDisable(false));
-                }
-                return null;
-             }
-        };
-        new Thread(task).start(); 
+        new Thread(task).start();
     }
 
     @FXML
     public void publishXsd(ActionEvent event) {
 
-         Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception { 
+            protected Void call() throws Exception {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Publishing XSD schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " ...");
@@ -777,17 +717,17 @@ public class AppController {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
                 return null;
-             }
+            }
         };
-        new Thread(task).start(); 
+        new Thread(task).start();
     }
 
     @FXML
     public void publishXsdModel(ActionEvent event) {
 
-         Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception { 
+            protected Void call() throws Exception {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Publishing XSD Model schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_MODEL_DIR) + " ...");
@@ -798,10 +738,10 @@ public class AppController {
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
-               return null;
-             }
+                return null;
+            }
         };
-        new Thread(task).start(); 
+        new Thread(task).start();
     }
 
     @FXML
@@ -840,7 +780,7 @@ public class AppController {
         Object source = event.getSource();
         String property = null;
         String value = null;
-        
+
         switch (source) {
             case TextField textField -> {
                 property = textField.getId();
@@ -854,7 +794,7 @@ public class AppController {
             default -> {
             }
         }
-        
+
         if (property != null && value != null && !property.isEmpty()) {
             properties.setProperty(property, value);
         }
@@ -865,20 +805,9 @@ public class AppController {
                 NIEMStatus.setText("NIEM " + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION));
             }
         }
-        
+
         if ("IEPDName".equals(property)) {
             ProjectStatus.setText(properties.getProperty(ProjectProperties.IEPD_NAME));
-        }   
-    }
-
-    @FXML
-    void toggleProjectProperty(ActionEvent event) {
-        CheckBox source = (CheckBox) event.getSource();
-        switch (source.getId()) {
-            case "ImportCodeDescriptions" ->
-                properties.setProperty(ProjectProperties.IMPORT_CODE_DESCRIPTIONS, Boolean.toString(source.isSelected()));
-            default -> {
-            }
         }
     }
 
@@ -890,9 +819,9 @@ public class AppController {
     @FXML
     public void validateMapping(ActionEvent event) {
 
-         Task<Void> task = new Task<Void>() {
+        Task<Void> task = new Task<Void>() {
             @Override
-            protected Void call() throws Exception { 
+            protected Void call() throws Exception {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Validating mapping from " + model.properties.getProperty(ProjectProperties.EXPORT_MAPPING_FILE) + " ...");
@@ -908,10 +837,92 @@ public class AppController {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
                 return null;
-             }
+            }
         };
-        new Thread(task).start(); 
-    } 
+        new Thread(task).start();
+    }
+
+    @FXML
+    void publishOpenApi(ActionEvent event) {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Publishing OpenAPI documents to " + model.properties.getProperty(ProjectProperties.EXPORT_OPENAPI_DIR) + " ...");
+                    model.createNIEM();
+                    model.cacheModels(false);
+                    model.exportOpenApis();
+                    Log.trace("\nOpenAPI documents published.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing OpenAPI documents: " + e.getMessage());
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
+                return null;
+            }
+        };
+        new Thread(task).start();
+    }
+
+    @FXML
+    void publishWsdl(ActionEvent event) {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Publishing WSDL documents to " + model.properties.getProperty(ProjectProperties.EXPORT_WSDL_DIR) + " ...");
+                    model.createNIEM();
+                    model.cacheModels(false);
+                    model.exportWsdls();
+                    Log.trace("\nWSDL documents published.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing WSDL documents: " + e.getMessage());
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
+                return null;
+            }
+        };
+        new Thread(task).start();
+    }
+
+    @FXML
+    void toggleProjectProperty(ActionEvent event) {
+        CheckBox source = (CheckBox) event.getSource();
+        switch (source.getId()) {
+            case "ImportCodeDescriptions" ->
+                properties.setProperty(ProjectProperties.IMPORT_CODE_DESCRIPTIONS, Boolean.toString(source.isSelected()));
+            default -> {
+            }
+        }
+    }
+
+    private void reloadDomains() {
+        // Populate Domain List View
+        String[] domains = model.getReferenceModelDomains(properties);
+        if (domains != null && DomainListView != null) {
+            DomainListView.getItems().clear();
+            DomainListView.getItems().addAll(domains);
+            DomainListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+            // Select domains that match IMPORT_INCLUDE_DOMAINS property
+            String includeDomains = properties.getProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS);
+            if (includeDomains != null && !includeDomains.isEmpty()) {
+                String[] domainsToInclude = includeDomains.split(",");
+                for (String domain : domainsToInclude) {
+                    String trimmedDomain = domain.trim();
+                    for (int i = 0; i < DomainListView.getItems().size(); i++) {
+                        if (DomainListView.getItems().get(i).equals(trimmedDomain)) {
+                            DomainListView.getSelectionModel().select(i);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     private void populateNiemVersionDropdown(ComboBox<String> comboBox, String selectedVersion) {
         Log.debug("Starting NIEM version fetch...");

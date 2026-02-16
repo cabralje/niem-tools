@@ -943,14 +943,13 @@ public class NiemUmlModel {
     //@SuppressWarnings("unchecked")
     public void exportXmlCatalog() {
 
-        String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-        properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
+        String projectDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
         String exportXsd = properties.getProperty(ProjectProperties.EXPORT_XSD);
 
         try {
             if (exportXsd.equals("true")) {
                 // export catalog file
-                XmlWriter xmlWriter = new XmlWriter(xmlDir);
+                XmlWriter xmlWriter = new XmlWriter(projectDir);
                 xmlWriter.exportXmlCatalog();
             }
         } catch (IOException e) {
@@ -963,9 +962,8 @@ public class NiemUmlModel {
      */
     //@SuppressWarnings("unchecked")
     public void exportMpdCatalog() {
-        String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
-                properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
-        XmlWriter xmlWriter = new XmlWriter(xmlDir);
+        String projectDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
+        XmlWriter xmlWriter = new XmlWriter(projectDir);
         // TODO: implement export of MPD Catalog
         //xmlWriter.exportMpdCatalog();
 
