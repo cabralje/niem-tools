@@ -183,7 +183,7 @@
                   </AnchorPane>
                </content>
             </TitledPane>
-            <TitledPane fx:id="NIEMPane" text="2. Import NIEM Model">
+            <TitledPane fx:id="NIEMPane" expanded="false" text="2. Import NIEM Model">
               <content>
                 <AnchorPane minHeight="-Infinity">
                      <children>
@@ -272,26 +272,42 @@
                               <Label text="-&gt;" />
                               <Button onAction="#validateMapping" text="Validate Mapping" />
                               <Label text="-&gt;" />
-                              <Button onAction="#publishCMF" text="Common Model Format (CMF)" />
+                              <Button onAction="#publishCmf" text="Common Model Format (CMF)" />
                            </items>
                         </ToolBar>
                      </children>
                   </AnchorPane>
               </content>
             </TitledPane>
-            <TitledPane text="5. Generate Specification">
+            <TitledPane text="5. Generate Schemas">
                <content>
                   <AnchorPane>
                      <children>
                         <ToolBar style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <items>
                               <Label text="CMF -&gt;" />
-                              <Button onAction="#publishXSDModel" text="XML Model Schemas" />
-                              <Button onAction="#publishXSD" text="XML Message Schemas" />
-                              <Button onAction="#publishJSON" text="JSON Message Schema" />
-                              <Button onAction="#publishSpecification" text="WSDL/OpenAPI" />
-                              <Separator orientation="VERTICAL" />
-                              <Button onAction="#publishHTML" text="Documentation (HTML)" />
+                              <Button onAction="#publishXsdModel" text="XML Model Schemas" />
+                              <Button onAction="#publishXsd" text="XML Message Schemas" />
+                              <Button onAction="#publishJson" text="JSON Message Schema" />
+                           </items>
+                        </ToolBar>
+                     </children>
+                  </AnchorPane>
+               </content>
+            </TitledPane>
+            <TitledPane text="6. Generate Specification">
+               <content>
+                  <AnchorPane>
+                     <children>
+                        <ToolBar style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <items>
+                              <Label text="UML -&gt;" />
+                              <Button onAction="#publishHtml" text="Documentation (HTML)" />
+                              <Button onAction="#publishCodelists" text="Codelists" />
+                              <Button onAction="#publishXmlCatalog" text="XML Catalog" />
+                              <Button onAction="#publishMpdCatalog" text="MPD Catalog" />
+                              <Button onAction="#publishWsdl" text="WSDL" />
+                              <Button onAction="#publishOpenApi" text="OpenAPI" />
                            </items>
                         </ToolBar>
                      </children>

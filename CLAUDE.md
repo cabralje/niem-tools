@@ -1,4 +1,6 @@
-# CLAUDE.md - AI Assistant Guide for niem-tools
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
@@ -66,7 +68,14 @@ Maven auto-selects the JavaFX platform classifier via OS-based profiles:
 ### Running Tests
 
 ```bash
+# Run all tests
 mvn test
+
+# Run a single test class
+mvn test -Dtest=NiemUmlModelTest
+
+# Run a single test method
+mvn test -Dtest=NiemUmlModelTest#testMethodName
 ```
 
 ### Test Location

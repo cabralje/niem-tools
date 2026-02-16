@@ -416,6 +416,17 @@ public class NamespaceModel {
     }
 
     /**
+     * identify if a prefix is an infrastructure prefix
+     *
+     * @param prefix
+     */
+    static Boolean isInfrastructureURI(String uri) {
+        if (uri == null)
+            return false;
+        return (uri.equals(NiemModel.LOCAL_URI) || uri.equals(NiemModel.XSD_URI) || uri.equals(NiemModel.STRUCTURES_URI));
+    }
+
+    /**
      * @param prefix
      * @return true if a prefix exists in reference model
      */

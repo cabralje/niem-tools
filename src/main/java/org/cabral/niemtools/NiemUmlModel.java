@@ -921,18 +921,71 @@ public class NiemUmlModel {
     }
 
     /**
-     * exports a NIEM IEPD including extension and exchange schema
-     *
-     * @param xmlDir
-     * @param wsdlDir
-     * @param jsonDir
-     * @param openapiDir
+     * exports Genericode codelists
      */
     //@SuppressWarnings("unchecked")
-    public void exportSpecification() {
+    public void exportCodelists() {
 
-        Log.start("exportSpecification");
-        Log.trace("Generating NIEM message specification");
+        Log.start("exportCodelists");
+        String exportXsd = properties.getProperty(ProjectProperties.EXPORT_XSD);
+        if (exportXsd.equals("true")){
+            String gcDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + properties.getProperty(ProjectProperties.EXPORT_CODELISTS_DIR);
+            XmlWriter gcWriter = new XmlWriter(gcDir);
+            gcWriter.exportCodeLists(ExtensionModel);
+            gcWriter.exportCodeLists(SubsetModel);
+        }
+        Log.stop("exportCodelists");
+    }
+
+    /**
+     * exports a XML Catalog
+     */
+    //@SuppressWarnings("unchecked")
+    public void exportXmlCatalog() {
+
+        String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+        properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
+        String exportXsd = properties.getProperty(ProjectProperties.EXPORT_XSD);
+
+        try {
+            if (exportXsd.equals("true")) {
+                // export catalog file
+                XmlWriter xmlWriter = new XmlWriter(xmlDir);
+                xmlWriter.exportXmlCatalog();
+            }
+        } catch (IOException e) {
+            Log.trace("exportXmlCatalog: error creating XML catalog file " + e.toString());
+        }
+    }
+
+        /**
+     * exports a OpenAPI documents
+     */
+    //@SuppressWarnings("unchecked")
+    public void exportMpdCatalog() {
+        String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
+                properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
+        XmlWriter xmlWriter = new XmlWriter(xmlDir);
+        // TODO: implement export of MPD Catalog
+        //xmlWriter.exportMpdCatalog();
+
+    }
+
+    /**
+     * exports a OpenAPI documents
+     */
+    //@SuppressWarnings("unchecked")
+    public void exportOpenApis() {
+
+    }
+
+    /**
+     * exports a WSDL documents
+     */
+    //@SuppressWarnings("unchecked")
+    public void exportWsdls() {
+
+        Log.start("exportWsdls");
         /*
 		 * cacheExternalSchemas(); cacheModel(referencePackage);
 		 * cacheModel(subsetPackage); cacheModel(extensionPackage);
@@ -952,11 +1005,11 @@ public class NiemUmlModel {
         // Verify XML directory exists
         Path xmlPath = Paths.get(xmlDir);
         if (!Files.exists(xmlPath)) {
-            Log.debug("exportSpecification: XML directory does not exist, creating " + xmlDir);
+            Log.debug("exportWSDLs: XML directory does not exist, creating " + xmlDir);
             try {
                 Files.createDirectories(xmlPath);
             } catch (IOException e) {
-                Log.trace("exportSpecification: error creating XML directory " + e.toString());
+                Log.trace("exportWSDLs: error creating XML directory " + e.toString());
                 return;
             }
         }
@@ -969,19 +1022,11 @@ public class NiemUmlModel {
                 xmlWriter.exportXmlCatalog();
             }
         } catch (IOException e) {
-            Log.trace("exportSpecification: error creating XML catalog file " + e.toString());
-        }
-
-        // export code lists
-        if (exportXsd.equals("true")){
-            String gcDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + "codelists";
-            XmlWriter gcWriter = new XmlWriter(gcDir);
-            gcWriter.exportCodeLists(ExtensionModel);
-            gcWriter.exportCodeLists(SubsetModel);
+            Log.trace("exportWSDLs: error creating XML catalog file " + e.toString());
         }
 
         // cache list of ports and message elements
-        Log.debug("exportSpecification: cache ports and message elements");
+        Log.debug("exportWSDLs: cache ports and message elements");
         Map<String, UmlClass> ports = new TreeMap<>();
         //Map<String, UmlClassInstance> messages = new TreeMap<>();
         Set<String> messageNamespaces = new TreeSet<>();
@@ -995,14 +1040,14 @@ public class NiemUmlModel {
             UmlClass port = (UmlClass) item;
             String portName = port.name();
             ports.put(portName, port);
-            Log.debug("exportSpecification: port: " + port.name());
+            Log.debug("exportWSDLs: port: " + port.name());
             if (port.children() != null)
               for (UmlItem item2 : port.children()) {
                 if (item2.kind() != anItemKind.anOperation)
                     continue;
                 UmlOperation operation = (UmlOperation) item2;
                 String operationName = operation.name();
-                Log.debug("exportSpecification: operation: " + operationName);
+                Log.debug("exportWSDLs: operation: " + operationName);
                 // operations.put(operationName, operation);
                 UmlClass outputType = null, inputType = null;
                 UmlParameter[] params = operation.params();
@@ -1011,21 +1056,21 @@ public class NiemUmlModel {
                         // ignore RESTful path, query, header or cookie parameters
                         if (!param.name.isEmpty() && !param.name.equals("body"))
                             continue;
-                        Log.debug("exportSpecification: param " + param.name);
+                        Log.debug("exportWSDLs: param " + param.name);
                         try {
                             UmlTypeSpec inputType2 = param.type;
                             if (inputType2 != null)
                                 inputType = inputType2.type;
                             // String mult = param.multiplicity;
                         } catch (Exception e) {
-                            Log.trace("exportSpecification: error - no input message for " + operationName);
+                            Log.trace("exportWSDLs: error - no input message for " + operationName);
                         }
                         if (inputType == null || !isNiemUml(inputType))
                             continue;
                         String inputMessage = inputType.propertyValue(NIEM_STEREOTYPE_XPATH);
                         if (inputMessage == null || inputMessage.isEmpty())
                             continue;
-                        Log.debug("exportSpecification: input Message: " + inputMessage + " from operation " + operationName);
+                        Log.debug("exportWSDLs: input Message: " + inputMessage + " from operation " + operationName);
                         String inputPrefix = NamespaceModel.getPrefix(inputMessage);
                         if (inputPrefix != null) {
                             messageNamespaces.add(inputPrefix);
@@ -1034,7 +1079,7 @@ public class NiemUmlModel {
                             if (element != null) {
                                 element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
                                 //messages.put(inputMessage, element);
-                                Log.debug("exportSpecification: element " + element.name() + " is input message element for operation " + operationName);
+                                Log.debug("exportWSDLs: element " + element.name() + " is input message element for operation " + operationName);
                             }
                         }
                     }
@@ -1048,13 +1093,13 @@ public class NiemUmlModel {
                             outputMessage = outputType.name();
                     }
                 } catch (Exception e) {
-                    Log.trace("exportSpecification: error - no output message for " + operationName + " " + e.toString());
+                    Log.trace("exportWSDLs: error - no output message for " + operationName + " " + e.toString());
                 }
                 if (outputType != null && isNiemUml(outputType))
                     outputMessage = outputType.propertyValue(NIEM_STEREOTYPE_XPATH);
                 if (outputMessage == null || outputMessage.isEmpty())
                     continue;
-                Log.debug("exportSpecification: output Message: " + outputMessage + " from operation " + operationName);
+                Log.debug("exportWSDLs: output Message: " + outputMessage + " from operation " + operationName);
                 String outputPrefix = NamespaceModel.getPrefix(outputMessage);
                 if (outputPrefix != null) {
                     //if (NamespaceModel.isNiemPrefix(outputPrefix)) {
@@ -1064,7 +1109,7 @@ public class NiemUmlModel {
                     if (element != null) {
                         element.set_PropertyValue(MESSAGE_ELEMENT_PROPERTY, operationName);
                         //messages.put(outputMessage, element);
-                        Log.debug("exportSpecification: element " + element.name() + " is output message element for operation " + operationName);
+                        Log.debug("exportWSDLs: element " + element.name() + " is output message element for operation " + operationName);
                     }
                 }
             }
@@ -1079,11 +1124,11 @@ public class NiemUmlModel {
         // Verify JSON directory exists
         Path jsonPath = Paths.get(jsonFile);
         if (!Files.exists(jsonPath)) {
-            Log.debug("exportSpecification: JSON directory does not exist, creating " + jsonFile);
+            Log.debug("exportWSDLs: JSON directory does not exist, creating " + jsonFile);
             try {
                 Files.createDirectories(jsonPath);
             } catch (IOException e) {
-                Log.trace("exportSpecification: error creating JSON directory " + e.toString());
+                Log.trace("exportWSDLs: error creating JSON directory " + e.toString());
                 return;
             }
         }
@@ -1095,7 +1140,7 @@ public class NiemUmlModel {
 
         for (String definition : jsonDefinitions) {
             String definition2 = definition.replaceAll("(\"\\$ref\": \")(.*)#/(.*\")", "$1#/$3");
-            //Log.debug("exportSpecification: definition " + definition2);
+            //Log.debug("exportAPIs: definition " + definition2);
             if (definition2 != null)
                 jsonDefinitions2.add(definition2);
         }
@@ -1107,7 +1152,7 @@ public class NiemUmlModel {
 
                     xmlWriter.exportMpdCatalog(messages.keySet(), properties);
                 } catch (IOException e) {
-                    Log.trace("exportSpecification: error exporting MPD catalog " + e.toString());
+                    Log.trace("exportAPIs: error exporting MPD catalog " + e.toString());
                 }
             }
                 */
@@ -1115,9 +1160,9 @@ public class NiemUmlModel {
 				try {
                     String wsdlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator +
                              properties.getProperty(ProjectProperties.EXPORT_WSDL_DIR);     
-                    xmlWriter.exportWSDL(wsdlDir, ports, messageNamespaces, properties);
+                    xmlWriter.exportWSDL(wsdlDir, ports, messageNamespaces);
                 } catch (IOException e) {
-                    Log.trace("exportSpecification: error exporting WSDL " + e.toString());
+                    Log.trace("exportWSDLs: error exporting WSDL " + e.toString());
                 }
             }
         }
@@ -1129,28 +1174,29 @@ public class NiemUmlModel {
                         jsonWriter.exportOpenApi(properties, ports, messageNamespaces, jsonDefinitions2);
                     }
                 } catch (IOException e) {
-                    Log.trace("exportSpecification: error exporting OpenAPI files " + e.toString());
+                    Log.trace("exportOpenAPI: error exporting OpenAPI files " + e.toString());
                 }
             //}
         }
         //if (exportCmf.equals("true"))
         //    exportCmf();
-        Log.trace("exportSpecification: done generating NIEM message specification");
+        Log.stop("exportWSDLs");
     }
 
     public void exportCmf() {
 
+        Log.start("exportCmf");
         String cmfFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + properties.getProperty(ProjectProperties.EXPORT_CMF_FILE);
         String cmfVersion = properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION);
 
         // Verify directory exists
         Path cmfPath = Paths.get(cmfFile).getParent();
         if (!Files.exists(cmfPath)) {
-            Log.debug("exportSpecification: cmf directory does not exist, creating " + cmfFile);
+            Log.debug("exportCmf: cmf directory does not exist, creating " + cmfFile);
             try {
                 Files.createDirectories(cmfPath);
             } catch (IOException e) {
-                Log.trace("exportSpecification: error creating cmf directory " + e.toString());
+                Log.trace("exportCmf: error creating cmf directory " + e.toString());
                 return;
             }
         }
@@ -1160,9 +1206,9 @@ public class NiemUmlModel {
             CmfWriter cmfWriter = new CmfWriter(cmfPath.toString(), cmfVersion);
             cmfWriter.exportCmf(cmfFile);
         } catch (IOException e) {
-            Log.trace("exportSpecification: error exporting common model format files " + e.toString());
+            Log.trace("exportCmf: error exporting common model format files " + e.toString());
         }
-        Log.stop("exportSpecification");
+        Log.stop("exportCmf");
     }
 
     /**

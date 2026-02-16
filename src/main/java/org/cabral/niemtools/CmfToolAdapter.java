@@ -122,7 +122,7 @@ class CmfToolAdapter {
      *
      * @param model
      */
-    protected void publishXSDModel() {
+    protected void publishXsdModel() {
 
         //String exportCmfToXsdModel = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD_MODEL);
         ProjectProperties properties = model.properties;
@@ -175,7 +175,7 @@ class CmfToolAdapter {
      *
      * @param model
      */
-    protected void publishXSD() {
+    protected void publishXsd() {
 
         //String exportCmfToXsd = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
         ProjectProperties properties = model.properties;
@@ -259,7 +259,7 @@ class CmfToolAdapter {
      *
      * @param model The NiemUmlModel instance.
      */
-    protected void publishJSON() {
+    protected void publishJson() {
         //String exportCmfToJson = model.properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
         ProjectProperties properties = model.properties;
 

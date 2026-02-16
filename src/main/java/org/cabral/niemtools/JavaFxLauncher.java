@@ -39,8 +39,13 @@ public class JavaFxLauncher {
                 });
 
                 stage.show();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Log.trace("Error loading App.fxml: " + e.getMessage());
+                Throwable cause = e;
+                while (cause.getCause() != null) {
+                    cause = cause.getCause();
+                    Log.trace("  Caused by: " + cause.getClass().getName() + ": " + cause.getMessage());
+                }
             }
         });
     }

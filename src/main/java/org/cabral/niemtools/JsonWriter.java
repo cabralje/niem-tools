@@ -59,8 +59,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.xml.XMLConstants;
-
 import fr.bouml.UmlClass;
 import fr.bouml.UmlClassInstance;
 import fr.bouml.UmlItem;
@@ -1128,7 +1126,7 @@ public class JsonWriter {
             if (elementName.equals("@id") || elementName.equals("@ref")) {
 //				elementName = JSON_LD_ID_ELEMENT_TYPE;
                 elementName2 = JSON_LD_ID_ELEMENT;
-                UmlClass baseType = NiemUmlModel.getSubsetModel().getType(XMLConstants.W3C_XML_SCHEMA_NS_URI, JSON_LD_ID_ELEMENT_TYPE);
+                UmlClass baseType = NiemUmlModel.getSubsetModel().getType(NiemModel.XSD_URI, JSON_LD_ID_ELEMENT_TYPE);
                 elementRef = exportJsonPointer(openapiPath, baseType);
             } else {
                 elementName = NamespaceModel.filterAttributePrefix(elementName);

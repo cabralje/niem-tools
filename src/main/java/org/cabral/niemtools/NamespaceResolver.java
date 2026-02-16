@@ -160,13 +160,13 @@ public class NamespaceResolver implements NamespaceContext {
     @Override
     public String getNamespaceURI(String prefix) {
         if (prefix == null) //			return prefix2Uri.get(DEFAULT_NS);
-            return XMLConstants.W3C_XML_SCHEMA_NS_URI; 
+            return NiemModel.XSD_URI;
         else {
             return switch (prefix) {
                 case XMLConstants.DEFAULT_NS_PREFIX ->
-                    XMLConstants.W3C_XML_SCHEMA_NS_URI;
+                    NiemModel.XSD_URI;
                 case "xs", "xsd" ->
-                    XMLConstants.W3C_XML_SCHEMA_NS_URI;
+                    NiemModel.XSD_URI;
                 case "local" ->
                     "http://local";
                 default ->

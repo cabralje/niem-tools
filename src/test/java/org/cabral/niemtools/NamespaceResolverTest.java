@@ -40,9 +40,9 @@ public class NamespaceResolverTest {
         Mockito.when(root.getFirstChild()).thenReturn(child);
         Mockito.when(child.hasAttributes()).thenReturn(false);
         NamespaceResolver resolver = new NamespaceResolver(root, true);
-        assertEquals(XMLConstants.W3C_XML_SCHEMA_NS_URI, resolver.getNamespaceURI(null));
-        assertEquals(XMLConstants.W3C_XML_SCHEMA_NS_URI, resolver.getNamespaceURI("xs"));
-        assertEquals(XMLConstants.W3C_XML_SCHEMA_NS_URI, resolver.getNamespaceURI("xsd"));
+        assertEquals(NiemModel.XSD_URI, resolver.getNamespaceURI(null));
+        assertEquals(NiemModel.XSD_URI, resolver.getNamespaceURI("xs"));
+        assertEquals(NiemModel.XSD_URI, resolver.getNamespaceURI("xsd"));
         assertEquals("http://local", resolver.getNamespaceURI("local"));
     }
 

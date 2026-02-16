@@ -163,8 +163,8 @@ public class XmlWriterTest {
         tempFile.deleteOnExit();
         try (FileWriter fw = new FileWriter(tempFile)) {
             fw.write("<xs:schema");
-            XmlWriter.writeXmlNs(fw, "xs", XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            XmlWriter.writeXmlNs(fw, "nc", "http://example.com/nc");
+            XmlWriter.writeXmlNs(fw, NiemModel.XSD_PREFIX, NiemModel.XSD_URI);
+            XmlWriter.writeXmlNs(fw, NiemModel.NC_PREFIX, "http://example.com/nc");
             XmlWriter.writeXmlNs(fw, "", "http://default.ns");
             fw.write(">\n</xs:schema>");
         }

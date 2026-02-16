@@ -591,8 +591,7 @@ public class AppController {
     }
 
     @FXML
-    public void publishCMF(ActionEvent event) {
-
+    public void publishCmf(ActionEvent event) {
          Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception { 
@@ -615,8 +614,28 @@ public class AppController {
     }
 
     @FXML
-    public void publishHTML(ActionEvent event) {
+    public void publishCodelists(ActionEvent event) {
+         Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Publishing Codelists to " + model.properties.getProperty(ProjectProperties.EXPORT_CODELISTS_DIR) + " ...");
+                    model.exportCodelists();
+                    Log.trace("\nCodelists published.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing Codelists: " + e.getMessage());
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
+                return null;
+             }
+        };
+        new Thread(task).start(); 
+    }
 
+    @FXML
+    public void publishHtml(ActionEvent event) {
          Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception { 
@@ -637,15 +656,14 @@ public class AppController {
     }
 
     @FXML
-    public void publishJSON(ActionEvent event) {
-
+    public void publishJson(ActionEvent event) {
          Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception { 
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Publishing JSON schema to " + model.properties.getProperty(ProjectProperties.EXPORT_JSON_DIR) + " ...");
-                    cmftool.publishJSON();
+                    cmftool.publishJson();
                     Log.trace("\nJSON schema published.\n");
                 } catch (Exception e) {
                     Log.trace("Error publishing JSON: " + e.getMessage());
@@ -659,17 +677,17 @@ public class AppController {
     }
 
     @FXML
-    void publishSpecification(ActionEvent event) {
-        Task<Void> task = new Task<Void>() {
+    public void publishMpdCatalog(ActionEvent event) {
+         Task<Void> task = new Task<Void>() {
             @Override
             protected Void call() throws Exception { 
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
-                    Log.trace("Publishing WSDL/OpenAPI specifications to " + model.properties.getProperty(ProjectProperties.EXPORT_HTML_DIR) + " ...");
-                    model.exportSpecification();
-                    Log.trace("\nWSDL/OpenAPI specifications published.\n");
+                    Log.trace("Publishing MPD catalog to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " ...");
+                    model.exportMpdCatalog();
+                    Log.trace("\nMPD catalog published.\n");
                 } catch (Exception e) {
-                    Log.trace("Error publishing WSDL/OpenAPI specifications: " + e.getMessage());
+                    Log.trace("Error publishing MPD catalog: " + e.getMessage());
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
@@ -677,11 +695,73 @@ public class AppController {
              }
         };
         new Thread(task).start(); 
-
     }
 
     @FXML
-    public void publishXSD(ActionEvent event) {
+    public void publishXmlCatalog(ActionEvent event) {
+         Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Publishing XML catalog to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " ...");
+                    model.exportXmlCatalog();
+                    Log.trace("\nXML catalog published.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing XML catalog: " + e.getMessage());
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
+                return null;
+             }
+        };
+        new Thread(task).start(); 
+    }
+
+    @FXML
+    void publishWsdl(ActionEvent event) {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Publishing WSDL documents to " + model.properties.getProperty(ProjectProperties.EXPORT_WSDL_DIR) + " ...");
+                    model.exportWsdls();
+                    Log.trace("\nWSDL documents published.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing WSDL documents: " + e.getMessage());
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
+                return null;
+             }
+        };
+        new Thread(task).start(); 
+    }
+
+    @FXML
+    void publishOpenApi(ActionEvent event) {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception { 
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Publishing OpenAPI documents to " + model.properties.getProperty(ProjectProperties.EXPORT_OPENAPI_DIR) + " ...");
+                    model.exportOpenApis();
+                    Log.trace("\nOpenAPI documents published.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing OpenAPI documents: " + e.getMessage());
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
+                return null;
+             }
+        };
+        new Thread(task).start(); 
+    }
+
+    @FXML
+    public void publishXsd(ActionEvent event) {
 
          Task<Void> task = new Task<Void>() {
             @Override
@@ -689,7 +769,7 @@ public class AppController {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Publishing XSD schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_DIR) + " ...");
-                    cmftool.publishXSD();
+                    cmftool.publishXsd();
                     Log.trace("\nXSD schemas published.\n");
                 } catch (Exception e) {
                     Log.trace("Error publishing XSD: " + e.getMessage());
@@ -703,7 +783,7 @@ public class AppController {
     }
 
     @FXML
-    public void publishXSDModel(ActionEvent event) {
+    public void publishXsdModel(ActionEvent event) {
 
          Task<Void> task = new Task<Void>() {
             @Override
@@ -711,7 +791,7 @@ public class AppController {
                 Platform.runLater(() -> mainControls.setDisable(true));
                 try {
                     Log.trace("Publishing XSD Model schemas to " + model.properties.getProperty(ProjectProperties.EXPORT_XSD_MODEL_DIR) + " ...");
-                    cmftool.publishXSDModel();
+                    cmftool.publishXsdModel();
                     Log.trace("\nXSD Model schemas published.\n");
                 } catch (Exception e) {
                     Log.trace("Error publishing XSD Model: " + e.getMessage());
