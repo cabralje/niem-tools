@@ -100,7 +100,12 @@ public class ProjectProperties extends Properties {
     static final String EXPORT_ATTRIBUTION = "ExportAttribution";
     static final String EXPORT_CT_URI = "ExportConformanceTargetURI";
     static final String EXPORT_DATE = "ExportDate";
-    static final String EXPORT_SORT_EXTENSION = "ExportSortExtension";     
+    static final String EXPORT_SORT_EXTENSION = "ExportSortExtension";
+    static final String EXPORT_XML_CATALOG = "ExportXmlCatalog";
+    static final String EXPORT_XML_CATALOG_FILE="ExportXmlCatalogFile";
+    static final String EXPORT_MPD_CATALOG = "ExportMpdCatalog";
+    static final String EXPORT_MPD_CATALOG_FILE="ExportMpdCatalogFile";
+
 
     // message specification properties
     static final String IEPD_NAME = "IEPDName";
@@ -114,7 +119,7 @@ public class ProjectProperties extends Properties {
     static final String IEPD_CHANGE_LOG_FILE = "IEPDChangeLogFile";
     static final String IEPD_READ_ME_FILE = "IEPDReadMeFile";
     static final String IEPD_CONFORMANCE_ASSERTION_FILE = "IEPDConformanceFile";
-    static final String IEPD_CATALOG_FILE = "IEPDCatalogFile";  
+    //static final String IEPD_CATALOG_FILE = "IEPDCatalogFile";  
 
     // import paths
     static final String IMPORT_REFERENCE_MODEL_DIR = "ImportReferenceModelDir";
@@ -198,6 +203,10 @@ public class ProjectProperties extends Properties {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         defaults.setProperty(EXPORT_DATE, dateFormat.format(new Date())); // default to today
         defaults.setProperty(EXPORT_SORT_EXTENSION, "true");
+        defaults.setProperty(EXPORT_XML_CATALOG, "true");
+        defaults.setProperty(EXPORT_XML_CATALOG_FILE, "xml-catalog.xml");
+        defaults.setProperty(EXPORT_MPD_CATALOG, "true");
+        defaults.setProperty(EXPORT_MPD_CATALOG_FILE, "mpd-catalog.xml");
 
         // message specification defaults
         defaults.setProperty(IEPD_NAME, "NIEM Message Specification");
@@ -211,7 +220,7 @@ public class ProjectProperties extends Properties {
         defaults.setProperty(IEPD_CHANGE_LOG_FILE, "changelog.txt");
         defaults.setProperty(IEPD_READ_ME_FILE, "readme.txt");
         defaults.setProperty(IEPD_CONFORMANCE_ASSERTION_FILE, "conformance-assertion.pdf");
-        defaults.setProperty(IEPD_CATALOG_FILE, "mpd-catalog.xml");
+        //defaults.setProperty(IEPD_CATALOG_FILE, "mpd-catalog.xml");
 
         // import paths
         defaults.setProperty(IMPORT_REFERENCE_MODEL_DIR,"");

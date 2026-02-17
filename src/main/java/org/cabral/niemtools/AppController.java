@@ -18,6 +18,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -42,6 +43,13 @@ public class AppController {
     private NiemUmlModel model;
     private CmfToolAdapter cmftool;
 
+    
+    @FXML
+    private Button CmfButton;
+
+    @FXML
+    private Button CodelistsButton;
+
     @FXML
     private ListView<String> DomainListView;
 
@@ -53,6 +61,9 @@ public class AppController {
 
     @FXML
     private TableView<String[]> ExternalNamespaceTable;
+
+    @FXML
+    private Button HtmlButton;
 
     @FXML
     private TextField IEPDChangeLogFile;
@@ -83,24 +94,15 @@ public class AppController {
 
     @FXML
     private CheckBox ImportCodeDescriptions;
-    /*
-    @FXML
-    private TextField ImportExcludeDomains;
-
-     @FXML
-    private TextField ImportExcludeCodes;
-
-    @FXML
-    private TextField ImportIncludeCodes;
-
-    @FXML
-    private TextField ImportIncludeDomains; */
 
     @FXML
     private TextField ImportMaxFacets;
 
     @FXML
     private ComboBox<String> ImportNIEMVersion;
+
+    @FXML
+    private Button JsonButton;
 
     @FXML
     private TableColumn<String[], String> LocalPathColumn;
@@ -112,6 +114,9 @@ public class AppController {
     private Label MessageStatus;
 
     @FXML
+    private Button MpdCatalogButton;
+
+    @FXML
     private TitledPane NIEMPane;
 
     @FXML
@@ -119,6 +124,9 @@ public class AppController {
 
     @FXML
     private TableColumn<String[], String> NamespaceColumn;
+
+    @FXML
+    private Button OpenApiButton;
 
     @FXML
     private TableColumn<String[], String> PrefixColumn;
@@ -131,6 +139,18 @@ public class AppController {
 
     @FXML
     private TableColumn<String[], String> URLColumn;
+
+    @FXML
+    private Button WsdlButton;
+
+    @FXML
+    private Button XmlCatalogButton;
+
+    @FXML
+    private Button XsdButton;
+
+    @FXML
+    private Button XsdModelButton;
 
     @FXML
     private VBox mainControls;
@@ -186,7 +206,6 @@ public class AppController {
         cmftool = new CmfToolAdapter(model);
 
         // cache UML model
-        //("Memorize references ...");
         if (umlPackage != null) {
             umlPackage.memo_ref();
         } else if (project != null) {
@@ -215,10 +234,6 @@ public class AppController {
         IEPDStatus.setText(properties.getProperty(ProjectProperties.IEPD_STATUS));
         IEPDVersion.setText(properties.getProperty(ProjectProperties.IEPD_VERSION));
         ExportURI.setText(properties.getProperty(ProjectProperties.EXPORT_URI));
-        //ImportExcludeDomains.setText(properties.getProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS));
-        //ImportIncludeDomains.setText(properties.getProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS));
-        //ImportExcludeCodes.setText(properties.getProperty(ProjectProperties.IMPORT_EXCLUDE_CODES));
-        //ImportIncludeCodes.setText(properties.getProperty(ProjectProperties.IMPORT_INCLUDE_CODES));
         ImportMaxFacets.setText(properties.getProperty(ProjectProperties.IMPORT_MAX_FACETS));
         ImportCodeDescriptions.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.IMPORT_CODE_DESCRIPTIONS)));
 
@@ -279,28 +294,7 @@ public class AppController {
                 properties.setProperty(ProjectProperties.EXPORT_URI, ExportURI.getText());
             }
         });
-        /*         ImportExcludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) {
-                properties.setProperty(ProjectProperties.IMPORT_EXCLUDE_DOMAINS, ImportExcludeDomains.getText());
-            }
-        }); */
- /*         ImportIncludeDomains.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) {
-                properties.setProperty(ProjectProperties.IMPORT_INCLUDE_DOMAINS, ImportIncludeDomains.getText());
-            }
-        }); */
- /*
-        ImportExcludeCodes.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) {
-                properties.setProperty(ProjectProperties.IMPORT_EXCLUDE_CODES, ImportExcludeCodes.getText());
-            }
-        });
-        ImportIncludeCodes.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) {
-                properties.setProperty(ProjectProperties.IMPORT_INCLUDE_CODES, ImportIncludeCodes.getText());
-            }
-        });
-         */
+
         ImportMaxFacets.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 properties.setProperty(ProjectProperties.IMPORT_MAX_FACETS, ImportMaxFacets.getText());
@@ -377,6 +371,9 @@ public class AppController {
         ProjectStatus.setText(properties.getProperty(ProjectProperties.IEPD_NAME));
         NIEMStatus.setText("NIEM " + properties.getProperty(ProjectProperties.IMPORT_NIEM_VERSION));
         MessageStatus.setText("");
+
+        // Update button visibility based on preferences
+        updateButtonVisbility();
     }
 
     public void updateDomainSelection() {
@@ -563,6 +560,10 @@ public class AppController {
 
             // Show the dialog
             stage.showAndWait();
+
+            // Update button visibility based on preferences
+            updateButtonVisbility();
+
         } catch (IOException e) {
             Log.trace("Failed to load Preferences dialog: " + e.getMessage());
         }
@@ -1015,5 +1016,23 @@ public class AppController {
         }
 
         return versions;
+    }
+
+    /** updateButtonVisibility - show buttons for enabled generations
+     * 
+     */
+    private void updateButtonVisbility() {
+
+        CmfButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_CMF).equals("true"));
+        CodelistsButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_CODELISTS).equals("true"));
+        HtmlButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_HTML).equals("true"));
+        JsonButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_JSON).equals("true"));
+        MpdCatalogButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_MPD_CATALOG).equals("true"));
+        OpenApiButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_OPENAPI).equals("true"));
+        WsdlButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_WSDL).equals("true"));
+        XmlCatalogButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_XML_CATALOG).equals("true"));
+        XsdButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_XSD).equals("true"));
+        XsdModelButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_XSD_MODEL).equals("true"));
+
     }
 }

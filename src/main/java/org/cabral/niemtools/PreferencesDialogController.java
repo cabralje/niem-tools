@@ -46,6 +46,12 @@ public class PreferencesDialogController {
     private TextField ExportJSONDir;
 
     @FXML
+    private CheckBox ExportMpdCatalog;
+
+    @FXML
+    private TextField ExportMpdCatalogFile;
+
+    @FXML
     private CheckBox ExportOpenAPI;
 
     @FXML
@@ -62,6 +68,12 @@ public class PreferencesDialogController {
 
     @FXML
     private TextField ExportWantlistFile;
+
+    @FXML
+    private CheckBox ExportXmlCatalog;
+
+    @FXML
+    private TextField ExportXmlCatalogFile;
 
     @FXML
     private CheckBox ExportXSD;
@@ -154,6 +166,24 @@ public class PreferencesDialogController {
             }
         });
 
+        ExportXmlCatalog.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.EXPORT_XML_CATALOG)));
+        ExportXmlCatalogFile.setText(properties.getProperty(ProjectProperties.EXPORT_XML_CATALOG_FILE));
+        ExportXmlCatalogFile.setDisable(!ExportXmlCatalog.isSelected());
+        ExportXmlCatalogFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportXmlCatalogFile, null));
+            }
+        });
+        
+        ExportMpdCatalog.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.EXPORT_MPD_CATALOG)));
+        ExportMpdCatalogFile.setText(properties.getProperty(ProjectProperties.EXPORT_MPD_CATALOG_FILE));
+        ExportMpdCatalogFile.setDisable(!ExportMpdCatalog.isSelected());
+        ExportMpdCatalogFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportMpdCatalogFile, null));
+            }
+        });
+
         ExportWantlist.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.EXPORT_WANTLIST)));
         ExportWantlistFile.setText(properties.getProperty(ProjectProperties.EXPORT_WANTLIST_FILE));
         ExportWantlistFile.setDisable(!ExportWantlist.isSelected());
@@ -205,6 +235,20 @@ public class PreferencesDialogController {
         LogDebug.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.LOG_DEBUG)));
         LogProfile.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.LOG_PROFILE)));
 
+    }
+
+    public void setStage(Stage stage) {
+        if (stage == null) {
+            throw new IllegalArgumentException("Stage cannot be null");
+        }
+        this.stage = stage;
+    }
+
+    @FXML
+    public void closeDialog() {
+        if (stage != null) {
+            stage.close();
+        }
     }
 
     @FXML
@@ -297,6 +341,14 @@ public class PreferencesDialogController {
                 ExportOpenAPIDir.setDisable(!source.isSelected());
                 properties.setProperty(ProjectProperties.EXPORT_OPENAPI, Boolean.toString(source.isSelected()));
             }
+            case "ExportXmlCatalog" -> {
+                ExportXmlCatalogFile.setDisable(!source.isSelected());
+                properties.setProperty(ProjectProperties.EXPORT_XML_CATALOG, Boolean.toString(source.isSelected()));
+            }
+            case "ExportMpdCatalog" -> {
+                ExportMpdCatalogFile.setDisable(!source.isSelected());
+                properties.setProperty(ProjectProperties.EXPORT_MPD_CATALOG, Boolean.toString(source.isSelected()));
+            }
             case "ExportWantlist" -> {
                 ExportWantlistFile.setDisable(!source.isSelected());
                 properties.setProperty(ProjectProperties.EXPORT_WANTLIST, Boolean.toString(source.isSelected()));
@@ -308,7 +360,6 @@ public class PreferencesDialogController {
             case "LogDebug" -> {
                 properties.setProperty(ProjectProperties.LOG_DEBUG, Boolean.toString(source.isSelected()));
                 Log.setDebug(source.isSelected());
-
             }
             case "LogProfile" -> {
                 properties.setProperty(ProjectProperties.LOG_PROFILE, Boolean.toString(source.isSelected()));
@@ -316,20 +367,6 @@ public class PreferencesDialogController {
             }
             default -> {
             }
-        }
-    }
-
-    public void setStage(Stage stage) {
-        if (stage == null) {
-            throw new IllegalArgumentException("Stage cannot be null");
-        }
-        this.stage = stage;
-    }
-
-    @FXML
-    public void closeDialog() {
-        if (stage != null) {
-            stage.close();
         }
     }
 

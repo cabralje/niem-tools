@@ -97,7 +97,7 @@ public class XmlWriter {
     static final String XML_FILE_TYPE = ".xml";
     static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"US-ASCII\"?>\n";
     static final String XSD_FILE_TYPE = ".xsd";
-    private static final String XML_CATALOG_FILE = "xml-catalog.xml";
+    //private static final String XML_CATALOG_FILE = "xml-catalog.xml";
     private static final String XML_CATALOG_HEADER = "<!DOCTYPE catalog PUBLIC \"-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN\" \"http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd\">\n";
 
     // Genericode defaults
@@ -297,7 +297,7 @@ public class XmlWriter {
         Date date = new Date();
         String today = dateFormat.format(date);
         Log.trace("Generating MPD catalog");
-        File file = Paths.get(directory, NiemUmlModel.getProperty(ProjectProperties.IEPD_CATALOG_FILE)).toFile();
+        File file = Paths.get(directory, NiemUmlModel.getProperty(ProjectProperties.EXPORT_MPD_CATALOG_FILE)).toFile();
         File parentFile = file.getParentFile();
         if (parentFile != null) {
             parentFile.mkdirs();
@@ -333,7 +333,7 @@ public class XmlWriter {
                     + "</nc:OrganizationPrimaryContactInformation>" + "</nc:EntityOrganization>"
                     + "</c:AuthoritativeSource>" + "<c:CreationDate>" + today + "</c:CreationDate>" + "<c:StatusText>"
                     + NiemUmlModel.getProperty(ProjectProperties.IEPD_STATUS) + "</c:StatusText>" + "</c:MPDInformation>");
-            Path p2 = Paths.get(directory, NiemUmlModel.getProperty(ProjectProperties.IEPD_CATALOG_FILE)).getParent();
+            Path p2 = Paths.get(directory, NiemUmlModel.getProperty(ProjectProperties.EXPORT_MPD_CATALOG_FILE)).getParent();
             if (messages != null) {
                 for (String message : messages) {
                     UmlClassInstance element;
@@ -349,7 +349,7 @@ public class XmlWriter {
                         xml.write("<nc:DescriptionText>" + element.description() + "</nc:DescriptionText>");
                     }
                     xml.write("<c:HasDocumentElement c:qualifiedNameList=\"" + message + "\"/>" + "<c:XMLSchemaValid>"
-                            + "<c:XMLCatalog c:pathURI=\"" + XML_CATALOG_FILE + "\"/>" + "</c:XMLSchemaValid>");
+                            + "<c:XMLCatalog c:pathURI=\"" + NiemUmlModel.getProperty(ProjectProperties.EXPORT_XML_CATALOG_FILE) + "\"/>" + "</c:XMLSchemaValid>");
                     String xmlExampleDir = NiemUmlModel.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + NiemUmlModel.getProperty(ProjectProperties.EXPORT_XML_DIR);
                     if (xmlExampleDir != null) {
                         Path p3;
@@ -673,7 +673,7 @@ public class XmlWriter {
     void exportXmlCatalog() throws IOException {
         FileWriter xml;
         Log.trace("Generating XML catalog");
-        File file = Paths.get(directory, XML_CATALOG_FILE).toFile();
+        File file = Paths.get(directory, NiemUmlModel.getProperty(ProjectProperties.EXPORT_XML_CATALOG_FILE)).toFile();
         File parentFile = file.getParentFile();
         if (parentFile != null) {
             parentFile.mkdirs();

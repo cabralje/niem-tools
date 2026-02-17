@@ -944,10 +944,10 @@ public class NiemUmlModel {
     public void exportXmlCatalog() {
 
         String projectDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
-        String exportXsd = properties.getProperty(ProjectProperties.EXPORT_XSD);
+        String exportXmlCatalog = properties.getProperty(ProjectProperties.EXPORT_XML_CATALOG);
 
         try {
-            if (exportXsd.equals("true")) {
+            if (exportXmlCatalog.equals("true")) {
                 // export catalog file
                 XmlWriter xmlWriter = new XmlWriter(projectDir);
                 xmlWriter.exportXmlCatalog();
