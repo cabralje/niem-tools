@@ -57,7 +57,7 @@
                         <TextField fx:id="ExportOpenAPIDir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                         <TextField fx:id="ExportWSDLDir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                         <TextField fx:id="ExportWantlistFile" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-                        <TextField fx:id="ExportJSONDir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <TextField fx:id="ExportJSONSchemaFile" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                         <TextField fx:id="ExportXSDDir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                         <TextField fx:id="ExportXSDModelDir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                         <Button mnemonicParsing="false" onAction="#selectDocumentationDirectory" text="Browse..." GridPane.columnIndex="2" GridPane.rowIndex="11" />

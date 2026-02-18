@@ -17,7 +17,7 @@ import fr.bouml.UmlItem;
 public class CmfWriterTest {
     @Test
     public void testIsOlderCmfVersionTrue() {
-        CmfWriter writer = new CmfWriter("dir", "0.7");
+        CmfWriter writer = new CmfWriter("0.7");
         assertTrue(writer.getClass().getDeclaredMethods().length > 0); // Sanity check
         // Reflection to access private method
         try {
@@ -33,7 +33,7 @@ public class CmfWriterTest {
 
     @Test
     public void testExportCmfModelNotNull() {
-        CmfWriter writer = new CmfWriter("dir", "0.8");
+        CmfWriter writer = new CmfWriter("0.8");
         // Should not throw and should return a LinkedHashSet
         try {
             var m = CmfWriter.class.getDeclaredMethod("exportCmfModel");
@@ -73,7 +73,7 @@ public class CmfWriterTest {
 */
     @Test
     public void testExportCmfClassHandlesNullBaseType() {
-        CmfWriter writer = new CmfWriter("dir", "0.8");
+        CmfWriter writer = new CmfWriter("0.8");
         try {
             var m = CmfWriter.class.getDeclaredMethod("exportCmfClass", UmlClass.class);
             m.setAccessible(true);
@@ -99,7 +99,7 @@ public class CmfWriterTest {
 
     @Test
     public void testTagMethodProducesCorrectXml() throws Exception {
-        CmfWriter writer = new CmfWriter("dir", "1.0");
+        CmfWriter writer = new CmfWriter("1.0");
         var tagMethod = CmfWriter.class.getDeclaredMethod("tag", String.class, String.class);
         tagMethod.setAccessible(true);
         String result = (String) tagMethod.invoke(writer, "TestTag", "TestContent");
@@ -108,7 +108,7 @@ public class CmfWriterTest {
 
     @Test
     public void testTagIdProducesCorrectXml() throws Exception {
-        CmfWriter writer = new CmfWriter("dir", "1.0");
+        CmfWriter writer = new CmfWriter("1.0");
         var tagIdMethod = CmfWriter.class.getDeclaredMethod("tagId", String.class, String.class, String.class);
         tagIdMethod.setAccessible(true);
         String result = (String) tagIdMethod.invoke(writer, "TestTag", "id:val", "Content");
@@ -118,7 +118,7 @@ public class CmfWriterTest {
 
     @Test
     public void testTagRefProducesCorrectXml() throws Exception {
-        CmfWriter writer = new CmfWriter("dir", "1.0");
+        CmfWriter writer = new CmfWriter("1.0");
         var tagRefMethod = CmfWriter.class.getDeclaredMethod("tagRef", String.class, String.class);
         tagRefMethod.setAccessible(true);
         String result = (String) tagRefMethod.invoke(writer, "TestTag", "ref:val");
@@ -128,7 +128,7 @@ public class CmfWriterTest {
 
     @Test
     public void testExportCmfMultiplicityNullOrEmpty() throws Exception {
-        CmfWriter writer = new CmfWriter("dir", "1.0");
+        CmfWriter writer = new CmfWriter("1.0");
         var method = CmfWriter.class.getDeclaredMethod("exportCmfMultiplicity", String.class);
         method.setAccessible(true);
         assertEquals("", method.invoke(writer, (String) null));
@@ -171,7 +171,7 @@ public class CmfWriterTest {
 
     @Test
     public void testExportCmfNamespaceHandlesNull() throws Exception {
-        CmfWriter writer = new CmfWriter("dir", "1.0");
+        CmfWriter writer = new CmfWriter("1.0");
         var method = CmfWriter.class.getDeclaredMethod("exportCmfNamespace", fr.bouml.UmlClassView.class);
         method.setAccessible(true);
         Object result = method.invoke(writer, (Object) null);

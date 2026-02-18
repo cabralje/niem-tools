@@ -36,7 +36,7 @@
  * <p>
  * Usage:
  * <pre>
- *     JsonWriter writer = new JsonWriter(outputDirectory);
+ *     JsonWriter writer = new JsonWriter();
  *     writer.exportJsonSchema(...);
  *     writer.exportOpenApi(...);
  * </pre>
@@ -87,14 +87,11 @@ public class JsonWriter {
     private static final String OPENAPI_FILE_TYPE = ".openapi.json";
     private static final String OPENAPI_VERSION = "3.1.0";
 
-    private final String directory;
-
     /**
-     * @param initialDirectory
+     * Creates a new JsonWriter.
      */
-    public JsonWriter(String initialDirectory) {
+    public JsonWriter() {
         super();
-        directory = initialDirectory;
     }
 
 
@@ -223,7 +220,8 @@ public class JsonWriter {
         if (sourcePath.compareTo(targetPath) != 0) {
             path = sourcePath.getParent().relativize(targetPath).toString().replaceAll("\\\\", "/");
             if (!path.startsWith("/") && (!path.startsWith(".")))
-                path = "./" + path + "#/definitions" + "/" + prefixedName;
+                path = "./" + path;
+            path += "#/definitions" + "/" + prefixedName;
             return path;
         }
         path += "#/" + "components/schemas" + "/" + prefixedName;
@@ -672,7 +670,7 @@ public class JsonWriter {
      * @param jsonDefinitions
      * @throws IOException
      */
-    void exportOpenApi(ProjectProperties properties, Map<String, UmlClass> ports, Set<String> messageNamespaces, TreeSet<String> jsonDefinitions) throws IOException {
+    void exportOpenApi(Map<String, UmlClass> ports, Set<String> messageNamespaces, TreeSet<String> jsonDefinitions) throws IOException {
 
         // export JSON-LD namespace definitions
         //TreeSet<String> jsonNamespaces = new TreeSet<>();
@@ -683,8 +681,8 @@ public class JsonWriter {
         //jsonNamespaces.add("\n" + getJsonPair(XmlWriter.CT_PREFIX, XmlWriter.CT_URI + "#"));
         //jsonNamespaces.add("\n" + getJsonPair(XmlWriter.TERM_PREFIX, XmlWriter.TERM_URI + "#"));
         // generate OpenAPI definitions
-        String openapiDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + 
-                            properties.getProperty(ProjectProperties.EXPORT_OPENAPI_DIR);
+        String openapiDir = NiemUmlModel.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + 
+                            NiemUmlModel.getProperty(ProjectProperties.EXPORT_OPENAPI_DIR);
         Log.trace("Generating OpenAPIs");
         if (ports != null && ports.values() != null)
           for (UmlClass port : ports.values()) {
@@ -701,7 +699,7 @@ public class JsonWriter {
 
             // get directory path
             Path openapiPath = Paths.get(openapiDir, portName + OPENAPI_FILE_TYPE);
-            Log.debug("exoirtOpenAPI: path " + openapiPath.toString());
+            Log.debug("exportOpenAPI: path " + openapiPath.toString());
 
             if (port.children() != null)
               for (UmlItem item : port.children()) {
@@ -1089,13 +1087,13 @@ public class JsonWriter {
                                 OPENAPI_VERSION,
                                 portName,
                                 port.description(),
-                                properties.getProperty(ProjectProperties.IEPD_TERMS_URL),
-                                properties.getProperty(ProjectProperties.IEPD_ORGANIZATION),
-                                properties.getProperty(ProjectProperties.IEPD_EMAIL),
-                                properties.getProperty(ProjectProperties.IEPD_CONTACT),
-                                properties.getProperty(ProjectProperties.IEPD_LICENSE_URL),
-                                properties.getProperty(ProjectProperties.IEPD_LICENSE_URL),
-                                properties.getProperty(ProjectProperties.IEPD_VERSION),
+                                NiemUmlModel.getProperty(ProjectProperties.IEPD_TERMS_URL),
+                                NiemUmlModel.getProperty(ProjectProperties.IEPD_ORGANIZATION),
+                                NiemUmlModel.getProperty(ProjectProperties.IEPD_EMAIL),
+                                NiemUmlModel.getProperty(ProjectProperties.IEPD_CONTACT),
+                                NiemUmlModel.getProperty(ProjectProperties.IEPD_LICENSE_URL),
+                                NiemUmlModel.getProperty(ProjectProperties.IEPD_LICENSE_URL),
+                                NiemUmlModel.getProperty(ProjectProperties.IEPD_VERSION),
                                 String.join(",", openapiPaths),
                                 String.join(",\n", jsonDefinitions)
                             ));
@@ -1180,18 +1178,8 @@ public class JsonWriter {
      * @return JSON filename as a Path
      */
      Path getJsonPath(UmlItem item) {
-        return Paths.get(directory, (NiemUmlModel.isNiem(item)) ? NiemUmlModel.NIEM_DIR + "/" : "", NamespaceModel.getPrefix(item) + JsonWriter.JSON_SCHEMA_FILE_TYPE);
+        return Paths.get(NiemUmlModel.getProperty(ProjectProperties.EXPORT_PROJECT_DIR), NiemUmlModel.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE) + JSON_SCHEMA_FILE_TYPE);
     } 
-
-    /**
-     * @param prefix
-     * @return JSON filename as a Path
-     */
-/*     Path getJsonPath(String prefix) {
-        String schemaURI = NamespaceModel.getSchemaURIForPrefix(prefix);
-        boolean isNiem = NamespaceModel.getNamespace(schemaURI).getReferenceClassView() != null;
-        return Paths.get(directory, (isNiem) ? NiemUmlModel.NIEM_DIR + "/" : "", prefix + JsonWriter.JSON_SCHEMA_FILE_TYPE);
-    } */
 
      static String getJsonFilename(String filename) {
         return filename + JsonWriter.JSON_SCHEMA_FILE_TYPE;

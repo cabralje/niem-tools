@@ -43,7 +43,7 @@ public class PreferencesDialogController {
     private CheckBox ExportJSON;
 
     @FXML
-    private TextField ExportJSONDir;
+    private TextField ExportJSONSchemaFile;
 
     @FXML
     private CheckBox ExportMpdCatalog;
@@ -149,11 +149,11 @@ public class PreferencesDialogController {
         });
 
         ExportJSON.setSelected(Boolean.parseBoolean(properties.getProperty(ProjectProperties.EXPORT_JSON)));
-        ExportJSONDir.setText(properties.getProperty(ProjectProperties.EXPORT_JSON_DIR));
-        ExportJSONDir.setDisable(!ExportJSON.isSelected());
-        ExportJSONDir.focusedProperty().addListener((obs, oldVal, newVal) -> {
+        ExportJSONSchemaFile.setText(properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE));
+        ExportJSONSchemaFile.setDisable(!ExportJSON.isSelected());
+        ExportJSONSchemaFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
-                setProjectProperty(new ActionEvent(ExportJSONDir, null));
+                setProjectProperty(new ActionEvent(ExportJSONSchemaFile, null));
             }
         });
 
@@ -334,7 +334,7 @@ public class PreferencesDialogController {
                 properties.setProperty(ProjectProperties.EXPORT_XSD, Boolean.toString(source.isSelected()));
             }
             case "ExportJSON" -> {
-                ExportJSONDir.setDisable(!source.isSelected());
+                ExportJSONSchemaFile.setDisable(!source.isSelected());
                 properties.setProperty(ProjectProperties.EXPORT_JSON, Boolean.toString(source.isSelected()));
             }
             case "ExportOpenAPI" -> {

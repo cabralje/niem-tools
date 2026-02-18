@@ -53,13 +53,13 @@ public class XmlWriterTest {
 
     @Test
     public void testConstructor() {
-        XmlWriter writer = new XmlWriter("/tmp/test");
+        XmlWriter writer = new XmlWriter();
         assertNotNull(writer);
     }
 
     @Test
     public void testConstructorWithNull() {
-        XmlWriter writer = new XmlWriter(null);
+        XmlWriter writer = new XmlWriter();
         assertNotNull(writer);
     }
 
@@ -102,7 +102,7 @@ public class XmlWriterTest {
     @Test
     @SuppressWarnings("UseSpecificCatch")
     public void testXmlAttributeViaReflection() {
-        XmlWriter writer = new XmlWriter("/tmp");
+        XmlWriter writer = new XmlWriter();
         try {
             Method m = XmlWriter.class.getDeclaredMethod("xmlAttribute", String.class, String.class);
             m.setAccessible(true);
@@ -116,7 +116,7 @@ public class XmlWriterTest {
     @Test
     @SuppressWarnings("UseSpecificCatch")
     public void testXmlAttributeEmptyValue() {
-        XmlWriter writer = new XmlWriter("/tmp");
+        XmlWriter writer = new XmlWriter();
         try {
             Method m = XmlWriter.class.getDeclaredMethod("xmlAttribute", String.class, String.class);
             m.setAccessible(true);
@@ -134,7 +134,7 @@ public class XmlWriterTest {
     public void testWriteXmlAttributeToFile() throws IOException {
         File tempFile = File.createTempFile("xmlAttrTest", ".xml");
         tempFile.deleteOnExit();
-        XmlWriter writer = new XmlWriter("/tmp");
+        XmlWriter writer = new XmlWriter();
         try {
             Method m = XmlWriter.class.getDeclaredMethod("writeXmlAttribute", FileWriter.class, String.class, String.class);
             m.setAccessible(true);

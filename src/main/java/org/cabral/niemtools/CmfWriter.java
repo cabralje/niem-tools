@@ -57,6 +57,7 @@ package org.cabral.niemtools;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -97,10 +98,9 @@ public class CmfWriter {
     private String facetName = "Facet";
 
     /**
-     * @param initialDirectory
      * @param version
      */
-    public CmfWriter(String initialDirectory, String version) {
+    public CmfWriter(String version) {
         super();
         if (version != null) {
             cmfVersion = version;
@@ -230,11 +230,24 @@ public class CmfWriter {
      * @param cmfDir
      * @param messages
      */
-    public void exportCmf(String cmfFile) throws IOException {
+    public void exportCmf() throws IOException {
 
         Log.start("exportCmf");
+        String cmfFile = NiemUmlModel.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + NiemUmlModel.getProperty(ProjectProperties.EXPORT_CMF_FILE);
         String path1 = getCmfFilename(cmfFile, cmfVersion);                
         Log.trace("Generating CMF model version " + cmfVersion + " in " + path1);
+
+        // Verify directory exists
+        Path cmfPath = Paths.get(cmfFile).getParent();
+        if (!Files.exists(cmfPath)) {
+            Log.debug("exportCmf: cmf directory does not exist, creating " + cmfFile);
+            try {
+                Files.createDirectories(cmfPath);
+            } catch (IOException e) {
+                Log.trace("exportCmf: error creating cmf directory " + e.toString());
+                return;
+            }
+        }
 
         String cmfUri = CMF_URI + cmfVersion + "/";
         if (isOlderCmfVersion(cmfVersion, "1.0")) {

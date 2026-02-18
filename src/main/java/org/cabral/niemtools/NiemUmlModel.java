@@ -1071,8 +1071,7 @@ public class NiemUmlModel {
         Log.start("exportCodelists");
         String exportXsd = properties.getProperty(ProjectProperties.EXPORT_XSD);
         if (exportXsd.equals("true")) {
-            String gcDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + properties.getProperty(ProjectProperties.EXPORT_CODELISTS_DIR);
-            XmlWriter gcWriter = new XmlWriter(gcDir);
+            XmlWriter gcWriter = new XmlWriter();
             gcWriter.exportCodeLists(ExtensionModel);
             gcWriter.exportCodeLists(SubsetModel);
         }
@@ -1085,15 +1084,11 @@ public class NiemUmlModel {
     //@SuppressWarnings("unchecked")
     public void exportXmlCatalog() {
 
-        String projectDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
-        String exportXmlCatalog = properties.getProperty(ProjectProperties.EXPORT_XML_CATALOG);
 
         try {
-            if (exportXmlCatalog.equals("true")) {
-                // export catalog file
-                XmlWriter xmlWriter = new XmlWriter(projectDir);
-                xmlWriter.exportXmlCatalog();
-            }
+            // export catalog file
+            XmlWriter xmlWriter = new XmlWriter();
+            xmlWriter.exportXmlCatalog();
         } catch (IOException e) {
             Log.trace("exportXmlCatalog: error creating XML catalog file " + e.toString());
         }
@@ -1104,16 +1099,12 @@ public class NiemUmlModel {
      */
     //@SuppressWarnings("unchecked")
     public void exportMpdCatalog() {
-        String projectDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
-        String exportMpdCatalog = properties.getProperty(ProjectProperties.EXPORT_MPD_CATALOG);
 
         try {
-            if (exportMpdCatalog.equals("true")) {
-                // export catalog file
-                XmlWriter xmlWriter = new XmlWriter(projectDir);
-                cacheMessages();
-                xmlWriter.exportMpdCatalog(messages.keySet());
-            }
+            // export catalog file
+            XmlWriter xmlWriter = new XmlWriter();
+            cacheMessages();
+            xmlWriter.exportMpdCatalog(messages.keySet());
         } catch (IOException e) {
             Log.trace("exportMpdCatalog: error creating MPD catalog file " + e.toString());
         }
@@ -1125,77 +1116,27 @@ public class NiemUmlModel {
     //@SuppressWarnings("unchecked")
     public void exportOpenApis() {
 
-    }
-
-    /**
-     * exports a WSDL documents
-     */
-    //@SuppressWarnings("unchecked")
-    public void exportWsdls() {
-
-        Log.start("exportWsdls");
-        /*
-		 * cacheExternalSchemas(); cacheModel(referencePackage);
-		 * cacheModel(subsetPackage); cacheModel(extensionPackage);
-         */
-        // export code lists for extension elements
-        //String exportCmf = properties.getProperty(ProjectProperties.EXPORT_CMF);
-        String exportXsd = properties.getProperty(ProjectProperties.EXPORT_XSD);
-        String exportJson = properties.getProperty(ProjectProperties.EXPORT_JSON);
-        //String exportCmfToXsd = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_XSD);
-        //String exportCmfToJson = properties.getProperty(ProjectProperties.EXPORT_CMF_TO_JSON);
-        String exportWsdl = properties.getProperty(ProjectProperties.EXPORT_WSDL);
-        String exportOpenApi = properties.getProperty(ProjectProperties.EXPORT_OPENAPI);
-
-        String xmlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator
-                + properties.getProperty(ProjectProperties.EXPORT_XSD_DIR);
-
-        // Verify XML directory exists
-        Path xmlPath = Paths.get(xmlDir);
-        if (!Files.exists(xmlPath)) {
-            Log.debug("exportWSDLs: XML directory does not exist, creating " + xmlDir);
-            try {
-                Files.createDirectories(xmlPath);
-            } catch (IOException e) {
-                Log.trace("exportWSDLs: error creating XML directory " + e.toString());
-                return;
-            }
-        }
-        /* XmlWriter xmlWriter = new XmlWriter(xmlDir);
-
-        try {
-//            if (exportXsd.equals("true") && exportCmfToXsd.equals("false")) {
-            if (exportXsd.equals("true")) {
-                // export catalog file
-                xmlWriter.exportXmlCatalog();
-            }
-        } catch (IOException e) {
-            Log.trace("exportWSDLs: error creating XML catalog file " + e.toString());
-        } */
+        Log.start("exportOpenApis");
 
         // cache messages and ports
         cacheMessages();
 
         TreeSet<String> jsonDefinitions = new TreeSet<>();
         TreeSet<String> jsonDefinitions2 = new TreeSet<>();
-        String jsonFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator
-                + properties.getProperty(ProjectProperties.EXPORT_JSON_SCHEMA_FILE);
-        String jsonDir = Paths.get(jsonFile).getParent().toString();
+        String openApiDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + properties.getProperty(ProjectProperties.EXPORT_OPENAPI_DIR);
 
-        // Verify JSON directory exists
-        Path jsonPath = Paths.get(jsonFile);
-        if (!Files.exists(jsonPath)) {
-            Log.debug("exportWSDLs: JSON directory does not exist, creating " + jsonFile);
+        // Verify OpenAPI directory exists
+        Path openApiPath = Paths.get(openApiDir);
+        if (!Files.exists(openApiPath)) {
+            Log.debug("exportOpenApis: OpenAPI directory does not exist, creating " + openApiDir);
             try {
-                Files.createDirectories(jsonPath);
+                Files.createDirectories(openApiPath);
             } catch (IOException e) {
-                Log.trace("exportWSDLs: error creating JSON directory " + e.toString());
+                Log.trace("exportOpenApis: error creating OpenAPI directory " + e.toString());
                 return;
             }
         }
-        //if (jsonDir != null) {
-        //    jsonDefinitions.addAll(SubsetModel.exportSchemas(null, jsonDir));
-        //}
+        //jsonDefinitions.addAll(SubsetModel.exportSchemas(null, jsonDir));
         jsonDefinitions.addAll(ExtensionModel.exportSchemas(properties));
         // swagger code generation tools do not support relative references, rename them to local references
 
@@ -1207,67 +1148,44 @@ public class NiemUmlModel {
             }
         }
 
-        if (exportXsd.equals("true")) {
-            /* 
-            if (exportCmfToXsd.equals("false")) {
-                try {
+        try {
+            JsonWriter jsonWriter = new JsonWriter();
+            jsonWriter.exportOpenApi(ports, messageNamespaces, jsonDefinitions2);
+        } catch (IOException e) {
+            Log.trace("exportOpenAPI: error exporting OpenAPI files " + e.toString());
+        }
+        Log.stop("exportOpenApis");
+    }
 
-                    xmlWriter.exportMpdCatalog(messages.keySet(), properties);
-                } catch (IOException e) {
-                    Log.trace("exportAPIs: error exporting MPD catalog " + e.toString());
-                }
-            }
-             */
-            if (exportWsdl.equals("true")) {
-                try {
-                    String wsdlDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator
-                            + properties.getProperty(ProjectProperties.EXPORT_WSDL_DIR);
-                    XmlWriter xmlWriter = new XmlWriter(xmlDir);
-                    xmlWriter.exportWSDL(wsdlDir, ports, messageNamespaces);
-                } catch (IOException e) {
-                    Log.trace("exportWSDLs: error exporting WSDL " + e.toString());
-                }
-            }
+    /**
+     * exports WSDL documents
+     */
+    //@SuppressWarnings("unchecked")
+    public void exportWsdls() {
+
+        Log.start("exportWsdls");
+  
+        // cache messages and ports
+        cacheMessages();
+
+        try {
+            XmlWriter xmlWriter = new XmlWriter();
+            xmlWriter.exportWSDL(ports, messageNamespaces);
+        } catch (IOException e) {
+            Log.trace("exportWSDLs: error exporting WSDL " + e.toString());
         }
-        if (exportJson.equals("true")) {
-            //if (exportCmfToJson.equals("false")) {
-            try {
-                if (exportOpenApi.equals("true")) {
-                    JsonWriter jsonWriter = new JsonWriter(jsonDir);
-                    jsonWriter.exportOpenApi(properties, ports, messageNamespaces, jsonDefinitions2);
-                }
-            } catch (IOException e) {
-                Log.trace("exportOpenAPI: error exporting OpenAPI files " + e.toString());
-            }
-            //}
-        }
-        //if (exportCmf.equals("true"))
-        //    exportCmf();
-        Log.stop("exportWSDLs");
+        Log.stop("exportWsdls");
     }
 
     public void exportCmf() {
 
         Log.start("exportCmf");
-        String cmfFile = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + properties.getProperty(ProjectProperties.EXPORT_CMF_FILE);
         String cmfVersion = properties.getProperty(ProjectProperties.EXPORT_CMF_VERSION);
 
-        // Verify directory exists
-        Path cmfPath = Paths.get(cmfFile).getParent();
-        if (!Files.exists(cmfPath)) {
-            Log.debug("exportCmf: cmf directory does not exist, creating " + cmfFile);
+        if (cmfVersion != null)
             try {
-                Files.createDirectories(cmfPath);
-            } catch (IOException e) {
-                Log.trace("exportCmf: error creating cmf directory " + e.toString());
-                return;
-            }
-        }
-
-        if (cmfFile != null && cmfVersion != null)
-            try {
-            CmfWriter cmfWriter = new CmfWriter(cmfPath.toString(), cmfVersion);
-            cmfWriter.exportCmf(cmfFile);
+            CmfWriter cmfWriter = new CmfWriter(cmfVersion);
+            cmfWriter.exportCmf();
         } catch (IOException e) {
             Log.trace("exportCmf: error exporting common model format files " + e.toString());
         }

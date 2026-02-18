@@ -40,8 +40,6 @@
  * <li>Utility methods for writing XML attributes and namespaces</li>
  * </ul>
  * <p>
- * This class depends on several NIEM and UML model classes, and expects a
- * directory path for output file generation.
  *
  * @author James Cabral
  * @version 1.0
@@ -59,6 +57,7 @@ package org.cabral.niemtools;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -165,15 +164,10 @@ public class XmlWriter {
     // cache for code list namespaces
     private final Set<String> CodeListNamespaces = new HashSet<>();
 
-    // import directory
-    private final String directory;
-
     /**
-     * @param initialDirectory
      */
-    public XmlWriter(String initialDirectory) {
+    public XmlWriter() {
         super();
-        directory = initialDirectory;
     }
 
     /**
@@ -183,6 +177,7 @@ public class XmlWriter {
      */
     void exportCodeLists(NiemModel model) {
 
+        String codeListDir = NiemUmlModel.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + NiemUmlModel.getProperty(ProjectProperties.EXPORT_CODELISTS_DIR);
         String version = NiemUmlModel.getProperty(ProjectProperties.IEPD_VERSION);
         if (version == null) {
             version = "";
@@ -218,7 +213,7 @@ public class XmlWriter {
                         // export code list
                         Log.trace("exportCodeList: exporting code list " + elementName + GC_FILE_TYPE);
                         try {
-                            File file = Paths.get(directory, elementName + GC_FILE_TYPE).toFile();
+                            File file = Paths.get(codeListDir, elementName + GC_FILE_TYPE).toFile();
                             File parentFile = file.getParentFile();
                             if (parentFile != null) {
                                 parentFile.mkdirs();
@@ -297,7 +292,7 @@ public class XmlWriter {
         Date date = new Date();
         String today = dateFormat.format(date);
         Log.trace("Generating MPD catalog");
-        File file = Paths.get(directory, NiemUmlModel.getProperty(ProjectProperties.EXPORT_MPD_CATALOG_FILE)).toFile();
+        File file = Paths.get(NiemUmlModel.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + NiemUmlModel.getProperty(ProjectProperties.EXPORT_MPD_CATALOG_FILE)).toFile();
         File parentFile = file.getParentFile();
         if (parentFile != null) {
             parentFile.mkdirs();
@@ -333,7 +328,8 @@ public class XmlWriter {
                     + "</nc:OrganizationPrimaryContactInformation>" + "</nc:EntityOrganization>"
                     + "</c:AuthoritativeSource>" + "<c:CreationDate>" + today + "</c:CreationDate>" + "<c:StatusText>"
                     + NiemUmlModel.getProperty(ProjectProperties.IEPD_STATUS) + "</c:StatusText>" + "</c:MPDInformation>");
-            Path p2 = Paths.get(directory, NiemUmlModel.getProperty(ProjectProperties.EXPORT_MPD_CATALOG_FILE)).getParent();
+            //Path p2 = Paths.get(directory, NiemUmlModel.getProperty(ProjectProperties.EXPORT_MPD_CATALOG_FILE)).getParent();
+            Path p2 = parentFile.toPath();
             if (messages != null) {
                 for (String message : messages) {
                     UmlClassInstance element;
@@ -428,10 +424,24 @@ public class XmlWriter {
      * @param messageNamespaces
      * @throws IOException
      */
-    void exportWSDL(String wsdlDir, Map<String, UmlClass> ports, Set<String> messageNamespaces) throws IOException {
+    void exportWSDL(Map<String, UmlClass> ports, Set<String> messageNamespaces) throws IOException {
 
         String WSDLURI = NiemUmlModel.getProperty(ProjectProperties.EXPORT_URI) + WSDL_SUFFIX;
         String WRAPPERURI = NiemUmlModel.getProperty(ProjectProperties.EXPORT_URI) + "/" + MESSAGE_WRAPPERS_FILE_NAME;
+        String wsdlDir = NiemUmlModel.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + NiemUmlModel.getProperty(ProjectProperties.EXPORT_WSDL_DIR);
+        String xsdDir = NiemUmlModel.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + NiemUmlModel.getProperty(ProjectProperties.EXPORT_XSD_DIR);
+        
+        // Verify WSDL directory exists
+        Path wsdlPath = Paths.get(wsdlDir);
+        if (!Files.exists(wsdlPath)) {
+            Log.debug("exportWSDLs: WSDL directory does not exist, creating " + wsdlDir);
+            try {
+                Files.createDirectories(wsdlPath);
+            } catch (IOException e) {
+                Log.trace("exportWSDLs: error creating WSDL directory " + e.toString());
+                return;
+            }
+        }
 
         Log.trace("Generating document/literal wrapper schema");
         TreeSet<String> xmlTypes = new TreeSet<>();
@@ -563,7 +573,7 @@ public class XmlWriter {
         ns.setFilepath(WRAPPER_PREFIX + XSD_FILE_TYPE);
         NamespaceModel.addPrefix(WRAPPER_PREFIX, WRAPPERURI);
         messageNamespaces.add(WRAPPER_PREFIX);
-        String filename = Paths.get(directory, MESSAGE_WRAPPERS_FILE_NAME + XmlWriter.XSD_FILE_TYPE).toString();
+        String filename = Paths.get(xsdDir, MESSAGE_WRAPPERS_FILE_NAME + XmlWriter.XSD_FILE_TYPE).toString();
         exportXmlSchema(filename, WRAPPERURI, xmlTypes, xmlElements, messageNamespaces);
 
         Log.trace("Generating WSDLs");
@@ -598,17 +608,17 @@ public class XmlWriter {
                     Path p3;
                     String s3 = "";
                     try {
-                        p2 = Paths.get(directory, path2);
+                        p2 = Paths.get(xsdDir, path2);
                         p3 = p1.getParent().relativize(p2);
                         s3 = p3.toString().replace('\\', '/');
                     } catch (Exception e1) {
                         Log.trace("exportWSDL: No relative path from " + path1 + " to " + path2 + " " + e1.toString());
                     }
                     wsdl.write("<wsp:UsingPolicy wsdl:required=\"true\"/>" + "<wsp:Policy wsu:Id=\"" + WSP_POLICY + "\">"
-                            + "<wsrmp:RMAssertion/>" + "</wsp:Policy>" + "<wsdl:types>" + "<xsd:schema>"
-                            //					+ "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + p3.toString() + "\"/>"
-                            + "<xsd:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + s3 + "\"/>"
-                            + "</xsd:schema>" + "</wsdl:types>");
+                            + "<wsrmp:RMAssertion/>" + "</wsp:Policy>" + "<wsdl:types>" + "<xs:schema>"
+                            //					+ "<xs:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + p3.toString() + "\"/>"
+                            + "<xs:import namespace=\"" + WRAPPERURI + "\" schemaLocation=\"" + s3 + "\"/>"
+                            + "</xs:schema>" + "</wsdl:types>");
                     wsdl.write("<!-- messages -->");
                     if (port.children() != null) {
                         for (UmlItem item : port.children()) {
@@ -673,7 +683,7 @@ public class XmlWriter {
     void exportXmlCatalog() throws IOException {
         FileWriter xml;
         Log.trace("Generating XML catalog");
-        File file = Paths.get(directory, NiemUmlModel.getProperty(ProjectProperties.EXPORT_XML_CATALOG_FILE)).toFile();
+        File file = Paths.get(NiemUmlModel.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + NiemUmlModel.getProperty(ProjectProperties.EXPORT_XML_CATALOG_FILE)).toFile();
         File parentFile = file.getParentFile();
         if (parentFile != null) {
             parentFile.mkdirs();
@@ -837,6 +847,7 @@ public class XmlWriter {
      */
     void exportXmlSchema(String filename, String nsSchemaURI, TreeSet<String> xmlTypes, TreeSet<String> xmlElements,
             Set<String> schemaNamespaces) {
+            String xsdDir = NiemUmlModel.getProperty(ProjectProperties.EXPORT_PROJECT_DIR) + File.separator + NiemUmlModel.getProperty(ProjectProperties.EXPORT_XSD_DIR);
         try {
             Log.debug("exportXMLSchema: exporting " + filename);
             File file = new File(filename);
@@ -901,7 +912,7 @@ public class XmlWriter {
                             Path p2 = null;
                             Path p3 = null;
                             try {
-                                p2 = Paths.get(directory, ns2.getFilepath());
+                                p2 = Paths.get(xsdDir, ns2.getFilepath());
                                 p3 = path1.relativize(p2);
                             } catch (Exception e1) {
                                 if (p2 != null) {

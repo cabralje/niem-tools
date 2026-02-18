@@ -295,7 +295,7 @@ class CmfToolAdapter {
             }
         }
 
-        // Export CMF to XSD
+        // Export CMF to Json
         String execCommandXsd
                 = properties.getProperty(ProjectProperties.EXPORT_CMFTOOL_TO_JSON) + " "
                 + jsonFile + " " + cmfFile + " ";
