@@ -239,7 +239,7 @@ public class ProjectProperties extends Properties {
         defaults.setProperty(EXPORT_WSDL_DIR,"xml\\wsdl");
         defaults.setProperty(EXPORT_OPENAPI_DIR,"json");
         defaults.setProperty(EXPORT_MAPPING_FILE,"model\\mapping\\niem-mapping.csv");
-        defaults.setProperty(EXPORT_WANTLIST_FILE,"model\\mapping\\wantlist");
+        defaults.setProperty(EXPORT_WANTLIST_FILE,"model\\mapping\\wantlist.xml");
         defaults.setProperty(EXPORT_CODELISTS_DIR,"codelists");
 
         // logging defaults

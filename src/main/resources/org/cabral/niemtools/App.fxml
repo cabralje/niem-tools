@@ -301,6 +301,7 @@
                               <Button fx:id="MpdCatalogButton" onAction="#publishMpdCatalog" text="MPD Catalog" />
                               <Button fx:id="WsdlButton" onAction="#publishWsdl" text="WSDL" />
                               <Button fx:id="OpenApiButton" onAction="#publishOpenApi" text="OpenAPI" />
+                              <Button fx:id="WantlistButton" onAction="#publishWantlist" text="Wantlist" />
                            </items>
                         </ToolBar>
                      </children>

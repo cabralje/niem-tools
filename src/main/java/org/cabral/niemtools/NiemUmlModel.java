@@ -205,7 +205,7 @@ public class NiemUmlModel {
     /**
      * @return NIEM version as a String
      */
-    public static String getNiemVersion() {
+    public static String getNiemVersion(boolean majorOnly) {
         //String niemVersion = NIEM_VERSION_DEFAULT;
         String niemVersion = UmlPackage.getProject().propertyValue(ProjectProperties.IMPORT_NIEM_VERSION);
         if (niemVersion != null && niemVersion.contains("-")) {
@@ -213,7 +213,7 @@ public class NiemUmlModel {
         }
 
         // Only use NIEM major versions
-        if (niemVersion != null && !niemVersion.isEmpty()) {
+        if (majorOnly && niemVersion != null && !niemVersion.isEmpty()) {
             String[] parts = niemVersion.split("\\.");
             if (parts.length > 0) {
                 niemVersion = parts[0] + ".0";
@@ -1241,7 +1241,7 @@ public class NiemUmlModel {
                 fw.write(XmlWriter.XML_HEADER);
                 //fw.write(XmlWriter.XML_ATTRIBUTION);
                 fw.write(properties.getProperty(ProjectProperties.EXPORT_ATTRIBUTION));
-                fw.write("<w:WantList w:release=\"" + getNiemVersion()
+                fw.write("<w:WantList w:release=\"" + getNiemVersion(false)
                         + "\" w:product=\"NIEM\" w:nillableDefault=\"true\" ");
                 UmlPackage modelPackage = SubsetModel.getModelPackage();
                 if (modelPackage == null) {

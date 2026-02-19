@@ -138,6 +138,9 @@ public class AppController {
     private TableColumn<String[], String> URLColumn;
 
     @FXML
+    private Button WantlistButton;
+
+    @FXML
     private Button WsdlButton;
 
     @FXML
@@ -757,9 +760,11 @@ public class AppController {
     }
 
     public void updateProjectDirectory(String newDir) {
-        properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, newDir);
-        properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, newDir + File.separator + "model" + File.separator + "mapping" + File.separator + "niem-mapping.csv");
-        properties.setProperty(ProjectProperties.EXPORT_HTML_DIR, newDir + File.separator + "model" + File.separator + "html");
+        if (newDir != null && !newDir.isEmpty()) {
+            properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, newDir);
+            properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, newDir + File.separator + "model" + File.separator + "mapping" + File.separator + "niem-mapping.csv");
+            properties.setProperty(ProjectProperties.EXPORT_HTML_DIR, newDir + File.separator + "model" + File.separator + "html");
+        }
     }
 
     @FXML
@@ -848,6 +853,29 @@ public class AppController {
                     Log.trace("\nOpenAPI documents published.\n");
                 } catch (Exception e) {
                     Log.trace("Error publishing OpenAPI documents: " + e.getMessage());
+                } finally {
+                    Platform.runLater(() -> mainControls.setDisable(false));
+                }
+                return null;
+            }
+        };
+        new Thread(task).start();
+    }
+
+    @FXML
+    void publishWantlist(ActionEvent event) {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                Platform.runLater(() -> mainControls.setDisable(true));
+                try {
+                    Log.trace("Publishing Wantlist documents to " + model.properties.getProperty(ProjectProperties.EXPORT_WANTLIST_FILE) + " ...");
+                    model.createNIEM();
+                    model.cacheModels(true);
+                    model.exportWantlist();
+                    Log.trace("\nWantlist documents published.\n");
+                } catch (Exception e) {
+                    Log.trace("Error publishing Wantlist documents: " + e.getMessage());
                 } finally {
                     Platform.runLater(() -> mainControls.setDisable(false));
                 }
@@ -1020,6 +1048,7 @@ public class AppController {
         JsonButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_JSON).equals("true"));
         MpdCatalogButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_MPD_CATALOG).equals("true"));
         OpenApiButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_OPENAPI).equals("true"));
+        WantlistButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_WANTLIST).equals("true"));
         WsdlButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_WSDL).equals("true"));
         XmlCatalogButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_XML_CATALOG).equals("true"));
         XsdButton.setVisible(properties.getProperty(ProjectProperties.EXPORT_XSD).equals("true"));

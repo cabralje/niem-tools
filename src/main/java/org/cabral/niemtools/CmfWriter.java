@@ -683,7 +683,7 @@ public class CmfWriter {
                 + tag("DocumentFilePathText", externalPath)
                 //+ tag("DocumentFilePathText", prefix)
                 + tag("NamespaceCategoryCode", namespaceCategoryCode)
-                + tag("NamespaceVersionText", NiemUmlModel.getNiemVersion());
+                + tag("NamespaceVersionText", NiemUmlModel.getNiemVersion(true));
         } else {
         // handle other namespaces
             namespaceCmf = tag("NamespaceURI", NamespaceModel.getSchemaURIForPrefix(prefix))
@@ -696,14 +696,14 @@ public class CmfWriter {
                         + tag("NamespacePrefixText", prefix)
                         + tag("ConformanceTargetURIList", NiemModel.NDR_URI + conformanceTargetURI)
                         + tag("DocumentFilePathText", path)
-                        + tag("NIEMVersionText", NiemUmlModel.getNiemVersion())
+                        + tag("NIEMVersionText", NiemUmlModel.getNiemVersion(true))
                         + tag("SchemaLanguageName", XmlWriter.XML_LANG)
                         + localTermsCmf);
             } else
                 namespaceCmf += tag("ConformanceTargetURI", NiemModel.NDR_URI + conformanceTargetURI)
                         + tag("DocumentFilePathText", path)
                         + tag("NamespaceCategoryCode", namespaceCategoryCode)
-                        + tag("ArchitectureVersionName", "NIEM" + NiemUmlModel.getNiemVersion())
+                        + tag("ArchitectureVersionName", "NIEM" + NiemUmlModel.getNiemVersion(true))
                         + tag("NamespaceLanguageName", XmlWriter.XML_LANG)
                         + augmentationCmf
                         + localTermsCmf;
