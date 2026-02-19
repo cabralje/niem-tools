@@ -66,9 +66,6 @@ public class AppController {
     private Button HtmlButton;
 
     @FXML
-    private TextField IEPDChangeLogFile;
-
-    @FXML
     private TextField IEPDContact;
 
     @FXML
@@ -84,10 +81,10 @@ public class AppController {
     private TextField IEPDOrganization;
 
     @FXML
-    private TextField IEPDReadMeFile;
+    private TextField IEPDStatus;
 
     @FXML
-    private TextField IEPDStatus;
+    private TextField IEPDTermsOfService;
 
     @FXML
     private TextField IEPDVersion;
@@ -224,13 +221,12 @@ public class AppController {
         String projectDir = properties.getProperty(ProjectProperties.EXPORT_PROJECT_DIR);
         ExportProjectDir.setText(projectDir);
         ProjectPane.setExpanded(projectDir == null || projectDir.isEmpty());
-        IEPDChangeLogFile.setText(properties.getProperty(ProjectProperties.IEPD_CHANGE_LOG_FILE));
         IEPDContact.setText(properties.getProperty(ProjectProperties.IEPD_CONTACT));
         IEPDEmail.setText(properties.getProperty(ProjectProperties.IEPD_EMAIL));
         IEPDLicense.setText(properties.getProperty(ProjectProperties.IEPD_LICENSE_URL));
         IEPDName.setText(properties.getProperty(ProjectProperties.IEPD_NAME));
         IEPDOrganization.setText(properties.getProperty(ProjectProperties.IEPD_ORGANIZATION));
-        IEPDReadMeFile.setText(properties.getProperty(ProjectProperties.IEPD_READ_ME_FILE));
+        IEPDTermsOfService.setText(properties.getProperty(ProjectProperties.IEPD_TERMS_URL));
         IEPDStatus.setText(properties.getProperty(ProjectProperties.IEPD_STATUS));
         IEPDVersion.setText(properties.getProperty(ProjectProperties.IEPD_VERSION));
         ExportURI.setText(properties.getProperty(ProjectProperties.EXPORT_URI));
@@ -243,9 +239,9 @@ public class AppController {
                 updateProjectDirectory(ExportProjectDir.getText());
             }
         });
-        IEPDChangeLogFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
+        IEPDTermsOfService.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
-                properties.setProperty(ProjectProperties.IEPD_CHANGE_LOG_FILE, IEPDChangeLogFile.getText());
+                properties.setProperty(ProjectProperties.IEPD_TERMS_URL, IEPDTermsOfService.getText());
             }
         });
         IEPDContact.focusedProperty().addListener((obs, oldVal, newVal) -> {
@@ -272,11 +268,6 @@ public class AppController {
         IEPDOrganization.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 properties.setProperty(ProjectProperties.IEPD_ORGANIZATION, IEPDOrganization.getText());
-            }
-        });
-        IEPDReadMeFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal) {
-                properties.setProperty(ProjectProperties.IEPD_READ_ME_FILE, IEPDReadMeFile.getText());
             }
         });
         IEPDStatus.focusedProperty().addListener((obs, oldVal, newVal) -> {
@@ -767,8 +758,8 @@ public class AppController {
 
     public void updateProjectDirectory(String newDir) {
         properties.setProperty(ProjectProperties.EXPORT_PROJECT_DIR, newDir);
-        properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, newDir + "/model/mapping/niem-mapping.csv");
-        properties.setProperty(ProjectProperties.EXPORT_HTML_DIR, newDir + "/model/html");
+        properties.setProperty(ProjectProperties.EXPORT_MAPPING_FILE, newDir + File.separator + "model" + File.separator + "mapping" + File.separator + "niem-mapping.csv");
+        properties.setProperty(ProjectProperties.EXPORT_HTML_DIR, newDir + File.separator + "model" + File.separator + "html");
     }
 
     @FXML

@@ -80,6 +80,55 @@
                   </GridPane>
                </content>
             </Tab>
+            <Tab text="Message Package">
+               <content>
+                  <GridPane>
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="XML examples">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                        </Label>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="JSON examples" GridPane.rowIndex="1">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                        </Label>
+                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Readme" GridPane.rowIndex="3">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                        </Label>
+                        <TextField fx:id="ExportXMLDir" onAction="#setProjectProperty" GridPane.columnIndex="1" />
+                        <TextField fx:id="ExportJSONDir" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <TextField fx:id="IEPDReadMeFile" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="ChangeLog" GridPane.rowIndex="4">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                        </Label>
+                        <TextField fx:id="IEPDChangeLogFile" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                        <Label alignment="CENTER_RIGHT" maxWidth="1.7976931348623157E308" text="Conformance Assertion" GridPane.rowIndex="2">
+                           <padding>
+                              <Insets right="10.0" />
+                           </padding>
+                        </Label>
+                        <TextField fx:id="IEPDConformanceFile" onAction="#setProjectProperty" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                     </children>
+                  </GridPane>
+               </content>
+            </Tab>
             <Tab text="cmftool">
                <content>
                   <GridPane>

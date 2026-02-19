@@ -43,6 +43,9 @@ public class PreferencesDialogController {
     private CheckBox ExportJSON;
 
     @FXML
+    private TextField ExportJSONDir;
+
+    @FXML
     private TextField ExportJSONSchemaFile;
 
     @FXML
@@ -76,6 +79,9 @@ public class PreferencesDialogController {
     private TextField ExportXmlCatalogFile;
 
     @FXML
+    private TextField ExportXMLDir;
+
+    @FXML
     private CheckBox ExportXSD;
 
     @FXML
@@ -86,6 +92,15 @@ public class PreferencesDialogController {
 
     @FXML
     private TextField ExportXSDModelDir;
+
+    @FXML
+    private TextField IEPDChangeLogFile;
+
+    @FXML
+    private TextField IEPDConformanceFile;
+
+    @FXML
+    private TextField IEPDReadMeFile;
 
     @FXML
     private CheckBox LogDebug;
@@ -206,6 +221,42 @@ public class PreferencesDialogController {
         niemmapping.focusedProperty().addListener((obs, oldVal, newVal) -> {
             if (!newVal) {
                 setProjectProperty(new ActionEvent(niemmapping, null));
+            }
+        });
+
+        // Message Package tab
+        ExportXMLDir.setText(properties.getProperty(ProjectProperties.EXPORT_XML_DIR));
+        ExportXMLDir.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportXMLDir, null));
+            }
+        });
+
+        ExportJSONDir.setText(properties.getProperty(ProjectProperties.EXPORT_JSON_DIR));
+        ExportJSONDir.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(ExportJSONDir, null));
+            }
+        });
+
+        IEPDConformanceFile.setText(properties.getProperty(ProjectProperties.IEPD_CONFORMANCE_ASSERTION_FILE));
+        IEPDConformanceFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(IEPDConformanceFile, null));
+            }
+        });
+
+        IEPDChangeLogFile.setText(properties.getProperty(ProjectProperties.IEPD_CHANGE_LOG_FILE));
+        IEPDChangeLogFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(IEPDChangeLogFile, null));
+            }
+        });
+        
+        IEPDReadMeFile.setText(properties.getProperty(ProjectProperties.IEPD_READ_ME_FILE));
+        IEPDReadMeFile.focusedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal) {
+                setProjectProperty(new ActionEvent(IEPDReadMeFile, null));
             }
         });
 
