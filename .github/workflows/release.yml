@@ -40,7 +40,7 @@ jobs:
       - name: Stamp version from tag
         run: |
           mvn --batch-mode versions:set -DnewVersion=${{ steps.version.outputs.version }} -DgenerateBackupPoms=false
-          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+          npm pkg set version=${{ steps.version.outputs.version }}
 
       - name: Decode signing keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > /tmp/niemtools-signing.p12
