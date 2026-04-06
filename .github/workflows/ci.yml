@@ -33,6 +33,10 @@ jobs:
       - name: Compile and test
         run: mvn --batch-mode compile test
 
+      - name: Get project version
+        id: project
+        run: echo "version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> "$GITHUB_OUTPUT"
+
       - name: Generate Maven SBOM
         run: mvn --batch-mode org.cyclonedx:cyclonedx-maven-plugin:2.8.0:makeAggregateBom
 
@@ -42,8 +46,9 @@ jobs:
       - name: Scan SBOM for vulnerabilities (Grype)
         uses: anchore/scan-action@v3
         with:
-          sbom: target/niemtools-*-sbom.json
+          sbom: target/niemtools-${{ steps.project.outputs.version }}-sbom.json
           fail-build: false
+          update-db: true
 
       - name: Upload SBOMs
         uses: actions/upload-artifact@v4

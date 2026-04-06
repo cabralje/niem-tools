@@ -61,6 +61,7 @@ jobs:
         with:
           sbom: target/niemtools-${{ steps.version.outputs.version }}-sbom.json
           fail-build: false
+          update-db: true
 
       - name: Verify JAR signature
         run: jarsigner -verify target/niemtools.jar
