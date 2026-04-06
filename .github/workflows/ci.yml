@@ -10,7 +10,7 @@ jobs:
   build-and-sbom:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
@@ -43,6 +43,16 @@ jobs:
       - name: Generate npm SBOM
         run: npm sbom --sbom-format cyclonedx --package-lock-only > sbom-npm.cdx.json
 
+      - name: Publish SBOM to GitHub dependency graph
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: target/github-dependency-graph.spdx.json
+          dependency-snapshot: true
+          upload-artifact: false
+          upload-release-assets: false
+
       - name: Scan SBOM for vulnerabilities (Grype)
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
@@ -54,6 +64,7 @@ jobs:
         with:
           name: sboms
           path: |
+            target/github-dependency-graph.spdx.json
             target/niemtools-*-sbom.xml
             target/niemtools-*-sbom.json
             sbom-npm.cdx.json
