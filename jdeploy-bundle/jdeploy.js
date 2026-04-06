@@ -3,7 +3,7 @@
 var path = require('path');
 var os = require('os');
 var jdeployHomeDir = process.env.JDEPLOY_HOME || path.join(os.homedir(), '.jdeploy');
-var jarName = "niemtools-2.0.jar";
+var jarName = "niemtools.jar";
 var mainClass = "{{MAIN_CLASS}}";
 var classPath = "{{CLASSPATH}}";
 var port = "0";

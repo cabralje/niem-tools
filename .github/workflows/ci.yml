@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [ "master", "dev" ]
+  pull_request:
+    branches: [ "master", "dev" ]
+
+jobs:
+  build-and-sbom:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Compile and test
+        run: mvn --batch-mode compile test
+
+      - name: Generate Maven SBOM
+        run: mvn --batch-mode org.cyclonedx:cyclonedx-maven-plugin:2.8.0:makeAggregateBom
+
+      - name: Generate npm SBOM
+        run: npm sbom --sbom-format cyclonedx --package-lock-only > sbom-npm.cdx.json
+
+      - name: Scan SBOM for vulnerabilities (Grype)
+        uses: anchore/scan-action@v3
+        with:
+          sbom: target/niemtools-*-sbom.json
+          fail-build: false
+
+      - name: Upload SBOMs
+        uses: actions/upload-artifact@v4
+        with:
+          name: sboms
+          path: |
+            target/niemtools-*-sbom.xml
+            target/niemtools-*-sbom.json
+            sbom-npm.cdx.json
+          retention-days: 30

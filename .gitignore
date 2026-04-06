@@ -27,6 +27,7 @@ replay_pid*
 */target/**
 target/
 !niemtools-bouml.jar
+!jdeploy-bundle/niemtools.jar
 
 pom.xml.tag
 pom.xml.releaseBackup
@@ -73,4 +74,9 @@ package-lock.json
 dist/*.tar.gz
 dist/*.tar.bz2
 dist/*.zip
+
+# Code signing — never commit keystores or encoded secrets
+*.p12
+*.p12.b64
+*.jks
 
