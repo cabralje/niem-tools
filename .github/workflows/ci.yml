@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ "master", "dev" ]
+    branches: [ "master" ]
   pull_request:
     branches: [ "master", "dev" ]
 
@@ -44,11 +44,10 @@ jobs:
         run: npm sbom --sbom-format cyclonedx --package-lock-only > sbom-npm.cdx.json
 
       - name: Scan SBOM for vulnerabilities (Grype)
-        uses: anchore/scan-action@v3
-        with:
-          sbom: target/niemtools-${{ steps.project.outputs.version }}-sbom.json
-          fail-build: false
-          update-db: true
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+          grype db update
+          grype sbom:target/niemtools-${{ steps.project.outputs.version }}-sbom.json || true
 
       - name: Upload SBOMs
         uses: actions/upload-artifact@v4
