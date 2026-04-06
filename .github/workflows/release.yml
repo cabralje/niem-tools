@@ -85,5 +85,6 @@ jobs:
 
       - name: Publish to npm with provenance
         run: |
-          npm config delete //registry.npmjs.org/:_authToken
           npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
