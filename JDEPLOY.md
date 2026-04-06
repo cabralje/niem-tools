@@ -160,3 +160,15 @@ Previously, users had to:
 3. Configure the environment
 
 With jDeploy, this is now automated through npm package installation, making it much easier for users to install and use niem-tools.
+
+## Release Process
+
+When you're ready to merge to master and cut a release. the steps are:
+
+- `git checkout master`
+- `git merge dev`
+- `git push origin master`
+- `git tag <version>` (e.g., v2.0.8)
+- `git push origin <version>`
+
+That last push will trigger the release workflow — build, sign, SBOM, Grype scan, GitHub Release, and `npm publish`.
