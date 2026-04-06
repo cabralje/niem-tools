@@ -36,6 +36,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install npm dependencies
         run: npm install
@@ -83,4 +84,6 @@ jobs:
             sbom-npm.cdx.json
 
       - name: Publish to npm with provenance
-        run: npm publish --provenance --access public
+        run: |
+          npm config delete //registry.npmjs.org/:_authToken
+          npm publish --provenance --access public
